@@ -20,8 +20,8 @@ public:
   virtual ~LikelihoodAnalysis();
   //! find the cut on LH that equals the electron ID with cuts (standard egamma)
   float findEquivalentLHCut();
-  //! find the cut on LH that equals the electron ID with cuts (custom)
-  float findEquivalentLHCut(const char *fileCuts, const char *fileSwitches);
+  //! find the cut on LH that gives a wanted efficiency
+  float findEquivalentLHCut(float wantEfficiency);
   //! reproduce the egamma cut based ID (for debugging)
   void reproduceEgammaCutID();
   //! produce the ID efficiency eta/pT distributions
