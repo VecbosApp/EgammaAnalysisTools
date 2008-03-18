@@ -67,7 +67,9 @@ int main(int argc, char* argv[]) {
 #if Application == 1
 
   LikelihoodAnalysis analysis(theChain);
-  analysis.reproduceEgammaCutID();
+  //  analysis.reproduceEgammaCutID();
+  //  analysis.findEquivalentLHCut( 0.957 );
+  analysis.estimateIDEfficiency();
 
 #endif
 
