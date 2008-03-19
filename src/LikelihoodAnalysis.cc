@@ -108,7 +108,8 @@ void LikelihoodAnalysis::reproduceEgammaCutID() {
       EgammaLooseCutBasedID.SetEOverPin( eleCorrEoPEle[iele] );
       EgammaLooseCutBasedID.SetElectronClass ( eleClassEle[iele] );
       EgammaLooseCutBasedID.SetEgammaCutBasedID ( eleIdCutBasedEle[iele] );
-      
+      EgammaLooseCutBasedID.SetLikelihood( eleLikelihoodEle[iele] );      
+
       bool isEleIDCutBased = EgammaLooseCutBasedID.output();
 
       if( isEleIDCutBased ) iSelected=iele;
@@ -166,10 +167,10 @@ void LikelihoodAnalysis::estimateIDEfficiency() {
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     // to have only BARREL
-//     if (fabs(etaMc[indexeplus]) < 1.476) GenEta->Fill(etaMc[indexeplus]);
-//     if (fabs(etaMc[indexeminus]) < 1.476) GenEta->Fill(etaMc[indexeminus]);
-//     if (fabs(etaMc[indexeplus]) < 1.476) GenPt->Fill(pMc[indexeplus] * fabs(sin(thetaMc[indexeplus])));
-//     if (fabs(etaMc[indexeminus]) < 1.476) GenPt->Fill(pMc[indexeminus] * fabs(sin(thetaMc[indexeminus])));
+    //     if (fabs(etaMc[indexeplus]) < 1.476) GenEta->Fill(etaMc[indexeplus]);
+    //     if (fabs(etaMc[indexeminus]) < 1.476) GenEta->Fill(etaMc[indexeminus]);
+    //     if (fabs(etaMc[indexeplus]) < 1.476) GenPt->Fill(pMc[indexeplus] * fabs(sin(thetaMc[indexeplus])));
+    //     if (fabs(etaMc[indexeminus]) < 1.476) GenPt->Fill(pMc[indexeminus] * fabs(sin(thetaMc[indexeminus])));
 
     GenEta->Fill(etaMc[indexeplus]);
     GenEta->Fill(etaMc[indexeminus]);

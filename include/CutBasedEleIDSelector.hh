@@ -27,6 +27,7 @@ public:
   void SetEOverPout(float EOverPout) { m_EOverPout = EOverPout; m_useEOverPout = true; }
   void SetEOverPin(float EOverPin) { m_EOverPin = EOverPin; m_useEOverPin = true; }
   void SetElectronClass(int electronClass) { m_electronClass = electronClass; m_electronClassInitialised = true; }
+  void SetLikelihood(float Likelihood) { m_Likelihood = Likelihood; m_useLikelihood = true; }
   //! set event by event output of egamma cut-based electron ID
   void SetEgammaCutBasedID(bool egammaCutBased) { m_egammaCutBased = egammaCutBased; m_egammaCutBasedInitialised = true; }
   //! get output of the selector
@@ -48,6 +49,7 @@ private:
   bool m_useSigmaPhiPhi;
   bool m_useEOverPout;
   bool m_useEOverPin;
+  bool m_useLikelihood;
   bool m_electronClassInitialised;
   bool m_egammaCutBasedInitialised;
 
@@ -62,6 +64,7 @@ private:
   float m_SigmaPhiPhi;
   float m_EOverPout;
   float m_EOverPin;
+  float m_Likelihood;
   int m_electronClass;
   bool m_egammaCutBased;
   

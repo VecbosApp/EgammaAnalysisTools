@@ -16,6 +16,7 @@ CutBasedEleIDSelector::CutBasedEleIDSelector() {
   m_useSigmaPhiPhi = false;
   m_useEOverPout = false;
   m_useEOverPin = false;
+  m_useLikelihood = false;
   m_electronClassInitialised = false;
   m_egammaCutBasedInitialised = false;
 
@@ -71,6 +72,7 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
     eleSelection->addCut("sigmaPhiPhi");
     eleSelection->addCut("eOverPout");
     eleSelection->addCut("eOverPin");
+    eleSelection->addCut("likelihood");
     eleSelection->summary();
   }
 
@@ -91,6 +93,7 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
   m_electronCounter.AddVar("eOverPout");
   m_electronCounter.AddVar("eOverPin");
   m_electronCounter.AddVar("finalCustomEleID");
+  m_electronCounter.AddVar("likelihood");
 
 
 }
@@ -121,6 +124,11 @@ bool CutBasedEleIDSelector::output() {
 
   if(selection->getSwitch("egammaCutBased") && 
      m_egammaCutBased ) m_electronCounter.IncrVar("egammaCutBased");
+
+  if(selection->getSwitch("likelihood") && 
+     selection->passCut("likelihood", fabs(m_Likelihood) )) {  
+    m_electronCounter.IncrVar("likelihood");
+  }
 
   // accept cracks
   if(m_electronClass != 40) {
@@ -170,7 +178,6 @@ bool CutBasedEleIDSelector::output() {
     if(selection->getSwitch("eOverPin") && 
        !selection->passCut("eOverPin", m_EOverPin)) return false; 
     m_electronCounter.IncrVar("eOverPin");
-
   }
   
   m_electronCounter.IncrVar("finalCustomEleID");
@@ -198,5 +205,6 @@ void CutBasedEleIDSelector::diplayEfficiencies() {
   m_electronCounter.Draw("eOverPout", "sigmaPhiPhi");
   m_electronCounter.Draw("eOverPin", "eOverPout");
   m_electronCounter.Draw("finalCustomEleID","electrons");
+  m_electronCounter.Draw("likelihood","electrons");
 
 }
