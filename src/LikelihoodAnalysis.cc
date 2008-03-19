@@ -419,11 +419,10 @@ void LikelihoodAnalysis::estimateFakeRate(const char *definition) {
   ElectronFakeRateEtaCutBased.AddNumerator(CutIdEta);
   ElectronFakeRateEtaCutBased.SetDenominator(FakeableJetsEta);
   ElectronFakeRateEtaCutBased.ComputeEfficiencies();
-  ElectronFakeRateEtaCutBased.SetTitle("electron efficiency vs #eta");
+  ElectronFakeRateEtaCutBased.SetTitle("jet fake probability vs #eta");
   ElectronFakeRateEtaCutBased.SetXaxisTitle("electron #eta");
-  ElectronFakeRateEtaCutBased.SetYaxisTitle("efficiency");
+  ElectronFakeRateEtaCutBased.SetYaxisTitle("jet #rightarrow fake e probability");
   ElectronFakeRateEtaCutBased.SetYaxisMin(0.0);
-  ElectronFakeRateEtaCutBased.DrawAll();
   ElectronFakeRateEtaCutBased.Write();
 
   EfficiencyEvaluator ElectronFakeRateEtaLikelihood("ElectronFakeRateEtaLikelihood.root");
@@ -433,11 +432,10 @@ void LikelihoodAnalysis::estimateFakeRate(const char *definition) {
   ElectronFakeRateEtaLikelihood.AddNumerator(LHIdEta);
   ElectronFakeRateEtaLikelihood.SetDenominator(FakeableJetsEta);
   ElectronFakeRateEtaLikelihood.ComputeEfficiencies();
-  ElectronFakeRateEtaLikelihood.SetTitle("electron efficiency vs #eta");
+  ElectronFakeRateEtaLikelihood.SetTitle("jet fake probability vs #eta");
   ElectronFakeRateEtaLikelihood.SetXaxisTitle("electron #eta");
-  ElectronFakeRateEtaLikelihood.SetYaxisTitle("efficiency");
+  ElectronFakeRateEtaLikelihood.SetYaxisTitle("jet #rightarrow fake e probability");
   ElectronFakeRateEtaLikelihood.SetYaxisMin(0.0);
-  ElectronFakeRateEtaLikelihood.DrawAll();
   ElectronFakeRateEtaLikelihood.Write();
 
   EfficiencyEvaluator ElectronFakeRatePtCutBased("ElectronFakeRatePtCutBased.root");
@@ -447,11 +445,10 @@ void LikelihoodAnalysis::estimateFakeRate(const char *definition) {
   ElectronFakeRatePtCutBased.AddNumerator(CutIdPt);
   ElectronFakeRatePtCutBased.SetDenominator(FakeableJetsPt);
   ElectronFakeRatePtCutBased.ComputeEfficiencies();
-  ElectronFakeRatePtCutBased.SetTitle("electron efficiency vs p_{T}");
+  ElectronFakeRatePtCutBased.SetTitle("jet fake probability vs p_{T}");
   ElectronFakeRatePtCutBased.SetXaxisTitle("electron p_{T} (GeV)");
-  ElectronFakeRatePtCutBased.SetYaxisTitle("efficiency");
+  ElectronFakeRatePtCutBased.SetYaxisTitle("jet #rightarrow fake e probability");
   ElectronFakeRatePtCutBased.SetYaxisMin(0.0);
-  ElectronFakeRatePtCutBased.DrawAll();
   ElectronFakeRatePtCutBased.Write();
 
   EfficiencyEvaluator ElectronFakeRatePtLikelihood("ElectronFakeRatePtLikelihood.root");
@@ -461,9 +458,9 @@ void LikelihoodAnalysis::estimateFakeRate(const char *definition) {
   ElectronFakeRatePtLikelihood.AddNumerator(LHIdPt);
   ElectronFakeRatePtLikelihood.SetDenominator(FakeableJetsPt);
   ElectronFakeRatePtLikelihood.ComputeEfficiencies();
-  ElectronFakeRatePtLikelihood.SetTitle("electron efficiency vs p_{T}");
+  ElectronFakeRatePtLikelihood.SetTitle("jet fake probability vs p_{T}");
   ElectronFakeRatePtLikelihood.SetXaxisTitle("electron p_{T}");
-  ElectronFakeRatePtLikelihood.SetYaxisTitle("efficiency");
+  ElectronFakeRatePtLikelihood.SetYaxisTitle("jet #rightarrow fake e probability");
   ElectronFakeRatePtLikelihood.SetYaxisMin(0.0);
   ElectronFakeRatePtLikelihood.DrawAll();
   ElectronFakeRatePtLikelihood.Write();
