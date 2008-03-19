@@ -69,7 +69,8 @@ int main(int argc, char* argv[]) {
   LikelihoodAnalysis analysis(theChain);
   //  analysis.reproduceEgammaCutID();
   //  analysis.findEquivalentLHCut( 0.957 );
-  analysis.estimateIDEfficiency();
+  //  analysis.estimateIDEfficiency();
+  analysis.estimateFakeRate();
 
 #endif
 
