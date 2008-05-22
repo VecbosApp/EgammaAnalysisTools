@@ -1,0 +1,12 @@
+eOverPin	-999.		999.
+deta		-0.005          0.005
+dphiIn		-0.04           0.04
+hOverE		-0.07           0.07
+s9s25		 0.7		1.0
+eOverPout	 0.5		999.
+dphiOut		-0.02		0.02
+invEminusInvP   -999.           999.
+bremFraction    -999.           999.
+sigmaEtaEta	 0.008		0.03
+sigmaPhiPhi     -999.           999.
+likelihood       0.98           1.0
