@@ -80,7 +80,6 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
   m_electronCounter.SetTitle("SINGLE ELECTRON COUNTER");
   m_electronCounter.AddVar("electrons");
   m_electronCounter.AddVar("egammaCutBased");
-  m_electronCounter.AddVar("outOfCracks");
   m_electronCounter.AddVar("hOverE");
   m_electronCounter.AddVar("s9s25");
   m_electronCounter.AddVar("deta");
@@ -130,55 +129,49 @@ bool CutBasedEleIDSelector::output() {
     m_electronCounter.IncrVar("likelihood");
   }
 
-  // accept cracks
-  if(m_electronClass != 40) {
-
-    m_electronCounter.IncrVar("outOfCracks");
-
-    if(selection->getSwitch("hOverE") && 
-       !selection->passCut("hOverE", fabs(m_HOverE) )) return false;  
-    m_electronCounter.IncrVar("hOverE");
-
-    if(selection->getSwitch("s9s25") && 
-       !selection->passCut("s9s25", m_S9S25)) return false; 
-    m_electronCounter.IncrVar("s9s25");
-
-    if(selection->getSwitch("deta") && 
-       !selection->passCut("deta", fabs(m_DEta) )) return false; 
-    m_electronCounter.IncrVar("deta");
-
-    if(selection->getSwitch("dphiIn") && 
-       !selection->passCut("dphiIn", fabs(m_DPhiIn) )) return false; 
-    m_electronCounter.IncrVar("dphiIn");
-
-    if(selection->getSwitch("dphiOut") && 
-       !selection->passCut("dphiOut", fabs(m_DPhiOut) )) return false; 
-    m_electronCounter.IncrVar("dphiOut");
-    
-    if(selection->getSwitch("invEminusInvP") && 
-       !selection->passCut("invEminusInvP", m_InvEminusInvP)) return false; 
-    m_electronCounter.IncrVar("invEminusInvP");
-    
-    if(selection->getSwitch("bremFraction") && 
-       !selection->passCut("bremFraction", m_BremFraction)) return false; 
-    m_electronCounter.IncrVar("bremFraction");
+  if(selection->getSwitch("hOverE") && 
+     !selection->passCut("hOverE", fabs(m_HOverE) )) return false;  
+  m_electronCounter.IncrVar("hOverE");
   
-    if(selection->getSwitch("sigmaEtaEta") && 
-       !selection->passCut("sigmaEtaEta", m_SigmaEtaEta)) return false; 
-    m_electronCounter.IncrVar("sigmaEtaEta");
+  if(selection->getSwitch("s9s25") && 
+     !selection->passCut("s9s25", m_S9S25)) return false; 
+  m_electronCounter.IncrVar("s9s25");
+  
+  if(selection->getSwitch("deta") && 
+     !selection->passCut("deta", fabs(m_DEta) )) return false; 
+  m_electronCounter.IncrVar("deta");
 
-    if(selection->getSwitch("sigmaPhiPhi") && 
-       !selection->passCut("sigmaPhiPhi", m_SigmaEtaEta)) return false; 
-    m_electronCounter.IncrVar("sigmaPhiPhi");
+  if(selection->getSwitch("dphiIn") && 
+     !selection->passCut("dphiIn", fabs(m_DPhiIn) )) return false; 
+  m_electronCounter.IncrVar("dphiIn");
 
-    if(selection->getSwitch("eOverPout") && 
-       !selection->passCut("eOverPout", m_EOverPout)) return false; 
-    m_electronCounter.IncrVar("eOverPout");
+  if(selection->getSwitch("dphiOut") && 
+     !selection->passCut("dphiOut", fabs(m_DPhiOut) )) return false; 
+  m_electronCounter.IncrVar("dphiOut");
+    
+  if(selection->getSwitch("invEminusInvP") && 
+     !selection->passCut("invEminusInvP", m_InvEminusInvP)) return false; 
+  m_electronCounter.IncrVar("invEminusInvP");
+    
+  if(selection->getSwitch("bremFraction") && 
+     !selection->passCut("bremFraction", m_BremFraction)) return false; 
+  m_electronCounter.IncrVar("bremFraction");
+  
+  if(selection->getSwitch("sigmaEtaEta") && 
+     !selection->passCut("sigmaEtaEta", m_SigmaEtaEta)) return false; 
+  m_electronCounter.IncrVar("sigmaEtaEta");
 
-    if(selection->getSwitch("eOverPin") && 
-       !selection->passCut("eOverPin", m_EOverPin)) return false; 
-    m_electronCounter.IncrVar("eOverPin");
-  }
+  if(selection->getSwitch("sigmaPhiPhi") && 
+     !selection->passCut("sigmaPhiPhi", m_SigmaEtaEta)) return false; 
+  m_electronCounter.IncrVar("sigmaPhiPhi");
+
+  if(selection->getSwitch("eOverPout") && 
+     !selection->passCut("eOverPout", m_EOverPout)) return false; 
+  m_electronCounter.IncrVar("eOverPout");
+
+  if(selection->getSwitch("eOverPin") && 
+     !selection->passCut("eOverPin", m_EOverPin)) return false; 
+  m_electronCounter.IncrVar("eOverPin");
   
   m_electronCounter.IncrVar("finalCustomEleID");
 
@@ -192,8 +185,7 @@ void CutBasedEleIDSelector::diplayEfficiencies() {
 
   m_electronCounter.Draw();
   m_electronCounter.Draw("egammaCutBased", "electrons");
-  m_electronCounter.Draw("outOfCracks","electrons");
-  m_electronCounter.Draw("hOverE","outOfCracks");
+  m_electronCounter.Draw("hOverE","electrons");
   m_electronCounter.Draw("s9s25","hOverE");
   m_electronCounter.Draw("deta","s9s25");
   m_electronCounter.Draw("dphiIn","deta");
