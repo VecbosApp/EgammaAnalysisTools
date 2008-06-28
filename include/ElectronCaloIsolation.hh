@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "TLorentzVector.h"
+#include "TVector3.h"
 
 class ElectronCaloIsolation {
  public:
@@ -15,7 +16,9 @@ class ElectronCaloIsolation {
   ~ElectronCaloIsolation() {}
 
   //! HCAL/ECAL towers of the event
-  void setTowers( std::vector<TLorentzVector> towers) { m_towers = towers; }
+  void setCaloTowers( std::vector<TVector3> position, 
+		      std::vector<float> emEnergy, 
+		      std::vector<float> hadEnergy);
 
   //! internal and external cones
   void setIntRadius (float intRadius) { m_intRadius = intRadius; }
@@ -27,18 +30,24 @@ class ElectronCaloIsolation {
   void setElectronMomentumAtVtx(TLorentzVector electronAtVertex) { m_electronAtVertex = electronAtVertex; }
 
   //! get the Et sums in a cone. If relative => give sumEt/pT electron
-  float getSumEt();
+  float getSumEtHcal();
+  float getSumEtEcal();
 
  private:
   
+  void getEtTowers();
+
   TLorentzVector m_electronSuperCluster;
   TLorentzVector m_electronAtVertex;
-  std::vector<TLorentzVector> m_towers;
-  
+  std::vector<TVector3> m_towersPosition;
+  std::vector<float> m_emEnergy, m_hadEnergy;
+
   float m_extRadius;
   float m_intRadius;
 
   bool m_relative;
+
+  float m_EtHcal, m_EtEcal;
 
 };
 
