@@ -22,8 +22,12 @@
 
 // Offline analysis includes
 #include "EgammaAnalysisTools/include/Application.hh"
+#include "CommonTools/include/TriggerMask.hh"
 #if Application == 1
 #include "EgammaAnalysisTools/include/LikelihoodAnalysis.hh"
+#endif
+#if Application == 2
+#include "EgammaAnalysisTools/include/LHPdfsProducer.hh"
 #endif
 
 int main(int argc, char* argv[]) {
@@ -72,6 +76,20 @@ int main(int argc, char* argv[]) {
   //  analysis.findEquivalentLHCut( 0.957 );       // loose eleID
   //  analysis.estimateIDEfficiency();
   //  analysis.estimateFakeRate();
+  
+#endif
+
+#if Application == 2
+  
+  LHPdfsProducer producer(theChain);
+  TriggerMask mask(treeCond);
+  mask.requireTrigger("HLT_Ele15_LW_L1R");
+
+  std::vector<int> requiredTriggers = mask.getBits();
+  producer.requireTrigger(requiredTriggers);
+
+  producer.Loop();
+  producer.saveHistos("ZTagAndProbePdfs.root");
 
 #endif
 
