@@ -33,8 +33,8 @@ public :
    Float_t         yMc[101];   //[nMc]
    Float_t         zMc[101];   //[nMc]
    Int_t           nTrg;
-   UChar_t         firedTrg[160];   //[nTrg]
-   UChar_t         evtPresel;
+   Bool_t          firedTrg[160];   //[nTrg]
+   Bool_t          evtPresel;
    Double_t        evtKfactor;
    Int_t           nEle;
    Int_t           chargeEle[50];   //[nEle]
@@ -135,7 +135,7 @@ public :
    Float_t         eleIsoFromDepsTkEle[50];   //[nEle]
    Float_t         eleIsoFromDepsEcalEle[50];   //[nEle]
    Float_t         eleIsoFromDepsHcalEle[50];   //[nEle]
-   UChar_t         eleIdCutBasedEle[50];   //[nEle]
+   Bool_t          eleIdCutBasedEle[50];   //[nEle]
    Float_t         eleLikelihoodEle[50];   //[nEle]
    Float_t         eleTipEle[50];   //[nEle]
    Int_t           nMuon;
