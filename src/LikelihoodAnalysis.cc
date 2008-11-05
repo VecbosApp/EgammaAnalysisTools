@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 
 #include "TVector3.h"
 #include "TH1F.h"
@@ -226,7 +227,7 @@ void LikelihoodAnalysis::estimateIDEfficiency() {
 	    
       }
 	  
-      if ( eleTrackerIso_sumPtEle[iele] < maxRelativeTrackerPtSum ) {
+      if ( eleSumPt04Ele[iele] < maxRelativeTrackerPtSum ) {
 
 	if ( !IsoFilled[matchedMcEle] ) {
 	      
@@ -359,12 +360,12 @@ void LikelihoodAnalysis::estimateFakeRate(const char *definition) {
     
     // jets are ordered in pT in the collection -> also in the tree
     // => jet 0 is the leading order one
-    for ( int jet=1; jet<nJet; jet++ ) {
+    for ( int jet=1; jet<nSisConeJet; jet++ ) {
       
-      if ( fabs(etaJet[jet]) < 2.5 && etJet[jet] > 10.0 ) {
+      if ( fabs(etaSisConeJet[jet]) < 2.5 && etSisConeJet[jet] > 10.0 ) {
 
-	FakeableJetsEta->Fill( etaJet[jet] );
-	FakeableJetsPt->Fill( etJet[jet] );
+	FakeableJetsEta->Fill( etaSisConeJet[jet] );
+	FakeableJetsPt->Fill( etSisConeJet[jet] );
 
       }
 
@@ -377,7 +378,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *definition) {
 	// remove from numerator an electron matching LO jet
 
 	TVector3 p3Ele(pxEle[iele], pyEle[iele], pzEle[iele]);
-	TVector3 p3LOJet(pxJet[0], pyJet[0], pzJet[0]);
+	TVector3 p3LOJet(pxSisConeJet[0], pySisConeJet[0], pzSisConeJet[0]);
 	float deltaR = p3Ele.DeltaR( p3LOJet );
 
 	if ( deltaR < 0.5 ) continue;
@@ -385,7 +386,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *definition) {
 	RecoEta->Fill(etaEle[iele]);
 	RecoPt->Fill(etEle[iele]);
 	
-	if ( eleTrackerIso_sumPtEle[iele] < maxRelativeTrackerPtSum ) {
+	if ( eleSumPt04Ele[iele] < maxRelativeTrackerPtSum ) {
 
 	  IsoEta->Fill(etaEle[iele]);
 	  IsoPt->Fill(etEle[iele]);
