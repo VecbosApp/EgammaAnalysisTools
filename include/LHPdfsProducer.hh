@@ -19,15 +19,17 @@ public:
   LHPdfsProducer(TTree *tree=0);
   //! destructor
   virtual ~LHPdfsProducer();
-  //! loop over events
-  void Loop();
+  //! loop over events doing signal pdfs with Zee 
+  void LoopZTagAndProbe();
+  //! loop over events doing bkg pdfs on QCD
+  void LoopQCD();
   //! set the list of the required triggers
   void requireTrigger(std::vector<int> requiredTriggers) { m_requiredTriggers = requiredTriggers; }
   //! save the pdfs in a ROOT file
   void saveHistos(const char *filename);
 
 private:
-
+  
   //! book the histograms of the PDFs
   void bookHistos();
 

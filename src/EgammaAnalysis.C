@@ -88,8 +88,11 @@ int main(int argc, char* argv[]) {
   std::vector<int> requiredTriggers = mask.getBits();
   producer.requireTrigger(requiredTriggers);
 
-  producer.Loop();
+  producer.LoopZTagAndProbe();
   producer.saveHistos("ZTagAndProbePdfs.root");
+
+//   producer.LoopQCD();
+//   producer.saveHistos("QCDPdfs.root");
 
 #endif
 
