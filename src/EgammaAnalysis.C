@@ -33,11 +33,16 @@
 int main(int argc, char* argv[]) {
 
   char inputFileName[150];
+  char outputFileName[150];
+
   if ( argc < 2 ){
-    std::cout << "missing argument: insert inputFile with list of root files" << std::endl; 
+    std::cout << "missing argument: insert at least inputFile with list of root files" << std::endl; 
+    std::cout << "EgammaAnalysis inputFile [outputFile]" << std::endl;
     return 1;
   }
   strcpy(inputFileName,argv[1]);
+  if ( argc < 3 ) sprintf(outputFileName,"pdfs.root");
+  else strcpy(outputFileName,argv[2]);
 
   // -------------------------
   // loading file:
@@ -89,10 +94,10 @@ int main(int argc, char* argv[]) {
   producer.requireTrigger(requiredTriggers);
 
   producer.LoopZTagAndProbe();
-  producer.saveHistos("ZTagAndProbePdfs.root");
+  producer.saveHistos(outputFileName);
 
 //   producer.LoopQCD();
-//   producer.saveHistos("QCDPdfs.root");
+//   producer.saveHistos(outputFileName);
 
 #endif
 
