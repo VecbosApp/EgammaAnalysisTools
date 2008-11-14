@@ -77,7 +77,7 @@ float LikelihoodAnalysis::findEquivalentLHCut(float wantEfficiency) {
 void LikelihoodAnalysis::reproduceEgammaCutID() {
 
   CutBasedEleIDSelector EgammaLooseCutBasedID;
-  EgammaLooseCutBasedID.Configure("config/"); 
+  EgammaLooseCutBasedID.Configure("config/looseEleId"); 
 
   int nEvtGoodElectron = 0;
 
@@ -322,31 +322,31 @@ void LikelihoodAnalysis::estimateIDEfficiency() {
 
 
 
-void LikelihoodAnalysis::estimateFakeRate(const char *definition) {
+void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
   // hardcoded cuts
-  float maxRelativeTrackerPtSum = 0.08;
-  float minLikelihood = 0.01;
+  float minLikelihoodTight = 0.812;
+  float minLikelihoodLoose = 0.056;
 
-  int nbinsEta = 40;
+  int nbinsEta = 60;
   float minEta = -2.5;
   float maxEta = 2.5;
     
   TH1F *FakeableJetsEta   = new TH1F( "FakeableJetsEta",  "fakeable jets #eta",     nbinsEta, minEta, maxEta );
   TH1F *RecoEta  = new TH1F( "RecoEta", "reconstructed #eta", nbinsEta, minEta, maxEta );
-  TH1F *IsoEta   = new TH1F( "IsoEta",  "isolated #eta",      nbinsEta, minEta, maxEta );
   TH1F *CutIdEta = new TH1F( "CutIdEta", "cut ID #eta",       nbinsEta, minEta, maxEta );
-  TH1F *LHIdEta  = new TH1F( "LHIdEta",  "LH ID #eta",        nbinsEta, minEta, maxEta );
+  TH1F *LHIdTightEta  = new TH1F( "LHIdTightEta",  "LH ID tight #eta",        nbinsEta, minEta, maxEta );
+  TH1F *LHIdLooseEta  = new TH1F( "LHIdLooseEta",  "LH ID loose #eta",        nbinsEta, minEta, maxEta );
 
-  int nbinsPt = 40;
+  int nbinsPt = 20;
   float minPt = 5.0;
   float maxPt = 100.;
   
   TH1F *FakeableJetsPt   = new TH1F( "FakeableJetsPt",  "fakeable jets p_{T} (GeV)",     nbinsPt, minPt, maxPt );
   TH1F *RecoPt  = new TH1F( "RecoPt", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
-  TH1F *IsoPt   = new TH1F( "IsoPt",  "isolated p_{T} (GeV)",      nbinsPt, minPt, maxPt );
   TH1F *CutIdPt = new TH1F( "CutIdPt", "cut ID p_{T} (GeV)",       nbinsPt, minPt, maxPt );
-  TH1F *LHIdPt  = new TH1F( "LHIdPt",  "LH ID p_{T} (GeV)",        nbinsPt, minPt, maxPt );
+  TH1F *LHIdTightPt  = new TH1F( "LHIdTightPt",  "LH ID tight p_{T} (GeV)",        nbinsPt, minPt, maxPt );
+  TH1F *LHIdLoosePt  = new TH1F( "LHIdLoosePt",  "LH ID loose p_{T} (GeV)",        nbinsPt, minPt, maxPt );
 
   Long64_t nbytes = 0, nb = 0;
   Long64_t nentries = fChain->GetEntries();
@@ -357,115 +357,164 @@ void LikelihoodAnalysis::estimateFakeRate(const char *definition) {
 
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
-    
-    // jets are ordered in pT in the collection -> also in the tree
-    // => jet 0 is the leading order one
-    for ( int jet=1; jet<nSisConeJet; jet++ ) {
-      
-      if ( fabs(etaSisConeJet[jet]) < 2.5 && etSisConeJet[jet] > 10.0 ) {
 
-	FakeableJetsEta->Fill( etaSisConeJet[jet] );
-	FakeableJetsPt->Fill( etSisConeJet[jet] );
+    bool tauPresence=false;
+
+    int mceleindex = -1;
+    for(int imc=0; imc<50; imc++) {
+      // not only ele from W->enu: there is enu emission (V_ud?) in madgraph
+      if ( (fabs(idMc[imc])==11) ) {
+        mceleindex=imc;
+        break;
+      }
+      // since the stable particle list is truncated, if there is a tau 
+      // not possible to say what happens...
+      if ( (fabs(idMc[imc])==15) ) {
+        tauPresence=true;
+        break;
+      }
+    }
+
+    if(tauPresence) continue;
+
+    //debug
+//     if(mceleindex==-1) {
+//       for(int imc=0; imc<20; imc++) {
+//         cout << "imc = " << imc << "\tidMc = " << idMc[imc] << "\tmothMc = " << mothMc[imc] << endl;
+//       }
+//     }
+    //enddebug
+
+    TVector3 mcEle(0,0,0);
+    if(mceleindex>-1) mcEle = TVector3(pMc[mceleindex]*cos(phiMc[mceleindex])*sin(thetaMc[mceleindex]), 
+                                       pMc[mceleindex]*sin(phiMc[mceleindex])*sin(thetaMc[mceleindex]),
+                                       pMc[mceleindex]*cos(thetaMc[mceleindex]));
+    
+//     int nJetsReco=0;
+//     int nEleReco=0;
+
+    for ( int jet=0; jet<nJet; jet++ ) {
+
+      TVector3 p3Jet(pxJet[jet],pyJet[jet],pzJet[jet]);
+
+       if ( fabs(etaJet[jet]) < 2.5 && etJet[jet] > 10.0 ) {
+        
+        float deltaR = 1000;
+        if(mceleindex>-1) deltaR = p3Jet.DeltaR(mcEle);
+
+        // remove from denominator the electron reconstructed as jet
+        if( deltaR>0.3 ) { 
+          FakeableJetsEta->Fill( etaJet[jet] );
+          FakeableJetsPt->Fill( etJet[jet] );
+          //          nJetsReco++;
+        }
 
       }
 
     }
 
-    for ( int iele=0; iele<nEle; iele++ ) {
+    for ( int ele=0; ele<nEle; ele++ ) {
       
-      if ( fabs(etaEle[iele]) < 2.5 && etEle[iele] > 10.0 ) {
-	
-	// remove from numerator an electron matching LO jet
+      if ( fabs(etaEle[ele]) < 2.5 && etEle[ele] > 10.0 ) {
 
-	TVector3 p3Ele(pxEle[iele], pyEle[iele], pzEle[iele]);
-	TVector3 p3LOJet(pxSisConeJet[0], pySisConeJet[0], pzSisConeJet[0]);
-	float deltaR = p3Ele.DeltaR( p3LOJet );
+        TVector3 p3Ele(pxEle[ele], pyEle[ele], pzEle[ele]);
+      
+        float deltaR = 1000;
+        if(mceleindex>-1) deltaR = p3Ele.DeltaR(mcEle);
+        
+        if(deltaR<0.3) continue;
 
-	if ( deltaR < 0.5 ) continue;
+        float dREleJet_min = 1000;
+        int closestJet=-1;
 
-	RecoEta->Fill(etaEle[iele]);
-	RecoPt->Fill(etEle[iele]);
-	
-	if ( eleSumPt04Ele[iele] < maxRelativeTrackerPtSum ) {
+        for ( int jet=0; jet<nJet; jet++ ) {
 
-	  IsoEta->Fill(etaEle[iele]);
-	  IsoPt->Fill(etEle[iele]);
+          if ( fabs(etaJet[jet]) < 2.5 && etJet[jet] > 10.0 ) {          
 
-	  
-	  if ( eleIdCutBasedEle[iele] ) {
-	    
-	    CutIdEta->Fill(etaEle[iele]);
-	    CutIdPt->Fill(etEle[iele]);
-	    
-	  }
+            TVector3 p3Jet(pxJet[jet],pyJet[jet],pzJet[jet]);
+            
+            float dREleJet = p3Jet.DeltaR(p3Ele);
+            if(dREleJet<dREleJet_min) {
+              closestJet=jet;
+              dREleJet_min=dREleJet;
+            }
 
-	  if ( eleLikelihoodEle[iele] > minLikelihood ) {
-	    
-	    LHIdEta->Fill(etaEle[iele]);
-	    LHIdPt->Fill(etEle[iele]);
-	    
-	  }
+          }
 
-	} // isolation
+        }
 
-      } // reco acceptance
+        //        nEleReco++;
 
+        if(closestJet > -1) {
+
+          float etFake=etJet[closestJet];
+          float etaFake=etaJet[closestJet];
+
+          RecoEta->Fill(etaFake);
+          RecoPt->Fill(etFake);
+
+          if ( eleIdCutBasedEle[ele] ) {
+
+            CutIdEta->Fill(etaFake);
+            CutIdPt->Fill(etFake);
+
+          }
+
+          if ( eleLikelihoodEle[ele] > minLikelihoodLoose ) {
+
+            LHIdLooseEta->Fill(etaFake);
+            LHIdLoosePt->Fill(etFake);
+
+          }
+
+          if ( eleLikelihoodEle[ele] > minLikelihoodTight ) {
+
+            LHIdTightEta->Fill(etaFake);
+            LHIdTightPt->Fill(etFake);
+
+          }
+
+        }
+
+      } // electron acceptance & pt cut
+      
     } // loop ele
+
+    //    cout << "nEleReco = " << nEleReco << " nJetsReco = " << nJetsReco << endl;
     
   } // loop events
   
-  EfficiencyEvaluator ElectronFakeRateEtaCutBased("ElectronFakeRateEtaCutBased.root");
-  ElectronFakeRateEtaCutBased.AddNumerator(FakeableJetsEta);
-  ElectronFakeRateEtaCutBased.AddNumerator(RecoEta);
-  ElectronFakeRateEtaCutBased.AddNumerator(IsoEta);
-  ElectronFakeRateEtaCutBased.AddNumerator(CutIdEta);
-  ElectronFakeRateEtaCutBased.SetDenominator(FakeableJetsEta);
-  ElectronFakeRateEtaCutBased.ComputeEfficiencies();
-  ElectronFakeRateEtaCutBased.SetTitle("jet fake probability vs #eta");
-  ElectronFakeRateEtaCutBased.SetXaxisTitle("electron #eta");
-  ElectronFakeRateEtaCutBased.SetYaxisTitle("jet #rightarrow fake e probability");
-  ElectronFakeRateEtaCutBased.SetYaxisMin(0.0);
-  ElectronFakeRateEtaCutBased.Write();
 
-  EfficiencyEvaluator ElectronFakeRateEtaLikelihood("ElectronFakeRateEtaLikelihood.root");
-  ElectronFakeRateEtaLikelihood.AddNumerator(FakeableJetsEta);
-  ElectronFakeRateEtaLikelihood.AddNumerator(RecoEta);
-  ElectronFakeRateEtaLikelihood.AddNumerator(IsoEta);
-  ElectronFakeRateEtaLikelihood.AddNumerator(LHIdEta);
-  ElectronFakeRateEtaLikelihood.SetDenominator(FakeableJetsEta);
-  ElectronFakeRateEtaLikelihood.ComputeEfficiencies();
-  ElectronFakeRateEtaLikelihood.SetTitle("jet fake probability vs #eta");
-  ElectronFakeRateEtaLikelihood.SetXaxisTitle("electron #eta");
-  ElectronFakeRateEtaLikelihood.SetYaxisTitle("jet #rightarrow fake e probability");
-  ElectronFakeRateEtaLikelihood.SetYaxisMin(0.0);
-  ElectronFakeRateEtaLikelihood.Write();
+  char filename[200];
+  sprintf(filename,"%s-EleMisidEta.root",outname);
+  EfficiencyEvaluator ElectronFakeRateEta(filename);
+  ElectronFakeRateEta.AddNumerator(FakeableJetsEta);
+  ElectronFakeRateEta.AddNumerator(RecoEta);
+  ElectronFakeRateEta.AddNumerator(CutIdEta);
+  ElectronFakeRateEta.AddNumerator(LHIdLooseEta);
+  ElectronFakeRateEta.AddNumerator(LHIdTightEta);
+  ElectronFakeRateEta.SetDenominator(FakeableJetsEta);
+  ElectronFakeRateEta.ComputeEfficiencies();
+  ElectronFakeRateEta.SetTitle("jet fake probability vs #eta");
+  ElectronFakeRateEta.SetXaxisTitle("electron #eta");
+  ElectronFakeRateEta.SetYaxisTitle("jet #rightarrow fake e probability");
+  ElectronFakeRateEta.SetYaxisMin(0.0);
+  ElectronFakeRateEta.Write();
 
-  EfficiencyEvaluator ElectronFakeRatePtCutBased("ElectronFakeRatePtCutBased.root");
-  ElectronFakeRatePtCutBased.AddNumerator(FakeableJetsPt);
-  ElectronFakeRatePtCutBased.AddNumerator(RecoPt);
-  ElectronFakeRatePtCutBased.AddNumerator(IsoPt);
-  ElectronFakeRatePtCutBased.AddNumerator(CutIdPt);
-  ElectronFakeRatePtCutBased.SetDenominator(FakeableJetsPt);
-  ElectronFakeRatePtCutBased.ComputeEfficiencies();
-  ElectronFakeRatePtCutBased.SetTitle("jet fake probability vs p_{T}");
-  ElectronFakeRatePtCutBased.SetXaxisTitle("electron p_{T} (GeV)");
-  ElectronFakeRatePtCutBased.SetYaxisTitle("jet #rightarrow fake e probability");
-  ElectronFakeRatePtCutBased.SetYaxisMin(0.0);
-  ElectronFakeRatePtCutBased.Write();
-
-  EfficiencyEvaluator ElectronFakeRatePtLikelihood("ElectronFakeRatePtLikelihood.root");
-  ElectronFakeRatePtLikelihood.AddNumerator(FakeableJetsPt);
-  ElectronFakeRatePtLikelihood.AddNumerator(RecoPt);
-  ElectronFakeRatePtLikelihood.AddNumerator(IsoPt);
-  ElectronFakeRatePtLikelihood.AddNumerator(LHIdPt);
-  ElectronFakeRatePtLikelihood.SetDenominator(FakeableJetsPt);
-  ElectronFakeRatePtLikelihood.ComputeEfficiencies();
-  ElectronFakeRatePtLikelihood.SetTitle("jet fake probability vs p_{T}");
-  ElectronFakeRatePtLikelihood.SetXaxisTitle("electron p_{T}");
-  ElectronFakeRatePtLikelihood.SetYaxisTitle("jet #rightarrow fake e probability");
-  ElectronFakeRatePtLikelihood.SetYaxisMin(0.0);
-  ElectronFakeRatePtLikelihood.DrawAll();
-  ElectronFakeRatePtLikelihood.Write();
+  sprintf(filename,"%s-EleMisidPt.root",outname);
+  EfficiencyEvaluator ElectronFakeRatePt(filename);
+  ElectronFakeRatePt.AddNumerator(FakeableJetsPt);
+  ElectronFakeRatePt.AddNumerator(RecoPt);
+  ElectronFakeRatePt.AddNumerator(CutIdPt);
+  ElectronFakeRatePt.AddNumerator(LHIdLoosePt);
+  ElectronFakeRatePt.AddNumerator(LHIdTightPt);
+  ElectronFakeRatePt.SetDenominator(FakeableJetsPt);
+  ElectronFakeRatePt.ComputeEfficiencies();
+  ElectronFakeRatePt.SetTitle("jet fake probability vs p_{T}");
+  ElectronFakeRatePt.SetXaxisTitle("electron p_{T}");
+  ElectronFakeRatePt.SetYaxisTitle("jet #rightarrow fake e probability");
+  ElectronFakeRatePt.SetYaxisMin(0.0);
+  ElectronFakeRatePt.Write();
 
 }
 

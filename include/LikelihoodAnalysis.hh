@@ -27,7 +27,7 @@ public:
   //! produce the ID efficiency eta/pT distributions
   void estimateIDEfficiency();
   //! produce the mis-ID eta/pT distributions
-  void estimateFakeRate(const char *definition="std");
+  void estimateFakeRate(const char *outname="job0");
 
 private:
 
