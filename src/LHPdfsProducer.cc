@@ -472,7 +472,7 @@ void LHPdfsProducer::LoopWjets() {
         iclass = 1;
         ifullclass = 3;
       }
-        
+
       float sigmaEtaEta = sqrt(fabs(covEtaEtaEle[iele]));
       float sigmaEtaPhi = sqrt(fabs(covEtaPhiEle[iele]));
       float sigmaPhiPhi = sqrt(fabs(covPhiPhiEle[iele]));
@@ -507,6 +507,8 @@ void LHPdfsProducer::LoopWjets() {
       double dEta = eleDeltaEtaAtVtxEle[iele];
       double EoPout = eleCorrEoPoutEle[iele];
       double HoE = eleHoEEle[iele];
+      double dxy = eleTrackDxyEle[iele];
+      double dxySig = eleTrackDxyEle[iele]/eleTrackDxyErrorEle[iele];
 
       dPhiCaloUnsplitEle    [iecal][iptbin] -> Fill ( dPhiCalo );
       dPhiVtxUnsplitEle     [iecal][iptbin] -> Fill ( dPhiVtx );
@@ -524,7 +526,8 @@ void LHPdfsProducer::LoopWjets() {
       phiLATUnsplitEle      [iecal][iptbin] -> Fill ( phiLat );
       a20UnsplitEle         [iecal][iptbin] -> Fill ( a20 );
       a42UnsplitEle         [iecal][iptbin] -> Fill ( a42 );
-
+      dxyUnsplitEle         [iecal][iptbin] -> Fill ( dxy );
+      dxySigUnsplitEle      [iecal][iptbin] -> Fill ( dxySig );
 
       dPhiCaloClassEle    [iecal][iptbin][iclass] -> Fill ( dPhiCalo );
       dPhiVtxClassEle     [iecal][iptbin][iclass] -> Fill ( dPhiVtx );
@@ -542,6 +545,8 @@ void LHPdfsProducer::LoopWjets() {
       phiLATClassEle      [iecal][iptbin][iclass] -> Fill ( phiLat );
       a20ClassEle         [iecal][iptbin][iclass] -> Fill ( a20 );
       a42ClassEle         [iecal][iptbin][iclass] -> Fill ( a42 );
+      dxyClassEle         [iecal][iptbin][iclass] -> Fill ( dxy );
+      dxySigClassEle      [iecal][iptbin][iclass] -> Fill ( dxySig );
 
       dPhiCaloFullclassEle    [iecal][iptbin][ifullclass] -> Fill ( dPhiCalo );
       dPhiVtxFullclassEle     [iecal][iptbin][ifullclass] -> Fill ( dPhiVtx );
@@ -559,6 +564,8 @@ void LHPdfsProducer::LoopWjets() {
       phiLATFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( phiLat );
       a20FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( a20 );
       a42FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( a42 );
+      dxyFullclassEle         [iecal][iptbin][ifullclass] -> Fill ( dxy );
+      dxySigFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( dxySig );
 
     } // loop on electrons
 
@@ -605,6 +612,10 @@ void LHPdfsProducer::bookHistos() {
   float a20Max    = 1.0;
   float a42Min    = 0.0;
   float a42Max    = 1.0;
+  float dxyMin    = -0.04;
+  float dxyMax    = 0.04;
+  float dxySigMin    = -10.0;
+  float dxySigMax    = 10.0;
 
   // booking histos eleID
   // iecal = 0 --> barrel
@@ -649,6 +660,10 @@ void LHPdfsProducer::bookHistos() {
       a20UnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, a20Min, a20Max);
       sprintf(histo,"a42Unsplit_electrons_%d_%d",iecal,iptbin);
       a42UnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, a42Min, a42Max);
+      sprintf(histo,"dxyUnsplit_electrons_%d_%d",iecal,iptbin);
+      dxyUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, dxyMin, dxyMax);
+      sprintf(histo,"dxySigUnsplit_electrons_%d_%d",iecal,iptbin);
+      dxySigUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, dxySigMin, dxySigMax);
 
       // iclass = 0: non-showering
       // iclass = 1: showering
@@ -686,6 +701,10 @@ void LHPdfsProducer::bookHistos() {
 	a20ClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, a20Min, a20Max);
 	sprintf(histo,"a42Class_electrons_%d_%d_%d",iecal,iptbin,iclass);
 	a42ClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, a42Min, a42Max);
+        sprintf(histo,"dxyClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
+        dxyClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, dxyMin, dxyMax);
+        sprintf(histo,"dxySigClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
+        dxySigClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, dxySigMin, dxySigMax);
 
       }
 
@@ -728,6 +747,10 @@ void LHPdfsProducer::bookHistos() {
 	a20FullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, a20Min, a20Max);
 	sprintf(histo,"a42Fullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
 	a42FullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, a42Min, a42Max);
+        sprintf(histo,"dxyFullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
+        dxyFullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, dxyMin, dxyMax);
+        sprintf(histo,"dxySigFullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
+        dxySigFullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, dxySigMin, dxySigMax);
 
       }
 
@@ -765,6 +788,8 @@ void LHPdfsProducer::saveHistos(const char *filename) {
       phiLATUnsplitEle[iecal][iptbin]->Write();
       a20UnsplitEle[iecal][iptbin]->Write();
       a42UnsplitEle[iecal][iptbin]->Write();
+      dxyUnsplitEle[iecal][iptbin]->Write();
+      dxySigUnsplitEle[iecal][iptbin]->Write();
 
       for(int iclass=0; iclass<2; iclass++) {
       
@@ -784,6 +809,8 @@ void LHPdfsProducer::saveHistos(const char *filename) {
 	phiLATClassEle[iecal][iptbin][iclass]->Write();
 	a20ClassEle[iecal][iptbin][iclass]->Write();
 	a42ClassEle[iecal][iptbin][iclass]->Write();
+	dxyClassEle[iecal][iptbin][iclass]->Write();
+	dxySigClassEle[iecal][iptbin][iclass]->Write();
 
       }
 
@@ -805,6 +832,8 @@ void LHPdfsProducer::saveHistos(const char *filename) {
 	phiLATFullclassEle[iecal][iptbin][ifullclass]->Write();
 	a20FullclassEle[iecal][iptbin][ifullclass]->Write();
 	a42FullclassEle[iecal][iptbin][ifullclass]->Write();
+	dxyFullclassEle[iecal][iptbin][ifullclass]->Write();
+	dxySigFullclassEle[iecal][iptbin][ifullclass]->Write();
 
       }
 

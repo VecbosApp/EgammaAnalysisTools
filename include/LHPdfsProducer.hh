@@ -68,6 +68,8 @@ private:
   TH1F *phiLATUnsplitEle[2][2];
   TH1F *a20UnsplitEle[2][2];
   TH1F *a42UnsplitEle[2][2];
+  TH1F *dxyUnsplitEle[2][2];
+  TH1F *dxySigUnsplitEle[2][2];
   
   /// Electrons class-splitted
   /// histo[ecalsubdet][ptbin][class]
@@ -87,6 +89,8 @@ private:
   TH1F *phiLATClassEle[2][2][2];
   TH1F *a20ClassEle[2][2][2];
   TH1F *a42ClassEle[2][2][2];
+  TH1F *dxyClassEle[2][2][2];
+  TH1F *dxySigClassEle[2][2][2];
 
   /// Electrons fullclass-splitted
   /// histo[ecalsubdet][ptbin][fullclass]
@@ -106,6 +110,8 @@ private:
   TH1F *phiLATFullclassEle[2][2][4];
   TH1F *a20FullclassEle[2][2][4];
   TH1F *a42FullclassEle[2][2][4];
+  TH1F *dxyFullclassEle[2][2][4];
+  TH1F *dxySigFullclassEle[2][2][4];
 
 };
 
