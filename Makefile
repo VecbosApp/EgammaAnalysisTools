@@ -109,11 +109,17 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)LHPdfsProducer.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
+CompareMisId: $(INCLUDEDIR)/src/CompareMisId.C \
+	$(OUTLIBCOMMON)EfficiencyEvaluator.o
+	$(CXX) $(CXXFLAGS) -o CompareMisId $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
+
 EgammaAnalysis.clean:
 	rm -f EgammaAnalysis
 
 clean:
 	rm -f $(OUTLIB)*.o $(OUTLIBCOMMON)*.o
 	rm -f EgammaAnalysis
+	rm -f CompareMisId
 
-all:  EgammaAnalysis
+all:  EgammaAnalysis CompareMisId
+
