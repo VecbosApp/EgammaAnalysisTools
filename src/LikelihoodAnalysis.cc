@@ -496,7 +496,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   ElectronFakeRateEta.SetDenominator(FakeableJetsEta);
   ElectronFakeRateEta.ComputeEfficiencies();
   ElectronFakeRateEta.SetTitle("jet fake probability vs #eta");
-  ElectronFakeRateEta.SetXaxisTitle("electron #eta");
+  ElectronFakeRateEta.SetXaxisTitle("#eta of closest jet");
   ElectronFakeRateEta.SetYaxisTitle("jet #rightarrow fake e probability");
   ElectronFakeRateEta.SetYaxisMin(0.0);
   ElectronFakeRateEta.Write();
@@ -511,7 +511,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   ElectronFakeRatePt.SetDenominator(FakeableJetsPt);
   ElectronFakeRatePt.ComputeEfficiencies();
   ElectronFakeRatePt.SetTitle("jet fake probability vs p_{T}");
-  ElectronFakeRatePt.SetXaxisTitle("electron p_{T}");
+  ElectronFakeRatePt.SetXaxisTitle("p_{T} of closest jet [GeV]");
   ElectronFakeRatePt.SetYaxisTitle("jet #rightarrow fake e probability");
   ElectronFakeRatePt.SetYaxisMin(0.0);
   ElectronFakeRatePt.Write();
