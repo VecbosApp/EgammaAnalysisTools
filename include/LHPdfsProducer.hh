@@ -23,6 +23,8 @@ public:
   void LoopZTagAndProbe();
   //! loop over events doing bkg pdfs on QCD
   void LoopQCD();
+  //! loop over events doing bkg pdfs on W+jets
+  void LoopWjets();
   //! set the list of the required triggers
   void requireTrigger(std::vector<int> requiredTriggers) { m_requiredTriggers = requiredTriggers; }
   //! save the pdfs in a ROOT file
