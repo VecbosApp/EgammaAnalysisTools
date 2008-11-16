@@ -127,13 +127,13 @@ void LikelihoodAnalysis::reproduceEgammaCutID() {
 
 
 
-void LikelihoodAnalysis::estimateIDEfficiency() {
+void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 
   // hardcoded cuts
-  float maxRelativeTrackerPtSum = 0.08;
-  float minLikelihood = 0.01;
+  float minLikelihoodTight = 0.812;
+  float minLikelihoodLoose = 0.056;
 
-  int nbinsEta = 40;
+  int nbinsEta = 60;
   float minEta = -2.5;
   float maxEta = 2.5;
     
@@ -141,21 +141,19 @@ void LikelihoodAnalysis::estimateIDEfficiency() {
   TH1F *RecoEta  = new TH1F( "RecoEta", "reconstructed #eta", nbinsEta, minEta, maxEta );
   TH1F *IsoEta   = new TH1F( "IsoEta",  "isolated #eta",      nbinsEta, minEta, maxEta );
   TH1F *CutIdEta = new TH1F( "CutIdEta", "cut ID #eta",       nbinsEta, minEta, maxEta );
-  TH1F *LHIdEta  = new TH1F( "LHIdEta",  "LH ID #eta",        nbinsEta, minEta, maxEta );
+  TH1F *LHIdLooseEta  = new TH1F( "LHIdLooseEta",  "LH Loose ID #eta",        nbinsEta, minEta, maxEta );
+  TH1F *LHIdTightEta  = new TH1F( "LHIdTightEta",  "LH Tight ID #eta",        nbinsEta, minEta, maxEta );
 
-  int nbinsPt = 40;
-  float minPt = 5.0;
+  int nbinsPt = 20;
+  float minPt = 10.0;
   float maxPt = 100.;
   
   TH1F *GenPt   = new TH1F( "GenPt",  "generated p_{T} (GeV)",     nbinsPt, minPt, maxPt );
   TH1F *RecoPt  = new TH1F( "RecoPt", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
   TH1F *IsoPt   = new TH1F( "IsoPt",  "isolated p_{T} (GeV)",      nbinsPt, minPt, maxPt );
   TH1F *CutIdPt = new TH1F( "CutIdPt", "cut ID p_{T} (GeV)",       nbinsPt, minPt, maxPt );
-  TH1F *LHIdPt  = new TH1F( "LHIdPt",  "LH ID p_{T} (GeV)",        nbinsPt, minPt, maxPt );
-
-  // e+e- in the Z->e+e-
-  int indexeplus = 7;
-  int indexeminus = 8;
+  TH1F *LHIdLoosePt  = new TH1F( "LHIdLoosePt",  "LH Loose ID p_{T} (GeV)",        nbinsPt, minPt, maxPt );
+  TH1F *LHIdTightPt  = new TH1F( "LHIdTightPt",  "LH Tight ID p_{T} (GeV)",        nbinsPt, minPt, maxPt );
 
   Long64_t nbytes = 0, nb = 0;
   Long64_t nentries = fChain->GetEntries();
@@ -167,156 +165,101 @@ void LikelihoodAnalysis::estimateIDEfficiency() {
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
-    // to have only BARREL
-    //     if (fabs(etaMc[indexeplus]) < 1.476) GenEta->Fill(etaMc[indexeplus]);
-    //     if (fabs(etaMc[indexeminus]) < 1.476) GenEta->Fill(etaMc[indexeminus]);
-    //     if (fabs(etaMc[indexeplus]) < 1.476) GenPt->Fill(pMc[indexeplus] * fabs(sin(thetaMc[indexeplus])));
-    //     if (fabs(etaMc[indexeminus]) < 1.476) GenPt->Fill(pMc[indexeminus] * fabs(sin(thetaMc[indexeminus])));
-
-    GenEta->Fill(etaMc[indexeplus]);
-    GenEta->Fill(etaMc[indexeminus]);
-    GenPt->Fill(pMc[indexeplus] * fabs(sin(thetaMc[indexeplus])));
-    GenPt->Fill(pMc[indexeminus] * fabs(sin(thetaMc[indexeminus])));
-
-    // to avoid double counting
-    bool RecoFilled[2], IsoFilled[2], CutIdFilled[2], LHIdFilled[2];
-    for (int mcele=0; mcele<2; mcele++){
-      RecoFilled[mcele] = false;
-      IsoFilled[mcele]   = false;
-      CutIdFilled[mcele] = false;
-      LHIdFilled[mcele] = false;
+    int mceleindex = -1;
+    for(int imc=0; imc<50; imc++) {
+      if ( fabs(idMc[imc])==11 && fabs(idMc[mothMc[imc]])==24 ) mceleindex = imc;
     }
+    
+    if(mceleindex==-1) continue;
 
-    // loop over ALL reconstructed electrons
+    TVector3 mcEle(pMc[mceleindex]*cos(phiMc[mceleindex])*sin(thetaMc[mceleindex]), 
+                   pMc[mceleindex]*sin(phiMc[mceleindex])*sin(thetaMc[mceleindex]),
+                   pMc[mceleindex]*cos(thetaMc[mceleindex]));
+
+    float mcEta=etaMc[mceleindex];
+    float mcPt=pMc[mceleindex] * fabs(sin(thetaMc[mceleindex]));
+
+    GenEta->Fill(mcEta);
+    GenPt->Fill(mcPt);
+
+    // loop over ALL reconstructed electrons and find the closest one to the generated one
+    float deltaR_min=0.3;
+    int matchedRecoEle=-1;
     for(int iele=0; iele<nEle; iele++) {
 
-      // matching with mc
-      int matchedMcEle = -1;
-      float mcEta, mcPt, deltaR;
-
-      TVector3 recoElectronPAtInner(pxAtInnerEle[iele],pyAtInnerEle[iele],pzAtInnerEle[iele]);
-
-      TVector3 trueElePeplus, trueElePeminus;
-      trueElePeplus.SetPtThetaPhi(pMc[indexeplus]*fabs(sin(thetaMc[indexeplus])),thetaMc[indexeplus],phiMc[indexeplus]);
-      trueElePeminus.SetPtThetaPhi(pMc[indexeminus]*fabs(sin(thetaMc[indexeminus])),thetaMc[indexeminus],phiMc[indexeminus]);
-
-      float deltaReplus = trueElePeplus.DeltaR(recoElectronPAtInner);
-      float deltaReminus = trueElePeminus.DeltaR(recoElectronPAtInner);
-      
-      if (deltaReplus < deltaReminus) {
-	deltaR = deltaReplus;
-	mcEta = etaMc[indexeplus];
-	mcPt = pMc[indexeplus]*fabs(sin(thetaMc[indexeplus])); 
-	matchedMcEle = 0;
-      }
-      if (deltaReminus < deltaReplus) { 
-	deltaR = deltaReminus; 
-	mcEta = etaMc[indexeminus]; 
-	mcPt = pMc[indexeminus]*fabs(sin(thetaMc[indexeminus])); 
-	matchedMcEle = 1;
+      TVector3 eleP3(pxEle[iele],pyEle[iele],pzEle[iele]);
+      float deltaR = eleP3.DeltaR(mcEle);
+      if(deltaR < deltaR_min) {
+        matchedRecoEle=iele;
+        deltaR_min=deltaR;
       }
 
-      //      to have only BARREL
-      // if ( fabs(etaEle[iele]) < 1.476 ) {
+    }
 
-	if ( !RecoFilled[matchedMcEle] ) {
+    if(matchedRecoEle > -1) {
+
+      if ( fabs(etaEle[matchedRecoEle]) < 2.5 && etEle[matchedRecoEle] > 10.0 ) {
 	    
-	RecoEta->Fill(mcEta);
-	RecoPt->Fill(mcPt);
-	RecoFilled[matchedMcEle] = true;
-	    
-      }
-	  
-      if ( eleSumPt04Ele[iele] < maxRelativeTrackerPtSum ) {
+        RecoEta->Fill(mcEta);
+        RecoPt->Fill(mcPt);
+        
+        if ( eleIdCutBasedEle[matchedRecoEle] ) {
+          
+          CutIdEta->Fill(mcEta);
+          CutIdPt->Fill(mcPt);
+          
+        }
+        
+        if ( eleLikelihoodEle[matchedRecoEle] > minLikelihoodLoose ) {
+          
+          LHIdLooseEta->Fill(mcEta);
+          LHIdLoosePt->Fill(mcPt);
+          
+        }
+        
+        if ( eleLikelihoodEle[matchedRecoEle] > minLikelihoodTight ) {
+          
+          LHIdTightEta->Fill(mcEta);
+          LHIdTightPt->Fill(mcPt);
+          
+        }
 
-	if ( !IsoFilled[matchedMcEle] ) {
-	      
-	  IsoEta->Fill(mcEta);
-	  IsoPt->Fill(mcPt);
-	  IsoFilled[matchedMcEle] = true;
-	      
-	}
-	    
-	if ( eleIdCutBasedEle[iele]  && !CutIdFilled[matchedMcEle] ) {
-	      
-	  CutIdEta->Fill(mcEta);
-	  CutIdPt->Fill(mcPt);
-	  CutIdFilled[matchedMcEle] = true;
-	      
-	}
+      } // electron acceptance & pt cut
 
-	if ( eleLikelihoodEle[iele] > minLikelihood && !LHIdFilled[matchedMcEle] ) {
-	      
-	  LHIdEta->Fill(mcEta);
-	  LHIdPt->Fill(mcPt);
-	  LHIdFilled[matchedMcEle] = true;
-	      
-	}
-
-      } // isolation
-	  
-      //      } // only BARREL
-	
-    } // loop ele
+    }
 
   } // loop events
 
-  EfficiencyEvaluator ElectronEffEtaCutBased("ElectronEffEtaCutBased.root");
-  ElectronEffEtaCutBased.AddNumerator(GenEta);
-  ElectronEffEtaCutBased.AddNumerator(RecoEta);
-  ElectronEffEtaCutBased.AddNumerator(IsoEta);
-  ElectronEffEtaCutBased.AddNumerator(CutIdEta);
-  ElectronEffEtaCutBased.SetDenominator(GenEta);
-  ElectronEffEtaCutBased.ComputeEfficiencies();
-  ElectronEffEtaCutBased.SetTitle("electron efficiency vs #eta");
-  ElectronEffEtaCutBased.SetXaxisTitle("electron #eta");
-  ElectronEffEtaCutBased.SetYaxisTitle("efficiency");
-  ElectronEffEtaCutBased.SetYaxisMin(0.0);
-  ElectronEffEtaCutBased.DrawAll();
-  ElectronEffEtaCutBased.Write();
+  char filename[200];
+  sprintf(filename,"%s-EleEfficiencyEta.root",outname);
+  EfficiencyEvaluator ElectronEffEta(filename);
+  ElectronEffEta.AddNumerator(GenEta);
+  ElectronEffEta.AddNumerator(RecoEta);
+  ElectronEffEta.AddNumerator(CutIdEta);
+  ElectronEffEta.AddNumerator(LHIdLooseEta);
+  ElectronEffEta.AddNumerator(LHIdTightEta);
+  ElectronEffEta.SetDenominator(GenEta);
+  ElectronEffEta.ComputeEfficiencies();
+  ElectronEffEta.SetTitle("electron efficiency vs #eta");
+  ElectronEffEta.SetXaxisTitle("electron #eta");
+  ElectronEffEta.SetYaxisTitle("efficiency");
+  ElectronEffEta.SetYaxisMin(0.0);
+  ElectronEffEta.Write();
 
-  EfficiencyEvaluator ElectronEffEtaLikelihood("ElectronEffEtaLikelihood.root");
-  ElectronEffEtaLikelihood.AddNumerator(GenEta);
-  ElectronEffEtaLikelihood.AddNumerator(RecoEta);
-  ElectronEffEtaLikelihood.AddNumerator(IsoEta);
-  ElectronEffEtaLikelihood.AddNumerator(LHIdEta);
-  ElectronEffEtaLikelihood.SetDenominator(GenEta);
-  ElectronEffEtaLikelihood.ComputeEfficiencies();
-  ElectronEffEtaLikelihood.SetTitle("electron efficiency vs #eta");
-  ElectronEffEtaLikelihood.SetXaxisTitle("electron #eta");
-  ElectronEffEtaLikelihood.SetYaxisTitle("efficiency");
-  ElectronEffEtaLikelihood.SetYaxisMin(0.0);
-  ElectronEffEtaLikelihood.DrawAll();
-  ElectronEffEtaLikelihood.Write();
-
-  EfficiencyEvaluator ElectronEffPtCutBased("ElectronEffPtCutBased.root");
-  ElectronEffPtCutBased.AddNumerator(GenPt);
-  ElectronEffPtCutBased.AddNumerator(RecoPt);
-  ElectronEffPtCutBased.AddNumerator(IsoPt);
-  ElectronEffPtCutBased.AddNumerator(CutIdPt);
-  ElectronEffPtCutBased.SetDenominator(GenPt);
-  ElectronEffPtCutBased.ComputeEfficiencies();
-  ElectronEffPtCutBased.SetTitle("electron efficiency vs p_{T}");
-  ElectronEffPtCutBased.SetXaxisTitle("electron p_{T} (GeV)");
-  ElectronEffPtCutBased.SetYaxisTitle("efficiency");
-  ElectronEffPtCutBased.SetYaxisMin(0.0);
-  ElectronEffPtCutBased.DrawAll();
-  ElectronEffPtCutBased.Write();
-
-  EfficiencyEvaluator ElectronEffPtLikelihood("ElectronEffPtLikelihood.root");
-  ElectronEffPtLikelihood.AddNumerator(GenPt);
-  ElectronEffPtLikelihood.AddNumerator(RecoPt);
-  ElectronEffPtLikelihood.AddNumerator(IsoPt);
-  ElectronEffPtLikelihood.AddNumerator(LHIdPt);
-  ElectronEffPtLikelihood.SetDenominator(GenPt);
-  ElectronEffPtLikelihood.ComputeEfficiencies();
-  ElectronEffPtLikelihood.SetTitle("electron efficiency vs p_{T}");
-  ElectronEffPtLikelihood.SetXaxisTitle("electron p_{T}");
-  ElectronEffPtLikelihood.SetYaxisTitle("efficiency");
-  ElectronEffPtLikelihood.SetYaxisMin(0.0);
-  ElectronEffPtLikelihood.DrawAll();
-  ElectronEffPtLikelihood.Write();
-
+  sprintf(filename,"%s-EleEfficiencyPt.root",outname);
+  EfficiencyEvaluator ElectronEffPt(filename);
+  ElectronEffPt.AddNumerator(GenPt);
+  ElectronEffPt.AddNumerator(RecoPt);
+  ElectronEffPt.AddNumerator(CutIdPt);
+  ElectronEffPt.AddNumerator(LHIdLoosePt);
+  ElectronEffPt.AddNumerator(LHIdTightPt);
+  ElectronEffPt.SetDenominator(GenPt);
+  ElectronEffPt.ComputeEfficiencies();
+  ElectronEffPt.SetTitle("electron efficiency vs p_{T}");
+  ElectronEffPt.SetXaxisTitle("electron p_{T} (GeV)");
+  ElectronEffPt.SetYaxisTitle("efficiency");
+  ElectronEffPt.SetYaxisMin(0.0);
+  ElectronEffPt.Write();
 
 }
 
@@ -339,7 +282,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   TH1F *LHIdLooseEta  = new TH1F( "LHIdLooseEta",  "LH ID loose #eta",        nbinsEta, minEta, maxEta );
 
   int nbinsPt = 20;
-  float minPt = 5.0;
+  float minPt = 10.0;
   float maxPt = 100.;
   
   TH1F *FakeableJetsPt   = new TH1F( "FakeableJetsPt",  "fakeable jets p_{T} (GeV)",     nbinsPt, minPt, maxPt );
