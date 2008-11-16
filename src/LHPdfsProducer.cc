@@ -589,7 +589,7 @@ void LHPdfsProducer::bookHistos() {
   float EoPoutMin   =  0.0;
   float EoPoutMax   =  8.0;
   float HoEMin      =  0.0; // zero-suppression in HCAL
-  float HoEMax      =  0.4; // no more cut in the electron pre-selection 
+  float HoEMax      =  0.1; // ??
   float fisherMin   = -15.0;
   float fisherMax   =  15.0;
   float sigmaEtaEtaMin = 0.0;
