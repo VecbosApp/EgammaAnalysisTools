@@ -109,6 +109,10 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)LHPdfsProducer.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
+CompareEff: $(INCLUDEDIR)/src/CompareEff.C \
+	$(OUTLIBCOMMON)EfficiencyEvaluator.o
+	$(CXX) $(CXXFLAGS) -o CompareEff $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
+
 CompareMisId: $(INCLUDEDIR)/src/CompareMisId.C \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o
 	$(CXX) $(CXXFLAGS) -o CompareMisId $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
@@ -124,5 +128,5 @@ clean:
 	rm -f EgammaAnalysis
 	rm -f CompareMisId
 
-all:  EgammaAnalysis CompareMisId MakeNotePdfPlots
+all:  EgammaAnalysis CompareEff CompareMisId MakeNotePdfPlots
 
