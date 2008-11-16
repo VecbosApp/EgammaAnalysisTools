@@ -74,9 +74,9 @@ void drawEta(const char* filename) {
   leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
   leg->SetFillColor(0);
   leg->AddEntry(efficiency[1],"reconstrunction");
-  leg->AddEntry(efficiency[2],"Branson shit");
-  leg->AddEntry(efficiency[3],"Baffo chocolate");
-  leg->AddEntry(efficiency[4],"Baffo dark chocolate");
+  leg->AddEntry(efficiency[2],"Loose Category standard");
+  leg->AddEntry(efficiency[3],"Loose Likelihood");
+  leg->AddEntry(efficiency[4],"Tight Likelihood");
 
   efficiency[1]->SetMinimum(0.0001);
   efficiency[1]->SetMaximum(1.0);
@@ -90,6 +90,7 @@ void drawEta(const char* filename) {
   leg->Draw();
 
   c1.SaveAs("elemisid-eta.eps");
+  c1.SaveAs("elemisid-eta.root");
 
 }
 
@@ -126,9 +127,9 @@ void drawPt(const char* filename) {
   leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
   leg->SetFillColor(0);
   leg->AddEntry(efficiency[1],"reconstrunction");
-  leg->AddEntry(efficiency[2],"Branson shit");
-  leg->AddEntry(efficiency[3],"Baffo chocolate");
-  leg->AddEntry(efficiency[4],"Baffo dark chocolate");
+  leg->AddEntry(efficiency[2],"Loose Category standard");
+  leg->AddEntry(efficiency[3],"Loose Likelihood");
+  leg->AddEntry(efficiency[4],"Tight Likelihood");
 
   efficiency[1]->SetMinimum(0.0001);
   efficiency[1]->SetMaximum(1.0);
@@ -142,6 +143,6 @@ void drawPt(const char* filename) {
   leg->Draw();
 
   c1.SaveAs("elemisid-pt.eps");
-
+  c1.SaveAs("elemisid-pt.root");
 
 }
