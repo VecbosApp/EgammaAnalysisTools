@@ -179,6 +179,9 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
     float mcEta=etaMc[mceleindex];
     float mcPt=pMc[mceleindex] * fabs(sin(thetaMc[mceleindex]));
 
+    // exclude forward electrons
+    if(mcPt < minPt || fabs(mcEta) > maxEta) continue;
+
     GenEta->Fill(mcEta);
     GenPt->Fill(mcPt);
 
@@ -198,34 +201,30 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 
     if(matchedRecoEle > -1) {
 
-      if ( fabs(etaEle[matchedRecoEle]) < 2.5 && etEle[matchedRecoEle] > 10.0 ) {
-	    
-        RecoEta->Fill(mcEta);
-        RecoPt->Fill(mcPt);
+      RecoEta->Fill(mcEta);
+      RecoPt->Fill(mcPt);
+      
+      if ( eleIdCutBasedEle[matchedRecoEle] ) {
         
-        if ( eleIdCutBasedEle[matchedRecoEle] ) {
-          
-          CutIdEta->Fill(mcEta);
-          CutIdPt->Fill(mcPt);
-          
-        }
+        CutIdEta->Fill(mcEta);
+        CutIdPt->Fill(mcPt);
         
-        if ( eleLikelihoodEle[matchedRecoEle] > minLikelihoodLoose ) {
-          
-          LHIdLooseEta->Fill(mcEta);
-          LHIdLoosePt->Fill(mcPt);
-          
-        }
+      }
+      
+      if ( eleLikelihoodEle[matchedRecoEle] > minLikelihoodLoose ) {
         
-        if ( eleLikelihoodEle[matchedRecoEle] > minLikelihoodTight ) {
-          
-          LHIdTightEta->Fill(mcEta);
-          LHIdTightPt->Fill(mcPt);
-          
-        }
-
-      } // electron acceptance & pt cut
-
+        LHIdLooseEta->Fill(mcEta);
+        LHIdLoosePt->Fill(mcPt);
+        
+      }
+      
+      if ( eleLikelihoodEle[matchedRecoEle] > minLikelihoodTight ) {
+        
+        LHIdTightEta->Fill(mcEta);
+        LHIdTightPt->Fill(mcPt);
+        
+      }
+      
     }
 
   } // loop events
