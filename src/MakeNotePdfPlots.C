@@ -161,7 +161,7 @@ void makePlots(TH1F *signalHistos[2][2][2], TH1F *backgroundHistos[2][2], const 
     }
     else if(iecal==1) {
       sprintf(epsfilename,"%s_EE.eps",namevar); 
-      sprintf(rootfilename,"%s_EB.root",namevar);
+      sprintf(rootfilename,"%s_EE.root",namevar);
     }
     c1.SaveAs(epsfilename);
     c1.SaveAs(rootfilename);
