@@ -25,6 +25,8 @@ public:
   void LoopQCD();
   //! loop over events doing bkg pdfs on W+jets
   void LoopWjets();
+  //! loop over events doing bkg pdfs on Z+jets
+  void LoopZjets(const char *filename);
   //! set the list of the required triggers
   void requireTrigger(std::vector<int> requiredTriggers) { m_requiredTriggers = requiredTriggers; }
   //! save the pdfs in a ROOT file
@@ -40,6 +42,7 @@ private:
 
   //! the tag and the probe
   int electrons[2];
+  int muons[2];
 
   //! the required trigger bits
   std::vector<int> m_requiredTriggers;

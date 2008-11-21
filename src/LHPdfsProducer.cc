@@ -6,6 +6,7 @@
 
 #include "CommonTools/include/Utils.hh"
 #include "EgammaAnalysisTools/include/CutBasedEleIDSelector.hh"
+#include "CommonTools/include/EfficiencyEvaluator.hh"
 #include "EgammaAnalysisTools/include/LHPdfsProducer.hh"
 
 LHPdfsProducer::LHPdfsProducer(TTree *tree)
@@ -385,6 +386,7 @@ void LHPdfsProducer::LoopQCD() {
   
 }
 
+// make jet PDFs from W+jets 
 void LHPdfsProducer::LoopWjets() {
 
   if(fChain == 0) return;
@@ -429,7 +431,7 @@ void LHPdfsProducer::LoopWjets() {
     if(mceleindex>-1) mcEle = TVector3(pMc[mceleindex]*cos(phiMc[mceleindex])*sin(thetaMc[mceleindex]), 
                                        pMc[mceleindex]*sin(phiMc[mceleindex])*sin(thetaMc[mceleindex]),
                                        pMc[mceleindex]*cos(thetaMc[mceleindex]));
-    
+
     // fill the PDFs for jets excluding the real electron in W+jets
     for(int iele=0;iele<nEle;iele++) {
 
@@ -570,6 +572,310 @@ void LHPdfsProducer::LoopWjets() {
     } // loop on electrons
 
   } // loop on events
+  
+}
+
+// make jets PDF removing the 2 electrons from Z: TOCHECK!!! something strange!
+void LHPdfsProducer::LoopZjets(const char *outname) {
+
+  int nbinsEta = 60;
+  float minEta = -2.5;
+  float maxEta = 2.5;
+  
+  TH1F *AllFakesEta = new TH1F("AllFakesEta", "all reconstructed fakes", nbinsEta, minEta, maxEta);
+  TH1F *UnmatchedFakesEta = new TH1F("UnmatchedFakesEta", "Fake electrons unmatched with true electrons", nbinsEta, minEta, maxEta);
+
+  int nbinsPt = 20;
+  float minPt = 10.0;
+  float maxPt = 100.;
+
+  TH1F *AllFakesPt = new TH1F("AllFakesPt", "all reconstructed fakes", nbinsPt, minPt, maxPt);
+  TH1F *UnmatchedFakesPt = new TH1F("UnmatchedFakesPt", "Fake electrons unmatched with true electrons", nbinsPt, minPt, maxPt);
+
+  if(fChain == 0) return;
+
+  bookHistos();
+
+  Long64_t nbytes = 0, nb = 0;
+  Long64_t nentries = fChain->GetEntries();
+  std::cout << "Number of entries = " << nentries << std::endl;
+  for (Long64_t jentry=0; jentry<nentries;jentry++) {
+    Long64_t ientry = LoadTree(jentry);
+    if (ientry < 0) break;
+    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
+    
+    // trigger
+//     Utils anaUtils;
+//     bool passedHLT = anaUtils.getTriggersOR(m_requiredTriggers, firedTrg);
+
+//     if(!passedHLT) continue;
+
+    bool tauPresence=false;
+    bool spuriousElectronsMadgraph=false;
+    int mcEleMinusIndex=-1, mcElePlusIndex=-1;
+    for(int imc=0; imc<50; imc++) {
+      // not only ele from Zee: there is enu emission (V_ud?) in madgraph: remove these spurious electrons
+      if ( (fabs(idMc[imc])==11) && fabs(idMc[mothMc[imc]])!=23 && fabs(idMc[mothMc[imc]])!=11 ) {
+        spuriousElectronsMadgraph=true;
+        break;
+      }
+      if ( idMc[imc]==11 && fabs(idMc[mothMc[imc]])==23 ) mcEleMinusIndex = imc;
+      if ( idMc[imc]==-11 && fabs(idMc[mothMc[imc]])==23 ) mcElePlusIndex = imc;
+      // since the stable particle list is truncated, if there is a tau 
+      // not possible to say what happens...
+      if ( (fabs(idMc[imc])==15) ) {
+        tauPresence=true;
+        break;
+      }
+    }
+
+    if(tauPresence || spuriousElectronsMadgraph) continue;
+
+    TVector3 mcElePlus(0,0,0), mcEleMinus(0,0,0);
+    if(mcEleMinusIndex>-1) mcEleMinus = TVector3(pMc[mcEleMinusIndex]*cos(phiMc[mcEleMinusIndex])*sin(thetaMc[mcEleMinusIndex]), 
+                                                 pMc[mcEleMinusIndex]*sin(phiMc[mcEleMinusIndex])*sin(thetaMc[mcEleMinusIndex]),
+                                                 pMc[mcEleMinusIndex]*cos(thetaMc[mcEleMinusIndex]));
+    
+    if(mcElePlusIndex>-1) mcEleMinus = TVector3(pMc[mcElePlusIndex]*cos(phiMc[mcElePlusIndex])*sin(thetaMc[mcElePlusIndex]), 
+                                                pMc[mcElePlusIndex]*sin(phiMc[mcElePlusIndex])*sin(thetaMc[mcElePlusIndex]),
+                                                pMc[mcElePlusIndex]*cos(thetaMc[mcElePlusIndex]));
+    
+
+    // fill the PDFs for jets excluding the real electron of Z->ee
+    // the two electrons are the nes that give the |mee-mZ| closest to 0
+    float minpullZee = 1000.;
+    electrons[0]=-1; electrons[1]=-1;
+    if(nEle>=2) {
+      for(int iele1=0; iele1<nEle; iele1++) {
+        TLorentzVector electron1(pxEle[iele1],pyEle[iele1],pzEle[iele1],energyEle[iele1]);
+        for(int iele2=iele1+1; iele2<nEle; iele2++) {
+          TLorentzVector electron2(pxEle[iele2],pyEle[iele2],pzEle[iele2],energyEle[iele2]);
+          
+          float mass = (electron1+electron2).M();
+          m_Zmass->Fill(mass);
+          float pull=fabs(mass-91.1876);
+          
+          if(pull < minpullZee) {
+            minpullZee = pull;
+            electrons[0] = iele1;
+            electrons[1] = iele2;
+          }
+        }
+      }
+    }
+
+    float minpullZmumu = 1000.;
+    muons[0]=-1, muons[1]=-1;
+    if(nMuon>=2) { 
+      for(int imu1=0; imu1<nMuon; imu1++) {
+        TLorentzVector muon1(pxMuon[imu1],pyMuon[imu1],pzMuon[imu1],momentumMuon[imu1]);
+        for(int imu2=imu1+1; imu2<nMuon; imu2++) {
+          TLorentzVector muon2(pxMuon[imu2],pyMuon[imu2],pzMuon[imu2],momentumMuon[imu2]);
+          
+          float mass = (muon1+muon2).M();
+          float pull=fabs(mass-91.1876);
+          
+          if(pull < minpullZmumu) {
+            minpullZmumu = pull;
+            muons[0] = imu1;
+            muons[1] = imu2;
+          }
+        }
+      }
+    }
+
+    bool Ztag = false;
+    // require the reconstruction of the Z
+    // the two electrons in the acceptance, pTmin and Z mass
+    // or the same with muons
+    if (electrons[0]=!-1 && electrons[1]!=-1) {
+
+      if( minpullZee < 9.0 &&
+          fabs(etaEle[electrons[0]]) < 2.5 &&
+          fabs(etaEle[electrons[1]]) < 2.5 &&
+          etEle[electrons[0]] > 5.0 &&
+          etEle[electrons[1]] > 5.0 ) Ztag = true;
+
+    } else if (muons[0]!=-1 && muons[1]!=-1) {
+      
+      if( minpullZmumu < 9.0 &&
+          fabs(etaMuon[muons[0]]) < 2.4 &&
+          fabs(etaMuon[muons[1]]) < 2.4 &&
+          etMuon[muons[0]] > 5.0 &&
+          etMuon[muons[1]] > 5.0 ) Ztag = true;
+
+    }
+
+
+    if(!Ztag) continue;
+    
+    cout << "Looking for fakes" << endl;
+
+    // find fake electrons
+    for(int iele=0;iele<nEle;iele++) {
+
+      cout << "iele = " << iele << "  electrons[0] = " << electrons[0] << "   electrons[1] = " << electrons[1] << endl;
+
+      if( iele==electrons[0] || iele==electrons[1] ) continue;
+
+      if( fabs(etaEle[iele]) > 2.5 || etEle[iele] < 5.0 ) continue;
+      
+      AllFakesEta->Fill(etaEle[iele]);
+      AllFakesPt->Fill(etEle[iele]);
+
+      TVector3 eleP3(pxEle[iele],pyEle[iele],pzEle[iele]);
+      
+      // evaluate the purity of the jets: p=#ele(unmatched)/#ele
+      if(mcEleMinusIndex>-1 && mcElePlusIndex>-1) {
+        float dRPlus = mcElePlus.DeltaR(eleP3);
+        float dRMinus = mcEleMinus.DeltaR(eleP3);
+        if(dRPlus>0.3 && dRMinus>0.3) {
+          UnmatchedFakesEta->Fill(etaEle[iele]);
+          UnmatchedFakesPt->Fill(etEle[iele]);
+        }
+      }
+      
+      /// define the bins in which can be splitted the PDFs
+      int iecal = (fabs( etaEle[iele])<1.479) ? 0 : 1;
+      int iptbin = (etEle[iele]<15.0) ? 0 : 1;
+      
+      int fullclassRaw = eleClassEle[iele];
+        
+      int iclass = -1;
+      int ifullclass = -1;
+      if ( fullclassRaw == 0 || fullclassRaw == 100 ) { // golden
+        iclass = 0;
+        ifullclass = 0;
+      }
+      else if ( fullclassRaw == 10 || fullclassRaw == 110 ) { // bigbrem
+        iclass = 0;
+        ifullclass = 1;
+      }
+      else if ( fullclassRaw == 20 || fullclassRaw == 120 ) { // narrow
+        iclass = 0;
+        ifullclass = 2;
+      }
+      else if ( (fullclassRaw >= 30 && fullclassRaw <= 40) ||
+                (fullclassRaw >= 130 && fullclassRaw <= 140) ) { // showering + cracks
+        iclass = 1;
+        ifullclass = 3;
+      }
+
+      float sigmaEtaEta = sqrt(fabs(covEtaEtaEle[iele]));
+      float sigmaEtaPhi = sqrt(fabs(covEtaPhiEle[iele]));
+      float sigmaPhiPhi = sqrt(fabs(covPhiPhiEle[iele]));
+      float s1s9 = s1s9Ele[iele];
+      float s9s25 = s9s25Ele[iele];
+      float lat = latEle[iele];
+      float etaLat = etaLatEle[iele];
+      float phiLat = phiLatEle[iele];
+      float a20 = a20Ele[iele];
+      float a42 = a42Ele[iele];
+      float fisher = -1000;
+
+      if ( iecal==0 ) { // barrel
+        if ( iptbin == 0 ) {  // low pt
+          fisher = 0.693496 - 12.7018 * sigmaEtaEta + 1.23863 * s9s25 - 10.115 * etaLat;
+        }
+        else if ( iptbin == 1 ) {  // high pt
+          fisher = 6.02184 - 49.2656 * sigmaEtaEta + 2.49634 * s9s25 - 30.1528 * etaLat;
+        }
+      }
+      else if ( iecal == 1  ) { // endcap
+        if ( iptbin == 0 ) {  // low pt
+          fisher = -1.11814 - 5.3288 * sigmaEtaEta + 4.51575 * s9s25 - 6.47578 * etaLat;
+        }
+        else if ( iptbin == 1 ) {  // high pt
+          fisher = 0.536351 - 11.7401 * sigmaEtaEta + 3.61809 * s9s25 - 9.3025 * etaLat;
+        }
+      }
+
+      double dPhiCalo = eleDeltaPhiAtCaloEle[iele];
+      double dPhiVtx = eleDeltaPhiAtVtxEle[iele];
+      double dEta = eleDeltaEtaAtVtxEle[iele];
+      double EoPout = eleCorrEoPoutEle[iele];
+      double HoE = eleHoEEle[iele];
+      double dxy = eleTrackDxyEle[iele];
+      double dxySig = eleTrackDxyEle[iele]/eleTrackDxyErrorEle[iele];
+
+      dPhiCaloUnsplitEle    [iecal][iptbin] -> Fill ( dPhiCalo );
+      dPhiVtxUnsplitEle     [iecal][iptbin] -> Fill ( dPhiVtx );
+      dEtaUnsplitEle        [iecal][iptbin] -> Fill ( dEta );
+      EoPoutUnsplitEle      [iecal][iptbin] -> Fill ( EoPout );
+      HoEUnsplitEle         [iecal][iptbin] -> Fill ( HoE );
+      shapeFisherUnsplitEle [iecal][iptbin] -> Fill ( fisher );
+      sigmaEtaEtaUnsplitEle [iecal][iptbin] -> Fill ( sigmaEtaEta );
+      sigmaEtaPhiUnsplitEle [iecal][iptbin] -> Fill ( sigmaEtaPhi );
+      sigmaPhiPhiUnsplitEle [iecal][iptbin] -> Fill ( sigmaPhiPhi );
+      s1s9UnsplitEle        [iecal][iptbin] -> Fill ( s1s9 );
+      s9s25UnsplitEle       [iecal][iptbin] -> Fill ( s9s25 );
+      LATUnsplitEle         [iecal][iptbin] -> Fill ( lat );
+      etaLATUnsplitEle      [iecal][iptbin] -> Fill ( etaLat );
+      phiLATUnsplitEle      [iecal][iptbin] -> Fill ( phiLat );
+      a20UnsplitEle         [iecal][iptbin] -> Fill ( a20 );
+      a42UnsplitEle         [iecal][iptbin] -> Fill ( a42 );
+      dxyUnsplitEle         [iecal][iptbin] -> Fill ( dxy );
+      dxySigUnsplitEle      [iecal][iptbin] -> Fill ( dxySig );
+
+      dPhiCaloClassEle    [iecal][iptbin][iclass] -> Fill ( dPhiCalo );
+      dPhiVtxClassEle     [iecal][iptbin][iclass] -> Fill ( dPhiVtx );
+      dEtaClassEle        [iecal][iptbin][iclass] -> Fill ( dEta );
+      EoPoutClassEle      [iecal][iptbin][iclass] -> Fill ( EoPout );
+      HoEClassEle         [iecal][iptbin][iclass] -> Fill ( HoE );
+      shapeFisherClassEle [iecal][iptbin][iclass] -> Fill ( fisher );
+      sigmaEtaEtaClassEle [iecal][iptbin][iclass] -> Fill ( sigmaEtaEta );
+      sigmaEtaPhiClassEle [iecal][iptbin][iclass] -> Fill ( sigmaEtaPhi );
+      sigmaPhiPhiClassEle [iecal][iptbin][iclass] -> Fill ( sigmaPhiPhi );
+      s1s9ClassEle        [iecal][iptbin][iclass] -> Fill ( s1s9 );
+      s9s25ClassEle       [iecal][iptbin][iclass] -> Fill ( s9s25 );
+      LATClassEle         [iecal][iptbin][iclass] -> Fill ( lat );
+      etaLATClassEle      [iecal][iptbin][iclass] -> Fill ( etaLat );
+      phiLATClassEle      [iecal][iptbin][iclass] -> Fill ( phiLat );
+      a20ClassEle         [iecal][iptbin][iclass] -> Fill ( a20 );
+      a42ClassEle         [iecal][iptbin][iclass] -> Fill ( a42 );
+      dxyClassEle         [iecal][iptbin][iclass] -> Fill ( dxy );
+      dxySigClassEle      [iecal][iptbin][iclass] -> Fill ( dxySig );
+
+      dPhiCaloFullclassEle    [iecal][iptbin][ifullclass] -> Fill ( dPhiCalo );
+      dPhiVtxFullclassEle     [iecal][iptbin][ifullclass] -> Fill ( dPhiVtx );
+      dEtaFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( dEta );
+      EoPoutFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( EoPout );
+      HoEFullclassEle         [iecal][iptbin][ifullclass] -> Fill ( HoE );
+      shapeFisherFullclassEle [iecal][iptbin][ifullclass] -> Fill ( fisher );
+      sigmaEtaEtaFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaEtaEta );
+      sigmaEtaPhiFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaEtaPhi );
+      sigmaPhiPhiFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaPhiPhi );
+      s1s9FullclassEle        [iecal][iptbin][ifullclass] -> Fill ( s1s9 );
+      s9s25FullclassEle       [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
+      LATFullclassEle         [iecal][iptbin][ifullclass] -> Fill ( lat );
+      etaLATFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( etaLat );
+      phiLATFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( phiLat );
+      a20FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( a20 );
+      a42FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( a42 );
+      dxyFullclassEle         [iecal][iptbin][ifullclass] -> Fill ( dxy );
+      dxySigFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( dxySig );
+
+    } // loop on electrons
+
+  } // loop on events
+
+  char filename[200];
+  sprintf(filename,"%s-JetPurityEta.root",outname);
+  EfficiencyEvaluator PurityOfFakesEta(filename);
+  PurityOfFakesEta.AddNumerator(AllFakesEta);
+  PurityOfFakesEta.AddNumerator(UnmatchedFakesEta);
+  PurityOfFakesEta.SetDenominator(AllFakesEta);
+  PurityOfFakesEta.ComputeEfficiencies();
+  PurityOfFakesEta.Write();
+
+  sprintf(filename,"%s-JetPurityPt.root",outname);
+  EfficiencyEvaluator PurityOfFakesPt(filename);
+  PurityOfFakesPt.AddNumerator(AllFakesPt);
+  PurityOfFakesPt.AddNumerator(UnmatchedFakesPt);
+  PurityOfFakesPt.SetDenominator(AllFakesPt);
+  PurityOfFakesPt.ComputeEfficiencies();
+  PurityOfFakesPt.Write();
   
 }
 
