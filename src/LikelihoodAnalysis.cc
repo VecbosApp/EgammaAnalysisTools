@@ -139,6 +139,10 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
     
   TH1F *GenEta   = new TH1F( "GenEta",  "generated #eta",     nbinsEta, minEta, maxEta );
   TH1F *RecoEta  = new TH1F( "RecoEta", "reconstructed #eta", nbinsEta, minEta, maxEta );
+  TH1F *GoldenEta = new TH1F( "GoldenEta", "golden@reconstruction #eta", nbinsEta, minEta, maxEta );
+  TH1F *NarrowEta = new TH1F( "NarrowEta", "narrow@reconstruction #eta", nbinsEta, minEta, maxEta );
+  TH1F *BigBremEta = new TH1F( "BigBremEta", "bigbrem@reconstruction #eta", nbinsEta, minEta, maxEta );
+  TH1F *ShoweringEta = new TH1F( "ShoweringEta", "narrow@reconstruction #eta", nbinsEta, minEta, maxEta );
   TH1F *IsoEta   = new TH1F( "IsoEta",  "isolated #eta",      nbinsEta, minEta, maxEta );
   TH1F *CutIdEta = new TH1F( "CutIdEta", "cut ID #eta",       nbinsEta, minEta, maxEta );
   TH1F *LHIdLooseEta  = new TH1F( "LHIdLooseEta",  "LH Loose ID #eta",        nbinsEta, minEta, maxEta );
@@ -150,6 +154,10 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   
   TH1F *GenPt   = new TH1F( "GenPt",  "generated p_{T} (GeV)",     nbinsPt, minPt, maxPt );
   TH1F *RecoPt  = new TH1F( "RecoPt", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
+  TH1F *GoldenPt = new TH1F( "GoldenPt", "golden@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
+  TH1F *NarrowPt = new TH1F( "NarrowPt", "narrow@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
+  TH1F *BigBremPt = new TH1F( "BigBremPt", "bigbrem@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
+  TH1F *ShoweringPt = new TH1F( "ShoweringPt", "narrow@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
   TH1F *IsoPt   = new TH1F( "IsoPt",  "isolated p_{T} (GeV)",      nbinsPt, minPt, maxPt );
   TH1F *CutIdPt = new TH1F( "CutIdPt", "cut ID p_{T} (GeV)",       nbinsPt, minPt, maxPt );
   TH1F *LHIdLoosePt  = new TH1F( "LHIdLoosePt",  "LH Loose ID p_{T} (GeV)",        nbinsPt, minPt, maxPt );
@@ -203,6 +211,23 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 
       RecoEta->Fill(mcEta);
       RecoPt->Fill(mcPt);
+
+      int fullclass = eleClassEle[matchedRecoEle];
+
+      if ( fullclass == 0 || fullclass == 100 ) {
+        GoldenEta->Fill(mcEta);
+        GoldenPt->Fill(mcPt);
+      } else if ( fullclass == 10 || fullclass == 110 ) {
+        BigBremEta->Fill(mcEta);
+        BigBremPt->Fill(mcPt);
+      } else if ( fullclass == 20 || fullclass == 120 ) {
+        NarrowEta->Fill(mcEta);
+        NarrowPt->Fill(mcPt);
+      } else if ( (fullclass >= 30 && fullclass <= 40) ||
+                  (fullclass >= 130 && fullclass <= 140) ) {
+        ShoweringEta->Fill(mcEta);
+        ShoweringPt->Fill(mcPt);
+      }
       
       if ( eleIdCutBasedEle[matchedRecoEle] ) {
         
@@ -234,6 +259,10 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   EfficiencyEvaluator ElectronEffEta(filename);
   ElectronEffEta.AddNumerator(GenEta);
   ElectronEffEta.AddNumerator(RecoEta);
+  ElectronEffEta.AddNumerator(GoldenEta);
+  ElectronEffEta.AddNumerator(BigBremEta);
+  ElectronEffEta.AddNumerator(NarrowEta);
+  ElectronEffEta.AddNumerator(ShoweringEta);
   ElectronEffEta.AddNumerator(CutIdEta);
   ElectronEffEta.AddNumerator(LHIdLooseEta);
   ElectronEffEta.AddNumerator(LHIdTightEta);
@@ -249,6 +278,10 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   EfficiencyEvaluator ElectronEffPt(filename);
   ElectronEffPt.AddNumerator(GenPt);
   ElectronEffPt.AddNumerator(RecoPt);
+  ElectronEffPt.AddNumerator(GoldenPt);
+  ElectronEffPt.AddNumerator(BigBremPt);
+  ElectronEffPt.AddNumerator(NarrowPt);
+  ElectronEffPt.AddNumerator(ShoweringPt);
   ElectronEffPt.AddNumerator(CutIdPt);
   ElectronEffPt.AddNumerator(LHIdLoosePt);
   ElectronEffPt.AddNumerator(LHIdTightPt);
@@ -276,6 +309,10 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
     
   TH1F *FakeableJetsEta   = new TH1F( "FakeableJetsEta",  "fakeable jets #eta",     nbinsEta, minEta, maxEta );
   TH1F *RecoEta  = new TH1F( "RecoEta", "reconstructed #eta", nbinsEta, minEta, maxEta );
+  TH1F *GoldenEta = new TH1F( "GoldenEta", "golden@reconstruction #eta", nbinsEta, minEta, maxEta );
+  TH1F *NarrowEta = new TH1F( "NarrowEta", "narrow@reconstruction #eta", nbinsEta, minEta, maxEta );
+  TH1F *BigBremEta = new TH1F( "BigBremEta", "bigbrem@reconstruction #eta", nbinsEta, minEta, maxEta );
+  TH1F *ShoweringEta = new TH1F( "ShoweringEta", "narrow@reconstruction #eta", nbinsEta, minEta, maxEta );
   TH1F *CutIdEta = new TH1F( "CutIdEta", "cut ID #eta",       nbinsEta, minEta, maxEta );
   TH1F *LHIdTightEta  = new TH1F( "LHIdTightEta",  "LH ID tight #eta",        nbinsEta, minEta, maxEta );
   TH1F *LHIdLooseEta  = new TH1F( "LHIdLooseEta",  "LH ID loose #eta",        nbinsEta, minEta, maxEta );
@@ -286,6 +323,10 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   
   TH1F *FakeableJetsPt   = new TH1F( "FakeableJetsPt",  "fakeable jets p_{T} (GeV)",     nbinsPt, minPt, maxPt );
   TH1F *RecoPt  = new TH1F( "RecoPt", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
+  TH1F *GoldenPt = new TH1F( "GoldenPt", "golden@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
+  TH1F *NarrowPt = new TH1F( "NarrowPt", "narrow@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
+  TH1F *BigBremPt = new TH1F( "BigBremPt", "bigbrem@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
+  TH1F *ShoweringPt = new TH1F( "ShoweringPt", "narrow@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
   TH1F *CutIdPt = new TH1F( "CutIdPt", "cut ID p_{T} (GeV)",       nbinsPt, minPt, maxPt );
   TH1F *LHIdTightPt  = new TH1F( "LHIdTightPt",  "LH ID tight p_{T} (GeV)",        nbinsPt, minPt, maxPt );
   TH1F *LHIdLoosePt  = new TH1F( "LHIdLoosePt",  "LH ID loose p_{T} (GeV)",        nbinsPt, minPt, maxPt );
@@ -395,6 +436,23 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
           RecoEta->Fill(etaFake);
           RecoPt->Fill(etFake);
 
+          int fullclass = eleClassEle[ele];
+          
+          if ( fullclass == 0 || fullclass == 100 ) {
+            GoldenEta->Fill(etaFake);
+            GoldenPt->Fill(etFake);
+          } else if ( fullclass == 10 || fullclass == 110 ) {
+            BigBremEta->Fill(etaFake);
+            BigBremPt->Fill(etFake);
+          } else if ( fullclass == 20 || fullclass == 120 ) {
+            NarrowEta->Fill(etaFake);
+            NarrowPt->Fill(etFake);
+          } else if ( (fullclass >= 30 && fullclass <= 40) ||
+                      (fullclass >= 130 && fullclass <= 140) ) {
+            ShoweringEta->Fill(etaFake);
+            ShoweringPt->Fill(etFake);
+          }
+
           if ( eleIdCutBasedEle[ele] ) {
 
             CutIdEta->Fill(etaFake);
@@ -431,6 +489,10 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   sprintf(filename,"%s-EleMisidEta.root",outname);
   EfficiencyEvaluator ElectronFakeRateEta(filename);
   ElectronFakeRateEta.AddNumerator(FakeableJetsEta);
+  ElectronFakeRateEta.AddNumerator(GoldenEta);
+  ElectronFakeRateEta.AddNumerator(BigBremEta);
+  ElectronFakeRateEta.AddNumerator(NarrowEta);
+  ElectronFakeRateEta.AddNumerator(ShoweringEta);
   ElectronFakeRateEta.AddNumerator(RecoEta);
   ElectronFakeRateEta.AddNumerator(CutIdEta);
   ElectronFakeRateEta.AddNumerator(LHIdLooseEta);
@@ -446,6 +508,10 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   sprintf(filename,"%s-EleMisidPt.root",outname);
   EfficiencyEvaluator ElectronFakeRatePt(filename);
   ElectronFakeRatePt.AddNumerator(FakeableJetsPt);
+  ElectronFakeRatePt.AddNumerator(GoldenPt);
+  ElectronFakeRatePt.AddNumerator(BigBremPt);
+  ElectronFakeRatePt.AddNumerator(NarrowPt);
+  ElectronFakeRatePt.AddNumerator(ShoweringPt);
   ElectronFakeRatePt.AddNumerator(RecoPt);
   ElectronFakeRatePt.AddNumerator(CutIdPt);
   ElectronFakeRatePt.AddNumerator(LHIdLoosePt);
