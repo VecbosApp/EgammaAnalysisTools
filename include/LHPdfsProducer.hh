@@ -20,7 +20,7 @@ public:
   //! destructor
   virtual ~LHPdfsProducer();
   //! loop over events doing signal pdfs with Zee 
-  void LoopZTagAndProbe();
+  void LoopZTagAndProbe(const char *treefilesuffix);
   //! loop over events doing bkg pdfs on QCD
   void LoopQCD();
   //! loop over events doing bkg pdfs on W+jets

@@ -86,6 +86,8 @@ $(OUTLIBCOMMON)SprDataFiller.o: $(INCLUDEDIRCOMMON)/CommonTools/src/SprDataFille
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)SprDataFiller.o $<
 $(OUTLIBCOMMON)TriggerMask.o: $(INCLUDEDIRCOMMON)/CommonTools/src/TriggerMask.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)TriggerMask.o $<
+$(OUTLIB)RedEleIDTree.o: $(INCLUDEDIR)/src/RedEleIDTree.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RedEleIDTree.o $<
 $(OUTLIB)LikelihoodAnalysis.o: $(INCLUDEDIR)/src/LikelihoodAnalysis.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LikelihoodAnalysis.o $<
 $(OUTLIB)LHPdfsProducer.o: $(INCLUDEDIR)/src/LHPdfsProducer.cc
@@ -105,6 +107,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIBCOMMON)SprDataFiller.o \
 	$(OUTLIBCOMMON)TriggerMask.o \
 	$(OUTLIBCOMMON)Utils.o \
+	$(OUTLIB)RedEleIDTree.o \
 	$(OUTLIB)LikelihoodAnalysis.o \
 	$(OUTLIB)LHPdfsProducer.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
@@ -133,6 +136,7 @@ clean:
 	rm -r CompareEff
 	rm -f CompareMisId
 	rm -r CompareClasses
+	rm -r MakeNotePdfPlots
 
 all:  EgammaAnalysis CompareEff CompareMisId CompareClasses MakeNotePdfPlots
 

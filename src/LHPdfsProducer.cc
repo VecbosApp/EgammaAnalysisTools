@@ -7,6 +7,7 @@
 #include "CommonTools/include/Utils.hh"
 #include "EgammaAnalysisTools/include/CutBasedEleIDSelector.hh"
 #include "CommonTools/include/EfficiencyEvaluator.hh"
+#include "EgammaAnalysisTools/include/RedEleIDTree.hh"
 #include "EgammaAnalysisTools/include/LHPdfsProducer.hh"
 
 LHPdfsProducer::LHPdfsProducer(TTree *tree)
@@ -28,11 +29,17 @@ LHPdfsProducer::LHPdfsProducer(TTree *tree)
 
 LHPdfsProducer::~LHPdfsProducer() { }
 
-void LHPdfsProducer::LoopZTagAndProbe() {
+void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
 
   if(fChain == 0) return;
 
   bookHistos();
+
+  char treename[200];
+  sprintf(treename,"%sPdfsTree.root",treefilesuffix);
+  RedEleIDTree reducedTree(treename);
+  reducedTree.addAttributes();
+  reducedTree.addCategories();
 
   Long64_t nbytes = 0, nb = 0;
   Long64_t nentries = fChain->GetEntries();
@@ -50,8 +57,8 @@ void LHPdfsProducer::LoopZTagAndProbe() {
     //    if(!passedHLT) continue;
 
     // best tag-probe pair = mee closest to Z mass
-    float minpull = 1000.;
-
+    float minpull = 100000.;
+    float mass = 1000;
     for(int iele1=0; iele1<nEle; iele1++) {
       TLorentzVector electron1(pxEle[iele1],pyEle[iele1],pzEle[iele1],energyEle[iele1]);
       for(int iele2=iele1+1; iele2<nEle; iele2++) {
@@ -65,7 +72,7 @@ void LHPdfsProducer::LoopZTagAndProbe() {
             (!m_selection->passCut("ptEleAcc",electron1.Pt()) ||
              !m_selection->passCut("ptEleAcc",electron2.Pt()) ) ) continue;
 
-        float mass = (electron1+electron2).M();
+        mass = (electron1+electron2).M();
         m_Zmass->Fill(mass);
         float pull=fabs(mass-91.1876);
 
@@ -92,6 +99,10 @@ void LHPdfsProducer::LoopZTagAndProbe() {
         TLorentzVector probeP4(pxEle[probe],pyEle[probe],pzEle[probe],energyEle[probe]);
         TLorentzVector tagP4(pxEle[tag],pyEle[tag],pzEle[tag],energyEle[tag]);
         
+        int charge = chargeEle[probe];
+        float pt = probeP4.Pt();
+        float eta = etaEle[probe];
+
         /// define the bins in which can be splitted the PDFs
         int iecal = (fabs( etaEle[probe])<1.479) ? 0 : 1;
         int iptbin = (probeP4.Pt()<15.0) ? 0 : 1;
@@ -225,13 +236,21 @@ void LHPdfsProducer::LoopZTagAndProbe() {
           a20FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( a20 );
           a42FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( a42 );
 
+          // fill the reduced tree
+          reducedTree.fillVariables(EoPout,HoE,dEta,dPhiVtx,s9s25,sigmaEtaEta);
+          reducedTree.fillAttributes(charge,eta,pt,mass);
+          reducedTree.fillCategories(iecal,iptbin,iclass);
+          reducedTree.store();
+
         } // fill histograms
 
       } // loop over the 2 Z electrons
 
     } // end tag and probe
 
-  }
+  } // loop over events
+
+  reducedTree.save();
 
 }
 
@@ -1068,7 +1087,9 @@ void LHPdfsProducer::bookHistos() {
 
 void LHPdfsProducer::saveHistos(const char *filename) {
 
-  TFile *file = TFile::Open(filename,"recreate");
+  char outfilename[200];
+  sprintf(outfilename,"%sPdfsHistograms.root",filename);
+  TFile *file = TFile::Open(outfilename,"recreate");
   file->mkdir("pdfsProducer","pdfs created from trees");
   file->cd("pdfsProducer");
 
