@@ -117,6 +117,10 @@ CompareMisId: $(INCLUDEDIR)/src/CompareMisId.C \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o
 	$(CXX) $(CXXFLAGS) -o CompareMisId $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
+CompareClasses: $(INCLUDEDIR)/src/CompareClasses.C \
+	$(OUTLIBCOMMON)EfficiencyEvaluator.o
+	$(CXX) $(CXXFLAGS) -o CompareClasses $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
+
 MakeNotePdfPlots: $(INCLUDEDIR)/src/MakeNotePdfPlots.C
 	$(CXX) $(CXXFLAGS) -o MakeNotePdfPlots $(GLIBS) $ $<
 
@@ -126,7 +130,9 @@ EgammaAnalysis.clean:
 clean:
 	rm -f $(OUTLIB)*.o $(OUTLIBCOMMON)*.o
 	rm -f EgammaAnalysis
+	rm -r CompareEff
 	rm -f CompareMisId
+	rm -r CompareClasses
 
-all:  EgammaAnalysis CompareEff CompareMisId MakeNotePdfPlots
+all:  EgammaAnalysis CompareEff CompareMisId CompareClasses MakeNotePdfPlots
 
