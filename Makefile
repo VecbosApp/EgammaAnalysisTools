@@ -127,6 +127,9 @@ CompareClasses: $(INCLUDEDIR)/src/CompareClasses.C \
 MakeNotePdfPlots: $(INCLUDEDIR)/src/MakeNotePdfPlots.C
 	$(CXX) $(CXXFLAGS) -o MakeNotePdfPlots $(GLIBS) $ $<
 
+MakeNoteBkgPdfPlots: $(INCLUDEDIR)/src/MakeNoteBkgPdfPlots.C
+	$(CXX) $(CXXFLAGS) -o MakeNoteBkgPdfPlots $(GLIBS) $ $<
+
 EgammaAnalysis.clean:
 	rm -f EgammaAnalysis
 
@@ -137,6 +140,12 @@ clean:
 	rm -f CompareMisId
 	rm -r CompareClasses
 	rm -r MakeNotePdfPlots
+	rm -r MakeNoteBkgPdfPlots
 
-all:  EgammaAnalysis CompareEff CompareMisId CompareClasses MakeNotePdfPlots
+all:  EgammaAnalysis \
+	CompareEff \
+	CompareMisId \
+	CompareClasses \
+	MakeNotePdfPlots \
+	MakeNoteBkgPdfPlots
 
