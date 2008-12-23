@@ -92,6 +92,8 @@ $(OUTLIB)LikelihoodAnalysis.o: $(INCLUDEDIR)/src/LikelihoodAnalysis.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LikelihoodAnalysis.o $<
 $(OUTLIB)LHPdfsProducer.o: $(INCLUDEDIR)/src/LHPdfsProducer.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LHPdfsProducer.o $<
+$(OUTLIB)IsolationPdfsProducer.o: $(INCLUDEDIR)/src/IsolationPdfsProducer.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)IsolationPdfsProducer.o $<
 
 #----------------------------------------------------#
 
@@ -109,7 +111,8 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIBCOMMON)Utils.o \
 	$(OUTLIB)RedEleIDTree.o \
 	$(OUTLIB)LikelihoodAnalysis.o \
-	$(OUTLIB)LHPdfsProducer.o
+	$(OUTLIB)LHPdfsProducer.o \
+	$(OUTLIB)IsolationPdfsProducer.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
 CompareEff: $(INCLUDEDIR)/src/CompareEff.C \
