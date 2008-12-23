@@ -376,19 +376,19 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 //     int nJetsReco=0;
 //     int nEleReco=0;
 
-    for ( int jet=0; jet<nJet; jet++ ) {
+    for ( int jet=0; jet<nSisConeJet; jet++ ) {
 
-      TVector3 p3Jet(pxJet[jet],pyJet[jet],pzJet[jet]);
+      TVector3 p3Jet(pxSisConeJet[jet],pySisConeJet[jet],pzSisConeJet[jet]);
 
-       if ( fabs(etaJet[jet]) < 2.5 && etJet[jet] > 10.0 ) {
+       if ( fabs(etaSisConeJet[jet]) < 2.5 && etSisConeJet[jet] > 10.0 ) {
         
         float deltaR = 1000;
         if(mceleindex>-1) deltaR = p3Jet.DeltaR(mcEle);
 
         // remove from denominator the electron reconstructed as jet
         if( deltaR>0.3 ) { 
-          FakeableJetsEta->Fill( etaJet[jet] );
-          FakeableJetsPt->Fill( etJet[jet] );
+          FakeableJetsEta->Fill( etaSisConeJet[jet] );
+          FakeableJetsPt->Fill( etSisConeJet[jet] );
           //          nJetsReco++;
         }
 
@@ -410,11 +410,11 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
         float dREleJet_min = 1000;
         int closestJet=-1;
 
-        for ( int jet=0; jet<nJet; jet++ ) {
+        for ( int jet=0; jet<nSisConeJet; jet++ ) {
 
-          if ( fabs(etaJet[jet]) < 2.5 && etJet[jet] > 10.0 ) {          
+          if ( fabs(etaSisConeJet[jet]) < 2.5 && etSisConeJet[jet] > 10.0 ) {          
 
-            TVector3 p3Jet(pxJet[jet],pyJet[jet],pzJet[jet]);
+            TVector3 p3Jet(pxSisConeJet[jet],pySisConeJet[jet],pzSisConeJet[jet]);
             
             float dREleJet = p3Jet.DeltaR(p3Ele);
             if(dREleJet<dREleJet_min) {
@@ -430,8 +430,8 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
         if(closestJet > -1) {
 
-          float etFake=etJet[closestJet];
-          float etaFake=etaJet[closestJet];
+          float etFake=etSisConeJet[closestJet];
+          float etaFake=etaSisConeJet[closestJet];
 
           RecoEta->Fill(etaFake);
           RecoPt->Fill(etFake);
