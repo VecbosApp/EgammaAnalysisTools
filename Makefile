@@ -133,8 +133,14 @@ MakeNotePdfPlots: $(INCLUDEDIR)/src/MakeNotePdfPlots.C
 MakeNoteBkgPdfPlots: $(INCLUDEDIR)/src/MakeNoteBkgPdfPlots.C
 	$(CXX) $(CXXFLAGS) -o MakeNoteBkgPdfPlots $(GLIBS) $ $<
 
+MakeNoteIsolationPlots: $(INCLUDEDIR)/src/MakeNoteIsolationPlots.C
+	$(CXX) $(CXXFLAGS) -o MakeNoteIsolationPlots $(GLIBS) $ $<
+
 CompareSignalPdfs: $(INCLUDEDIR)/src/CompareSignalPdfs.C
 	$(CXX) $(CXXFLAGS) -o CompareSignalPdfs $(GLIBS) $ $<
+
+CompareSignalIsolation: $(INCLUDEDIR)/src/CompareSignalIsolation.C
+	$(CXX) $(CXXFLAGS) -o CompareSignalIsolation $(GLIBS) $ $<
 
 EgammaAnalysis.clean:
 	rm -f EgammaAnalysis
@@ -148,6 +154,8 @@ clean:
 	rm -r MakeNotePdfPlots
 	rm -r MakeNoteBkgPdfPlots
 	rm -r CompareSignalPdfs
+	rm -r CompareSignalIsolation
+	rm -r MakeNoteIsolationPlots
 
 all:  EgammaAnalysis \
 	CompareEff \
@@ -155,5 +163,7 @@ all:  EgammaAnalysis \
 	CompareClasses \
 	MakeNotePdfPlots \
 	MakeNoteBkgPdfPlots \
-	CompareSignalPdfs
+	CompareSignalPdfs \
+	CompareSignalIsolation \
+	MakeNoteIsolationPlots
 
