@@ -1,10 +1,10 @@
 eOverPin	0.0		999.
-deta		0.0		0.008
-dphiIn		0.0		0.06
-hOverE		0.0		0.09
-s9s25		0.7		1.0
-eOverPout	0.6		2.5
-dphiOut		0.0		0.011
+deta		0.0		0.005
+dphiIn		0.0		0.02
+hOverE		0.0		0.06
+s9s25		0.8		1.0
+eOverPout	0.7		2.5
+dphiOut		0.0		0.02
 invEminusInvP	0.0		0.02
 bremFraction	0.0		999.
 sigmaEtaEta	0.0		999.

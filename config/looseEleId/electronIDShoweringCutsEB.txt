@@ -1,7 +1,7 @@
 eOverPin	0.0		999.
 deta		0.0		0.009
 dphiIn		0.0		0.08
-hOverE		0.0		0.12
+hOverE		0.0		0.08
 s9s25		0.5		1.0
 eOverPout	0.5		999.
 dphiOut		0.0		999.
