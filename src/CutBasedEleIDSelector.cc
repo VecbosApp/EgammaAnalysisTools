@@ -115,7 +115,7 @@ bool CutBasedEleIDSelector::output() {
     selection=m_EgammaCutIDSelection[offset+1];
   else if(GsfClass==20)
     selection=m_EgammaCutIDSelection[offset+2];
-  else if(GsfClass>=30 && GsfClass<=40) {
+  else if(GsfClass>=30 && GsfClass<=42) {
     selection=m_EgammaCutIDSelection[offset+3];
   }
 
