@@ -1,6 +1,10 @@
 #include "EgammaAnalysisTools/include/CutBasedEleIDSelector.hh"
+#include "CommonTools/include/LeptonIdBits.h"
+#include "CommonTools/include/Utils.hh"
 #include <iostream>
 #include <math.h>
+
+using namespace bits;
 
 CutBasedEleIDSelector::CutBasedEleIDSelector() {
 
@@ -20,23 +24,26 @@ CutBasedEleIDSelector::CutBasedEleIDSelector() {
   m_electronClassInitialised = false;
   m_egammaCutBasedInitialised = false;
 
+  // fiducial flag HAS to be set, otherwise the selector doesn't know which slection apply (EB or EE)
+  m_fiducialflag = -1;
+
 }
 
 CutBasedEleIDSelector::~CutBasedEleIDSelector() {}
 
 void CutBasedEleIDSelector::Configure(const char *configDir) {
 
-  std::string fileSwitches = std::string(configDir) + "electronIDSwitches.txt";
+  std::string fileSwitches = std::string(configDir) + "/electronIDSwitches.txt";
 
-  std::string goldenCutsEB = std::string(configDir) + "electronIDGoldenCutsEB.txt";
-  std::string bigbremCutsEB = std::string(configDir) + "electronIDBigBremCutsEB.txt";
-  std::string narrowCutsEB = std::string(configDir) + "electronIDNarrowCutsEB.txt";
-  std::string showeringCutsEB = std::string(configDir) + "electronIDShoweringCutsEB.txt";
+  std::string goldenCutsEB = std::string(configDir) + "/electronIDGoldenCutsEB.txt";
+  std::string bigbremCutsEB = std::string(configDir) + "/electronIDBigBremCutsEB.txt";
+  std::string narrowCutsEB = std::string(configDir) + "/electronIDNarrowCutsEB.txt";
+  std::string showeringCutsEB = std::string(configDir) + "/electronIDShoweringCutsEB.txt";
 
-  std::string goldenCutsEE = std::string(configDir) + "electronIDGoldenCutsEE.txt";
-  std::string bigbremCutsEE = std::string(configDir) + "electronIDBigBremCutsEE.txt";
-  std::string narrowCutsEE = std::string(configDir) + "electronIDNarrowCutsEE.txt";
-  std::string showeringCutsEE = std::string(configDir) + "electronIDShoweringCutsEE.txt";
+  std::string goldenCutsEE = std::string(configDir) + "/electronIDGoldenCutsEE.txt";
+  std::string bigbremCutsEE = std::string(configDir) + "/electronIDBigBremCutsEE.txt";
+  std::string narrowCutsEE = std::string(configDir) + "/electronIDNarrowCutsEE.txt";
+  std::string showeringCutsEE = std::string(configDir) + "/electronIDShoweringCutsEE.txt";
   
   Selection *goldenSelectionEB = new Selection(goldenCutsEB, fileSwitches);
   Selection *bigbremSelectionEB = new Selection(bigbremCutsEB, fileSwitches);
@@ -101,21 +108,32 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
 
 bool CutBasedEleIDSelector::output() {
 
+  if ( m_fiducialflag == -1 ) {
+    cout << "CONFIGURATION ERROR! Fiducial flag not set. Use the method CutBasedEleIDSelector::SetEcalFiducialRegion(int word) to do it. Returning always false eleID." << endl;
+    return false;
+  }
+
+  Utils anaUtils;
+
+  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isGap);
+
+  if ( eleInGap ) return false;
+
   int GsfClass = m_electronClass;
   int offset=0;
-  if(GsfClass>=100) {
-    GsfClass-=100;
+  bool eeElectron = anaUtils.fiducialFlagECAL(m_fiducialflag, isEE);
+  if(eeElectron) {
     offset=4;
   }
 
   Selection *selection;
-  if(GsfClass==0) 
+  if(GsfClass==GOLDEN) 
     selection=m_EgammaCutIDSelection[offset];
-  else if(GsfClass==10)
+  else if(GsfClass==BIGBREM)
     selection=m_EgammaCutIDSelection[offset+1];
-  else if(GsfClass==20)
+  else if(GsfClass==NARROW)
     selection=m_EgammaCutIDSelection[offset+2];
-  else if(GsfClass>=30 && GsfClass<=42) {
+  else if(GsfClass==SHOWERING) {
     selection=m_EgammaCutIDSelection[offset+3];
   }
 

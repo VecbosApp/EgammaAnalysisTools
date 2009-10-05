@@ -28,6 +28,7 @@ public:
   void SetEOverPin(float EOverPin) { m_EOverPin = EOverPin; m_useEOverPin = true; }
   void SetElectronClass(int electronClass) { m_electronClass = electronClass; m_electronClassInitialised = true; }
   void SetLikelihood(float Likelihood) { m_Likelihood = Likelihood; m_useLikelihood = true; }
+  void SetEcalFiducialRegion(int word) { m_fiducialflag = word; }
   //! set event by event output of egamma cut-based electron ID
   void SetEgammaCutBasedID(bool egammaCutBased) { m_egammaCutBased = egammaCutBased; m_egammaCutBasedInitialised = true; }
   //! get output of the selector
@@ -66,6 +67,7 @@ private:
   float m_EOverPin;
   float m_Likelihood;
   int m_electronClass;
+  int m_fiducialflag;
   bool m_egammaCutBased;
   
   //! contains the class-dependent electron ID cuts
