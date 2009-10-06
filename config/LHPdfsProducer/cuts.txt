@@ -2,7 +2,7 @@ etaEleAcc       -2.5      2.5
 ptEleAcc	5         1000
 relSumPtTracks  0         0.20
 meeWindow      60.0       110.0
-etaJetAcc       -3.0      3.0
+etaJetAcc       -2.5      2.5
 ptJetAcc	30	  1000
 jetDeltaPhi	100	  360
 jetInvMass	70	  110

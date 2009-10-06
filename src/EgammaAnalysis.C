@@ -32,17 +32,16 @@
 
 int main(int argc, char* argv[]) {
 
-  char inputFileName[150];
-  char outputFileName[150];
+  char inputFileName[300];
+  char outputFileName[300];
 
-  if ( argc < 2 ){
+  if ( argc < 3 ){
     std::cout << "missing argument: insert at least inputFile with list of root files" << std::endl; 
-    std::cout << "EgammaAnalysis inputFile [outputFile]" << std::endl;
+    std::cout << "EgammaAnalysis inputFile outputFile" << std::endl;
     return 1;
   }
   strcpy(inputFileName,argv[1]);
-  if ( argc < 3 ) sprintf(outputFileName,"pdfs.root");
-  else strcpy(outputFileName,argv[2]);
+  strcpy(outputFileName,argv[2]);
 
   // -------------------------
   // loading file:
@@ -85,6 +84,8 @@ int main(int argc, char* argv[]) {
 #endif
 
 #if Application == 2
+
+  char title[1000];
   
   LHPdfsProducer producer(theChain);
 
@@ -100,15 +101,21 @@ int main(int argc, char* argv[]) {
   maskBackground.requireTrigger("HLT_Ele15_SW_L1R");   // to be changed
   std::vector<int> requiredBackgroundTriggers = maskBackground.getBits();
   producer.requireBackgroundTrigger(requiredBackgroundTriggers);
+  
+  // sprintf(title,"%s_zTandP_tree.root",outputFileName);  
+  // producer.LoopZTagAndProbe(title);
+  // sprintf(title,"%s_zTandP_histos.root",outputFileName);    
+  // producer.saveHistos(title);
 
-  // producer.LoopZTagAndProbe("fromZ_TandP_");
-  // producer.saveHistos("fromZ_TandP_histos");
+  // sprintf(title,"%s_zMC_tree.root",outputFileName);  
+  // producer.LoopZ(title);
+  // sprintf(title,"%s_zMC_histos.root",outputFileName);    
+  // producer.saveHistos(title);
 
-  // producer.LoopZ("fromZ_MC_");
-  // producer.saveHistos("fromZ_MC_histos");
-
-  producer.LoopQCDTagAndProbe("fromQCD_TandP_");
-  producer.saveHistos("fromQCD_TandP_histos");
+  sprintf(title,"%s_qcdTandP_tree.root",outputFileName);  
+  producer.LoopQCDTagAndProbe(title);
+  sprintf(title,"%s_qcdTandP_histos.root",outputFileName);    
+  producer.saveHistos(title);
 
 #endif
 

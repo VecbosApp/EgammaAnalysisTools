@@ -50,7 +50,7 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
   bookHistos();
 
   char treename[200];
-  sprintf(treename,"%sPdfsTree.root",treefilesuffix);
+  sprintf(treename,"%s",treefilesuffix);
   RedEleIDTree reducedTree(treename);
   reducedTree.addAttributesSignal();
   reducedTree.addCategories();
@@ -289,7 +289,7 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
   if(fChain == 0) return;
 
   char treename[200];
-  sprintf(treename,"%sPdfsTree.root",treefilesuffix);
+  sprintf(treename,"%s",treefilesuffix);
   RedEleIDTree reducedTree(treename);
   reducedTree.addAttributesSignal();
   reducedTree.addCategories();
@@ -651,7 +651,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
   bookHistos();
   
   char treename[200];
-  sprintf(treename,"%sPdfsTree.root",treefilesuffix);
+  sprintf(treename,"%s",treefilesuffix);
   RedEleIDTree reducedTree(treename);
   reducedTree.addAttributesBackground();
   reducedTree.addCategories();
@@ -664,7 +664,6 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
   int tagandprobe = 0;
   int nocrack     = 0;
   int eleTot      = 0;
-  int probeIsol   = 0;
   int deltaphi    = 0;
   int invmass     = 0;
 
@@ -678,7 +677,6 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
-
     allevents++;
     
     // QCD trigger
@@ -691,21 +689,22 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     vector<int> probeCandidates;
     vector<int> tagCandidates;
     
-    // selecting electrons in the acceptance to work as probe
+    // selecting electrons in the acceptance and possibly loose isolated to work as probe
     for(int iele=0; iele<nEle; iele++) {
       TLorentzVector electron(pxEle[iele],pyEle[iele],pzEle[iele],energyEle[iele]);
+      float relativeIsol = dr04TkSumPtEle[iele]/electron.Pt();
       if( m_selection->getSwitch("etaEleAcc") && (!m_selection->passCut("etaEleAcc",etaEle[iele]) ) ) continue;
       if( m_selection->getSwitch("ptEleAcc")  && (!m_selection->passCut("ptEleAcc",electron.Pt()) ) ) continue;      
+      if( m_selection->getSwitch("applyIsolationOnProbe") && !m_selection->passCut("relSumPtTracks",relativeIsol) ) continue;
       probeCandidates.push_back(iele);
     }
     if (probeCandidates.size()>0) oneele++;
 
     // selecting jets in the acceptance to work as tag
-    for (int iJet=0; iJet<nSisConeCorrJet; iJet++){    
-
-      if ( m_selection->getSwitch("etaJetAcc") && !m_selection->passCut("etaJetAcc",etaSisConeCorrJet[iJet]) ) continue;
-      if ( m_selection->getSwitch("etJetAcc")  && !m_selection->passCut("etJetAcc",etSisConeCorrJet[iJet]) )   continue;
-      tagCandidates.push_back(iJet);
+    for (int ijet=0; ijet<nSisConeCorrJet; ijet++){    
+      if ( m_selection->getSwitch("etaJetAcc") && !m_selection->passCut("etaJetAcc",etaSisConeCorrJet[ijet]) ) continue;
+      if ( m_selection->getSwitch("etJetAcc")  && !m_selection->passCut("etJetAcc",etSisConeCorrJet[ijet]) )   continue;
+      tagCandidates.push_back(ijet);
     }
     if (tagCandidates.size()>0) onejet++;
 
@@ -714,7 +713,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     int theTag   = -999;
     int theProbe = -999;
     float tagEt  = -999.;
-
+    
     for (int iJet=0; iJet<tagCandidates.size(); iJet++){ 
 
       TLorentzVector p4Jet;
@@ -724,8 +723,8 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       // we use the highest ET jet (with a potential probe) as a tag 
       if (etSisConeCorrJet[tagCandidates[iJet]]<tagEt) continue;
 
-      // we choose the probe with min Dphi wrt the tag
-      float dPhiMin = 999.;
+      // we choose the probe with max Dphi wrt the tag
+      float dPhiMax = -999.;
 
       for (int iEle=0; iEle<probeCandidates.size(); iEle++){       
 
@@ -735,11 +734,9 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
 	TVector3 p3Ele(pxEle[probeCandidates[iEle]],pyEle[probeCandidates[iEle]],pzEle[probeCandidates[iEle]]);
 	p4Ele.SetXYZT (pxEle[probeCandidates[iEle]],pyEle[probeCandidates[iEle]],pzEle[probeCandidates[iEle]],energyEle[probeCandidates[iEle]]);
 
-	// probe must be loose-isolated, if required
-        float probePt = p4Ele.Pt();
-        float relativeIsolProbe = dr04TkSumPtEle[iEle]/probePt;
-	if ( m_selection->getSwitch("applyIsolationOnProbe") && !m_selection->passCut("relSumPtTracks",relativeIsolProbe) ) continue;
-	probeIsol++;
+	// the electron and the tag must not be the same thing
+	float deltaR = p3Ele.DeltaR(p3Jet);
+	if (deltaR<0.4) continue;
 
 	// minimal requirements on invariant mass and separation
 	float deltaPhi = fabs(p3Jet.DeltaPhi(p3Ele));
@@ -751,11 +748,11 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
 
 	// we have a potential probe and this is highest ET jet up to now -> it's our tag
 	tagEt  = etSisConeCorrJet[tagCandidates[iJet]];
-	theTag = iJet;
+	theTag = tagCandidates[iJet];
 	
-	// in case of more probe for this tag
-	if (deltaPhi<dPhiMin) { 
-	  dPhiMin  = deltaPhi;
+	// in case of several probes for this tag
+	if (deltaPhi>dPhiMax) { 
+	  dPhiMax  = deltaPhi;
 	  theProbe = probeCandidates[iEle];
 	}
       }
@@ -764,8 +761,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     // we need a tag and a probe
     if (theTag<-800 || theProbe<-800) continue;
     tagandprobe++;
-
-    
+        
     // variables for the tree
     TLorentzVector p4Tag, p4Probe;	
     TVector3 p3Probe(pxEle[theProbe],pyEle[theProbe],pzEle[theProbe]);
@@ -775,6 +771,13 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     float theDeltaPhi = fabs(p3Tag.DeltaPhi(p3Probe));
     float theInvMass  = (p4Tag+p4Probe).M();
     float theMet      = etMet[0];
+
+    if (theDeltaPhi<0.5) { 
+      cout << "probe: " << etaEle[theProbe]          << " " << phiEle[theProbe]          << " " << etEle[theProbe] << endl;
+      cout << "tag "    << etaSisConeCorrJet[theTag] << " " << phiSisConeCorrJet[theTag] << " " << etSisConeCorrJet[theTag] << endl;
+      cout << "dPhi = " << theDeltaPhi << endl;
+      cout << jentry << endl;
+    }
 
     // others
     int charge = chargeEle[theProbe];
@@ -881,7 +884,6 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
   cout << "no crack       = " << nocrack        << endl;
   cout << "statistics from QCD tag and probe - electrons: " << endl;
   cout << "eleTot         = " << eleTot         << endl;
-  cout << "probeIso       = " << probeIsol      << endl;
   cout << "deltaPhi ok    = " << deltaphi       << endl;
   cout << "inv mass       = " << invmass        << endl; 
 
@@ -1521,7 +1523,7 @@ void LHPdfsProducer::bookHistos() {
 void LHPdfsProducer::saveHistos(const char *filename) {
 
   char outfilename[200];
-  sprintf(outfilename,"%sPdfsHistograms.root",filename);
+  sprintf(outfilename,"%s",filename);
   TFile *file = TFile::Open(outfilename,"recreate");
   file->mkdir("pdfsProducer","pdfs created from trees");
   file->cd("pdfsProducer");
