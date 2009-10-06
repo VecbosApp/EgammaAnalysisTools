@@ -37,9 +37,9 @@ float LikelihoodAnalysis::findEquivalentLHCut(float wantEfficiency) {
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     for(int iele=0; iele<nEle; iele++) {
-      if (eleClassEle[iele]==40) LHBinnedHisto->Fill(1.0);
+      if (classificationEle[iele]==40) LHBinnedHisto->Fill(1.0);
       else {
-	LHBinnedHisto->Fill(eleLikelihoodEle[iele]);
+	LHBinnedHisto->Fill(eleIdLikelihoodEle[iele]);
       }
     }
 
@@ -96,20 +96,20 @@ void LikelihoodAnalysis::reproduceEgammaCutID() {
 
       TVector3 pTrkAtOuter(pxAtOuterEle[iele],pyAtOuterEle[iele],pzAtOuterEle[iele]);
 
-      EgammaLooseCutBasedID.SetHOverE( eleHoEEle[iele] );
+      EgammaLooseCutBasedID.SetHOverE( hOverEEle[iele] );
       EgammaLooseCutBasedID.SetS9S25( s9s25Ele[iele] );
-      EgammaLooseCutBasedID.SetDEta( eleDeltaEtaAtVtxEle[iele] );
-      EgammaLooseCutBasedID.SetDPhiIn( eleDeltaPhiAtVtxEle[iele] );
-      EgammaLooseCutBasedID.SetDPhiOut( eleDeltaPhiAtCaloEle[iele] );
-      EgammaLooseCutBasedID.SetInvEminusInvP( 1./eleCaloCorrEEle[iele]-1./eleTrackerPEle[iele] );
-      EgammaLooseCutBasedID.SetBremFraction( fabs(eleTrackerPEle[iele]-pTrkAtOuter.Mag())/eleTrackerPEle[iele] );
+      EgammaLooseCutBasedID.SetDEta( deltaEtaAtVtxEle[iele] );
+      EgammaLooseCutBasedID.SetDPhiIn( deltaPhiAtVtxEle[iele] );
+      EgammaLooseCutBasedID.SetDPhiOut( deltaPhiAtCaloEle[iele] );
+      EgammaLooseCutBasedID.SetInvEminusInvP( 1./ecalEle[iele]-1./momentumEle[iele] );
+      EgammaLooseCutBasedID.SetBremFraction( fabs(momentumEle[iele]-pTrkAtOuter.Mag())/momentumEle[iele] );
       EgammaLooseCutBasedID.SetSigmaEtaEta( sqrt(covEtaEtaEle[iele]) );
       EgammaLooseCutBasedID.SetSigmaPhiPhi( sqrt(covPhiPhiEle[iele]) );
-      EgammaLooseCutBasedID.SetEOverPout( eleCorrEoPoutEle[iele] );
-      EgammaLooseCutBasedID.SetEOverPin( eleCorrEoPEle[iele] );
-      EgammaLooseCutBasedID.SetElectronClass ( eleClassEle[iele] );
-      EgammaLooseCutBasedID.SetEgammaCutBasedID ( eleIdCutBasedEle[iele] );
-      EgammaLooseCutBasedID.SetLikelihood( eleLikelihoodEle[iele] );      
+      EgammaLooseCutBasedID.SetEOverPout( eSeedOverPoutEle[iele] );
+      EgammaLooseCutBasedID.SetEOverPin( eSuperClusterOverPEle[iele] );
+      EgammaLooseCutBasedID.SetElectronClass ( classificationEle[iele] );
+      EgammaLooseCutBasedID.SetEgammaCutBasedID ( eleIdCutsEle[iele] );
+      EgammaLooseCutBasedID.SetLikelihood( eleIdLikelihoodEle[iele] );      
 
       bool isEleIDCutBased = EgammaLooseCutBasedID.output();
 
@@ -212,7 +212,7 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
       RecoEta->Fill(mcEta);
       RecoPt->Fill(mcPt);
 
-      int fullclass = eleClassEle[matchedRecoEle];
+      int fullclass = classificationEle[matchedRecoEle];
 
       if ( fullclass == 0 || fullclass == 100 ) {
         GoldenEta->Fill(mcEta);
@@ -229,21 +229,21 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
         ShoweringPt->Fill(mcPt);
       }
       
-      if ( eleIdCutBasedEle[matchedRecoEle] ) {
+      if ( eleIdCutsEle[matchedRecoEle] ) {
         
         CutIdEta->Fill(mcEta);
         CutIdPt->Fill(mcPt);
         
       }
       
-      if ( eleLikelihoodEle[matchedRecoEle] > minLikelihoodLoose ) {
+      if ( eleIdLikelihoodEle[matchedRecoEle] > minLikelihoodLoose ) {
         
         LHIdLooseEta->Fill(mcEta);
         LHIdLoosePt->Fill(mcPt);
         
       }
       
-      if ( eleLikelihoodEle[matchedRecoEle] > minLikelihoodTight ) {
+      if ( eleIdLikelihoodEle[matchedRecoEle] > minLikelihoodTight ) {
         
         LHIdTightEta->Fill(mcEta);
         LHIdTightPt->Fill(mcPt);
@@ -436,7 +436,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
           RecoEta->Fill(etaFake);
           RecoPt->Fill(etFake);
 
-          int fullclass = eleClassEle[ele];
+          int fullclass = classificationEle[ele];
           
           if ( fullclass == 0 || fullclass == 100 ) {
             GoldenEta->Fill(etaFake);
@@ -453,21 +453,21 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
             ShoweringPt->Fill(etFake);
           }
 
-          if ( eleIdCutBasedEle[ele] ) {
+          if ( eleIdCutsEle[ele] ) {
 
             CutIdEta->Fill(etaFake);
             CutIdPt->Fill(etFake);
 
           }
 
-          if ( eleLikelihoodEle[ele] > minLikelihoodLoose ) {
+          if ( eleIdLikelihoodEle[ele] > minLikelihoodLoose ) {
 
             LHIdLooseEta->Fill(etaFake);
             LHIdLoosePt->Fill(etFake);
 
           }
 
-          if ( eleLikelihoodEle[ele] > minLikelihoodTight ) {
+          if ( eleIdLikelihoodEle[ele] > minLikelihoodTight ) {
 
             LHIdTightEta->Fill(etaFake);
             LHIdTightPt->Fill(etFake);

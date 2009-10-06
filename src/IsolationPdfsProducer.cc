@@ -99,22 +99,22 @@ void IsolationPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
         int iecal = (fabs( etaEle[probe])<1.479) ? 0 : 1;
         
         // apply the electron ID loose on the tag electron        
-        float tagIdentified = eleIdCutBasedEle[tag];
+        float tagIdentified = eleIdCutsEle[tag];
         
         // Tracker isolation
         // on the tag electron...
         
-        bool tagIsolated = ( m_selection->passCut("relSumPtTracks",eleSumPt04Ele[tag]) );
+        bool tagIsolated = ( m_selection->passCut("relSumPtTracks",dr04TkSumPtEle[tag]) );
 
         // ID on the probe electron...
         bool probeIdentified = true;
         if ( m_selection->getSwitch("applyIDOnProbe") ) {
-          probeIdentified = eleIdCutBasedEle[probe];
+          probeIdentified = eleIdCutsEle[probe];
         }
         
-        float TkSumPtRel = eleSumPt04Ele[probe];
-        float EcalSumEtRel = eleSumEmEt04Ele[probe];
-        float HcalSumEtRel = eleSumHadEt04Ele[probe];
+        float TkSumPtRel = dr04TkSumPtEle[probe];
+        float EcalSumEtRel = dr04EcalRecHitSumEtEle[probe];
+        float HcalSumEtRel = dr04HcalTowerSumEtEle[probe];
         float EcalRecHitsSumEtRel = 0;
 
         /// fill the electron ID pdfs only if:
@@ -165,16 +165,16 @@ void IsolationPdfsProducer::LoopQCD() {
           ! m_selection->passCut("etaEleAcc",etaEle[iele]) ) continue;
       
       if ( m_selection->getSwitch("applyIDOnProbe") &&
-           ! eleIdCutBasedEle[iele] ) continue;
+           ! eleIdCutsEle[iele] ) continue;
       
       TLorentzVector eleP4(pxEle[iele],pyEle[iele],pzEle[iele],energyEle[iele]);
 
       /// define the bins in which can be splitted the PDFs
       int iecal = (fabs( etaEle[iele])<1.479) ? 0 : 1;
 
-      float TkSumPtRel = eleSumPt04Ele[iele];
-      float EcalSumEtRel = eleSumEmEt04Ele[iele];
-      float HcalSumEtRel = eleSumHadEt04Ele[iele];
+      float TkSumPtRel = dr04TkSumPtEle[iele];
+      float EcalSumEtRel = dr04EcalRecHitSumEtEle[iele];
+      float HcalSumEtRel = dr04HcalTowerSumEtEle[iele];
       float EcalRecHitsSumEtRel = 0;
       
       tkSumPtRel   [iecal] -> Fill ( TkSumPtRel );
@@ -248,15 +248,15 @@ void IsolationPdfsProducer::LoopWjets() {
           ! m_selection->passCut("etaEleAcc",etaEle[iele]) ) continue;
       
       if ( m_selection->getSwitch("applyIDOnProbe") &&
-           ! eleIdCutBasedEle[iele] ) continue;
+           ! eleIdCutsEle[iele] ) continue;
       
       
       /// define the bins in which can be splitted the PDFs
       int iecal = (fabs( etaEle[iele])<1.479) ? 0 : 1;
 
-      float TkSumPtRel = eleSumPt04Ele[iele];
-      float EcalSumEtRel = eleSumEmEt04Ele[iele];
-      float HcalSumEtRel = eleSumHadEt04Ele[iele];
+      float TkSumPtRel = dr04TkSumPtEle[iele];
+      float EcalSumEtRel = dr04EcalRecHitSumEtEle[iele];
+      float HcalSumEtRel = dr04HcalTowerSumEtEle[iele];
       float EcalRecHitsSumEtRel = 0;
       
       tkSumPtRel   [iecal] -> Fill ( TkSumPtRel );
