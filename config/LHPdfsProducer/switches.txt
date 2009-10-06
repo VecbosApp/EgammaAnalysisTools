@@ -1,6 +1,13 @@
-requireTrigger          1
-applyIsolationOnProbe   1
+requireTriggerSignal	0
+requireTriggerQCDBack	0
+applyIsolationOnProbe   0
 meeWindow               1
 etaEleAcc               1
 ptEleAcc                1
 relSumPtTracks          1
+etaJetAcc               1
+ptJetAcc                1
+jetDeltaPhi		0
+jetInvMass		0
+
+
