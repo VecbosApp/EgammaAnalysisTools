@@ -736,7 +736,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
 
 	// the electron and the tag must not be the same thing
 	float deltaR = p3Ele.DeltaR(p3Jet);
-	if (deltaR<0.4) continue;
+	if (deltaR<0.3) continue;
 
 	// minimal requirements on invariant mass and separation
 	float deltaPhi = fabs(p3Jet.DeltaPhi(p3Ele));
