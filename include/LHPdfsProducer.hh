@@ -11,6 +11,7 @@
 #include "TH1F.h"
 #include "CommonTools/include/Selection.hh"
 #include "EgammaAnalysisTools/include/EgammaBase.h"
+#include "EgammaAnalysisTools/include/CutBasedEleIDSelector.hh"
 
 class LHPdfsProducer : public EgammaBase {
 
@@ -19,18 +20,26 @@ public:
   LHPdfsProducer(TTree *tree=0);
   //! destructor
   virtual ~LHPdfsProducer();
-  //! loop over events doing signal pdfs with Zee 
+  //! loop over events doing signal pdfs with Zee - tag and probe 
   void LoopZTagAndProbe(const char *treefilesuffix);
+  //! loop over events doing signal pdfs with Zee - MC
+  void LoopZ(const char *treefilesuffix);
   //! loop over events doing bkg pdfs on QCD
   void LoopQCD();
+  //! loop over events doing bkg pdfs on QCD using the tag and probe method
+  void LoopQCDTagAndProbe(const char *treefilesuffix);
   //! loop over events doing bkg pdfs on W+jets
   void LoopWjets();
   //! loop over events doing bkg pdfs on Z+jets
   void LoopZjets(const char *filename);
   //! set the list of the required triggers
-  void requireTrigger(std::vector<int> requiredTriggers) { m_requiredTriggers = requiredTriggers; }
+  void requireTrigger          (std::vector<int> requiredTriggers)           { m_requiredTriggers = requiredTriggers; }
+  void requireSignalTrigger    (std::vector<int> requiredSignalTriggers)     { m_requiredSignalTriggers = requiredSignalTriggers; }
+  void requireBackgroundTrigger(std::vector<int> requiredBackgroundTriggers) { m_requiredBackgroundTriggers = requiredBackgroundTriggers; }
   //! save the pdfs in a ROOT file
   void saveHistos(const char *filename);
+  //! returns the output of the custom cut electron ID                                                                                
+  bool isEleID(int eleIndex);
 
 private:
   
@@ -40,12 +49,17 @@ private:
   //! contains the class-dependent electron ID cuts
   std::vector<Selection*> m_EgammaCutIDSelection;
 
+  //! to evaluate custom eleID                                                                                                               
+  CutBasedEleIDSelector EgammaCutBasedID;
+
   //! the tag and the probe
   int electrons[2];
   int muons[2];
 
   //! the required trigger bits
   std::vector<int> m_requiredTriggers;
+  std::vector<int> m_requiredSignalTriggers;
+  std::vector<int> m_requiredBackgroundTriggers;
 
   //! the configurable selection
   Selection *m_selection;
@@ -61,9 +75,9 @@ private:
   TH1F *EoPoutUnsplitEle[2][2];
   TH1F *HoEUnsplitEle[2][2];  
   TH1F *shapeFisherUnsplitEle[2][2];  
-  TH1F *sigmaEtaEtaUnsplitEle[2][2];
-  TH1F *sigmaEtaPhiUnsplitEle[2][2];
-  TH1F *sigmaPhiPhiUnsplitEle[2][2];
+  TH1F *sigmaIEtaIEtaUnsplitEle[2][2];
+  TH1F *sigmaIEtaIPhiUnsplitEle[2][2];
+  TH1F *sigmaIPhiIPhiUnsplitEle[2][2];
   TH1F *s1s9UnsplitEle[2][2];
   TH1F *s9s25UnsplitEle[2][2];
   TH1F *LATUnsplitEle[2][2];
@@ -82,9 +96,9 @@ private:
   TH1F *EoPoutClassEle[2][2][2];
   TH1F *HoEClassEle[2][2][2];
   TH1F *shapeFisherClassEle[2][2][2];
-  TH1F *sigmaEtaEtaClassEle[2][2][2];
-  TH1F *sigmaEtaPhiClassEle[2][2][2];
-  TH1F *sigmaPhiPhiClassEle[2][2][2];
+  TH1F *sigmaIEtaIEtaClassEle[2][2][2];
+  TH1F *sigmaIEtaIPhiClassEle[2][2][2];
+  TH1F *sigmaIPhiIPhiClassEle[2][2][2];
   TH1F *s1s9ClassEle[2][2][2];
   TH1F *s9s25ClassEle[2][2][2];
   TH1F *LATClassEle[2][2][2];
@@ -103,9 +117,9 @@ private:
   TH1F *EoPoutFullclassEle[2][2][4];
   TH1F *HoEFullclassEle[2][2][4];
   TH1F *shapeFisherFullclassEle[2][2][4];
-  TH1F *sigmaEtaEtaFullclassEle[2][2][4];
-  TH1F *sigmaEtaPhiFullclassEle[2][2][4];
-  TH1F *sigmaPhiPhiFullclassEle[2][2][4];
+  TH1F *sigmaIEtaIEtaFullclassEle[2][2][4];
+  TH1F *sigmaIEtaIPhiFullclassEle[2][2][4];
+  TH1F *sigmaIPhiIPhiFullclassEle[2][2][4];
   TH1F *s1s9FullclassEle[2][2][4];
   TH1F *s9s25FullclassEle[2][2][4];
   TH1F *LATFullclassEle[2][2][4];

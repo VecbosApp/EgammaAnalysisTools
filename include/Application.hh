@@ -4,4 +4,4 @@
 //   2 = Pdfs Maker from Z tag and probe
 //   3 = Isolation Pdfs from Z tag and probe
 
-#define Application 3
+#define Application 2

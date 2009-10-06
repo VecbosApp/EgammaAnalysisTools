@@ -87,17 +87,28 @@ int main(int argc, char* argv[]) {
 #if Application == 2
   
   LHPdfsProducer producer(theChain);
-  TriggerMask mask(treeCond);
-  mask.requireTrigger("HLT_Ele15_LW_L1R");
 
-  std::vector<int> requiredTriggers = mask.getBits();
-  producer.requireTrigger(requiredTriggers);
+  TriggerMask maskSignal(treeCond);
+  maskSignal.requireTrigger("HLT_Ele15_SW_L1R");
+  maskSignal.requireTrigger("HLT_Ele15_SW_EleId_L1R");
+  maskSignal.requireTrigger("HLT_Ele15_SW_LooseTrackIso_L1R");
+  maskSignal.requireTrigger("HLT_Ele15_SiStrip_L1R");
+  std::vector<int> requiredSignalTriggers = maskSignal.getBits();
+  producer.requireSignalTrigger(requiredSignalTriggers);
 
-  producer.LoopZTagAndProbe();
-  producer.saveHistos(outputFileName);
+  TriggerMask maskBackground(treeCond);
+  maskBackground.requireTrigger("HLT_Ele15_SW_L1R");   // to be changed
+  std::vector<int> requiredBackgroundTriggers = maskBackground.getBits();
+  producer.requireBackgroundTrigger(requiredBackgroundTriggers);
 
-//   producer.LoopQCD();
-//   producer.saveHistos(outputFileName);
+  // producer.LoopZTagAndProbe("fromZ_TandP_");
+  // producer.saveHistos("fromZ_TandP_histos");
+
+  // producer.LoopZ("fromZ_MC_");
+  // producer.saveHistos("fromZ_MC_histos");
+
+  producer.LoopQCDTagAndProbe("fromQCD_TandP_");
+  producer.saveHistos("fromQCD_TandP_histos");
 
 #endif
 
