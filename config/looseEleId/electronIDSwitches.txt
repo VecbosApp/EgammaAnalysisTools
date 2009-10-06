@@ -1,4 +1,4 @@
-egammaCutBased	1
+egammaCutBased	0
 eOverPin	0
 deta		1
 dphiIn		1
