@@ -772,13 +772,6 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     float theInvMass  = (p4Tag+p4Probe).M();
     float theMet      = etMet[0];
 
-    if (theDeltaPhi<0.5) { 
-      cout << "probe: " << etaEle[theProbe]          << " " << phiEle[theProbe]          << " " << etEle[theProbe] << endl;
-      cout << "tag "    << etaSisConeCorrJet[theTag] << " " << phiSisConeCorrJet[theTag] << " " << etSisConeCorrJet[theTag] << endl;
-      cout << "dPhi = " << theDeltaPhi << endl;
-      cout << jentry << endl;
-    }
-
     // others
     int charge = chargeEle[theProbe];
     float pt   = p4Probe.Pt();
