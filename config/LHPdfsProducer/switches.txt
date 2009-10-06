@@ -7,7 +7,7 @@ ptEleAcc                1
 relSumPtTracks          1
 etaJetAcc               1
 ptJetAcc                1
-jetDeltaPhi		0
+jetDeltaPhi		1
 jetInvMass		0
 
 
