@@ -67,7 +67,6 @@ void RooLogon() {
 
   vecbosStyle->cd();
 
-  gSystem->Load("libPhysics");
   gSystem->Load("libRooFit") ;
-  gSystem->Load("../MLFit/workdir/libMLFit") ;
+  gSystem->Load("../../MLFit/workdir/libMLFit") ;
 }
