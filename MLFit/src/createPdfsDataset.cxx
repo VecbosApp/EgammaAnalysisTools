@@ -8,9 +8,49 @@
 #include <RooCategory.h>
 
 void createAll() {
+  
+  double lumiZee = lumi( 2675110, 1944, 1.0); 
+  double lumiWenu = lumi( 2157227, 11840, 1.0);
+  double lumiWgamma = lumi( 100480, 11960, 1.0);
+  double lumiTTbar = lumi( 528940, 375, 1.0);
+  double lumiQCD_BCtoE_Pt20to30 = lumi( 2468398, 400e+6, 0.00048);
+  double lumiQCD_BCtoE_Pt30to80 = lumi( 2041296, 100e+6, 0.0024);
+  double lumiQCD_BCtoE_Pt80to170 = lumi( 1042477, 1.9e+6, 0.012);
 
-  createPdfsDataset_ZTaP("tmp/Zee_TandP_tree.root","datasets/zee.root");
-  createPdfsDataset_QCDTaP("tmp/QCD_Pt15_mergedTree.root","datasets/qcd.root");
+  // --- now create the datasets useful for signal PDFs (Z -> ee ML fit) ---
+  createPdfsDataset_ZTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsSIGNAL/Zee_zTandP_tree.root","datasets_ZTaP/zee.root", 1.0);
+  createPdfsDataset_ZTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsSIGNAL/TTbar_zTandP_tree.root","datasets_ZTaP/ttbar.root", lumiZee/lumiTTbar);
+  createPdfsDataset_ZTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsSIGNAL/QCD_BCtoE_Pt20to30_zTandP_tree.root","datasets_ZTaP/QCD_BCtoE_Pt20to30.root", lumiZee/lumiQCD_BCtoE_Pt20to30);
+  createPdfsDataset_ZTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsSIGNAL/QCD_BCtoE_Pt30to80_zTandP_tree.root","datasets_ZTaP/QCD_BCtoE_Pt30to80.root", lumiZee/lumiQCD_BCtoE_Pt30to80);
+  createPdfsDataset_ZTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsSIGNAL/QCD_BCtoE_Pt80to170_zTandP_tree.root","datasets_ZTaP/QCD_BCtoE_Pt80to170.root", lumiZee/lumiQCD_BCtoE_Pt20to30);
+
+  // merge the backgrounds to Z->ee
+  TFile *ttbar = TFile::Open("datasets_ZTaP/ttbar.root");
+  RooDataSet *data_ttbar = (RooDataSet*) ttbar->Get("T1");
+  ttbar->Close();
+
+  TFile *QCD_BCtoE_Pt20to30 = TFile::Open("datasets_ZTaP/QCD_BCtoE_Pt20to30.root");
+  RooDataSet *data_QCD_BCtoE_Pt20to30 = (RooDataSet*) QCD_BCtoE_Pt20to30->Get("T1");
+  QCD_BCtoE_Pt20to30->Close();
+
+  TFile *QCD_BCtoE_Pt30to80 = TFile::Open("datasets_ZTaP/QCD_BCtoE_Pt30to80.root");
+  RooDataSet *data_QCD_BCtoE_Pt30to80 = (RooDataSet*) QCD_BCtoE_Pt30to80->Get("T1");
+  QCD_BCtoE_Pt30to80->Close();
+  
+  TFile *QCD_BCtoE_Pt80to170 = TFile::Open("datasets_ZTaP/QCD_BCtoE_Pt80to170.root");
+  RooDataSet *data_QCD_BCtoE_Pt80to170 = (RooDataSet*) QCD_BCtoE_Pt80to170->Get("T1");
+  QCD_BCtoE_Pt80to170->Close();
+
+  RooDataSet *bkg = new RooDataSet(*data_ttbar);
+  bkg->append(*data_QCD_BCtoE_Pt20to30);
+  bkg->append(*data_QCD_BCtoE_Pt30to80);
+  bkg->append(*data_QCD_BCtoE_Pt80to170);
+
+  TFile *bkgFile = TFile::Open("datasets_ZTaP/background.root","recreate");
+  bkg->Write();
+  bkgFile->Close();
+
+  //  createPdfsDataset_QCDTaP("tmp/QCD_Pt15_mergedTree.root","datasets/qcd.root");
 
 }
 
@@ -135,3 +175,8 @@ void createPdfsDataset_QCDTaP(const char *treefile, const char *roofitfile, doub
 
 }
 
+double lumi(double numgen, double sigma, double filtereff) {
+
+  return numgen / sigma / filtereff; 
+
+} 
