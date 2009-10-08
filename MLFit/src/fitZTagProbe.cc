@@ -3,6 +3,9 @@ MLOptions GetDefaultOptions() {
   MLOptions opts;
   // Fit configuration
   opts.addBoolOption("useinvMass", "Use invMass", kTRUE);        
+  opts.addBoolOption("AllFit",          "Fit all species",        kFALSE);
+  opts.addBoolOption("ZOnlyFit",        "Fit Z species only",     kTRUE);
+  opts.addBoolOption("bkgOnlyFit",      "Fit bkg species only",   kFALSE);
   return opts;
 }
 
@@ -18,7 +21,7 @@ void myFit() {
   MLOptions opts = GetDefaultOptions();
   
   // define the structure of the dataset
-  RooRealVar *zmass = new RooRealVar("zmass","e^{+}e^{-} Mass [GeV/c^{2}]",90,40,110);
+  RooRealVar *zmass = new RooRealVar("zmass","e^{+}e^{-} Mass [GeV/c^{2}]",90,60,110);
   theFit.AddFlatFileColumn(zmass);
   
   // define a fit model
@@ -43,28 +46,37 @@ void FitZeeTagAndProbe() {
   
   myFit();
 
+  // Various fit options...
+  MLOptions opts = GetDefaultOptions();
+
   // Load the data
-  //  theFit.addDataSetFromRootFile("T1", "T1", "/cmsrm/pc21/emanuele/Likelihood2.1.X/PdfsDatasets/ZJetsMADGRAPHPdfsDataset.root");
-  //  theFit.addDataSetFromRootFile("T1", "T1", "/cmsrm/pc21/emanuele/Likelihood2.1.X/PdfsDatasets/WpTTJetsMADGRAPHPdfsDataset.root");
-  // W,Z+jets: 300 pb-1, 2.2 fb-1 ttbar+jets 
-  theFit.addDataSetFromRootFile("T1", "T1", "/cmsrm/pc21/emanuele/Likelihood2.1.X/PdfsDatasets/ZpWpTTJetsMADGRAPHPdfsDataset.root");
+  char datasetname[200];
+  if(opts.getBoolVal("AllFit")) sprintf(datasetname,"datasets/merged_data.root");
+  if(opts.getBoolVal("ZOnlyFit")) sprintf(datasetname,"datasets/zee.root");
+  if(opts.getBoolVal("bkgOnlyFit")) sprintf(datasetname,"datasets/qcd.root");
+  theFit.addDataSetFromRootFile("T1", "T1", datasetname);
   RooDataSet *data = theFit.getDataSet("T1");
 
   // build the fit likelihood
   RooAbsPdf *myPdf = theFit.buildModel("myFit");
   
   // Initialize the fit...
-  theFit.initialize("MLFit/fitconfig/fit-tagprobe.config");
+  if(opts.getBoolVal("AllFit")) theFit.initialize("fitconfig/fit-tagprobe.config");
+  if(opts.getBoolVal("ZOnlyFit")) theFit.initialize("fitconfig/fit-tagprobe-zonly.config");
+  if(opts.getBoolVal("bkgOnlyFit")) theFit.initialize("fitconfig/fit-tagprobe-bkgonly.config");
   
   // Print Fit configuration 
-  myPdf->getParameters(data)->selectByAttrib("Constant",kTRUE)->Print("V");  
+  myPdf->getParameters(data)->selectByAttrib("Constant",kTRUE)->Print("V");
   myPdf->getParameters(data)->selectByAttrib("Constant",kFALSE)->Print("V");
   
   RooFitResult *fitres =  myPdf->fitTo(*data,theFit.getNoNormVars("myFit"),"MHTER");
   fitres->Print("V");
   
   // write the config file corresponding to the fit minimum
-  theFit.writeConfigFile("MLFit/fitres/fitMinimum-tagprobe.config");  
+  if(opts.getBoolVal("AllFit")) theFit.writeConfigFile("fitres/fitMinimum-tagprobe.config");  
+  if(opts.getBoolVal("ZOnlyFit")) theFit.writeConfigFile("fitres/fitMinimum-tagprobe-zonly.config");  
+  if(opts.getBoolVal("bkgOnlyFit")) theFit.writeConfigFile("fitres/fitMinimum-tagprobe-bkgonly.config");  
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,11 +85,15 @@ void PlotZeeTagAndProbe(int nbins=19) {
 
   myFit();
 
+  // Various fit options...
+  MLOptions opts = GetDefaultOptions();
+
   // Load the data
-  //  theFit.addDataSetFromRootFile("T1", "T1", "/cmsrm/pc21/emanuele/Likelihood2.1.X/PdfsDatasets/ZJetsMADGRAPHPdfsDataset.root");
-  //  theFit.addDataSetFromRootFile("T1", "T1", "/cmsrm/pc21/emanuele/Likelihood2.1.X/PdfsDatasets/WpTTJetsMADGRAPHPdfsDataset.root");
-  // W,Z+jets: 300 pb-1, 2.2 fb-1 ttbar+jets
-  theFit.addDataSetFromRootFile("T1", "T1", "/cmsrm/pc21/emanuele/Likelihood2.1.X/PdfsDatasets/ZpWpTTJetsMADGRAPHPdfsDataset.root");
+  char datasetname[200];
+  if(opts.getBoolVal("AllFit")) sprintf(datasetname,"datasets/merged_data.root");
+  if(opts.getBoolVal("ZOnlyFit")) sprintf(datasetname,"datasets/zee.root");
+  if(opts.getBoolVal("bkgOnlyFit")) sprintf(datasetname,"datasets/qcd.root");
+  theFit.addDataSetFromRootFile("T1", "T1", datasetname);
 
   RooDataSet *data = theFit.getDataSet("T1");
 
@@ -85,18 +101,19 @@ void PlotZeeTagAndProbe(int nbins=19) {
   RooAbsPdf *myPdf = theFit.buildModel("myFit");
 
   // Initialize the fit...
-  theFit.initialize("MLFit/fitres/fitMinimum-tagprobe.config");
+  if(opts.getBoolVal("AllFit")) theFit.initialize("fitres/fitMinimum-tagprobe.config");
+  if(opts.getBoolVal("ZOnlyFit")) theFit.initialize("fitres/fitMinimum-tagprobe-zonly.config");
+  if(opts.getBoolVal("bkgOnlyFit")) theFit.initialize("fitres/fitMinimum-tagprobe-bkgonly.config");
 
   TCanvas *c = new TCanvas("c","fitResult");
-  TFile *output = new TFile("MLFit/fitoutput/data-tagprobe.root","RECREATE");
 
   RooPlot* MassPlot = MakePlot("zmass", &theFit, data, nbins, false);    
 
   MassPlot->SetYTitle("Events");
   MassPlot->Draw();
-  c->SaveAs("MLFit/fitoutput/data-tagprobe.eps");
-  MassPlot->Write();
-  //  output->Close();
+  if(opts.getBoolVal("AllFit")) c->SaveAs("fitoutput/data-tagprobe.eps");
+  if(opts.getBoolVal("ZOnlyFit")) c->SaveAs("fitoutput/data-tagprobe-zonly.eps");
+  if(opts.getBoolVal("bkgOnlyFit")) c->SaveAs("fitoutput/data-tagprobe-bkgonly.eps");
 
 }
 
