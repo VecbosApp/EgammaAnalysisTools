@@ -3,8 +3,8 @@ MLOptions GetDefaultOptions() {
   MLOptions opts;
   // Fit configuration
   opts.addBoolOption("useinvMass", "Use invMass", kTRUE);        
-  opts.addBoolOption("AllFit",          "Fit all species",        kFALSE);
-  opts.addBoolOption("ZOnlyFit",        "Fit Z species only",     kTRUE);
+  opts.addBoolOption("AllFit",          "Fit all species",        kTRUE);
+  opts.addBoolOption("ZOnlyFit",        "Fit Z species only",     kFALSE);
   opts.addBoolOption("bkgOnlyFit",      "Fit bkg species only",   kFALSE);
   return opts;
 }
@@ -22,7 +22,9 @@ void myFit() {
   
   // define the structure of the dataset
   RooRealVar *zmass = new RooRealVar("zmass","e^{+}e^{-} Mass [GeV/c^{2}]",90,60,110);
+  RooRealVar* weight = new RooRealVar("weight", "weight",1);
   theFit.AddFlatFileColumn(zmass);
+  theFit.AddFlatFileColumn(weight);
   
   // define a fit model
   theFit.addModel("myFit", "Tag And Probe Zee");
@@ -51,11 +53,13 @@ void FitZeeTagAndProbe() {
 
   // Load the data
   char datasetname[200];
-  if(opts.getBoolVal("AllFit")) sprintf(datasetname,"datasets/merged_data.root");
-  if(opts.getBoolVal("ZOnlyFit")) sprintf(datasetname,"datasets/zee.root");
-  if(opts.getBoolVal("bkgOnlyFit")) sprintf(datasetname,"datasets/qcd.root");
+  if(opts.getBoolVal("AllFit")) sprintf(datasetname,"datasets_ZTaP/data.root");
+  if(opts.getBoolVal("ZOnlyFit")) sprintf(datasetname,"datasets_ZTaP/zee.root");
+  if(opts.getBoolVal("bkgOnlyFit")) sprintf(datasetname,"datasets_ZTaP/background.root");
   theFit.addDataSetFromRootFile("T1", "T1", datasetname);
+
   RooDataSet *data = theFit.getDataSet("T1");
+  data->setWeightVar("weight");
 
   // build the fit likelihood
   RooAbsPdf *myPdf = theFit.buildModel("myFit");
@@ -90,12 +94,13 @@ void PlotZeeTagAndProbe(int nbins=19) {
 
   // Load the data
   char datasetname[200];
-  if(opts.getBoolVal("AllFit")) sprintf(datasetname,"datasets/merged_data.root");
-  if(opts.getBoolVal("ZOnlyFit")) sprintf(datasetname,"datasets/zee.root");
-  if(opts.getBoolVal("bkgOnlyFit")) sprintf(datasetname,"datasets/qcd.root");
+  if(opts.getBoolVal("AllFit")) sprintf(datasetname,"datasets_ZTaP/data.root");
+  if(opts.getBoolVal("ZOnlyFit")) sprintf(datasetname,"datasets_ZTaP/zee.root");
+  if(opts.getBoolVal("bkgOnlyFit")) sprintf(datasetname,"datasets_ZTaP/background.root");
   theFit.addDataSetFromRootFile("T1", "T1", datasetname);
 
   RooDataSet *data = theFit.getDataSet("T1");
+  data->setWeightVar("weight");
 
   // build the fit likelihood
   RooAbsPdf *myPdf = theFit.buildModel("myFit");
@@ -109,11 +114,11 @@ void PlotZeeTagAndProbe(int nbins=19) {
 
   RooPlot* MassPlot = MakePlot("zmass", &theFit, data, nbins, false);    
 
-  MassPlot->SetYTitle("Events");
+  MassPlot->SetYTitle("electrons in 10 pb^{-1}");
   MassPlot->Draw();
-  if(opts.getBoolVal("AllFit")) c->SaveAs("fitoutput/data-tagprobe.eps");
-  if(opts.getBoolVal("ZOnlyFit")) c->SaveAs("fitoutput/data-tagprobe-zonly.eps");
-  if(opts.getBoolVal("bkgOnlyFit")) c->SaveAs("fitoutput/data-tagprobe-bkgonly.eps");
+  if(opts.getBoolVal("AllFit")) c->SaveAs("fitoutput/mass-tagprobe.eps");
+  if(opts.getBoolVal("ZOnlyFit")) c->SaveAs("fitoutput/mass-tagprobe-zonly.eps");
+  if(opts.getBoolVal("bkgOnlyFit")) c->SaveAs("fitoutput/mass-tagprobe-bkgonly.eps");
 
 }
 
@@ -122,6 +127,10 @@ void PlotZeeTagAndProbe(int nbins=19) {
 // Make the plot for a given variable
 RooPlot *MakePlot(TString VarName, MLFit* theFit, RooDataSet* theData, int nbins, bool poissonError=true)
 {
+
+  // Various fit options...
+  MLOptions opts = GetDefaultOptions();
+
   RooRealVar* Var = theFit->RealObservable(VarName);
   double min=Var->getMin();
   double max=Var->getMax();
@@ -135,15 +144,16 @@ RooPlot *MakePlot(TString VarName, MLFit* theFit, RooDataSet* theData, int nbins
 
   // plot the total likelihood
   RooAbsPdf *thePdf = theFit->getPdf("myFit");
-  thePdf->plotOn(plot, RooFit::LineColor(kBlack));
+  thePdf->plotOn(plot, RooFit::LineColor(kRed+3));
 
   double Ns = theFit->getRealPar("N_sig")->getVal();
   double Nb = theFit->getRealPar("N_bkg")->getVal();
 
   // plot (dashed) the bkg component
-  theFit->getRealPar("N_sig")->setVal(0.);
-  thePdf->plotOn(plot, RooFit::Normalization(Nb/(Ns+Nb)),RooFit::LineColor(kBlack),RooFit::LineStyle(kDashed));
-
+  if(opts.getBoolVal("AllFit")) {
+    theFit->getRealPar("N_sig")->setVal(0.);
+    thePdf->plotOn(plot, RooFit::Normalization(Nb/(Ns+Nb)),RooFit::LineColor(kAzure+3),RooFit::LineStyle(kDashed));
+  }
   
   return plot;
 }
