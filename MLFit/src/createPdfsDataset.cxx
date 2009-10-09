@@ -83,17 +83,10 @@ void createPdfsDataset_ZTaP(const char *treefile, const char *roofitfile, double
   RooRealVar *charge = new RooRealVar("charge", "charge", 0);
   RooRealVar *eta = new RooRealVar("eta", "eta", 0, -2.5, 2.5);
   RooRealVar *pt = new RooRealVar("pt", "pt", 0, 0., 1000,"GeV");
-  RooRealVar *zmass = new RooRealVar("zmass","zmass",90,60,110,"GeV");
-
-  RooCategory *iecal = new RooCategory("iecal", "iecal");
-  iecal->defineType("barrel",0);
-  iecal->defineType("endcap",1);
-  RooCategory *iptbin = new RooCategory("iptbin", "iptbin");
-  iptbin->defineType("lowpt",0);
-  iptbin->defineType("highpt",1);
-  RooCategory *iclass = new RooCategory("iclass", "iclass");
-  iclass->defineType("nonshowering",0);
-  iclass->defineType("showering",1); 
+  RooRealVar *zmass = new RooRealVar("zmass","zmass", 90, 60, 110, "GeV");
+  RooRealVar *iecal = new RooRealVar("iecal", "iecal", 0, 1);
+  RooRealVar *iptbin = new RooRealVar("iptbin", "iptbin", 0, 1);
+  RooRealVar *iclass = new RooRealVar("iclass", "iclass", 0, 1);
 
   RooArgSet setTagAndProbe(*EoPout,*EoP,*HoE,*deltaEta,*deltaPhi,*s9s25,*s1s9,*sigmaIEtaIEta);
   setTagAndProbe.add(*zmass);
@@ -145,16 +138,9 @@ void createPdfsDataset_QCDTaP(const char *treefile, const char *roofitfile, doub
   RooRealVar *deltaphi = new RooRealVar("qcdDeltaphi", "qcddeltaPhi", 0, 0., TMath::Pi());
   RooRealVar *mass = new RooRealVar("qcdInvmass","qcdInvmass",1,0,1000,"GeV");
   RooRealVar *met = new RooRealVar("qcdMet", "qcdMet", 0, 0.,100,"GeV");
-
-  RooCategory *iecal = new RooCategory("iecal", "iecal");
-  iecal->defineType("barrel",0);
-  iecal->defineType("endcap",1);
-  RooCategory *iptbin = new RooCategory("iptbin", "iptbin");
-  iptbin->defineType("lowpt",0);
-  iptbin->defineType("highpt",1);
-  RooCategory *iclass = new RooCategory("iclass", "iclass");
-  iclass->defineType("nonshowering",0);
-  iclass->defineType("showering",1); 
+  RooRealVar *iecal = new RooRealVar("iecal", "iecal", 0, 1);
+  RooRealVar *iptbin = new RooRealVar("iptbin", "iptbin", 0, 1);
+  RooRealVar *iclass = new RooRealVar("iclass", "iclass", 0, 1);
 
   RooArgSet setTagAndProbe(*EoPout,*EoP,*HoE,*deltaEta,*deltaPhi,*s9s25,*s1s9,*sigmaIEtaIEta);
   setTagAndProbe.add(*eta);
