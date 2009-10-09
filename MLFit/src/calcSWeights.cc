@@ -3,9 +3,10 @@ void calcSWeight_mee() {
   MLFit theFit;
   
   // define the structure of the dataset
-  RooRealVar* zmass = new RooRealVar("zmass",  "e^{+}e^{-} Mass [GeV/c^{2}]" , 90., 40., 110.);
-
+  RooRealVar* zmass = new RooRealVar("zmass",  "e^{+}e^{-} Mass [GeV/c^{2}]" , 90., 60., 110.);
+  RooRealVar* weight = new RooRealVar("weight", "weight",1);
   theFit.AddFlatFileColumn(zmass);
+  theFit.AddFlatFileColumn(weight);
   
   // define a fit model
   theFit.addModel("myFit", "Tag And Probe Zee");
@@ -18,7 +19,7 @@ void calcSWeight_mee() {
   theFit.addPdfWName("myFit", "sig" , "zmass",  "Cruijff",  "sig_Mass");
   theFit.addPdfWName("myFit", "bkg" , "zmass",  "Poly2",  "bkg_Mass");
 
-  theFit.addDataSetFromRootFile("T1", "T1", "/cmsrm/pc21/emanuele/Likelihood2.1.X/PdfsDatasets/ZpWpTTJetsMADGRAPHPdfsDataset.root");
+  theFit.addDataSetFromRootFile("T1", "T1", "datasets_ZTaP/data.root");
 
   RooDataSet *data = theFit.getDataSet("T1");
   
@@ -26,7 +27,7 @@ void calcSWeight_mee() {
   RooAbsPdf *myPdf = theFit.buildModel("myFit");
   
   // Initialize the fit...
-  theFit.initialize("MLFit/fitres/fitMinimum-tagprobe.config");
+  theFit.initialize("fitres/fitMinimum-tagprobe.config");
   
   // fix all parameters, float the yields and fit
   theFit._parameterSet.selectByName("*")->setAttribAll("Constant",kTRUE);
@@ -44,7 +45,7 @@ void calcSWeight_mee() {
   RooArgSet nonormvars;
   RooDataSet* dsnew = MLSPlot::addSWeightToData((RooSimultaneous*)(myPdf), yieldsList, *data, nonormvars) ;
 
-  TFile sPlots("MLFit/fitoutput/sPlotsTagAndProbe.root","recreate");
+  TFile sPlots("sPlots/zTaP.root","recreate");
   cout << "number of entries in set to write: " << dsnew->numEntries() << endl ;
   dsnew->Write();
   sPlots.Close();
