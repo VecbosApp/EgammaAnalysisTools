@@ -31,6 +31,7 @@ LHPdfsProducer::LHPdfsProducer(TTree *tree)
   m_selection->addCut("relSumPtTracks");
   m_selection->addCut("jetDeltaPhi");
   m_selection->addCut("jetInvMass");
+  m_selection->addCut("ptHat");
   m_selection->summary();
   
   // single electron efficiency            
@@ -658,6 +659,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
 
   // counters
   int allevents   = 0;
+  int pthat       = 0;
   int trigger     = 0;
   int oneele      = 0;
   int onejet      = 0;
@@ -678,7 +680,11 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
     allevents++;
-    
+
+    // pT hat cut
+    if( m_selection->getSwitch("ptHat") && (!m_selection->passCut("ptHat",genPtHat) ) ) continue;
+    pthat++;
+
     // QCD trigger
     Utils anaUtilsQCD;
     bool passedHLTQCD = anaUtilsQCD.getTriggersOR(m_requiredBackgroundTriggers, firedTrg);
@@ -860,7 +866,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
 
       // fill the reduced tree
       reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta);    
-      reducedTree.fillAttributesBackground(charge,eta,pt,theDeltaPhi,theInvMass,theMet);
+      reducedTree.fillAttributesBackground(charge,eta,pt,theDeltaPhi,theInvMass,theMet,genPtHat);
       reducedTree.fillCategories(iecal,iptbin,iclass);
       reducedTree.store();
     } // no showering    
@@ -870,6 +876,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
   // statistics
   cout << "statistics from QCD tag and probe: " << endl;
   cout << "allevents      = " << allevents      << endl;
+  cout << "pthat          = " << pthat          << endl;
   cout << "trigger        = " << trigger        << endl;
   cout << "one probe cand = " << oneele         << endl;
   cout << "one tag cand   = " << onejet         << endl;

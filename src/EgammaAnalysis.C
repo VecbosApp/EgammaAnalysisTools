@@ -91,31 +91,35 @@ int main(int argc, char* argv[]) {
 
   TriggerMask maskSignal(treeCond);
   maskSignal.requireTrigger("HLT_Ele15_SW_L1R");
-  maskSignal.requireTrigger("HLT_Ele15_SW_EleId_L1R");
-  maskSignal.requireTrigger("HLT_Ele15_SW_LooseTrackIso_L1R");
-  maskSignal.requireTrigger("HLT_Ele15_SiStrip_L1R");
+  maskSignal.requireTrigger("HLT_Ele20_SW_L1R");
   std::vector<int> requiredSignalTriggers = maskSignal.getBits();
   producer.requireSignalTrigger(requiredSignalTriggers);
 
   TriggerMask maskBackground(treeCond);
-  maskBackground.requireTrigger("HLT_Ele15_SW_L1R");   // to be changed
+  maskBackground.requireTrigger("HLT_DiJetAve30U_1E31");   
+  maskBackground.requireTrigger("HLT_Jet30");   
+  maskBackground.requireTrigger("HLT_Jet50");   
   std::vector<int> requiredBackgroundTriggers = maskBackground.getBits();
   producer.requireBackgroundTrigger(requiredBackgroundTriggers);
-  
-  // sprintf(title,"%s_zTandP_tree.root",outputFileName);  
-  // producer.LoopZTagAndProbe(title);
-  // sprintf(title,"%s_zTandP_histos.root",outputFileName);    
-  // producer.saveHistos(title);
 
-  // sprintf(title,"%s_zMC_tree.root",outputFileName);  
-  // producer.LoopZ(title);
-  // sprintf(title,"%s_zMC_histos.root",outputFileName);    
-  // producer.saveHistos(title);
+  /*
+  sprintf(title,"%s_zTandP_tree.root",outputFileName);  
+  producer.LoopZTagAndProbe(title);
+  sprintf(title,"%s_zTandP_histos.root",outputFileName);    
+  producer.saveHistos(title);
+  */
 
+  sprintf(title,"%s_zMC_tree.root",outputFileName);  
+  producer.LoopZ(title);
+  sprintf(title,"%s_zMC_histos.root",outputFileName);    
+  producer.saveHistos(title);
+
+  /*
   sprintf(title,"%s_qcdTandP_tree.root",outputFileName);  
   producer.LoopQCDTagAndProbe(title);
   sprintf(title,"%s_qcdTandP_histos.root",outputFileName);    
   producer.saveHistos(title);
+  */
 
 #endif
 

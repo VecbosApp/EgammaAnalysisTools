@@ -23,7 +23,7 @@ public:
   //! note: when both electrons from Z are probes, the same Z mass is repeated
   void fillAttributesSignal(int charge, float eta, float pt, float zmass);
   //! fill electron attributes + other quantities for background tag and probe
-  void fillAttributesBackground(int charge, float eta, float pt, float deltaphi, float invmass, float met);
+  void fillAttributesBackground(int charge, float eta, float pt, float deltaphi, float invmass, float met, float pth);
   //! fill the splitting categories of the PDFs
   //! iclass: 0=non-showering, 1=showering
   //! iecal: 0=EB, 1=EE
@@ -56,6 +56,7 @@ private:
   float myQCDDeltaphi;
   float myQCDInvmass;
   float myQCDMet;
+  float myQCDPtHat;
 
   int myiecal;
   int myiptbin;

@@ -34,6 +34,7 @@ void RedEleIDTree::addAttributesBackground() {
   myTree->Branch("qcdDeltaphi",    &myQCDDeltaphi,    "qcdDeltaphi/F");
   myTree->Branch("qcdInvmass",     &myQCDInvmass,     "qcdInvmass/F");
   myTree->Branch("qcdMet",         &myQCDMet,         "qcdMet/F");
+  myTree->Branch("qcdPtHat",       &myQCDPtHat,       "qcdPtHat/F");
 }
 
 void RedEleIDTree::addCategories() {
@@ -79,7 +80,7 @@ void RedEleIDTree::fillAttributesSignal(int charge, float eta, float pt, float z
 
 }
 
-void RedEleIDTree::fillAttributesBackground(int charge, float eta, float pt, float deltaphi, float invmass, float met) {
+void RedEleIDTree::fillAttributesBackground(int charge, float eta, float pt, float deltaphi, float invmass, float met, float pth) {
 
   myQCDCharge=charge;
   myQCDEta=eta;
@@ -87,6 +88,7 @@ void RedEleIDTree::fillAttributesBackground(int charge, float eta, float pt, flo
   myQCDDeltaphi=deltaphi;
   myQCDInvmass=invmass;
   myQCDMet=met;
+  myQCDPtHat=pth;
 
 }
 

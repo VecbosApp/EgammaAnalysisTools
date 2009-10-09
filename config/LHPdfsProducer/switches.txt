@@ -1,6 +1,7 @@
-requireTriggerSignal	0
-requireTriggerQCDBack	0
+requireTriggerSignal	1
+requireTriggerQCDBack	1
 applyIsolationOnProbe   0
+ptHat			0
 meeWindow               1
 etaEleAcc               1
 ptEleAcc                1
