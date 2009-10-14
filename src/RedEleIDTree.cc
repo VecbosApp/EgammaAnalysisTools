@@ -21,6 +21,7 @@ RedEleIDTree::~RedEleIDTree() {
 }
 
 void RedEleIDTree::addAttributesSignal() {
+
   myTree->Branch("charge",      &myCharge,      "charge/I");
   myTree->Branch("eta",         &myEta,         "eta/F");
   myTree->Branch("pt",          &myPt,          "pt/F");
@@ -28,6 +29,7 @@ void RedEleIDTree::addAttributesSignal() {
 }
 
 void RedEleIDTree::addAttributesBackground() {
+
   myTree->Branch("qcdCharge",      &myQCDCharge,      "qcdCharge/I");
   myTree->Branch("qcdEta",         &myQCDEta,         "qcdEta/F");
   myTree->Branch("qcdPt",          &myQCDPt,          "qcdPt/F");
@@ -38,21 +40,33 @@ void RedEleIDTree::addAttributesBackground() {
 }
 
 void RedEleIDTree::addCategories() {
+
   myTree->Branch("iecal",      &myiecal,      "iecal/I");
   myTree->Branch("iptbin",     &myiptbin,     "iptbin/I");
   myTree->Branch("iclass",     &myiclass,     "iclass/I");
 }
 
 void RedEleIDTree::addMore() {
+
   myTree->Branch("relIsolTag",   &myRelIsolTag,   "relIsolTag/F");
   myTree->Branch("relIsolProbe", &myRelIsolProbe, "relIsolProbe/F");
 }
 
+void RedEleIDTree::addGamma() {
+
+  myTree->Branch("absTrackerIsolGammaCand",&myAbsTrackerIsolGammaCand,"absTrackerIsolGammaCand/F");
+  myTree->Branch("absEcalIsolGammaCand",   &myAbsEcalIsolGammaCand,   "absEcalIsolGammaCand/F");
+  myTree->Branch("absHcalIsolGammaCand",   &myAbsHcalIsolGammaCand,   "absHcalIsolGammaCand/F");
+  myTree->Branch("isGamma",                &myIsGamma,                "isGamma/I");
+}
+
 void RedEleIDTree::store() {
+
   myTree->Fill();
 }
 
 void RedEleIDTree::save() {
+
   myFile->cd();
   myTree->Write();
   myFile->Close();
@@ -101,6 +115,16 @@ void RedEleIDTree::fillCategories(int iecal, int iptbin, int iclass) {
 }
 
 void RedEleIDTree::fillMore(float rit, float rip) {
+
   myRelIsolTag=rit;
   myRelIsolProbe=rip;
 }
+
+void RedEleIDTree::fillGamma(float atg, float aeg, float ahg, int ig) {
+
+  myAbsTrackerIsolGammaCand = atg;
+  myAbsEcalIsolGammaCand    = aeg;
+  myAbsHcalIsolGammaCand    = ahg;
+  myIsGamma=ig;
+}
+

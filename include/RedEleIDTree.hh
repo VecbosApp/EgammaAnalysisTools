@@ -16,6 +16,7 @@ public:
   //! add the splitting categories (see below)
   void addCategories();
   void addMore();
+  void addGamma();
 
   //! fill the tree with electron id variables
   void fillVariables(float EoPout, float EoP, float HoE, float DeltaEta, float DeltaPhi, float s9s25, float s1s9, float SigmaIEtaIEta);
@@ -30,7 +31,8 @@ public:
   //! iptbin: 0=<15 GeV, 1=>15GeV
   void fillCategories(int iecal, int iptbin, int iclass); 
   void fillMore(float rit, float rip);
-  
+  void fillGamma(float atg, float aeg, float ahg, int ig);
+
   void store();
   void save();
 
@@ -64,6 +66,11 @@ private:
 
   float myRelIsolTag;
   float myRelIsolProbe;
+
+  float myAbsTrackerIsolGammaCand;
+  float myAbsEcalIsolGammaCand;
+  float myAbsHcalIsolGammaCand;
+  int myIsGamma;
 
   TFile *myFile;
   TTree *myTree;

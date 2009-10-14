@@ -24,6 +24,9 @@ public:
   void LoopZTagAndProbe(const char *treefilesuffix);
   //! loop over events doing signal pdfs with Zee - MC
   void LoopZ(const char *treefilesuffix);
+
+  //! loop over events doing signal pdfs with Zee - MC
+  void LoopZwithMass(const char *treefilesuffix);
   //! loop over events doing bkg pdfs on QCD
   void LoopQCD();
   //! loop over events doing bkg pdfs on QCD using the tag and probe method
