@@ -940,8 +940,6 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
 	float invMass  = (p4Jet+p4Ele).M();
 	if ( m_selection->getSwitch("jetDeltaPhi") && !m_selection->passCut("jetDeltaPhi", deltaPhi) ) continue;
 	deltaphi++;
-	if ( m_selection->getSwitch("jetInvMass")  && m_selection->passCut("jetInvMass", invMass) ) continue;
-	invmass++;
 
 	// we have a potential probe and this is highest ET jet up to now -> it's our tag
 	tagEt  = etSisConeCorrJet[tagCandidates[iJet]];
@@ -959,7 +957,6 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     if (theTag<-800 || theProbe<-800) continue;
     tagandprobe++;
       
-
     // variables for the tree
     TLorentzVector p4Tag, p4Probe;	
     TVector3 p3Probe(pxEle[theProbe],pyEle[theProbe],pzEle[theProbe]);
@@ -969,6 +966,22 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     float theDeltaPhi = fabs(p3Tag.DeltaPhi(p3Probe));
     float theInvMass  = (p4Tag+p4Probe).M();
     float theMet      = etMet[0];
+
+    // reject events with >=2 electrons making a Z
+    if ( nEle>=2 ) {
+      float mass = -1;
+      float meepull = 1000.;      
+      for (int iele=0; iele<nEle && iele != theProbe; iele++) {
+        TLorentzVector p4Electron(pxEle[iele],pyEle[iele],pzEle[iele],energyEle[iele]);
+        float mee = (p4Probe + p4Electron).M();
+        if ( fabs( mee - 91.1876) < meepull ) {
+          meepull = fabs(mee - 91.1876);
+          mass = mee;
+        }
+      }
+      if ( m_selection->getSwitch("jetInvMass")  && m_selection->passCut("jetInvMass", mass) ) continue;
+      invmass++;
+    }
 
     // only for Gamma+jets: check if the probe is isolated and if it close to the MC gamma
     // to be commented out if not running on gamma+jets  
