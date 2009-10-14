@@ -23,15 +23,15 @@ LHPdfsProducer::LHPdfsProducer(TTree *tree)
   m_selection->addSwitch("requireTriggerSignal");
   m_selection->addSwitch("requireTriggerQCDBack");
   m_selection->addSwitch("applyIsolationOnProbe");
+  m_selection->addCut("ptHat");
   m_selection->addCut("meeWindow");
   m_selection->addCut("etaEleAcc");
   m_selection->addCut("ptEleAcc");
+  m_selection->addCut("relSumPtTracks");
   m_selection->addCut("etaJetAcc");
   m_selection->addCut("ptJetAcc");
-  m_selection->addCut("relSumPtTracks");
   m_selection->addCut("jetDeltaPhi");
   m_selection->addCut("jetInvMass");
-  m_selection->addCut("ptHat");
   m_selection->addCut("antiIsolTracker");
   m_selection->addCut("antiIsolEcal");
   m_selection->summary();
@@ -966,7 +966,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     float theDeltaPhi = fabs(p3Tag.DeltaPhi(p3Probe));
     float theInvMass  = (p4Tag+p4Probe).M();
     float theMet      = etMet[0];
-
+    
     // reject events with >=2 electrons making a Z
     if ( nEle>=2 ) {
       float mass = -1;
@@ -980,8 +980,8 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
         }
       }
       if ( m_selection->getSwitch("jetInvMass")  && m_selection->passCut("jetInvMass", mass) ) continue;
-      invmass++;
     }
+    invmass++;
 
     // only for Gamma+jets: check if the probe is isolated and if it close to the MC gamma
     // to be commented out if not running on gamma+jets  
@@ -1110,13 +1110,13 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
   cout << "one probe cand = "     << oneele          << endl;
   cout << "one tag cand   = "     << onejet          << endl;
   cout << "T and P found  = "     << tagandprobe     << endl; 
+  cout << "inv mass       = "     << invmass         << endl; 
+  cout << "anti isol, tracker = " << trackerNotIsol  << endl;
+  cout << "anti isol, ecal    = " << ecalNotIsol     << endl;
   cout << "no crack       = "     << nocrack         << endl;
   cout << "statistics from QCD tag and probe - electrons: " << endl;
   cout << "eleTot         = "     << eleTot          << endl;
   cout << "deltaPhi ok    = "     << deltaphi        << endl;
-  cout << "inv mass       = "     << invmass         << endl; 
-  cout << "anti isol, tracker = " << trackerNotIsol  << endl;
-  cout << "anti isol, ecal    = " << ecalNotIsol     << endl;
   reducedTree.save();  
 }
 
