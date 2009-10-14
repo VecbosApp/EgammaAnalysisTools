@@ -9,7 +9,7 @@ if len(sys.argv) != 5:
     print "usage cmst3_submit_manyfilesperjob.py dataset njobs applicationName queue"
     sys.exit(1)
 dataset = sys.argv[1]
-inputlist = "../HiggsAnalysisTools/cmst3_32X/"+dataset+".list"
+inputlist = "castor_OctX/"+dataset+".list"
 output = dataset
 queue = sys.argv[4]
 ijobmax = int(sys.argv[2])
