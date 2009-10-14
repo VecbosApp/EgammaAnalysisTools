@@ -10,5 +10,6 @@ etaJetAcc               1
 ptJetAcc                1
 jetDeltaPhi		1
 jetInvMass		0
-
+antiIsolTracker		1
+antiIsolEcal		1
 
