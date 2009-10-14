@@ -6,6 +6,6 @@ meeWindow      60.0     110.0
 etaJetAcc       -2.5    2.5
 ptJetAcc	30	1000
 jetDeltaPhi	0.3	1000
-jetInvMass	70	100000
-antiIsolTracker  5      100000
-antiIsolEcal     2      100000
+jetInvMass	70	10000
+antiIsolTracker  5      10000
+antiIsolEcal     2      10000
