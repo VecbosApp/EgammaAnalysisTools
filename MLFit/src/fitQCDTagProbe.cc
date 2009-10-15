@@ -44,7 +44,7 @@ void myFit() {
   // deltaphi PDF
   if(opts.getBoolVal("useDeltaPhi")) {
     theFit.addPdfWName("myFit", "sig" ,    "qcdDeltaphi",  "Cruijff", "sig_deltaphi");
-    theFit.addPdfWName("myFit", "wenu" ,   "qcdDeltaphi",  "Cruijff", "wenu_deltaphi");
+    theFit.addPdfWName("myFit", "wenu" ,   "qcdDeltaphi",  "Poly2", "wenu_deltaphi");
     theFit.addPdfWName("myFit", "ttbar" ,  "qcdDeltaphi",  "Poly3",   "ttbar_deltaphi");
   }
   
@@ -82,7 +82,7 @@ void FitQCDTagAndProbe() {
   if(opts.getBoolVal("ttbarOnlyFit"))       sprintf(datasetname,"/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/ttbar.root");
   theFit.addDataSetFromRootFile("T1", "T1", datasetname);
   RooDataSet *data = theFit.getDataSet("T1");
-  RooDataSet *reddata = data->reduce("qcdDeltaphi>1.0");
+  RooDataSet *reddata = data->reduce("qcdDeltaphi>1.0 && qcdDeltaphi<3.1415");
   reddata->setWeightVar("weight");
   
   // build the fit likelihood
@@ -126,7 +126,7 @@ void PlotQCDTagAndProbe(int nbins=19) {
   theFit.addDataSetFromRootFile("T1", "T1", datasetname);
 
   RooDataSet *data = theFit.getDataSet("T1");
-  RooDataSet *reddata = data->reduce("qcdDeltaphi>1.0");
+  RooDataSet *reddata = data->reduce("qcdDeltaphi>1.0 && qcdDeltaphi<3.1415");
   reddata->setWeightVar("weight");
 
   // build the fit likelihood
