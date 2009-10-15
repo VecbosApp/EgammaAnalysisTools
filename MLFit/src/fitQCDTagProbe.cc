@@ -43,7 +43,7 @@ void myFit() {
 
   // deltaphi PDF
   if(opts.getBoolVal("useDeltaPhi")) {
-    theFit.addPdfWName("myFit", "sig" ,    "qcdDeltaphi",  "Poly3",   "sig_deltaphi");
+    theFit.addPdfWName("myFit", "sig" ,    "qcdDeltaphi",  "Cruijff", "sig_deltaphi");
     theFit.addPdfWName("myFit", "wenu" ,   "qcdDeltaphi",  "Cruijff", "wenu_deltaphi");
     theFit.addPdfWName("myFit", "ttbar" ,  "qcdDeltaphi",  "Poly3",   "ttbar_deltaphi");
   }
@@ -78,7 +78,7 @@ void FitQCDTagAndProbe() {
   char datasetname[200];
   if(opts.getBoolVal("AllFit"))             sprintf(datasetname,"/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/data.root");
   if(opts.getBoolVal("QCDOnlyFit"))         sprintf(datasetname,"/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/qcdSignal.root"); // QCD+gammaPlusJet 
-  if(opts.getBoolVal("wenuOnlyFit"))        sprintf(datasetname,"/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/wenu_5jobs.root");
+  if(opts.getBoolVal("wenuOnlyFit"))        sprintf(datasetname,"/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/wenu.root");
   if(opts.getBoolVal("ttbarOnlyFit"))       sprintf(datasetname,"/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/ttbar.root");
   theFit.addDataSetFromRootFile("T1", "T1", datasetname);
   RooDataSet *data = theFit.getDataSet("T1");
@@ -121,7 +121,7 @@ void PlotQCDTagAndProbe(int nbins=19) {
   char datasetname[200];
   if(opts.getBoolVal("AllFit"))             sprintf(datasetname,"/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/data.root");
   if(opts.getBoolVal("QCDOnlyFit"))         sprintf(datasetname,"/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/qcdSignal.root");
-  if(opts.getBoolVal("wenuOnlyFit"))        sprintf(datasetname,"/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/wenu_5jobs.root"); 
+  if(opts.getBoolVal("wenuOnlyFit"))        sprintf(datasetname,"/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/wenu.root"); 
   if(opts.getBoolVal("ttbarOnlyFit"))       sprintf(datasetname,"/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/ttbar.root");
   theFit.addDataSetFromRootFile("T1", "T1", datasetname);
 
