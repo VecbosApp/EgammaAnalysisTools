@@ -22,9 +22,10 @@ public:
   virtual ~LHPdfsProducer();
   //! loop over events doing signal pdfs with Zee - tag and probe 
   void LoopZTagAndProbe(const char *treefilesuffix);
+  //! loop over events doing signal pdfs with Zee - tag and probe. Then match with MC truth from Z 
+  void LoopZTagAndProbeForMcTruth(const char *treefilesuffix);
   //! loop over events doing signal pdfs with Zee - MC
   void LoopZ(const char *treefilesuffix);
-
   //! loop over events doing signal pdfs with Zee - MC
   void LoopZwithMass(const char *treefilesuffix);
   //! loop over events doing bkg pdfs on QCD

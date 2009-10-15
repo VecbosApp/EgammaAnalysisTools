@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
   maskSignal.requireTrigger("HLT_Ele20_SW_L1R");
   std::vector<int> requiredSignalTriggers = maskSignal.getBits();
   producer.requireSignalTrigger(requiredSignalTriggers);
-
+  
   TriggerMask maskBackground(treeCond);
   maskBackground.requireTrigger("HLT_DiJetAve30U_1E31");   
   maskBackground.requireTrigger("HLT_Jet30");   
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
   */
 
   sprintf(title,"%s_zMC_tree.root",outputFileName);  
-  producer.LoopZ(title);
+  producer.LoopZTagAndProbeForMcTruth(title);
   sprintf(title,"%s_zMC_histos.root",outputFileName);    
   producer.saveHistos(title);
 

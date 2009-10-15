@@ -35,9 +35,11 @@ LHPdfsProducer::LHPdfsProducer(TTree *tree)
   m_selection->addCut("antiIsolTracker");
   m_selection->addCut("antiIsolEcal");
   m_selection->summary();
+  cout << "done with cuts" << endl;
   
   // single electron efficiency            
   EgammaCutBasedID.Configure("config/looseEleId/");
+  cout << "done with eleID" << endl;
 }
 
 LHPdfsProducer::~LHPdfsProducer() { }
@@ -515,6 +517,221 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
 
   reducedTree.save();
 }
+
+// PDF for electrons matching the MC truth from Z. To decouple from tag and probe we 
+// apply the same T&P as for data driven method.
+// Probe electrons are within the acceptance (and loose isolated in the tracker)
+// The tag electron is the one with the best match to the Z
+// the tag must be within the acceptance, tracker isolated and loose identified
+void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
+  
+  if(fChain == 0) return;
+  
+  char treename[200];
+  sprintf(treename,"%s",treefilesuffix);
+  RedEleIDTree reducedTree(treename);
+  reducedTree.addAttributesSignal();
+  reducedTree.addCategories();
+  
+  // counters
+  int allevents   = 0;
+  int trigger     = 0;
+  int twoele      = 0;
+  int eleTot      = 0;
+  int eleEta      = 0;
+  int elePt       = 0;
+  int invmass     = 0;
+  int tagId       = 0;
+  int tagIsol     = 0;
+  int probeIsol   = 0;
+  int tagProbeTot = 0;
+
+  // loop over entries
+  Long64_t nbytes = 0, nb = 0;
+  Long64_t nentries = fChain->GetEntries();
+
+  std::cout << "Number of entries = " << nentries << std::endl;
+  for (Long64_t jentry=0; jentry<nentries;jentry++) {
+    Long64_t ientry = LoadTree(jentry);
+    if (ientry < 0) break;
+    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
+
+    Utils anaUtils;
+    
+    allevents++;
+
+    
+    // to find the real electrons from Z (MC truth)
+    int mcInd1 = -1;
+    int mcInd2 = -1;
+    for(int iMc=0; iMc<nMc; iMc++) {
+      if ( (fabs(idMc[iMc])==11) && (fabs(idMc[mothMc[iMc]])==23) && mcInd1==-1 )              { mcInd1=iMc; continue; }
+      if ( (fabs(idMc[iMc])==11) && (fabs(idMc[mothMc[iMc]])==23) && mcInd1!=-1 && mcInd2==-1) { mcInd2=iMc; break; }
+    }
+    TVector3 _mcEle1(0,0,0);
+    TVector3 _mcEle2(0,0,0);
+    if(mcInd1>-1) _mcEle1 = TVector3(pMc[mcInd1]*cos(phiMc[mcInd1])*sin(thetaMc[mcInd1]),pMc[mcInd1]*sin(phiMc[mcInd1])*sin(thetaMc[mcInd1]),pMc[mcInd1]*cos(thetaMc[mcInd1]));
+    if(mcInd2>-1) _mcEle2 = TVector3(pMc[mcInd2]*cos(phiMc[mcInd2])*sin(thetaMc[mcInd2]),pMc[mcInd2]*sin(phiMc[mcInd2])*sin(thetaMc[mcInd2]),pMc[mcInd2]*cos(thetaMc[mcInd2]));
+
+
+    // trigger: for october exercise skimmed samples, with HLT15 passed: can be switched off.
+    if ( m_selection->getSwitch("requireTriggerSignal") ) { 
+      bool passedHLT = anaUtils.getTriggersOR(m_requiredSignalTriggers, firedTrg);
+      if ( !passedHLT ) continue;   
+    }
+    trigger++;
+    
+    // best tag-probe pair = mee closest to Z mass
+    float minpull = 100000.;
+    float mass    = 1000.;
+    float okmass  = 1000.;
+
+    for(int iele1=0; iele1<nEle; iele1++) {
+      TLorentzVector electron1(pxEle[iele1],pyEle[iele1],pzEle[iele1],energyEle[iele1]);
+
+      for(int iele2=iele1+1; iele2<nEle; iele2++) {
+        TLorentzVector electron2(pxEle[iele2],pyEle[iele2],pzEle[iele2],energyEle[iele2]);
+	
+	eleTot++;
+
+        if( m_selection->getSwitch("etaEleAcc") && (!m_selection->passCut("etaEleAcc",etaEle[iele1]) || !m_selection->passCut("etaEleAcc",etaEle[iele2]) ) ) continue;
+	eleEta++;
+
+        if( m_selection->getSwitch("ptEleAcc")  && (!m_selection->passCut("ptEleAcc",electron1.Pt()) || !m_selection->passCut("ptEleAcc",electron2.Pt()) ) ) continue;
+	elePt++;
+	
+        mass = (electron1+electron2).M();
+        float pull=fabs(mass-91.1876);
+	if(pull < minpull) {
+	  okmass  = mass;
+          minpull = pull;
+          electrons[0] = iele1;
+          electrons[1] = iele2;
+        }
+      }
+    }
+
+    if (okmass<999) twoele++;
+
+    // start the tag & probe
+    if( m_selection->passCut("meeWindow",okmass) ) {
+
+      if ( okmass>110 || okmass<60 ) cout << "BACO!" << endl;
+      invmass++;
+      
+      for(int iele=0; iele<2; ++iele) {
+        int tag=electrons[0], probe=electrons[1];
+        if(iele=1) {
+          tag=electrons[1]; 
+          probe=electrons[0];
+        }
+	
+        TLorentzVector probeP4(pxEle[probe],pyEle[probe],pzEle[probe],energyEle[probe]);
+        TLorentzVector tagP4(pxEle[tag],    pyEle[tag],  pzEle[tag],  energyEle[tag]);
+
+	// various about probe
+        int charge = chargeEle[probe];
+        float pt   = probeP4.Pt();
+        float eta  = etaEle[probe];
+
+        /// define the bins in which can be splitted the PDFs
+        int iecal  = (fabs(etaEle[probe])<1.479) ? 0 : 1;
+        int iptbin = (probeP4.Pt()<15.0) ? 0 : 1;
+        int fullclassRaw = classificationEle[probe];
+        int iclass     = -1;
+        int ifullclass = -1;
+        if      ( fullclassRaw == GOLDEN )    { iclass = 0; }
+        else if ( fullclassRaw == BIGBREM )   { iclass = 0; }
+        else if ( fullclassRaw == NARROW )    { iclass = 0; }
+        else if ( fullclassRaw == SHOWERING ) { iclass = 1; }
+        if (iclass>-1) tagProbeTot++;
+
+        // apply the electron ID loose on the tag electron
+	// float tagIdentified = anaUtils.electronIdVal(eleIdCutsEle[tag],eleIdRobustLoose);  
+	float tagIdentified = isEleID(tag);
+        if (tagIdentified) tagId++;
+
+        // apply tracker isolation on the tag electron 
+	float tagPt           = tagP4.Pt();
+	float relativeIsolTag = dr04TkSumPtEle[tag]/tagPt;
+        bool tagIsolated      = ( m_selection->passCut("relSumPtTracks",relativeIsolTag) );
+	if (tagIsolated) tagIsol++;
+
+        // apply tracker isolation on the probe electron
+        bool probeIsolated = true;
+	float probePt      = probeP4.Pt();
+	float relativeIsolProbe = dr04TkSumPtEle[probe]/probePt;	
+        if ( m_selection->getSwitch("applyIsolationOnProbe") ) {
+          probeIsolated = ( m_selection->passCut("relSumPtTracks",relativeIsolProbe) );
+        }
+	if(probeIsolated) probeIsol++;
+
+
+	// some eleID variables
+        float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaEle[probe]));
+        float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiEle[probe]));
+        float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiEle[probe]));
+        float s1s9          = s1s9Ele[probe];
+        float s9s25         = s9s25Ele[probe];
+        float lat           = latEle[probe];
+        float etaLat        = etaLatEle[probe];
+        float phiLat        = phiLatEle[probe];
+        float a20           = a20Ele[probe];
+        float a42           = a42Ele[probe];
+	double dPhiCalo     = deltaPhiAtCaloEle[probe];
+	double dPhiVtx      = deltaPhiAtVtxEle[probe];
+	double dEtaVtx      = deltaEtaAtVtxEle[probe];
+	double EoPout       = eSeedOverPoutEle[probe];
+	double EoP          = eSuperClusterOverPEle[probe];
+	double HoE          = hOverEEle[probe];
+
+	
+        /// fill the electron ID pdfs only if:
+        /// the tag is loose isolated and identified (ALWAYS)
+        /// the probe is loose isolated              (ONLY IF REQUIRED)
+	/// it matches one of the MC electrons from Z
+	if( tagIsolated && tagIdentified && probeIsolated && iclass>-1) {   
+
+	  // does the probe match the MC truth?
+	  bool matchMc = false;
+	  TVector3 p3Probe(pxEle[probe],pyEle[probe],pzEle[probe]);
+	  if (mcInd1>-1) { float deltaR = p3Probe.DeltaR(_mcEle1); if (deltaR<0.3) matchMc = true; }
+	  if (mcInd2>-1) { float deltaR = p3Probe.DeltaR(_mcEle2); if (deltaR<0.3) matchMc = true; }
+
+	  // only if it matches with MC fill the reduced tree
+	  if (matchMc) { 
+	    reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta);
+	    reducedTree.fillAttributesSignal(charge,eta,pt,okmass);
+	    reducedTree.fillCategories(iecal,iptbin,iclass);
+	    reducedTree.store();
+	  }
+
+        } // fill histograms
+	
+      } // loop over the 2 Z electrons
+      
+    } // end tag and probe
+    
+  } // loop over events
+  
+  cout << "statistics from Tag and Probe: " << endl;
+  cout << "allevents   = " << allevents << endl;
+  cout << "trigger     = " << trigger << endl;
+  cout << "twoele      = " << twoele  << endl;
+  cout << "invmass     = " << invmass << endl;
+  cout << "tagProbeTot = " << tagProbeTot << endl;
+  cout << "tagId       = " << tagId       << endl;
+  cout << "tagIsol     = " << tagIsol     << endl;
+  cout << "probeIsol   = " << probeIsol   << endl;  
+  cout << "statistics from Tag and Probe - electrons: " << endl;
+  cout << "eleTot      = " << eleTot  << endl;
+  cout << "eleEta      = " << eleEta  << endl;
+  cout << "elePt       = " << elePt   << endl;
+
+  reducedTree.save();
+}
+
 
 // PDF for the signal from a pure Z MC sample. Same requests as above
 void LHPdfsProducer::LoopZwithMass(const char *treefilesuffix) {
