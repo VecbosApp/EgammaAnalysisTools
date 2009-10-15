@@ -31,61 +31,61 @@ void createAll() {
 
   // --- now create the datasets useful for background PDFs (QCD ML fit) ---
   cout << "create datasets one by one" << endl;
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/QCD_Pt15_qcdTandP_tree.root","/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/qcd_pt15.root", lumi/lumiQCD15);
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/QCD_Pt30_qcdTandP_tree.root","/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/qcd_pt30.root", lumi/lumiQCD30);
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/QCD_Pt80_qcdTandP_tree.root","/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/qcd_pt80.root", lumi/lumiQCD80);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/QCD_Pt15_qcdTandP_tree.root","/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/qcd_pt15.root", lumi/lumiQCD15);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/QCD_Pt30_qcdTandP_tree.root","/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/qcd_pt30.root", lumi/lumiQCD30);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/QCD_Pt80_qcdTandP_tree.root","/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/qcd_pt80.root", lumi/lumiQCD80);
 
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/TTbar_qcdTandP_tree.root","/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/ttbar.root", lumi/lumiTTbar);
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/Wenu_qcdTandP_tree_5files.root","/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/wenu_5jobs.root", lumi/lumiWenu);
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/Zee_qcdTandP_tree.root","/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/zee.root", lumi/lumiZee);  
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/TTbar_qcdTandP_tree.root","/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/ttbar.root", lumi/lumiTTbar);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/Wenu_qcdTandP_tree_5files.root","/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/wenu_5jobs.root", lumi/lumiWenu);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/Zee_qcdTandP_tree.root","/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/zee.root", lumi/lumiZee);  
 
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt15to20_qcdTandP_tree.root",  "/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet1520.root",   lumi/lumiPhotonJet_Pt15to20);
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt20to30_qcdTandP_tree.root",  "/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet2030.root",   lumi/lumiPhotonJet_Pt20to30);
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt30to50_qcdTandP_tree.root",  "/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet3050.root",   lumi/lumiPhotonJet_Pt30to50);
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt50to80_qcdTandP_tree.root",  "/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet5080.root",   lumi/lumiPhotonJet_Pt50to80);
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt80to120_qcdTandP_tree.root", "/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet80120.root",  lumi/lumiPhotonJet_Pt80to120);
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt120to170_qcdTandP_tree.root","/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet120170.root", lumi/lumiPhotonJet_Pt120to170);
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt170to300_qcdTandP_tree.root","/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet170300.root", lumi/lumiPhotonJet_Pt170to300);
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt300to500_qcdTandP_tree.root","/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet300500.root", lumi/lumiPhotonJet_Pt300to500);
-  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt500toInf_qcdTandP_tree.root","/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet500Inf.root", lumi/lumiPhotonJet_Pt500toInf);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt15to20_qcdTandP_tree.root",  "/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet1520.root",   lumi/lumiPhotonJet_Pt15to20);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt20to30_qcdTandP_tree.root",  "/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet2030.root",   lumi/lumiPhotonJet_Pt20to30);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt30to50_qcdTandP_tree.root",  "/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet3050.root",   lumi/lumiPhotonJet_Pt30to50);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt50to80_qcdTandP_tree.root",  "/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet5080.root",   lumi/lumiPhotonJet_Pt50to80);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt80to120_qcdTandP_tree.root", "/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet80120.root",  lumi/lumiPhotonJet_Pt80to120);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt120to170_qcdTandP_tree.root","/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet120170.root", lumi/lumiPhotonJet_Pt120to170);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt170to300_qcdTandP_tree.root","/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet170300.root", lumi/lumiPhotonJet_Pt170to300);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt300to500_qcdTandP_tree.root","/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet300500.root", lumi/lumiPhotonJet_Pt300to500);
+  createPdfsDataset_QCDTaP("/cmsrm/pc21/crovelli/data/Like3.2.X/resultsQCD/PhotonJet_Pt500toInf_qcdTandP_tree.root","/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet500Inf.root", lumi/lumiPhotonJet_Pt500toInf);
 
 
 
   // merge some backgrounds to QCD: gamma + jets 
   cout << "create merged gamma+jets dataset" << endl;
-  TFile *ForQCD_GammaJet_1520_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet1520.root");
+  TFile *ForQCD_GammaJet_1520_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet1520.root");
   RooDataSet *dataQCD_GammaJet1520 = (RooDataSet*) ForQCD_GammaJet_1520_file->Get("T1");
   ForQCD_GammaJet_1520_file->Close();
 
-  TFile *ForQCD_GammaJet_2030_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet2030.root");
+  TFile *ForQCD_GammaJet_2030_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet2030.root");
   RooDataSet *dataQCD_GammaJet2030 = (RooDataSet*) ForQCD_GammaJet_2030_file->Get("T1");
   ForQCD_GammaJet_2030_file->Close();
 
-  TFile *ForQCD_GammaJet_3050_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet3050.root");
+  TFile *ForQCD_GammaJet_3050_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet3050.root");
   RooDataSet *dataQCD_GammaJet3050 = (RooDataSet*) ForQCD_GammaJet_3050_file->Get("T1");
   ForQCD_GammaJet_3050_file->Close();
 
-  TFile *ForQCD_GammaJet_5080_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet5080.root");
+  TFile *ForQCD_GammaJet_5080_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet5080.root");
   RooDataSet *dataQCD_GammaJet5080 = (RooDataSet*) ForQCD_GammaJet_5080_file->Get("T1");
   ForQCD_GammaJet_5080_file->Close();
 
-  TFile *ForQCD_GammaJet_80120_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet80120.root");
+  TFile *ForQCD_GammaJet_80120_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet80120.root");
   RooDataSet *dataQCD_GammaJet80120 = (RooDataSet*) ForQCD_GammaJet_80120_file->Get("T1");
   ForQCD_GammaJet_80120_file->Close();
 
-  TFile *ForQCD_GammaJet_120170_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet120170.root");
+  TFile *ForQCD_GammaJet_120170_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet120170.root");
   RooDataSet *dataQCD_GammaJet120170 = (RooDataSet*) ForQCD_GammaJet_120170_file->Get("T1");
   ForQCD_GammaJet_120170_file->Close();
 
-  TFile *ForQCD_GammaJet_170300_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet170300.root");
+  TFile *ForQCD_GammaJet_170300_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet170300.root");
   RooDataSet *dataQCD_GammaJet170300 = (RooDataSet*) ForQCD_GammaJet_170300_file->Get("T1");
   ForQCD_GammaJet_170300_file->Close();
 
-  TFile *ForQCD_GammaJet_300500_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet300500.root");
+  TFile *ForQCD_GammaJet_300500_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet300500.root");
   RooDataSet *dataQCD_GammaJet300500 = (RooDataSet*) ForQCD_GammaJet_300500_file->Get("T1");
   ForQCD_GammaJet_300500_file->Close();
 
-  TFile *ForQCD_GammaJet_500Inf_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet500Inf.root");
+  TFile *ForQCD_GammaJet_500Inf_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet500Inf.root");
   RooDataSet *dataQCD_GammaJet500Inf = (RooDataSet*) ForQCD_GammaJet_500Inf_file->Get("T1");
   ForQCD_GammaJet_500Inf_file->Close();
 
@@ -99,57 +99,55 @@ void createAll() {
   bkgPhotonJetForQcd->append(*dataQCD_GammaJet300500);
   bkgPhotonJetForQcd->append(*dataQCD_GammaJet500Inf);
   
-  TFile *bkgPhotonJetForQcd_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/photonJet.root","recreate");
+  TFile *bkgPhotonJetForQcd_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/photonJet.root","recreate");
   bkgPhotonJetForQcd->Write();
   bkgPhotonJetForQcd_file->Close();
 
 
-
   // merge the signals
   cout << "create merged signal dataset" << endl;
-  TFile *qcdPt15ForQcd_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/qcd_pt15.root");
+  TFile *qcdPt15ForQcd_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/qcd_pt15.root");
   RooDataSet *dataQcd_qcd15 = (RooDataSet*) qcdPt15ForQcd_file->Get("T1");
   qcdPt15ForQcd_file->Close();  
 
-  TFile *qcdPt30ForQcd_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/qcd_pt30.root");
+  TFile *qcdPt30ForQcd_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/qcd_pt30.root");
   RooDataSet *dataQcd_qcd30 = (RooDataSet*) qcdPt30ForQcd_file->Get("T1");
   qcdPt30ForQcd_file->Close();  
 
-  TFile *qcdPt80ForQcd_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/qcd_pt80.root");
+  TFile *qcdPt80ForQcd_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/qcd_pt80.root");
   RooDataSet *dataQcd_qcd80 = (RooDataSet*) qcdPt80ForQcd_file->Get("T1");
   qcdPt80ForQcd_file->Close();  
 
   RooDataSet *qcdSignalForQcd = new RooDataSet(*dataQcd_qcd15);
   qcdSignalForQcd->append(*dataQcd_qcd30);
   qcdSignalForQcd->append(*dataQcd_qcd80);
+  qcdSignalForQcd->append(*bkgPhotonJetForQcd); // fakes from photon+j are 'signal'
 
-  TFile *qcdSignalForQcd_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/qcdSignal.root","recreate");
+  TFile *qcdSignalForQcd_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/qcdSignal.root","recreate");
   qcdSignalForQcd->Write();
   qcdSignalForQcd_file->Close();
 
 
-
   // merge the signal + bkg to data-like dataset for QCD
   cout << "create merged data-like dataset" << endl;
-  TFile *ForQCD_Zee_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/zee.root");
+  TFile *ForQCD_Zee_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/zee.root");
   RooDataSet *dataQcd_zee = (RooDataSet*) ForQCD_Zee_file->Get("T1");
   ForQCD_Zee_file->Close();
   
-  TFile *ttbarForQcd_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/ttbar.root");
+  TFile *ttbarForQcd_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/ttbar.root");
   RooDataSet *dataQcd_ttbar = (RooDataSet*) ttbarForQcd_file->Get("T1");
   ttbarForQcd_file->Close();  
 
-  TFile *wenuForQcd_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/wenu_5jobs.root");
+  TFile *wenuForQcd_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/wenu_5jobs.root");
   RooDataSet *dataQcd_wenu = (RooDataSet*) wenuForQcd_file->Get("T1");
   wenuForQcd_file->Close();    
 
   RooDataSet *dataForQcd = new RooDataSet(*qcdSignalForQcd);
-  dataForQcd->append(*bkgPhotonJetForQcd);
   dataForQcd->append(*dataQcd_ttbar);
   dataForQcd->append(*dataQcd_wenu);
   dataForQcd->append(*dataQcd_zee);
 
-  TFile *datafileForQcd_file = TFile::Open("/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/data.root","recreate");
+  TFile *datafileForQcd_file = TFile::Open("/cmsrm/pc21/emanuele/releases/egammaOctX/offline/EgammaAnalysisTools/MLFit/datasets_QCDTaP/data.root","recreate");
   dataForQcd->Write();
   datafileForQcd_file->Close();
 }
