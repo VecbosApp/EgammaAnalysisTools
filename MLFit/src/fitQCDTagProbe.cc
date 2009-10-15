@@ -24,8 +24,8 @@ void myFit() {
   MLOptions opts = GetDefaultOptions();
 
   // define the structure of the dataset
-  RooRealVar *deltaphi = new RooRealVar("qcdDeltaphi","di-jet #Delta #phi",     1,0.5,3.1415);
-  RooRealVar *met      = new RooRealVar("qcdMet",     "MET",                    10,0,100, "GeV");
+  RooRealVar *deltaphi = new RooRealVar("qcdDeltaphi","di-jet #Delta #phi",     1,1.0,3.1415);
+  RooRealVar *met      = new RooRealVar("qcdMet",     "MET",                    10,0,100, "GeV");  
   RooRealVar *mass     = new RooRealVar("qcdInvmass", "tag-probeinvariant mass",10,0,600, "GeV");
   RooRealVar *weight   = new RooRealVar("weight",     "weight",                 1);
   theFit.AddFlatFileColumn(deltaphi);
@@ -82,7 +82,8 @@ void FitQCDTagAndProbe() {
   if(opts.getBoolVal("ttbarOnlyFit"))       sprintf(datasetname,"/cmsrm/pc21/crovelli/data/Like3.2.X/datasets_QCDTaP/ttbar.root");
   theFit.addDataSetFromRootFile("T1", "T1", datasetname);
   RooDataSet *data = theFit.getDataSet("T1");
-  data->setWeightVar("weight");
+  RooDataSet *reddata = data->reduce("qcdDeltaphi>1.0");
+  reddata->setWeightVar("weight");
   
   // build the fit likelihood
   RooAbsPdf *myPdf = theFit.buildModel("myFit");
@@ -94,10 +95,10 @@ void FitQCDTagAndProbe() {
   if(opts.getBoolVal("ttbarOnlyFit"))      theFit.initialize("fitconfig/fit-qcdtagprobe-ttbaronly.config");
   
   // Print Fit configuration 
-  myPdf->getParameters(data)->selectByAttrib("Constant",kTRUE)->Print("V");
-  myPdf->getParameters(data)->selectByAttrib("Constant",kFALSE)->Print("V");
+  myPdf->getParameters(reddata)->selectByAttrib("Constant",kTRUE)->Print("V");
+  myPdf->getParameters(reddata)->selectByAttrib("Constant",kFALSE)->Print("V");
   
-  RooFitResult *fitres =  myPdf->fitTo(*data,theFit.getNoNormVars("myFit"),"MHTER");
+  RooFitResult *fitres =  myPdf->fitTo(*reddata,theFit.getNoNormVars("myFit"),"MHTER");
   fitres->Print("V");
   
   // write the config file corresponding to the fit minimum
@@ -125,7 +126,8 @@ void PlotQCDTagAndProbe(int nbins=19) {
   theFit.addDataSetFromRootFile("T1", "T1", datasetname);
 
   RooDataSet *data = theFit.getDataSet("T1");
-  data->setWeightVar("weight");
+  RooDataSet *reddata = data->reduce("qcdDeltaphi>1.0");
+  reddata->setWeightVar("weight");
 
   // build the fit likelihood
   RooAbsPdf *myPdf = theFit.buildModel("myFit");
@@ -139,7 +141,7 @@ void PlotQCDTagAndProbe(int nbins=19) {
   if(opts.getBoolVal("useDeltaPhi")) {
     TCanvas *c = new TCanvas("c","fitResult");
 
-    RooPlot* MassPlot = MakePlot("qcdDeltaphi", &theFit, data, nbins, false);    
+    RooPlot* MassPlot = MakePlot("qcdDeltaphi", &theFit, reddata, nbins, false);    
     
     MassPlot->SetYTitle("Events");
     MassPlot->Draw();
@@ -152,7 +154,7 @@ void PlotQCDTagAndProbe(int nbins=19) {
   if(opts.getBoolVal("useMET")) {
     TCanvas *c = new TCanvas("c","fitResult");
 
-    RooPlot* MassPlot = MakePlot("qcdMet", &theFit, data, nbins, false);    
+    RooPlot* MassPlot = MakePlot("qcdMet", &theFit, reddata, nbins, false);    
     
     MassPlot->SetYTitle("Events");
     MassPlot->Draw();
@@ -166,7 +168,7 @@ void PlotQCDTagAndProbe(int nbins=19) {
 
     TCanvas *c = new TCanvas("c","fitResult");
 
-    RooPlot* MassPlot = MakePlot("qcdInvmass", &theFit, data, nbins, false);    
+    RooPlot* MassPlot = MakePlot("qcdInvmass", &theFit, reddata, nbins, false);    
     
     MassPlot->SetYTitle("Events");
     MassPlot->Draw();
