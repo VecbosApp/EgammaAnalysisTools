@@ -29,6 +29,9 @@
 #if Application == 2
 #include "EgammaAnalysisTools/include/LHPdfsProducer.hh"
 #endif
+#if Application == 3
+#include "EgammaAnalysisTools/include/sPlotsPdfsComparison.hh"
+#endif
 
 int main(int argc, char* argv[]) {
 
@@ -45,7 +48,14 @@ int main(int argc, char* argv[]) {
 
   // -------------------------
   // loading file:
-  TChain *theChain = new TChain("ntp1");
+  TChain *theChain = 0;
+
+#if Application != 3
+  theChain = new TChain("ntp1");
+#else 
+  theChain = new TChain(outputFileName);
+#endif
+
   char Buffer[500];
   char MyRootFile[2000];  
   std::cout << "input: " << inputFileName << std::endl;
@@ -120,6 +130,14 @@ int main(int argc, char* argv[]) {
   sprintf(title,"%s_qcdTandP_histos.root",outputFileName);    
   producer.saveHistos(title);
   */
+
+#endif
+
+#if Application == 3
+
+  sPlotsPdfsComparison p(theChain);
+  p.RunOverMC(false);
+  p.Loop();
 
 #endif
 
