@@ -526,7 +526,9 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
 void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
   
   if(fChain == 0) return;
-  
+
+  bookHistos();
+
   char treename[200];
   sprintf(treename,"%s",treefilesuffix);
   RedEleIDTree reducedTree(treename);
@@ -641,10 +643,10 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
         int fullclassRaw = classificationEle[probe];
         int iclass     = -1;
         int ifullclass = -1;
-        if      ( fullclassRaw == GOLDEN )    { iclass = 0; }
-        else if ( fullclassRaw == BIGBREM )   { iclass = 0; }
-        else if ( fullclassRaw == NARROW )    { iclass = 0; }
-        else if ( fullclassRaw == SHOWERING ) { iclass = 1; }
+        if      ( fullclassRaw == GOLDEN )    { iclass = 0; ifullclass = 0; }
+        else if ( fullclassRaw == BIGBREM )   { iclass = 0; ifullclass = 1; }
+        else if ( fullclassRaw == NARROW )    { iclass = 0; ifullclass = 2; }
+        else if ( fullclassRaw == SHOWERING ) { iclass = 1; ifullclass = 3; }
         if (iclass>-1) tagProbeTot++;
 
         // apply the electron ID loose on the tag electron
@@ -705,6 +707,55 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
 	    reducedTree.fillAttributesSignal(charge,eta,pt,okmass);
 	    reducedTree.fillCategories(iecal,iptbin,iclass);
 	    reducedTree.store();
+
+            dPhiCaloUnsplitEle      [iecal][iptbin] -> Fill ( dPhiCalo );
+            dPhiVtxUnsplitEle       [iecal][iptbin] -> Fill ( dPhiVtx );
+            dEtaUnsplitEle          [iecal][iptbin] -> Fill ( dEtaVtx );
+            EoPoutUnsplitEle        [iecal][iptbin] -> Fill ( EoPout );
+            HoEUnsplitEle           [iecal][iptbin] -> Fill ( HoE );
+            sigmaIEtaIEtaUnsplitEle [iecal][iptbin] -> Fill ( sigmaIEtaIEta );
+            sigmaIEtaIPhiUnsplitEle [iecal][iptbin] -> Fill ( sigmaIEtaIPhi );
+            sigmaIPhiIPhiUnsplitEle [iecal][iptbin] -> Fill ( sigmaIPhiIPhi );
+            s1s9UnsplitEle          [iecal][iptbin] -> Fill ( s1s9 );
+            s9s25UnsplitEle         [iecal][iptbin] -> Fill ( s9s25 );
+            LATUnsplitEle           [iecal][iptbin] -> Fill ( lat );
+            etaLATUnsplitEle        [iecal][iptbin] -> Fill ( etaLat );
+            phiLATUnsplitEle        [iecal][iptbin] -> Fill ( phiLat );
+            a20UnsplitEle           [iecal][iptbin] -> Fill ( a20 );
+            a42UnsplitEle           [iecal][iptbin] -> Fill ( a42 );
+
+            dPhiCaloClassEle      [iecal][iptbin][iclass] -> Fill ( dPhiCalo );
+            dPhiVtxClassEle       [iecal][iptbin][iclass] -> Fill ( dPhiVtx );
+            dEtaClassEle          [iecal][iptbin][iclass] -> Fill ( dEtaVtx );
+            EoPoutClassEle        [iecal][iptbin][iclass] -> Fill ( EoPout );
+            HoEClassEle           [iecal][iptbin][iclass] -> Fill ( HoE );
+            sigmaIEtaIEtaClassEle [iecal][iptbin][iclass] -> Fill ( sigmaIEtaIEta );
+            sigmaIEtaIPhiClassEle [iecal][iptbin][iclass] -> Fill ( sigmaIEtaIPhi );
+            sigmaIPhiIPhiClassEle [iecal][iptbin][iclass] -> Fill ( sigmaIPhiIPhi );
+            s1s9ClassEle          [iecal][iptbin][iclass] -> Fill ( s1s9 );
+            s9s25ClassEle         [iecal][iptbin][iclass] -> Fill ( s9s25 );
+            LATClassEle           [iecal][iptbin][iclass] -> Fill ( lat );
+            etaLATClassEle        [iecal][iptbin][iclass] -> Fill ( etaLat );
+            phiLATClassEle        [iecal][iptbin][iclass] -> Fill ( phiLat );
+            a20ClassEle           [iecal][iptbin][iclass] -> Fill ( a20 );
+            a42ClassEle           [iecal][iptbin][iclass] -> Fill ( a42 );
+
+            dPhiCaloFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( dPhiCalo );
+            dPhiVtxFullclassEle       [iecal][iptbin][ifullclass] -> Fill ( dPhiVtx );
+            dEtaFullclassEle          [iecal][iptbin][ifullclass] -> Fill ( dEtaVtx );
+            EoPoutFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( EoPout );
+            HoEFullclassEle           [iecal][iptbin][ifullclass] -> Fill ( HoE );
+            sigmaIEtaIEtaFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaIEtaIEta );
+            sigmaIEtaIPhiFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaIEtaIPhi );
+            sigmaIPhiIPhiFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaIPhiIPhi );
+            s1s9FullclassEle          [iecal][iptbin][ifullclass] -> Fill ( s1s9 );
+            s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
+            LATFullclassEle           [iecal][iptbin][ifullclass] -> Fill ( lat );
+            etaLATFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( etaLat );
+            phiLATFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( phiLat );
+            a20FullclassEle           [iecal][iptbin][ifullclass] -> Fill ( a20 );
+            a42FullclassEle           [iecal][iptbin][ifullclass] -> Fill ( a42 );
+
 	  }
 
         } // fill histograms
