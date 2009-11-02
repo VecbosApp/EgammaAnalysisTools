@@ -24,6 +24,8 @@ public:
   void SetBremFraction(float BremFraction) { m_BremFraction = BremFraction; m_useBremFraction = true; }
   void SetSigmaEtaEta(float SigmaEtaEta) { m_SigmaEtaEta = SigmaEtaEta; m_useSigmaEtaEta = true; }
   void SetSigmaPhiPhi(float SigmaPhiPhi) { m_SigmaPhiPhi = SigmaPhiPhi; m_useSigmaPhiPhi = true; }
+  void SetSigmaIEtaIEta(float SigmaIEtaIEta) { m_SigmaIEtaIEta = SigmaIEtaIEta; m_useSigmaIEtaIEta = true; }
+  void SetSigmaIPhiIPhi(float SigmaIPhiIPhi) { m_SigmaIPhiIPhi = SigmaIPhiIPhi; m_useSigmaIPhiIPhi = true; }
   void SetEOverPout(float EOverPout) { m_EOverPout = EOverPout; m_useEOverPout = true; }
   void SetEOverPin(float EOverPin) { m_EOverPin = EOverPin; m_useEOverPin = true; }
   void SetElectronClass(int electronClass) { m_electronClass = electronClass; m_electronClassInitialised = true; }
@@ -48,6 +50,8 @@ private:
   bool m_useBremFraction;
   bool m_useSigmaEtaEta;
   bool m_useSigmaPhiPhi;
+  bool m_useSigmaIEtaIEta;
+  bool m_useSigmaIPhiIPhi;
   bool m_useEOverPout;
   bool m_useEOverPin;
   bool m_useLikelihood;
@@ -63,6 +67,8 @@ private:
   float m_BremFraction;
   float m_SigmaEtaEta;
   float m_SigmaPhiPhi;
+  float m_SigmaIEtaIEta;
+  float m_SigmaIPhiIPhi;
   float m_EOverPout;
   float m_EOverPin;
   float m_Likelihood;

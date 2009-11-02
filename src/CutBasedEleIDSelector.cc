@@ -18,6 +18,8 @@ CutBasedEleIDSelector::CutBasedEleIDSelector() {
   m_useBremFraction = false;
   m_useSigmaEtaEta = false;
   m_useSigmaPhiPhi = false;
+  m_useSigmaIEtaIEta = false;
+  m_useSigmaIPhiIPhi = false;
   m_useEOverPout = false;
   m_useEOverPin = false;
   m_useLikelihood = false;
@@ -77,6 +79,8 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
     eleSelection->addCut("bremFraction"); 
     eleSelection->addCut("sigmaEtaEta");
     eleSelection->addCut("sigmaPhiPhi");
+    eleSelection->addCut("sigmaIEtaIEta");
+    eleSelection->addCut("sigmaIPhiIPhi");
     eleSelection->addCut("eOverPout");
     eleSelection->addCut("eOverPin");
     eleSelection->addCut("likelihood");
@@ -96,6 +100,8 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
   m_electronCounter.AddVar("bremFraction");
   m_electronCounter.AddVar("sigmaEtaEta");
   m_electronCounter.AddVar("sigmaPhiPhi");
+  m_electronCounter.AddVar("sigmaIEtaIEta");
+  m_electronCounter.AddVar("sigmaIPhiIPhi");
   m_electronCounter.AddVar("eOverPout");
   m_electronCounter.AddVar("eOverPin");
   m_electronCounter.AddVar("finalCustomEleID");
@@ -180,8 +186,16 @@ bool CutBasedEleIDSelector::output() {
   m_electronCounter.IncrVar("sigmaEtaEta");
 
   if(selection->getSwitch("sigmaPhiPhi") && 
-     !selection->passCut("sigmaPhiPhi", m_SigmaEtaEta)) return false; 
+     !selection->passCut("sigmaPhiPhi", m_SigmaPhiPhi)) return false; 
   m_electronCounter.IncrVar("sigmaPhiPhi");
+
+  if(selection->getSwitch("sigmaIEtaIEta") && 
+     !selection->passCut("sigmaIEtaIEta", m_SigmaIEtaIEta)) return false; 
+  m_electronCounter.IncrVar("sigmaIEtaIEta");
+
+  if(selection->getSwitch("sigmaIPhiIPhi") && 
+     !selection->passCut("sigmaIPhiIPhi", m_SigmaIPhiIPhi)) return false; 
+  m_electronCounter.IncrVar("sigmaIPhiIPhi");
 
   if(selection->getSwitch("eOverPout") && 
      !selection->passCut("eOverPout", m_EOverPout)) return false; 
@@ -212,7 +226,9 @@ void CutBasedEleIDSelector::diplayEfficiencies() {
   m_electronCounter.Draw("bremFraction", "invEminusInvP");
   m_electronCounter.Draw("sigmaEtaEta","bremFraction");
   m_electronCounter.Draw("sigmaPhiPhi","sigmaEtaEta");
-  m_electronCounter.Draw("eOverPout", "sigmaPhiPhi");
+  m_electronCounter.Draw("sigmaIEtaIEta","sigmaPhiPhi");
+  m_electronCounter.Draw("sigmaIPhiIPhi","sigmaIEtaIEta");
+  m_electronCounter.Draw("eOverPout", "sigmaIPhiIPhi");
   m_electronCounter.Draw("eOverPin", "eOverPout");
   m_electronCounter.Draw("finalCustomEleID","electrons");
   m_electronCounter.Draw("likelihood","electrons");
