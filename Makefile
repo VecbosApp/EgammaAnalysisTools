@@ -66,7 +66,7 @@ OUTLIBCOMMON     = $(INCLUDEDIRCOMMON)/CommonTools/lib/
 .PREFIXES: ./lib/
 
 
-$(OUTLIB)EgammaBase.o: $(INCLUDEDIR)/src/EgammaBase.C $(INCLUDEDIR)/src/LikelihoodAnalysis.cc
+$(OUTLIB)EgammaBase.o: $(INCLUDEDIR)/src/EgammaBase.C
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)EgammaBase.o $<
 $(OUTLIBCOMMON)Conditions.o: $(INCLUDEDIRCOMMON)/CommonTools/src/Conditions.C
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)Conditions.o $<
@@ -96,6 +96,10 @@ $(OUTLIB)sPlotsPdfsComparison.o: $(INCLUDEDIR)/src/sPlotsPdfsComparison.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)sPlotsPdfsComparison.o $<
 $(OUTLIB)IsolationPdfsProducer.o: $(INCLUDEDIR)/src/IsolationPdfsProducer.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)IsolationPdfsProducer.o $<
+$(OUTLIB)SuperClusterWSelection.o: $(INCLUDEDIR)/src/SuperClusterWSelection.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)SuperClusterWSelection.o $<
+$(OUTLIB)McTruthEvent.o: ../src/McTruthEvent.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)McTruthEvent.o $<
 
 #----------------------------------------------------#
 
@@ -112,10 +116,10 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIBCOMMON)TriggerMask.o \
 	$(OUTLIBCOMMON)Utils.o \
 	$(OUTLIB)RedEleIDTree.o \
-	$(OUTLIB)LikelihoodAnalysis.o \
-	$(OUTLIB)LHPdfsProducer.o \
 	$(OUTLIB)sPlotsPdfsComparison.o \
-	$(OUTLIB)IsolationPdfsProducer.o
+	$(OUTLIB)IsolationPdfsProducer.o \
+	$(OUTLIB)SuperClusterWSelection.o \
+	$(OUTLIB)McTruthEvent.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
 CompareEff: $(INCLUDEDIR)/src/CompareEff.C \
