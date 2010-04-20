@@ -23,14 +23,17 @@
 // Offline analysis includes
 #include "EgammaAnalysisTools/include/Application.hh"
 #include "CommonTools/include/TriggerMask.hh"
-#if Application == 1
-#include "EgammaAnalysisTools/include/LikelihoodAnalysis.hh"
-#endif
-#if Application == 2
-#include "EgammaAnalysisTools/include/LHPdfsProducer.hh"
-#endif
+// #if Application == 1
+// #include "EgammaAnalysisTools/include/LikelihoodAnalysis.hh"
+// #endif
+// #if Application == 2
+// #include "EgammaAnalysisTools/include/LHPdfsProducer.hh"
+// #endif
 #if Application == 3
 #include "EgammaAnalysisTools/include/sPlotsPdfsComparison.hh"
+#endif
+#if Application == 4
+#include "EgammaAnalysisTools/include/SuperClusterWSelection.hh"
 #endif
 
 int main(int argc, char* argv[]) {
@@ -38,13 +41,14 @@ int main(int argc, char* argv[]) {
   char inputFileName[300];
   char outputFileName[300];
 
-  if ( argc < 3 ){
+  if ( argc < 4 ){
     std::cout << "missing argument: insert at least inputFile with list of root files" << std::endl; 
-    std::cout << "EgammaAnalysis inputFile outputFile" << std::endl;
+    std::cout << "EgammaAnalysis inputFile outputFile 0" << std::endl;
     return 1;
   }
   strcpy(inputFileName,argv[1]);
   strcpy(outputFileName,argv[2]);
+  int signal = atoi(argv[3]);
 
   // -------------------------
   // loading file:
@@ -82,62 +86,72 @@ int main(int argc, char* argv[]) {
   inputFile->close();
   delete inputFile;
 
-#if Application == 1
+// #if Application == 1
 
-  LikelihoodAnalysis analysis(theChain);
-  analysis.reproduceEgammaCutID();
-  //  analysis.findEquivalentLHCut( 0.79935 );        // tight eleID
-  //  analysis.findEquivalentLHCut( 0.957 );       // loose eleID
-  //  analysis.estimateIDEfficiency();
-  //  analysis.estimateFakeRate();
+//   LikelihoodAnalysis analysis(theChain);
+//   analysis.reproduceEgammaCutID();
+//   //  analysis.findEquivalentLHCut( 0.79935 );        // tight eleID
+//   //  analysis.findEquivalentLHCut( 0.957 );       // loose eleID
+//   //  analysis.estimateIDEfficiency();
+//   //  analysis.estimateFakeRate();
   
-#endif
+// #endif
 
-#if Application == 2
+// #if Application == 2
 
-  char title[1000];
+//   char title[1000];
   
-  LHPdfsProducer producer(theChain);
+//   LHPdfsProducer producer(theChain);
 
-  TriggerMask maskSignal(treeCond);
-  maskSignal.requireTrigger("HLT_Ele15_SW_L1R");
-  maskSignal.requireTrigger("HLT_Ele20_SW_L1R");
-  std::vector<int> requiredSignalTriggers = maskSignal.getBits();
-  producer.requireSignalTrigger(requiredSignalTriggers);
+//   TriggerMask maskSignal(treeCond);
+//   maskSignal.requireTrigger("HLT_Ele15_SW_L1R");
+//   maskSignal.requireTrigger("HLT_Ele20_SW_L1R");
+//   std::vector<int> requiredSignalTriggers = maskSignal.getBits();
+//   producer.requireSignalTrigger(requiredSignalTriggers);
   
-  TriggerMask maskBackground(treeCond);
-  maskBackground.requireTrigger("HLT_DiJetAve30U_1E31");   
-  maskBackground.requireTrigger("HLT_Jet30");   
-  maskBackground.requireTrigger("HLT_Jet50");   
-  std::vector<int> requiredBackgroundTriggers = maskBackground.getBits();
-  producer.requireBackgroundTrigger(requiredBackgroundTriggers);
+//   TriggerMask maskBackground(treeCond);
+//   maskBackground.requireTrigger("HLT_DiJetAve30U_1E31");   
+//   maskBackground.requireTrigger("HLT_Jet30");   
+//   maskBackground.requireTrigger("HLT_Jet50");   
+//   std::vector<int> requiredBackgroundTriggers = maskBackground.getBits();
+//   producer.requireBackgroundTrigger(requiredBackgroundTriggers);
 
-  /*
-  sprintf(title,"%s_zTandP_tree.root",outputFileName);  
-  producer.LoopZTagAndProbe(title);
-  sprintf(title,"%s_zTandP_histos.root",outputFileName);    
-  producer.saveHistos(title);
-  */
+//   /*
+//   sprintf(title,"%s_zTandP_tree.root",outputFileName);  
+//   producer.LoopZTagAndProbe(title);
+//   sprintf(title,"%s_zTandP_histos.root",outputFileName);    
+//   producer.saveHistos(title);
+//   */
 
-  sprintf(title,"%s_zMC_tree.root",outputFileName);  
-  producer.LoopZTagAndProbeForMcTruth(title);
-  sprintf(title,"%s_zMC_histos.root",outputFileName);    
-  producer.saveHistos(title);
+//   sprintf(title,"%s_zMC_tree.root",outputFileName);  
+//   producer.LoopZTagAndProbeForMcTruth(title);
+//   sprintf(title,"%s_zMC_histos.root",outputFileName);    
+//   producer.saveHistos(title);
 
-  /*
-  sprintf(title,"%s_qcdTandP_tree.root",outputFileName);  
-  producer.LoopQCDTagAndProbe(title);
-  sprintf(title,"%s_qcdTandP_histos.root",outputFileName);    
-  producer.saveHistos(title);
-  */
+//   /*
+//   sprintf(title,"%s_qcdTandP_tree.root",outputFileName);  
+//   producer.LoopQCDTagAndProbe(title);
+//   sprintf(title,"%s_qcdTandP_histos.root",outputFileName);    
+//   producer.saveHistos(title);
+//   */
 
-#endif
+// #endif
 
 #if Application == 3
 
   sPlotsPdfsComparison p(theChain);
   p.RunOverMC(false);
   p.Loop();
+
+#endif
+
+#if Application == 4
+
+  SuperClusterWSelection p(theChain);
+  p.setPrefix(outputFileName);
+  p.setSignal(signal);
+  p.Loop();
+  p.displayEfficiencies();
 
 #endif
 
