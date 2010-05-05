@@ -20,6 +20,11 @@ CutBasedEleIDSelector::CutBasedEleIDSelector() {
   m_useSigmaPhiPhi = false;
   m_useEOverPout = false;
   m_useEOverPin = false;
+  m_useEcalIso = false;
+  m_useTrkIso = false;
+  m_useHcalIso = false;
+  m_useCombIso = false;
+  m_useMissingHits = false;
   m_useLikelihood = false;
   m_electronClassInitialised = false;
   m_egammaCutBasedInitialised = false;
@@ -88,6 +93,11 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
     eleSelection->addCut("sigmaPhiPhi");
     eleSelection->addCut("eOverPout");
     eleSelection->addCut("eOverPin");
+    eleSelection->addCut("ecalIso");
+    eleSelection->addCut("trkIso");
+    eleSelection->addCut("hcalIso");
+    eleSelection->addCut("combIso");
+    eleSelection->addCut("missHits");
     eleSelection->addCut("likelihood");
     eleSelection->summary();
   }
@@ -95,6 +105,9 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
 
   m_electronCounter.SetTitle("SINGLE ELECTRON COUNTER");
   m_electronCounter.AddVar("electrons");
+  m_electronCounter.AddVar("electronsOnlyID");
+  m_electronCounter.AddVar("electronsOnlyIso");
+  m_electronCounter.AddVar("electronsOnlyConv");
   m_electronCounter.AddVar("egammaCutBased");
   m_electronCounter.AddVar("hOverE");
   m_electronCounter.AddVar("s9s25");
@@ -107,13 +120,21 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
   m_electronCounter.AddVar("sigmaPhiPhi");
   m_electronCounter.AddVar("eOverPout");
   m_electronCounter.AddVar("eOverPin");
+  m_electronCounter.AddVar("trkIso");
+  m_electronCounter.AddVar("hcalIso");
+  m_electronCounter.AddVar("combIso");
+  m_electronCounter.AddVar("missHits");
   m_electronCounter.AddVar("finalCustomEleID");
+  m_electronCounter.AddVar("finalCustomEleIDOnlyID");
+  m_electronCounter.AddVar("finalCustomEleIDOnlyIso");
+  m_electronCounter.AddVar("finalCustomEleIDOnlyConv");
   m_electronCounter.AddVar("likelihood");
 
 
 }
 
-void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir) {
+void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir) 
+{
 
   m_classDep = false;
 
@@ -143,6 +164,11 @@ void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir) {
     eleSelection->addCut("sigmaPhiPhi");
     eleSelection->addCut("eOverPout");
     eleSelection->addCut("eOverPin");
+    eleSelection->addCut("ecalIso");
+    eleSelection->addCut("trkIso");
+    eleSelection->addCut("hcalIso");
+    eleSelection->addCut("combIso");
+    eleSelection->addCut("missHits");
     eleSelection->addCut("likelihood");
     eleSelection->summary();
   }
@@ -150,6 +176,9 @@ void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir) {
 
   m_electronCounter.SetTitle("SINGLE ELECTRON COUNTER");
   m_electronCounter.AddVar("electrons");
+  m_electronCounter.AddVar("electronsOnlyID");
+  m_electronCounter.AddVar("electronsOnlyIso");
+  m_electronCounter.AddVar("electronsOnlyConv");
   m_electronCounter.AddVar("egammaCutBased");
   m_electronCounter.AddVar("hOverE");
   m_electronCounter.AddVar("s9s25");
@@ -162,13 +191,48 @@ void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir) {
   m_electronCounter.AddVar("sigmaPhiPhi");
   m_electronCounter.AddVar("eOverPout");
   m_electronCounter.AddVar("eOverPin");
+  m_electronCounter.AddVar("ecalIso");
+  m_electronCounter.AddVar("trkIso");
+  m_electronCounter.AddVar("hcalIso");
+  m_electronCounter.AddVar("combIso");
+  m_electronCounter.AddVar("missHits");
   m_electronCounter.AddVar("finalCustomEleID");
+  m_electronCounter.AddVar("finalCustomEleIDOnlyID");
+  m_electronCounter.AddVar("finalCustomEleIDOnlyIso");
+  m_electronCounter.AddVar("finalCustomEleIDOnlyConv");
   m_electronCounter.AddVar("likelihood");
-
 
 }
 
 bool CutBasedEleIDSelector::output() {
+  
+  if ( m_fiducialflag == -1 ) {
+    cout << "CONFIGURATION ERROR! Fiducial flag not set. Use the method CutBasedEleIDSelector::SetEcalFiducialRegion(int word) to do it. Returning always false eleID." << endl;
+    return false;
+  }
+  
+  if ( !m_classDep ) {
+    cout << "CutBasedEleIDSelector::output() method is intended for class based ele ID, while you configured for class independent ID. Use outputNoClass() instead." << endl;
+    return false;
+  }
+
+  Utils anaUtils;
+  bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
+  if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
+
+  m_electronCounter.IncrVar("electrons");
+  if (!outputEleId())
+    return false;
+  if (!outputIso())
+    return false;
+  if (!outputConv())
+    return false;
+
+  m_electronCounter.IncrVar("finalCustomEleID");
+  return true;  
+
+}
+bool CutBasedEleIDSelector::outputEleId() {
 
   if ( m_fiducialflag == -1 ) {
     cout << "CONFIGURATION ERROR! Fiducial flag not set. Use the method CutBasedEleIDSelector::SetEcalFiducialRegion(int word) to do it. Returning always false eleID." << endl;
@@ -206,7 +270,7 @@ bool CutBasedEleIDSelector::output() {
     selection=m_EgammaCutIDSelection[offset+3];
   }
 
-  m_electronCounter.IncrVar("electrons");
+  m_electronCounter.IncrVar("electronsOnlyID");
 
   if(selection->getSwitch("egammaCutBased") && 
      m_egammaCutBased ) m_electronCounter.IncrVar("egammaCutBased");
@@ -260,14 +324,154 @@ bool CutBasedEleIDSelector::output() {
      !selection->passCut("eOverPin", m_EOverPin)) return false; 
   m_electronCounter.IncrVar("eOverPin");
   
-  m_electronCounter.IncrVar("finalCustomEleID");
+  m_electronCounter.IncrVar("finalCustomEleIDOnlyID");
 
   return true;
 
 
 }
 
-bool CutBasedEleIDSelector::outputNoClass() {
+
+bool CutBasedEleIDSelector::outputIso() 
+{
+  if ( m_fiducialflag == -1 ) {
+    cout << "CONFIGURATION ERROR! Fiducial flag not set. Use the method CutBasedEleIDSelector::SetEcalFiducialRegion(int word) to do it. Returning always false eleID." << endl;
+    return false;
+  }
+
+  if ( !m_classDep ) {
+    cout << "CutBasedEleIDSelector::output() method is intended for class based ele ID, while you configured for class independent ID. Use outputNoClass() instead." << endl;
+    return false;
+  }
+
+  Utils anaUtils;
+  bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
+  if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
+
+  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isGap);
+
+  if ( eleInGap ) return false;
+
+  int GsfClass = m_electronClass;
+  int offset=0;
+  bool eeElectron = anaUtils.fiducialFlagECAL(m_fiducialflag, isEE);
+  if(eeElectron) {
+    offset=4;
+  }
+
+  Selection *selection;
+  if(GsfClass==GOLDEN) 
+    selection=m_EgammaCutIDSelection[offset];
+  else if(GsfClass==BIGBREM)
+    selection=m_EgammaCutIDSelection[offset+1];
+  else if(GsfClass==NARROW)
+    selection=m_EgammaCutIDSelection[offset+2];
+  else if(GsfClass==SHOWERING) {
+    selection=m_EgammaCutIDSelection[offset+3];
+  }
+
+  m_electronCounter.IncrVar("electronsOnlyIso");
+
+  if(selection->getSwitch("ecalIso") && 
+     !selection->passCut("ecalIso", fabs(m_ecalIso))) return false; 
+  m_electronCounter.IncrVar("ecalIso");
+
+  if(selection->getSwitch("trkIso") && 
+     !selection->passCut("trkIso", fabs(m_trkIso))) return false; 
+  m_electronCounter.IncrVar("trkIso");
+
+  if(selection->getSwitch("hcalIso") && 
+     !selection->passCut("hcalIso", fabs(m_hcalIso))) return false; 
+  m_electronCounter.IncrVar("hcalIso");
+
+  if(selection->getSwitch("combIso") && 
+     !selection->passCut("combIso", fabs(m_combIso))) return false; 
+  m_electronCounter.IncrVar("combIso");
+
+  m_electronCounter.IncrVar("finalCustomEleIDOnlyIso");
+
+  return true;
+}
+
+bool CutBasedEleIDSelector::outputConv()
+{
+  if ( m_fiducialflag == -1 ) {
+    cout << "CONFIGURATION ERROR! Fiducial flag not set. Use the method CutBasedEleIDSelector::SetEcalFiducialRegion(int word) to do it. Returning always false eleID." << endl;
+    return false;
+  }
+
+  if ( !m_classDep ) {
+    cout << "CutBasedEleIDSelector::output() method is intended for class based ele ID, while you configured for class independent ID. Use outputNoClass() instead." << endl;
+    return false;
+  }
+
+  Utils anaUtils;
+  bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
+  if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
+
+  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isGap);
+
+  if ( eleInGap ) return false;
+
+  int GsfClass = m_electronClass;
+  int offset=0;
+  bool eeElectron = anaUtils.fiducialFlagECAL(m_fiducialflag, isEE);
+  if(eeElectron) {
+    offset=4;
+  }
+
+  Selection *selection;
+  if(GsfClass==GOLDEN) 
+    selection=m_EgammaCutIDSelection[offset];
+  else if(GsfClass==BIGBREM)
+    selection=m_EgammaCutIDSelection[offset+1];
+  else if(GsfClass==NARROW)
+    selection=m_EgammaCutIDSelection[offset+2];
+  else if(GsfClass==SHOWERING) {
+    selection=m_EgammaCutIDSelection[offset+3];
+  }
+
+  m_electronCounter.IncrVar("electronsOnlyConv");
+
+  if(selection->getSwitch("missHits") && 
+     !selection->passCut("missHits", m_missingHits)) return false; 
+  m_electronCounter.IncrVar("missHits");
+
+  m_electronCounter.IncrVar("finalCustomEleIDOnlyConv");
+
+  return true;
+}
+
+bool CutBasedEleIDSelector::outputNoClass() 
+{
+  if ( m_fiducialflag == -1 ) {
+    cout << "CONFIGURATION ERROR! Fiducial flag not set. Use the method CutBasedEleIDSelector::SetEcalFiducialRegion(int word) to do it. Returning always false eleID." << endl;
+    return false;
+  }
+
+  if ( m_classDep ) {
+    cout << "CutBasedEleIDSelector::output() method is intended for class IN-dependent ele ID, while you configured for class based ID. Use output() instead." << endl;
+    return false;
+  }
+
+  Utils anaUtils;
+  bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
+  if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
+
+  m_electronCounter.IncrVar("electrons");
+  if (!outputNoClassEleId())
+    return false;
+  if (!outputNoClassIso())
+    return false;
+  if (!outputNoClassConv())
+    return false;
+
+  m_electronCounter.IncrVar("finalCustomEleID");
+  return true;  
+
+}
+
+bool CutBasedEleIDSelector::outputNoClassEleId() {
 
   if ( m_fiducialflag == -1 ) {
     cout << "CONFIGURATION ERROR! Fiducial flag not set. Use the method CutBasedEleIDSelector::SetEcalFiducialRegion(int word) to do it. Returning always false eleID." << endl;
@@ -293,7 +497,7 @@ bool CutBasedEleIDSelector::outputNoClass() {
 
   Selection *selection = m_EgammaCutIDSelection[offset];
 
-  m_electronCounter.IncrVar("electrons");
+  m_electronCounter.IncrVar("electronsOnlyID");
 
   if(selection->getSwitch("egammaCutBased") && 
      m_egammaCutBased ) m_electronCounter.IncrVar("egammaCutBased");
@@ -346,20 +550,107 @@ bool CutBasedEleIDSelector::outputNoClass() {
   if(selection->getSwitch("eOverPin") && 
      !selection->passCut("eOverPin", m_EOverPin)) return false; 
   m_electronCounter.IncrVar("eOverPin");
-  
-  m_electronCounter.IncrVar("finalCustomEleID");
+
+  m_electronCounter.IncrVar("finalCustomEleIDOnlyID");
 
   return true;
 
-
 }
 
+bool CutBasedEleIDSelector::outputNoClassIso() 
+{
+  if ( m_fiducialflag == -1 ) {
+    cout << "CONFIGURATION ERROR! Fiducial flag not set. Use the method CutBasedEleIDSelector::SetEcalFiducialRegion(int word) to do it. Returning always false eleID." << endl;
+    return false;
+  }
+
+  if ( m_classDep ) {
+    cout << "CutBasedEleIDSelector::output() method is intended for class IN-dependent ele ID, while you configured for class based ID. Use output() instead." << endl;
+    return false;
+  }
+
+  Utils anaUtils;
+  bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
+  if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
+
+  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isGap);
+
+  if ( eleInGap ) return false;
+
+  int offset=0;
+  bool eeElectron = anaUtils.fiducialFlagECAL(m_fiducialflag, isEE);
+  if(eeElectron) offset=1;
+
+  Selection *selection = m_EgammaCutIDSelection[offset];
+
+  m_electronCounter.IncrVar("electronsOnlyIso");
+
+  if(selection->getSwitch("ecalIso") && 
+     !selection->passCut("ecalIso", fabs(m_ecalIso))) return false; 
+  m_electronCounter.IncrVar("ecalIso");
+
+  if(selection->getSwitch("trkIso") && 
+     !selection->passCut("trkIso", fabs(m_trkIso))) return false; 
+  m_electronCounter.IncrVar("trkIso");
+
+  if(selection->getSwitch("hcalIso") && 
+     !selection->passCut("hcalIso", fabs(m_hcalIso))) return false; 
+  m_electronCounter.IncrVar("hcalIso");
+
+  if(selection->getSwitch("combIso") && 
+     !selection->passCut("combIso", fabs(m_combIso))) return false; 
+  m_electronCounter.IncrVar("combIso");
+
+  m_electronCounter.IncrVar("finalCustomEleIDOnlyIso");
+
+  return true;
+}
+
+bool CutBasedEleIDSelector::outputNoClassConv()
+{
+  if ( m_fiducialflag == -1 ) {
+    cout << "CONFIGURATION ERROR! Fiducial flag not set. Use the method CutBasedEleIDSelector::SetEcalFiducialRegion(int word) to do it. Returning always false eleID." << endl;
+    return false;
+  }
+
+  if ( m_classDep ) {
+    cout << "CutBasedEleIDSelector::output() method is intended for class IN-dependent ele ID, while you configured for class based ID. Use output() instead." << endl;
+    return false;
+  }
+
+  Utils anaUtils;
+  bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
+  if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
+
+  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isGap);
+
+  if ( eleInGap ) return false;
+
+  int offset=0;
+  bool eeElectron = anaUtils.fiducialFlagECAL(m_fiducialflag, isEE);
+  if(eeElectron) offset=1;
+
+  Selection *selection = m_EgammaCutIDSelection[offset];
+
+  m_electronCounter.IncrVar("electronsOnlyConv");
+
+  if(selection->getSwitch("missHits") && 
+     !selection->passCut("missHits", m_missingHits)) return false; 
+  m_electronCounter.IncrVar("ecalIso");
+
+  m_electronCounter.IncrVar("finalCustomEleIDOnlyConv");
+
+  return true;
+}
 
 void CutBasedEleIDSelector::diplayEfficiencies() {
 
   m_electronCounter.Draw();
-  m_electronCounter.Draw("egammaCutBased", "electrons");
-  m_electronCounter.Draw("hOverE","electrons");
+
+  std::cout << "++++++ ELEID PART +++++++" << std::endl;
+  m_electronCounter.Draw("finalCustomEleIDOnlyID","electronsOnlyID");
+  std::cout << "====== CUTS EFFICIENCY ======" << std::endl;
+  m_electronCounter.Draw("hOverE","electronsOnlyID");
   m_electronCounter.Draw("s9s25","hOverE");
   m_electronCounter.Draw("deta","s9s25");
   m_electronCounter.Draw("dphiIn","deta");
@@ -370,7 +661,22 @@ void CutBasedEleIDSelector::diplayEfficiencies() {
   m_electronCounter.Draw("sigmaPhiPhi","sigmaEtaEta");
   m_electronCounter.Draw("eOverPout", "sigmaPhiPhi");
   m_electronCounter.Draw("eOverPin", "eOverPout");
+
+  std::cout << "++++++ ISO PART +++++++" << std::endl;
+  m_electronCounter.Draw("finalCustomEleIDOnlyIso","electronsOnlyIso");
+  std::cout << "====== CUTS EFFICIENCY ======" << std::endl;
+  m_electronCounter.Draw("ecalIso", "electronsOnlyIso");
+  m_electronCounter.Draw("trkIso", "ecalIso");
+  m_electronCounter.Draw("hcalIso", "trkIso");
+  m_electronCounter.Draw("combIso", "electronsOnlyIso");
+
+  std::cout << "++++++ CONV REJ PART +++++++" << std::endl;
+  m_electronCounter.Draw("finalCustomEleIDOnlyConv","electronsOnlyConv");
+  std::cout << "====== CUTS EFFICIENCY ======" << std::endl;
+  m_electronCounter.Draw("missHits", "electronsOnlyConv");
+
+  std::cout << "++++++ FINAL EFFICIENCY +++++++" << std::endl;
   m_electronCounter.Draw("finalCustomEleID","electrons");
   m_electronCounter.Draw("likelihood","electrons");
-
+  m_electronCounter.Draw("egammaCutBased", "electrons");
 }

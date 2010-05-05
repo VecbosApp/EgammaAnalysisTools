@@ -32,14 +32,33 @@ public:
   void SetLikelihood(float Likelihood) { m_Likelihood = Likelihood; m_useLikelihood = true; }
   void SetEcalFiducialRegion(int word) { m_fiducialflag = word; }
   void SetRecoFlag(int word) { m_recoflag = word; }
-  //! do not apply electron ID if the electron is tracker driven
-  void applyElectronIDOnPFlowElectrons(bool what) { m_applyIDOnPFlow = what; }
+  void SetEcalIsolation(float ecalIso) { m_ecalIso = ecalIso; m_useEcalIso = true; }
+  void SetTrkIsolation(float trkIso) { m_trkIso = trkIso; m_useTrkIso = true; }
+  void SetHcalIsolation(float hcalIso) { m_hcalIso = hcalIso; m_useHcalIso = true; }
+  void SetCombinedIsolation(float combIso) { m_combIso = combIso; m_useCombIso = true; }
+  void SetMissingHits(int missingHits) { m_missingHits = missingHits; m_useMissingHits = true; }
   //! set event by event output of egamma cut-based electron ID
   void SetEgammaCutBasedID(bool egammaCutBased) { m_egammaCutBased = egammaCutBased; m_egammaCutBasedInitialised = true; }
+
+  //! do not apply electron ID if the electron is tracker driven
+  void applyElectronIDOnPFlowElectrons(bool what) { m_applyIDOnPFlow = what; }
+
   //! get output of the selector (class dependent)
   bool output();
+  //! get output of the selector (class dependent) only EleId
+  bool outputEleId(); 
+  //! get output of the selector (class dependent) only Iso
+  bool outputIso();
+  //! get output of the selector (class dependent) only Conv
+  bool outputConv();
   //! get output of the selector (class independent)
   bool outputNoClass();
+  //! get output of the selector (class independent) only EleId
+  bool outputNoClassEleId();
+  //! get output of the selector (class independent) only Iso
+  bool outputNoClassIso();
+  //! get output of the selector (class independent) only Conv
+  bool outputNoClassConv();
   //! display the electron efficiency
   void diplayEfficiencies();
 
@@ -58,8 +77,14 @@ private:
   bool m_useEOverPout;
   bool m_useEOverPin;
   bool m_useLikelihood;
+  bool m_useEcalIso;
+  bool m_useTrkIso;
+  bool m_useHcalIso;
+  bool m_useCombIso;
+  bool m_useMissingHits;
   bool m_electronClassInitialised;
   bool m_egammaCutBasedInitialised;
+
 
   float m_HOverE;
   float m_S9S25;
@@ -73,9 +98,16 @@ private:
   float m_EOverPout;
   float m_EOverPin;
   float m_Likelihood;
+  float m_ecalIso;
+  float m_trkIso;
+  float m_hcalIso;
+  float m_combIso;
+
+  int m_missingHits;
   int m_electronClass;
   int m_fiducialflag;
   int m_recoflag;
+
   bool m_egammaCutBased;
   
   bool m_applyIDOnPFlow;
