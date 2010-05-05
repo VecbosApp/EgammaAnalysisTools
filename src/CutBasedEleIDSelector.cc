@@ -636,7 +636,7 @@ bool CutBasedEleIDSelector::outputNoClassConv()
 
   if(selection->getSwitch("missHits") && 
      !selection->passCut("missHits", m_missingHits)) return false; 
-  m_electronCounter.IncrVar("ecalIso");
+  m_electronCounter.IncrVar("missHits");
 
   m_electronCounter.IncrVar("finalCustomEleIDOnlyConv");
 
