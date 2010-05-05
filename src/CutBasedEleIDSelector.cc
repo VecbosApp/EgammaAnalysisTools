@@ -94,7 +94,7 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
     eleSelection->addCut("eOverPout");
     eleSelection->addCut("eOverPin");
     eleSelection->addCut("ecalIso");
-    eleSelection->addCut("trkIso");
+    eleSelection->addCut("trackerIso");
     eleSelection->addCut("hcalIso");
     eleSelection->addCut("combIso");
     eleSelection->addCut("missHits");
@@ -120,11 +120,10 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
   m_electronCounter.AddVar("sigmaPhiPhi");
   m_electronCounter.AddVar("eOverPout");
   m_electronCounter.AddVar("eOverPin");
-  m_electronCounter.AddVar("trkIso");
+  m_electronCounter.AddVar("trackerIso");
   m_electronCounter.AddVar("hcalIso");
   m_electronCounter.AddVar("combIso");
   m_electronCounter.AddVar("missHits");
-  m_electronCounter.AddVar("finalCustomEleID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyIso");
   m_electronCounter.AddVar("finalCustomEleIDOnlyConv");
@@ -165,7 +164,7 @@ void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir)
     eleSelection->addCut("eOverPout");
     eleSelection->addCut("eOverPin");
     eleSelection->addCut("ecalIso");
-    eleSelection->addCut("trkIso");
+    eleSelection->addCut("trackerIso");
     eleSelection->addCut("hcalIso");
     eleSelection->addCut("combIso");
     eleSelection->addCut("missHits");
@@ -192,7 +191,7 @@ void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir)
   m_electronCounter.AddVar("eOverPout");
   m_electronCounter.AddVar("eOverPin");
   m_electronCounter.AddVar("ecalIso");
-  m_electronCounter.AddVar("trkIso");
+  m_electronCounter.AddVar("trackerIso");
   m_electronCounter.AddVar("hcalIso");
   m_electronCounter.AddVar("combIso");
   m_electronCounter.AddVar("missHits");
@@ -220,15 +219,14 @@ bool CutBasedEleIDSelector::output() {
   bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
   if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
 
-  m_electronCounter.IncrVar("electrons");
   if (!outputEleId())
     return false;
   if (!outputIso())
     return false;
   if (!outputConv())
     return false;
-
   m_electronCounter.IncrVar("finalCustomEleID");
+
   return true;  
 
 }
@@ -243,6 +241,8 @@ bool CutBasedEleIDSelector::outputEleId() {
     cout << "CutBasedEleIDSelector::output() method is intended for class based ele ID, while you configured for class independent ID. Use outputNoClass() instead." << endl;
     return false;
   }
+
+  m_electronCounter.IncrVar("electrons");
 
   Utils anaUtils;
   bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
@@ -343,17 +343,10 @@ bool CutBasedEleIDSelector::outputIso()
     cout << "CutBasedEleIDSelector::output() method is intended for class based ele ID, while you configured for class independent ID. Use outputNoClass() instead." << endl;
     return false;
   }
-
-  Utils anaUtils;
-  bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
-  if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
-
-  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isGap);
-
-  if ( eleInGap ) return false;
-
-  int GsfClass = m_electronClass;
+  
+    int GsfClass = m_electronClass;
   int offset=0;
+  Utils anaUtils;
   bool eeElectron = anaUtils.fiducialFlagECAL(m_fiducialflag, isEE);
   if(eeElectron) {
     offset=4;
@@ -372,21 +365,25 @@ bool CutBasedEleIDSelector::outputIso()
 
   m_electronCounter.IncrVar("electronsOnlyIso");
 
-  if(selection->getSwitch("ecalIso") && 
-     !selection->passCut("ecalIso", fabs(m_ecalIso))) return false; 
-  m_electronCounter.IncrVar("ecalIso");
-
-  if(selection->getSwitch("trkIso") && 
-     !selection->passCut("trkIso", fabs(m_trkIso))) return false; 
-  m_electronCounter.IncrVar("trkIso");
-
-  if(selection->getSwitch("hcalIso") && 
-     !selection->passCut("hcalIso", fabs(m_hcalIso))) return false; 
-  m_electronCounter.IncrVar("hcalIso");
+  if(!selection->getSwitch("combIso")) {
+    if(selection->getSwitch("ecalIso") && 
+       !selection->passCut("ecalIso", fabs(m_ecalIso))) return false; 
+    m_electronCounter.IncrVar("ecalIso");
+    
+    if(selection->getSwitch("trackerIso") && 
+       !selection->passCut("trackerIso", fabs(m_trackerIso))) return false; 
+    m_electronCounter.IncrVar("trackerIso");
+    
+    if(selection->getSwitch("hcalIso") && 
+       !selection->passCut("hcalIso", fabs(m_hcalIso))) return false; 
+    m_electronCounter.IncrVar("hcalIso");
+  }    
 
   if(selection->getSwitch("combIso") && 
-     !selection->passCut("combIso", fabs(m_combIso))) return false; 
-  m_electronCounter.IncrVar("combIso");
+     !selection->passCut("combIso", fabs(m_combIso))) {
+    return false; 
+    m_electronCounter.IncrVar("combIso");
+  }
 
   m_electronCounter.IncrVar("finalCustomEleIDOnlyIso");
 
@@ -405,16 +402,9 @@ bool CutBasedEleIDSelector::outputConv()
     return false;
   }
 
-  Utils anaUtils;
-  bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
-  if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
-
-  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isGap);
-
-  if ( eleInGap ) return false;
-
   int GsfClass = m_electronClass;
   int offset=0;
+  Utils anaUtils;
   bool eeElectron = anaUtils.fiducialFlagECAL(m_fiducialflag, isEE);
   if(eeElectron) {
     offset=4;
@@ -454,19 +444,20 @@ bool CutBasedEleIDSelector::outputNoClass()
     return false;
   }
 
+  m_electronCounter.IncrVar("electrons");
+
   Utils anaUtils;
   bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
   if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
 
-  m_electronCounter.IncrVar("electrons");
   if (!outputNoClassEleId())
     return false;
   if (!outputNoClassIso())
     return false;
   if (!outputNoClassConv())
     return false;
-
   m_electronCounter.IncrVar("finalCustomEleID");
+
   return true;  
 
 }
@@ -482,6 +473,8 @@ bool CutBasedEleIDSelector::outputNoClassEleId() {
     cout << "CutBasedEleIDSelector::output() method is intended for class IN-dependent ele ID, while you configured for class based ID. Use output() instead." << endl;
     return false;
   }
+
+  m_electronCounter.IncrVar("electrons");
 
   Utils anaUtils;
   bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
@@ -569,15 +562,8 @@ bool CutBasedEleIDSelector::outputNoClassIso()
     return false;
   }
 
-  Utils anaUtils;
-  bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
-  if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
-
-  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isGap);
-
-  if ( eleInGap ) return false;
-
   int offset=0;
+  Utils anaUtils;
   bool eeElectron = anaUtils.fiducialFlagECAL(m_fiducialflag, isEE);
   if(eeElectron) offset=1;
 
@@ -585,21 +571,25 @@ bool CutBasedEleIDSelector::outputNoClassIso()
 
   m_electronCounter.IncrVar("electronsOnlyIso");
 
-  if(selection->getSwitch("ecalIso") && 
-     !selection->passCut("ecalIso", fabs(m_ecalIso))) return false; 
-  m_electronCounter.IncrVar("ecalIso");
-
-  if(selection->getSwitch("trkIso") && 
-     !selection->passCut("trkIso", fabs(m_trkIso))) return false; 
-  m_electronCounter.IncrVar("trkIso");
-
-  if(selection->getSwitch("hcalIso") && 
-     !selection->passCut("hcalIso", fabs(m_hcalIso))) return false; 
-  m_electronCounter.IncrVar("hcalIso");
-
+  if(!selection->getSwitch("combIso")) {
+    if(selection->getSwitch("ecalIso") && 
+       !selection->passCut("ecalIso", fabs(m_ecalIso))) return false; 
+    m_electronCounter.IncrVar("ecalIso");
+    
+    if(selection->getSwitch("trackerIso") && 
+       !selection->passCut("trackerIso", fabs(m_trackerIso))) return false; 
+    m_electronCounter.IncrVar("trackerIso");
+    
+    if(selection->getSwitch("hcalIso") && 
+       !selection->passCut("hcalIso", fabs(m_hcalIso))) return false; 
+    m_electronCounter.IncrVar("hcalIso");
+  }
+    
   if(selection->getSwitch("combIso") && 
-     !selection->passCut("combIso", fabs(m_combIso))) return false; 
-  m_electronCounter.IncrVar("combIso");
+     !selection->passCut("combIso", fabs(m_combIso))) {
+    return false; 
+    m_electronCounter.IncrVar("combIso");
+  }
 
   m_electronCounter.IncrVar("finalCustomEleIDOnlyIso");
 
@@ -618,15 +608,8 @@ bool CutBasedEleIDSelector::outputNoClassConv()
     return false;
   }
 
-  Utils anaUtils;
-  bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
-  if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
-
-  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isGap);
-
-  if ( eleInGap ) return false;
-
   int offset=0;
+  Utils anaUtils;
   bool eeElectron = anaUtils.fiducialFlagECAL(m_fiducialflag, isEE);
   if(eeElectron) offset=1;
 
@@ -666,8 +649,8 @@ void CutBasedEleIDSelector::diplayEfficiencies() {
   m_electronCounter.Draw("finalCustomEleIDOnlyIso","electronsOnlyIso");
   std::cout << "====== CUTS EFFICIENCY ======" << std::endl;
   m_electronCounter.Draw("ecalIso", "electronsOnlyIso");
-  m_electronCounter.Draw("trkIso", "ecalIso");
-  m_electronCounter.Draw("hcalIso", "trkIso");
+  m_electronCounter.Draw("trackerIso", "ecalIso");
+  m_electronCounter.Draw("hcalIso", "trackerIso");
   m_electronCounter.Draw("combIso", "electronsOnlyIso");
 
   std::cout << "++++++ CONV REJ PART +++++++" << std::endl;

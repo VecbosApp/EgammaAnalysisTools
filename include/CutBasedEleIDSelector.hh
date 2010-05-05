@@ -33,7 +33,7 @@ public:
   void SetEcalFiducialRegion(int word) { m_fiducialflag = word; }
   void SetRecoFlag(int word) { m_recoflag = word; }
   void SetEcalIsolation(float ecalIso) { m_ecalIso = ecalIso; m_useEcalIso = true; }
-  void SetTrkIsolation(float trkIso) { m_trkIso = trkIso; m_useTrkIso = true; }
+  void SetTrkIsolation(float trackerIso) { m_trackerIso = trackerIso; m_useTrkIso = true; }
   void SetHcalIsolation(float hcalIso) { m_hcalIso = hcalIso; m_useHcalIso = true; }
   void SetCombinedIsolation(float combIso) { m_combIso = combIso; m_useCombIso = true; }
   void SetMissingHits(int missingHits) { m_missingHits = missingHits; m_useMissingHits = true; }
@@ -99,7 +99,7 @@ private:
   float m_EOverPin;
   float m_Likelihood;
   float m_ecalIso;
-  float m_trkIso;
+  float m_trackerIso;
   float m_hcalIso;
   float m_combIso;
 
