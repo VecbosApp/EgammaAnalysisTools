@@ -9,182 +9,149 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TFile.h>
+#include <TTree.h>
 #include <TH1F.h>
 #include <TLegend.h>
 #include <TCanvas.h>
+#include <TPad.h>
+#include <RooDataSet.h>
+
+char inputFileNameData[150];
+char inputFileNameSigMC[150];
+char inputFileNameQCDMC[150];
 
 using namespace std;
 
-void makePlots(TH1F *signalHistos1[2][2][2], TH1F *signalHistos2[2][2][2], const char *namevar, const char *axistitle);
+void makePlots(const char *namevar, const char *axistitle, int nbins, float min, float max);
 
-int main(int argc, char* argv[]) {
+int ComparePdfs() {
 
-  char inputFileNameSignal1[150];
-  char inputFileNameSignal2[150];
-  if ( argc < 3 ){
-    std::cout << "missing argument!" << std::endl; 
-    std::cout << "usage: MakeNotePdfPlots fileSignal1.root fileSignal2.root" << std::endl;
-    return 1;
-  }
-  strcpy(inputFileNameSignal1,argv[1]);
-  strcpy(inputFileNameSignal2,argv[2]);
+  sprintf(inputFileNameData,"results/datasets/sPlots/Wenu.root");
+  sprintf(inputFileNameSigMC,"results/isolation_trees/WJetsMADGRAPH_IsolVtx.root");
+  sprintf(inputFileNameQCDMC,"results/isolation_trees/QCD_IsolVtx.root");
 
   gROOT->SetStyle("Plain");
   gStyle->SetOptStat(0);
 
-  TFile *signalFile1 = TFile::Open(inputFileNameSignal1);
-  signalFile1->cd();
+  //[iecal:0=EB;1=EE][isample:0=sig,1=qcd][imc:0=mc,1=data]
+  int nbins = 100;
+  float deltaPhiMin  = -0.1;
+  float deltaPhiMax  =  0.1;
+  float deltaEtaMin     = -0.02;
+  float deltaEtaMax     =  0.02;
+  float EoPMin      =  0.0;
+  float EoPMax      =  8.0;
+  float HoEMin      =  0.0;
+  float HoEMax      =  0.2;
+  float sigmaIEtaIEtaMin = 0.0;
+  float sigmaIEtaIEtaMax = 0.05;
 
-  //[iecal:0=EB;1=EE][iptbin:0=<15GeV;1=>15GeV][iclass:0=nonshowering;1=showering]
-  TH1F *dPhiClassEle1[2][2][2];
-  TH1F *dEtaClassEle1[2][2][2];
-  TH1F *EoPoutClassEle1[2][2][2];
-  TH1F *EoPClassEle1[2][2][2];
-  TH1F *HoEClassEle1[2][2][2];
-  TH1F *sigmaIEtaIEtaClassEle1[2][2][2];
-  TH1F *s9s25ClassEle1[2][2][2];
-  TH1F *s1s9ClassEle1[2][2][2];
-
-  int iptbin=1; // draw only >15 GeV
-
-  char histo[200];
-
-  for(int iecal=0; iecal<2; iecal++) {
-    
-    for(int iclass=0; iclass<2; iclass++) {
-      
-      sprintf(histo,"dPhiClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      dPhiClassEle1[iecal][iptbin][iclass]     = (TH1F*)gDirectory->Get(histo);
-      sprintf(histo,"dEtaClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      dEtaClassEle1[iecal][iptbin][iclass]        = (TH1F*)gDirectory->Get(histo);
-      sprintf(histo,"EoPoutClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      EoPoutClassEle1[iecal][iptbin][iclass]      = (TH1F*)gDirectory->Get(histo); 
-      sprintf(histo,"EoPClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      EoPClassEle1[iecal][iptbin][iclass]      = (TH1F*)gDirectory->Get(histo); 
-      sprintf(histo,"HoEClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      HoEClassEle1[iecal][iptbin][iclass]         = (TH1F*)gDirectory->Get(histo); 
-      sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      sigmaIEtaIEtaClassEle1[iecal][iptbin][iclass] = (TH1F*)gDirectory->Get(histo); 
-      sprintf(histo,"s9s25Class_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      s9s25ClassEle1[iecal][iptbin][iclass] = (TH1F*)gDirectory->Get(histo);
-      sprintf(histo,"s1s9Class_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      s1s9ClassEle1[iecal][iptbin][iclass] = (TH1F*)gDirectory->Get(histo);
-
-    }
-
-  }
-
-
-  TFile *signalFile2 = TFile::Open(inputFileNameSignal2);
-  signalFile2->cd();
-
-  TH1F *dPhiClassEle2[2][2][2];
-  TH1F *dEtaClassEle2[2][2][2];
-  TH1F *EoPoutClassEle2[2][2][2];
-  TH1F *EoPClassEle2[2][2][2];
-  TH1F *HoEClassEle2[2][2][2];
-  TH1F *sigmaIEtaIEtaClassEle2[2][2][2];
-  TH1F *s9s25ClassEle2[2][2][2];
-  TH1F *s1s9ClassEle2[2][2][2];
-
-  for(int iecal=0; iecal<2; iecal++) {
-
-    for(int iclass=0; iclass<2; iclass++) {
-
-      sprintf(histo,"dPhiClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      dPhiClassEle2[iecal][iptbin][iclass]     = (TH1F*)gDirectory->Get(histo);
-      sprintf(histo,"dEtaClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      dEtaClassEle2[iecal][iptbin][iclass]        = (TH1F*)gDirectory->Get(histo);
-      sprintf(histo,"EoPoutClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      EoPoutClassEle2[iecal][iptbin][iclass]      = (TH1F*)gDirectory->Get(histo); 
-      sprintf(histo,"EoPClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      EoPClassEle2[iecal][iptbin][iclass]      = (TH1F*)gDirectory->Get(histo); 
-      sprintf(histo,"HoEClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      HoEClassEle2[iecal][iptbin][iclass]         = (TH1F*)gDirectory->Get(histo); 
-      sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      sigmaIEtaIEtaClassEle2[iecal][iptbin][iclass] = (TH1F*)gDirectory->Get(histo); 
-      sprintf(histo,"s9s25Class_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      s9s25ClassEle2[iecal][iptbin][iclass] = (TH1F*)gDirectory->Get(histo);
-      sprintf(histo,"s1s9Class_electrons_%d_%d_%d",iecal,iptbin,iclass);
-      s1s9ClassEle2[iecal][iptbin][iclass] = (TH1F*)gDirectory->Get(histo);
-      
-      dPhiClassEle2[iecal][iptbin][iclass]->Sumw2();
-      dEtaClassEle2[iecal][iptbin][iclass]->Sumw2();
-      EoPoutClassEle2[iecal][iptbin][iclass]->Sumw2();
-      EoPClassEle2[iecal][iptbin][iclass]->Sumw2();
-      HoEClassEle2[iecal][iptbin][iclass]->Sumw2();
-      sigmaIEtaIEtaClassEle2[iecal][iptbin][iclass]->Sumw2();
-      s9s25ClassEle2[iecal][iptbin][iclass]->Sumw2();
-      s1s9ClassEle2[iecal][iptbin][iclass]->Sumw2();
-      
-    }
-
-  }
-
-  makePlots(dPhiClassEle1,dPhiClassEle2,"dPhiIn","#Delta #phi_{in} (rad)");
-  makePlots(dEtaClassEle1,dEtaClassEle2,"dEtaIn","#Delta #eta_{in} (rad)");
-  makePlots(EoPoutClassEle1,EoPoutClassEle2,"EoPout","E_{seed}/p_{out}");
-  makePlots(EoPClassEle1,EoPClassEle2,"EoP","E_{SC}/p_{in}");
-  makePlots(HoEClassEle1,HoEClassEle2,"HoE","H/E");
-  makePlots(sigmaIEtaIEtaClassEle1,sigmaIEtaIEtaClassEle2,"sigmaIEtaIEta","#sigma_{#eta#eta} (rad^{2})");
-  makePlots(s9s25ClassEle1,s9s25ClassEle2,"s9s25","s_{9}/s_{25}");
-  makePlots(s1s9ClassEle1,s1s9ClassEle2,"s1s9","s_{1}/s_{9}");
+  makePlots("deltaPhi","#Delta #phi_{in} (rad)",nbins,deltaPhiMin,deltaPhiMax);
+  makePlots("deltaEta","#Delta #eta_{in} (rad)",nbins,deltaEtaMin,deltaEtaMax);
+  makePlots("eop","E_{SC}/P_{in}",nbins,EoPMin,EoPMax);
+  makePlots("see","#sigma_{i#eta i#eta}",nbins,sigmaIEtaIEtaMin,sigmaIEtaIEtaMax);
 
 }
 
-void makePlots(TH1F *signalHistos1[2][2][2], TH1F *signalHistos2[2][2][2], const char *namevar, const char *axistitle) {
+void makePlots(const char *namevar, const char *axistitle, int nbins, float min, float max) {
 
-  int iptbin=1;
+  TFile *dataFile = TFile::Open(inputFileNameData);
+  RooDataSet* dataset = (RooDataSet*)dataFile->Get("dataset");
+
+  TFile *sigFile = TFile::Open(inputFileNameSigMC);
+  TTree *sigTree = (TTree*)sigFile->Get("T1");
+
+  TFile *qcdFile = TFile::Open(inputFileNameQCDMC);
+  TTree *qcdTree = (TTree*)qcdFile->Get("T1");
+
+  TTree *mcTree = 0;
+
+  TCanvas c1;
+  // c1.SetLogy();
+
+  TPad *npad = 0;
+  
+  TH1F *pdf[2][2][2];
+  for(int iecal=0; iecal<2; iecal++) {
+    for(int isample=0; isample<2; isample++) {
+      for(int imc=0; imc<2; imc++) {
+        
+        char histo[200];
+        sprintf(histo,"%s_%d_%d_%d",namevar,iecal,isample,imc);
+        pdf[iecal][isample][imc]    = new TH1F(histo, histo, nbins, min, max);
+        pdf[iecal][isample][imc]->Sumw2();
+      }
+    }
+  }  
 
   for(int iecal=0; iecal<2; iecal++) {
+          
+    std::string cut;
+    if(iecal==0) cut="(abs(eta)<1.479)";
+    else cut="(abs(eta)>1.479)";
 
-    TCanvas c1;
-    c1.SetLogy();
+    for(int isample=0; isample<2; isample++) {
 
-    if(signalHistos1[iecal][iptbin][0]) {
-      signalHistos1[iecal][iptbin][0]->SetLineWidth(2);
-      signalHistos1[iecal][iptbin][0]->SetLineColor(kRed+1);
-      signalHistos1[iecal][iptbin][0]->Scale(1.0/signalHistos1[iecal][iptbin][0]->Integral());
-    }
-    if(signalHistos1[iecal][iptbin][1]) {
-      signalHistos1[iecal][iptbin][1]->SetLineWidth(2);
-      signalHistos1[iecal][iptbin][1]->SetLineColor(kBlue+3);
-      signalHistos1[iecal][iptbin][1]->Scale(1.0/signalHistos1[iecal][iptbin][1]->Integral());
-    }
-    if(signalHistos2[iecal][iptbin][0]) {
-      signalHistos2[iecal][iptbin][0]->SetLineWidth(2);
-      signalHistos2[iecal][iptbin][0]->SetLineColor(kRed+1);
-      signalHistos2[iecal][iptbin][0]->SetLineStyle(kDashed);
-      signalHistos2[iecal][iptbin][0]->Scale(1.0/signalHistos2[iecal][iptbin][0]->Integral());
-    }
-    if(signalHistos2[iecal][iptbin][1]) {
-      signalHistos2[iecal][iptbin][1]->SetLineWidth(2);
-      signalHistos2[iecal][iptbin][1]->SetLineColor(kBlue+3);
-      signalHistos2[iecal][iptbin][1]->SetLineStyle(kDashed);
-      signalHistos2[iecal][iptbin][1]->Scale(1.0/signalHistos2[iecal][iptbin][1]->Integral());
+      std::string dataWeight;
+      if(isample==0) {
+        dataWeight = cut+std::string("*0.01*N_sig_sw");
+        mcTree = sigTree;
+      } else {
+        dataWeight = cut+std::string("*0.01*N_qcd_sw");
+        mcTree = qcdTree;
+      }
+
+      // fill MC
+      TString name = pdf[iecal][isample][0]->GetName();
+      mcTree->Project(name.Data(),namevar,cut.c_str());
+
+      // fill data s-weighted
+      name = pdf[iecal][isample][1]->GetName();
+      TTree *treeData = (TTree*)dataset->tree();
+      treeData->Project(name.Data(),namevar,dataWeight.c_str());
+    
+      // style
+      pdf[iecal][isample][0]->SetLineWidth(2);
+      pdf[iecal][isample][0]->SetLineColor(kRed+1);
+      pdf[iecal][isample][0]->Scale(pdf[iecal][isample][1]->Integral()/pdf[iecal][isample][0]->Integral());
+     
+      float max = TMath::Max(pdf[iecal][isample][0]->GetMaximum(),pdf[iecal][isample][1]->GetMaximum());
+      pdf[iecal][isample][0]->SetMaximum(max+sqrt(max));
+
+      pdf[iecal][isample][1]->SetLineWidth(2);
+      pdf[iecal][isample][1]->SetMarkerStyle(4);
+      pdf[iecal][isample][1]->SetMarkerColor(kBlack);
+      
+      pdf[iecal][isample][0]->SetTitle("");
+      pdf[iecal][isample][0]->GetXaxis()->SetTitle(axistitle);
+      pdf[iecal][isample][0]->GetYaxis()->SetTitle("normalized to 10/nb");
+
     }
 
-//     double  max=TMath::Max(signalHistos1[iecal][iptbin][0]->GetMaximum(),signalHistos1[iecal][iptbin][1]->GetMaximum());
-//     max=TMath::Max(max,backgroundHistos[iecal][iptbin]->GetMaximum());
-//     signalHistos1[iecal][iptbin][0]->SetMaximum(max+sqrt(max));
-//     signalHistos1[iecal][iptbin][1]->SetMaximum(max+sqrt(max));
-//     backgroundHistos[iecal][iptbin]->SetMaximum(max+sqrt(max));
+    c1.cd();
+    // large plot for the signal
+    pdf[iecal][0][0]->Draw("hist");
+    pdf[iecal][0][1]->Draw("same pe1");
 
-    signalHistos1[iecal][iptbin][0]->SetTitle("");
-    signalHistos1[iecal][iptbin][0]->GetXaxis()->SetTitle(axistitle);
-    signalHistos1[iecal][iptbin][0]->GetYaxis()->SetTitle("a.u.");
-    signalHistos1[iecal][iptbin][0]->Draw();
-    signalHistos1[iecal][iptbin][1]->Draw("same");
-    signalHistos2[iecal][iptbin][0]->Draw("same pe1");
-    signalHistos2[iecal][iptbin][1]->Draw("same pe1");
+    // inset for the background
+    npad = new TPad("npad", "", 0.6, 0.6, 0.9, 0.88);
+    npad->Draw();
+    npad->cd();
+    // -- make enough space so that axis titles are not cut off
+    npad->SetBottomMargin(0.25);
+    npad->SetLeftMargin(0.25);
+
+    pdf[iecal][1][0]->Draw("hist");
+    pdf[iecal][1][1]->Draw("same pe1");
+
+    // -- go back to the big canvas and put a legend there
+    c1.cd();
 
     TLegend* leg = new TLegend(0.15,0.75,0.40,0.90);
     leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
     leg->SetFillColor(0);
-    leg->AddEntry(signalHistos1[iecal][iptbin][0],"MC non-showering");
-    leg->AddEntry(signalHistos1[iecal][iptbin][1],"MC showering");
-    leg->AddEntry(signalHistos2[iecal][iptbin][0],"data non-showering");
-    leg->AddEntry(signalHistos2[iecal][iptbin][1],"data showering");
+    leg->AddEntry(pdf[iecal][0][0],"MC");
+    leg->AddEntry(pdf[iecal][0][1],"data");
     leg->Draw();
 
     char epsfilename[200];
@@ -192,8 +159,7 @@ void makePlots(TH1F *signalHistos1[2][2][2], TH1F *signalHistos2[2][2][2], const
     if(iecal==0) {
       sprintf(epsfilename,"%s_EB.eps",namevar);
       sprintf(rootfilename,"%s_EB.root",namevar);
-    }
-    else if(iecal==1) {
+    } else {
       sprintf(epsfilename,"%s_EE.eps",namevar); 
       sprintf(rootfilename,"%s_EE.root",namevar);
     }

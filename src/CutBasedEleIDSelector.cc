@@ -215,6 +215,8 @@ bool CutBasedEleIDSelector::output() {
     return false;
   }
 
+  m_electronCounter.IncrVar("electrons");
+
   Utils anaUtils;
   bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
   if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
@@ -242,13 +244,14 @@ bool CutBasedEleIDSelector::outputEleId() {
     return false;
   }
 
-  m_electronCounter.IncrVar("electrons");
+
+  m_electronCounter.IncrVar("electronsOnlyID");
 
   Utils anaUtils;
   bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
   if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
 
-  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isGap);
+  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isEBEEGap);
 
   if ( eleInGap ) return false;
 
@@ -270,7 +273,6 @@ bool CutBasedEleIDSelector::outputEleId() {
     selection=m_EgammaCutIDSelection[offset+3];
   }
 
-  m_electronCounter.IncrVar("electronsOnlyID");
 
   if(selection->getSwitch("egammaCutBased") && 
      m_egammaCutBased ) m_electronCounter.IncrVar("egammaCutBased");
@@ -474,13 +476,13 @@ bool CutBasedEleIDSelector::outputNoClassEleId() {
     return false;
   }
 
-  m_electronCounter.IncrVar("electrons");
+  m_electronCounter.IncrVar("electronsOnlyID");
 
   Utils anaUtils;
   bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
   if ( isPFlowOnly && !m_applyIDOnPFlow ) return true;
 
-  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isGap);
+  bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isEBEEGap);
 
   if ( eleInGap ) return false;
 
@@ -489,8 +491,6 @@ bool CutBasedEleIDSelector::outputNoClassEleId() {
   if(eeElectron) offset=1;
 
   Selection *selection = m_EgammaCutIDSelection[offset];
-
-  m_electronCounter.IncrVar("electronsOnlyID");
 
   if(selection->getSwitch("egammaCutBased") && 
      m_egammaCutBased ) m_electronCounter.IncrVar("egammaCutBased");
