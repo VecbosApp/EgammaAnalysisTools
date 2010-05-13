@@ -18,8 +18,8 @@ for($i=1; $i<=$nrows; $i++) {
     if($rows[$i]=~/BARREL/) { $ecal = "EB"; }
     else { if($rows[$i]=~/ENDCAP/) { $ecal = "EE"; } }
     if($rows[$i]=~/(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)/) {
-        system("mkdir -p Vecbos$1");
-        $file = "Vecbos"."$1"."/electronIDCuts"."$ecal".".txt";
+        system("mkdir -p ../../config/vecbos/electronId/Vecbos$1");
+        $file = "../../config/vecbos/electronId/Vecbos"."$1"."/electronIDCuts"."$ecal".".txt";
         print "writing cuts for eff = $1 % in $ecal. File is: $file\n";
         open(CONFIGFILE,">$file"); 
         print CONFIGFILE "deta \t 0.0 \t $2 \n";
@@ -29,7 +29,8 @@ for($i=1; $i<=$nrows; $i++) {
         print CONFIGFILE "trackerIso \t -100 \t $6 \n";
         print CONFIGFILE "ecalIso \t -100 \t $7 \n";
         print CONFIGFILE "hcalIso \t -100 \t $8 \n";
-        print CONFIGFILE "missingHits \t 0 \t 1 \n";
+        print CONFIGFILE "missHits \t 0 \t 1 \n";
+        print CONFIGFILE "combIso         0.0             999.\n";
         print CONFIGFILE "eOverPin        0.0             999.\n";
         print CONFIGFILE "s9s25           0.0             1.0\n";
         print CONFIGFILE "eOverPout       0.0             1000\n";
