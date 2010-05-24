@@ -13,6 +13,7 @@
 #include <fstream>
 #include <string>
 #include <stdio.h>
+#include <cstdlib>
 
 // ROOT includes
 #include <TROOT.h>
@@ -35,12 +36,16 @@
 #if Application == 4
 #include "EgammaAnalysisTools/include/SuperClusterWSelection.hh"
 #endif
+#if Application == 5
+#include "EgammaAnalysisTools/include/sPlotsPdfsComparison.h"
+#endif
 
 int main(int argc, char* argv[]) {
 
   char inputFileName[300];
   char outputFileName[300];
 
+#if Application != 5
   if ( argc < 4 ){
     std::cout << "missing argument: insert at least inputFile with list of root files" << std::endl; 
     std::cout << "EgammaAnalysis inputFile outputFile 0" << std::endl;
@@ -85,6 +90,7 @@ int main(int argc, char* argv[]) {
   }
   inputFile->close();
   delete inputFile;
+#endif
 
 // #if Application == 1
 
@@ -152,6 +158,29 @@ int main(int argc, char* argv[]) {
   p.setSignal(signal);
   p.Loop();
   p.displayEfficiencies();
+
+#endif
+
+#if Application == 5
+
+  int factor=2;
+  char charFactor[10];
+  sprintf(charFactor,"%d",factor);
+  
+  int isMC = 1;
+  
+  TFile *fileData = TFile::Open((std::string("results/sPlots_x")+std::string(charFactor)+std::string("/Wenu_tree.root")).c_str());
+  TFile *fileMC = TFile::Open((std::string("results/isolation_trees_unweighted_x")+std::string(charFactor)+std::string("/WJetsMADGRAPH_out-Wenu.root")).c_str());
+
+  TTree *tree = 0;
+  if(isMC) tree = (TTree*) fileMC->Get("T1");
+  else tree = (TTree*) fileData->Get("dataset");
+
+  sPlotsPdfsComparison p;
+  p.SetFactor(factor);
+  p.Init(tree, isMC);
+  p.Loop();
+
 
 #endif
 
