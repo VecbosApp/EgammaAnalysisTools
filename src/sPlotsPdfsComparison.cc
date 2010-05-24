@@ -1,161 +1,220 @@
 #define sPlotsPdfsComparison_cxx
-#include "include/sPlotsPdfsComparison.hh"
+#include "include/sPlotsPdfsComparison.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
 
 #include <iostream>
+#include <math.h>
 
 using namespace std;
 
 void sPlotsPdfsComparison::Loop()
 {
-//   In a ROOT session, you can do:
-//      Root > .L sPlotsPdfsComparison.C
-//      Root > sPlotsPdfsComparison t
-//      Root > t.GetEntry(12); // Fill t data members with entry number 12
-//      Root > t.Show();       // Show values of entry 12
-//      Root > t.Show(16);     // Read and show values of entry 16
-//      Root > t.Loop();       // Loop on all entries
-//
+  //   In a ROOT session, you can do:
+  //      Root > .L sPlotsPdfsComparison.C
+  //      Root > sPlotsPdfsComparison t
+  //      Root > t.GetEntry(12); // Fill t data members with entry number 12
+  //      Root > t.Show();       // Show values of entry 12
+  //      Root > t.Show(16);     // Read and show values of entry 16
+  //      Root > t.Loop();       // Loop on all entries
+  //
+  
+  if (fChain == 0) return;
 
-//     This is the loop skeleton where:
-//    jentry is the global entry number in the chain
-//    ientry is the entry number in the current Tree
-//  Note that the argument to GetEntry must be:
-//    jentry for TChain::GetEntry
-//    ientry for TTree::GetEntry and TBranch::GetEntry
-//
-//       To read only selected branches, Insert statements like:
-// METHOD1:
-//    fChain->SetBranchStatus("*",0);  // disable all branches
-//    fChain->SetBranchStatus("branchname",1);  // activate branchname
-// METHOD2: replace line
-//    fChain->GetEntry(jentry);       //read all branches
-//by  b_branchname->GetEntry(ientry); //read only this branch
-   if (fChain == 0) return;
+  bookHistosFixedBinning();
+  InitCuts();
+  float sel, norm;
+  sel = norm = 0;
+  
+  Long64_t nentries = fChain->GetEntries();
+  
+  int firstEvent = 0;
+  int lastEvent  = nentries;
+  cout << firstEvent << " " << lastEvent << endl;
+  
+  Long64_t nbytes = 0, nb = 0;
+  for (Long64_t jentry=firstEvent; jentry<lastEvent;jentry++) {
+    Long64_t ientry = LoadTree(jentry);
+    if (ientry < 0) break;
+    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    
+    int jecal;
+    if(m_isMC) {
+      if (fabs(f_eta)<1.46)  jecal = 0;
+      else if (fabs(f_eta)>=1.52) jecal = 1;
+      else continue;
+    } else {
+      if (fabs(eta)<1.46)  jecal = 0;
+      else if (fabs(eta)>=1.52) jecal = 1;
+      else continue;
+    }
 
-   bookHistos();
+    // da cambiare (solo x dati, selezionare sgn o fondo)
+    float wgt = (m_isMC) ? 1.0 : N_sig_sw;
+    // float wgt = (m_isMC) ? 1.0 : N_qcd_sw;
 
-   Long64_t nentries = fChain->GetEntries();
+    vector<float> WP_inf, WP_sup;
+    if(jecal == 0) {
+      WP_inf = WP70_EB_inf;
+      WP_sup = WP70_EB_sup;
+    } else {
+      WP_inf = WP70_EE_inf;
+      WP_sup = WP70_EE_sup;
+    }
 
-   int firstEvent = 0;
-   int lastEvent = 0;
-   if( m_isMC ) {
-     lastEvent = nentries/2 - 1;
-   } else {
-     firstEvent = nentries/2;
-     lastEvent = nentries;
-   }
+    if(m_isMC) {
+      dPhiClassEle          [jecal] -> Fill ( f_dphi, wgt );
+      dEtaClassEle          [jecal] -> Fill ( f_deta, wgt );
+      EoPClassEle           [jecal] -> Fill ( f_eop, wgt );
+      HoEClassEle           [jecal] -> Fill ( f_hoe, wgt );
+      sigmaIEtaIEtaClassEle [jecal] -> Fill ( f_see, wgt );
+      
+      norm += wgt;
+      if(f_see >= WP_inf[0] && f_see <= WP_sup[0])
+        //         f_dphi >= WP_inf[1] && f_dphi <= WP_sup[1] &&
+        //         f_deta >= WP_inf[2] && f_deta <= WP_sup[2] &&
+        //         f_hoe >= WP_inf[3] && f_hoe <= WP_sup[3]) 
+         sel += wgt;         
 
-   cout << firstEvent << " " << lastEvent << endl;
+    } else {
+      dPhiClassEle          [jecal] -> Fill ( dphi, wgt );
+      dEtaClassEle          [jecal] -> Fill ( deta, wgt );
+      EoPClassEle           [jecal] -> Fill ( eop, wgt );
+      HoEClassEle           [jecal] -> Fill ( hoe, wgt );
+      sigmaIEtaIEtaClassEle [jecal] -> Fill ( see, wgt );
 
-   Long64_t nbytes = 0, nb = 0;
-   for (Long64_t jentry=firstEvent; jentry<lastEvent;jentry++) {
-      Long64_t ientry = LoadTree(jentry);
-      if (ientry < 0) break;
-      nb = fChain->GetEntry(jentry);   nbytes += nb;
-      // if (Cut(ientry) < 0) continue;
+      norm += wgt;
+      if(see >= WP_inf[0] && see <= WP_sup[0])
+        //         dphi >= WP_inf[1] && dphi <= WP_sup[1] &&
+        //         deta >= WP_inf[2] && deta <= WP_sup[2] &&
+        //         hoe >= WP_inf[3] && hoe <= WP_sup[3]) 
+        sel += wgt;         
 
-      int jecal = (int)iecal;
-      int jptbin = (int)iptbin;
-      int jclass = (int)iclass;
+    }
+  } // loop over events
 
-      float wgt = (m_isMC) ? 1.0 : N_sig_sw;
+  float eff = sel/norm;
+  float erreff = sqrt(eff*(1-eff)/fabs(norm));
 
-      dPhiClassEle          [jecal][jptbin][jclass] -> Fill ( deltaPhi, wgt );
-      dEtaClassEle          [jecal][jptbin][jclass] -> Fill ( deltaEta, wgt );
-      EoPoutClassEle        [jecal][jptbin][jclass] -> Fill ( EoPout, wgt );
-      EoPClassEle           [jecal][jptbin][jclass] -> Fill ( EoP, wgt );
-      HoEClassEle           [jecal][jptbin][jclass] -> Fill ( HoE, wgt );
-      sigmaIEtaIEtaClassEle [jecal][jptbin][jclass] -> Fill ( sigmaIEtaIEta, wgt );
-      s1s9ClassEle          [jecal][jptbin][jclass] -> Fill ( s1s9, wgt );
-      s9s25ClassEle         [jecal][jptbin][jclass] -> Fill ( s9s25, wgt );
+  std::cout << "EFFICIENCY = " << eff << " +/- " << erreff << std::endl; 
+  std::cout << "(selected events = " << sel << " over total of " << norm << " events " << std::endl;
 
-   }
-
-   char buffer[200];
-   if( m_isMC ) sprintf(buffer,"pdfs_histograms_MC.root");
-   else sprintf(buffer,"pdfs_histograms_data.root");
-   TFile *fileOut = TFile::Open(buffer,"recreate");
-
-   for (int jecal=0; jecal<2; jecal++) {
-     for(int jptbin=0; jptbin<2; jptbin++) {
-       for(int jclass=0; jclass<2; jclass++) {
-        dPhiClassEle[jecal][jptbin][jclass]->Write();
-        dEtaClassEle[jecal][jptbin][jclass]->Write();
-        EoPoutClassEle[jecal][jptbin][jclass]->Write();
-        EoPClassEle[jecal][jptbin][jclass]->Write();           
-        HoEClassEle[jecal][jptbin][jclass]->Write();
-        sigmaIEtaIEtaClassEle[jecal][jptbin][jclass]->Write();
-        s1s9ClassEle[jecal][jptbin][jclass]->Write();
-        s9s25ClassEle[jecal][jptbin][jclass]->Write();
-       }
-     }
-   }
-   
-   fileOut->Close();
-
-
+  char buffer[200];
+  if( m_isMC ) sprintf(buffer,"pdfs_histograms_MC_x%d.root",m_factor);
+  else sprintf(buffer,"pdfs_histograms_data_x%d.root",m_factor);
+  TFile *fileOut = TFile::Open(buffer,"recreate");
+  
+  for (int jecal=0; jecal<2; jecal++) {
+    dPhiClassEle[jecal]->Write();
+    dEtaClassEle[jecal]->Write();
+    EoPClassEle[jecal]->Write();           
+    HoEClassEle[jecal]->Write();
+    sigmaIEtaIEtaClassEle[jecal]->Write();
+  }
+  
+  fileOut->Close();
 }
 
-void sPlotsPdfsComparison::bookHistos() {
+void sPlotsPdfsComparison::bookHistosVariableBinning() {
+  
+  float dPhiBins[12] = {-0.1, -0.0348 , -0.0272 , -0.0196 , -0.012 , -0.0044 , 0.0032 , 0.0108 , 0.0184 , 
+                        0.026 , 0.0336 , 0.1};
 
-  int nbins = 100;
+  float dEtaBins[12] = {-0.01 , -0.00424  , -0.00272 , -0.00196 , -0.0012 , -0.00044 , 0.00032 , 0.00108 , 
+                        0.00184 , 0.0026 , 0.00412 , 0.01};
 
-  float dPhiMin = -0.15;
-  float dPhiMax =  0.15;
-  float dEtaMin     = -0.02;
-  float dEtaMax     =  0.02;
-  float EoPoutMin   =  0.0;
-  float EoPoutMax   =  20.0;
-  float EoPMin   =  0.0;
-  float EoPMax   =  20.0;
-  float HoEMin      =  0.0; // zero-suppression in HCAL
-  float HoEMax      =  0.1; // ??
-  float sigmaIEtaIEtaMin = 0.0;
-  float sigmaIEtaIEtaMax = 0.05;
-  float s1s9Min  = 0.0;
-  float s1s9Max  = 1.0;
-  float s9s25Min = 0.5;
-  float s9s25Max = 1.0;
+  float EoPBinsEB[12] = {0, 0.5, 0.75, 0.875, 1, 1.125, 1.25, 1.5, 2, 4.0, 7., 10.};
+  float EoPBinsEE[12] = {0, 0.5, 0.75, 0.875, 1, 1.125, 1.25, 1.5, 2, 4.0, 7., 10.};
+
+  float seeBinsEB[14] = {0., 0.005 , 0.0055 , 0.006 , 0.0065 , 0.007 , 0.0075 , 0.008 , 0.0085 , 0.009 , 0.0095, 0.01,
+                         0.015, 0.020 };
+
+  float seeBinsEE[14] = {0., 0.015 , 0.02, 0.021 , 0.022 , 0.023 , 0.024 , 0.025 , 0.026 , 0.027 , 0.028 , 0.029, 
+                         0.03, 0.04};
+
+  float HoEBins[6] = {0., 0.005, 0.01, 0.03, 0.06, 0.1 };
 
   // booking histos eleID
   // iecal = 0 --> barrel
   // iecal = 1 --> endcap
+  char histo[200];
   for (int iecal=0; iecal<2; iecal++) {
-
-    // iptbin = 0: < 15 GeV
-    // iptbin = 1: > 15 GeV
-    for(int iptbin=0; iptbin<2; iptbin++) {
       
-      // iclass = 0: non-showering
-      // iclass = 1: showering
-      for(int iclass=0; iclass<2; iclass++) {
-
-        char histo[200];
-      
-	sprintf(histo,"dPhiClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	dPhiClassEle[iecal][iptbin][iclass]    = new TH1F(histo, histo, nbins, dPhiMin, dPhiMax);
-	sprintf(histo,"dEtaClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	dEtaClassEle[iecal][iptbin][iclass]        = new TH1F(histo, histo, nbins, dEtaMin, dEtaMax);
-	sprintf(histo,"EoPoutClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	EoPoutClassEle[iecal][iptbin][iclass]      = new TH1F(histo, histo, nbins, EoPoutMin, EoPoutMax);
-	sprintf(histo,"EoPClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	EoPClassEle[iecal][iptbin][iclass]      = new TH1F(histo, histo, nbins, EoPMin, EoPMax);
-	sprintf(histo,"HoEClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	HoEClassEle[iecal][iptbin][iclass]         = new TH1F(histo, histo, nbins, HoEMin, HoEMax);
-	sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	sigmaIEtaIEtaClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, sigmaIEtaIEtaMin, sigmaIEtaIEtaMax);
-	sprintf(histo,"s1s9Class_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	s1s9ClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, s1s9Min, s1s9Max);
-	sprintf(histo,"s9s25Class_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	s9s25ClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, s9s25Min, s9s25Max);
-
-      }
-
-    }
+    sprintf(histo,"dPhiClass_electrons_%d",iecal);
+    dPhiClassEle[iecal] = new TH1F(histo, histo, 15, dPhiBins);
+    sprintf(histo,"dEtaClass_electrons_%d",iecal);
+    dEtaClassEle[iecal] = new TH1F(histo, histo, 15, dEtaBins);
+    sprintf(histo,"HoEClass_electrons_%d",iecal);
+    HoEClassEle[iecal] = new TH1F(histo, histo, 5, HoEBins);
 
   }
+
+  
+  int iecal = 0;
+  sprintf(histo,"EoPClass_electrons_%d",iecal);
+  EoPClassEle[iecal] = new TH1F(histo, histo, 11, EoPBinsEB);
+  sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",iecal);
+  sigmaIEtaIEtaClassEle[iecal] = new TH1F(histo, histo, 13, seeBinsEB);
+
+  iecal = 1;
+  sprintf(histo,"EoPClass_electrons_%d",iecal);
+  EoPClassEle[iecal] = new TH1F(histo, histo, 11, EoPBinsEE);
+  sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",iecal);
+  sigmaIEtaIEtaClassEle[iecal] = new TH1F(histo, histo, 13, seeBinsEE);
+
+}
+
+
+
+void sPlotsPdfsComparison::bookHistosFixedBinning() {
+  
+  // booking histos eleID
+  // iecal = 0 --> barrel
+  // iecal = 1 --> endcap
+  char histo[200];
+  for (int iecal=0; iecal<2; iecal++) {
+      
+    sprintf(histo,"dPhiClass_electrons_%d",iecal);
+    dPhiClassEle[iecal] = new TH1F(histo, histo, 31, -0.15, 0.15);
+    dPhiClassEle[iecal]->Sumw2();
+    sprintf(histo,"dEtaClass_electrons_%d",iecal);
+    dEtaClassEle[iecal] = new TH1F(histo, histo, 31, -0.02, 0.02);
+    dEtaClassEle[iecal]->Sumw2();
+    sprintf(histo,"HoEClass_electrons_%d",iecal);
+    HoEClassEle[iecal] = new TH1F(histo, histo, 31, 0., 0.15);
+    HoEClassEle[iecal]->Sumw2();
+    sprintf(histo,"EoPClass_electrons_%d",iecal);
+    EoPClassEle[iecal] = new TH1F(histo, histo, 31, 0., 10.);
+    EoPClassEle[iecal]->Sumw2();
+    sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",iecal);
+    sigmaIEtaIEtaClassEle[iecal] = new TH1F(histo, histo, 31, 0., 0.05);
+    sigmaIEtaIEtaClassEle[iecal]->Sumw2();
+  }
+  
+}
+
+void sPlotsPdfsComparison::InitCuts() {
+
+  // see, dphi, deta, H/E
+  WP70_EB_inf.push_back(0.0);  
+  WP70_EB_inf.push_back(-0.02);
+  WP70_EB_inf.push_back(-0.006);
+  WP70_EB_inf.push_back(0.00);
+
+  WP70_EB_sup.push_back(0.01);
+  WP70_EB_sup.push_back(0.02);
+  WP70_EB_sup.push_back(0.006);
+  WP70_EB_sup.push_back(0.02);
+
+  WP70_EE_inf.push_back(0.0);
+  WP70_EE_inf.push_back(-0.02);
+  WP70_EE_inf.push_back(-0.003);
+  WP70_EE_inf.push_back(0.00);
+
+  WP70_EE_sup.push_back(0.03);
+  WP70_EE_sup.push_back(0.02);
+  WP70_EE_sup.push_back(0.003);
+  WP70_EE_sup.push_back(0.0025);
 
 }
