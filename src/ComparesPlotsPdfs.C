@@ -17,6 +17,7 @@ using namespace std;
 char inputFactor[150];
 
 void makePlots(TH1F *signalHistos1[2], TH1F *signalHistos2[2], const char *namevar, const char *axistitle);
+void makePlots1(TH1F *signalHistos1, TH1F *signalHistos2, const char *namevar, const char *axistitle);
 
 int main(int argc, char* argv[]) {
 
@@ -44,6 +45,9 @@ int main(int argc, char* argv[]) {
   TH1F *sigmaIEtaIEtaClassEle1[2];
 
   char histo[200];
+
+  TH1F *etaClassEle1 = (TH1F*)gDirectory->Get("etaClass_electrons");
+  etaClassEle1 -> SetMinimum(0.001);
 
   for(int iecal=0; iecal<2; iecal++) {
       
@@ -76,6 +80,9 @@ int main(int argc, char* argv[]) {
   TH1F *HoEClassEle2[2];
   TH1F *sigmaIEtaIEtaClassEle2[2];
 
+  TH1F *etaClassEle2 = (TH1F*)gDirectory->Get("etaClass_electrons");
+  etaClassEle2 -> SetMinimum(0.001);
+
   for(int iecal=0; iecal<2; iecal++) {
       
     sprintf(histo,"dPhiClass_electrons_%d",iecal);
@@ -103,7 +110,7 @@ int main(int argc, char* argv[]) {
   makePlots(EoPClassEle1,EoPClassEle2,"EoP","E_{SC}/p_{in}");
   makePlots(HoEClassEle1,HoEClassEle2,"HoE","H/E");
   makePlots(sigmaIEtaIEtaClassEle1,sigmaIEtaIEtaClassEle2,"sigmaIEtaIEta","#sigma_{#eta#eta} (rad^{2})");
-
+  makePlots1(etaClassEle1,etaClassEle2,"eta","#eta");
 }
 
 void makePlots(TH1F *signalHistos1[2], TH1F *signalHistos2[2], const char *namevar, const char *axistitle) {
@@ -140,7 +147,7 @@ void makePlots(TH1F *signalHistos1[2], TH1F *signalHistos2[2], const char *namev
 
     signalHistos1[iecal]->SetTitle("");
      signalHistos1[iecal]->GetXaxis()->SetTitle(axistitle);
-    signalHistos1[iecal]->GetYaxis()->SetTitle("electrons in 200 nb^{-1}");
+    signalHistos1[iecal]->GetYaxis()->SetTitle("electrons in 7.9 nb^{-1}");
     signalHistos1[iecal]->Draw("hist");
     signalHistos2[iecal]->Draw("pE1 same");
 
@@ -167,3 +174,56 @@ void makePlots(TH1F *signalHistos1[2], TH1F *signalHistos2[2], const char *namev
   }
 
 }
+
+
+void makePlots1(TH1F *signalHistos1, TH1F *signalHistos2, const char *namevar, const char *axistitle) {
+
+  int iptbin=1;
+
+  TCanvas c1;
+  
+  // MC
+  if(signalHistos1) {
+    signalHistos1 -> SetLineWidth(2);
+    signalHistos1 -> SetLineColor(kRed+1);
+    signalHistos1 -> SetFillColor(kYellow+1);
+    signalHistos1 -> Scale((float)signalHistos2 ->GetSum()/(float)signalHistos1 ->GetSum());
+    std::cout << "Normalized to " << (float)signalHistos2 ->GetSum() << std::endl;
+  }
+
+  // data
+  if(signalHistos2) {
+    signalHistos2 -> SetLineWidth(2);
+    signalHistos2 -> SetLineColor(kBlack);
+    signalHistos2 -> SetMarkerColor(kBlack);
+    signalHistos2 -> SetMarkerStyle(8);
+  }
+  
+  double  max=TMath::Max(signalHistos1->GetMaximum(),signalHistos2->GetMaximum());
+  // signalHistos1->SetMaximum(max+sqrt(max));
+  signalHistos1->SetMaximum(13.);
+
+  double  min=TMath::Min(signalHistos1->GetMinimum(),signalHistos2->GetMinimum());
+  signalHistos1->SetMinimum(-5.);
+
+  signalHistos1->SetTitle("");
+  signalHistos1->GetXaxis()->SetTitle(axistitle);
+  signalHistos1->GetYaxis()->SetTitle("electrons in 7.9 nb^{-1}");
+  signalHistos1->Draw("hist");
+  signalHistos2->Draw("pE1 same");
+
+  TLegend* leg = new TLegend(0.15,0.75,0.40,0.90);
+  leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
+  leg->SetFillColor(0);
+  leg->AddEntry(signalHistos1,"MC");
+  leg->AddEntry(signalHistos2,"data");
+  leg->Draw();
+  
+  char epsfilename[200];
+  char rootfilename[200];
+  sprintf(epsfilename,"%s_x%s.eps",namevar,inputFactor);
+  sprintf(rootfilename,"%s_x%s.root",namevar,inputFactor);
+  c1.SaveAs(epsfilename);
+  c1.SaveAs(rootfilename);
+}
+

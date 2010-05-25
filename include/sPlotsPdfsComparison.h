@@ -124,6 +124,7 @@ public :
    TH1F *EoPClassEle[2];
    TH1F *HoEClassEle[2];
    TH1F *sigmaIEtaIEtaClassEle[2];
+   TH1F *etaClassEle;
    
    // cuts
    std::vector<float> WP70_EB_sup, WP70_EB_inf, WP70_EE_sup, WP70_EE_inf;

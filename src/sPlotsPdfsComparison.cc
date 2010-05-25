@@ -42,11 +42,11 @@ void sPlotsPdfsComparison::Loop()
     int jecal;
     if(m_isMC) {
       if (fabs(f_eta)<1.46)  jecal = 0;
-      else if (fabs(f_eta)>=1.52) jecal = 1;
+      else if (fabs(f_eta)>=1.46) jecal = 1;
       else continue;
     } else {
       if (fabs(eta)<1.46)  jecal = 0;
-      else if (fabs(eta)>=1.52) jecal = 1;
+      else if (fabs(eta)>=1.46) jecal = 1;
       else continue;
     }
 
@@ -69,6 +69,7 @@ void sPlotsPdfsComparison::Loop()
       EoPClassEle           [jecal] -> Fill ( f_eop, wgt );
       HoEClassEle           [jecal] -> Fill ( f_hoe, wgt );
       sigmaIEtaIEtaClassEle [jecal] -> Fill ( f_see, wgt );
+      etaClassEle                   -> Fill ( f_eta, wgt );
       
       norm += wgt;
       if(f_see >= WP_inf[0] && f_see <= WP_sup[0])
@@ -83,6 +84,7 @@ void sPlotsPdfsComparison::Loop()
       EoPClassEle           [jecal] -> Fill ( eop, wgt );
       HoEClassEle           [jecal] -> Fill ( hoe, wgt );
       sigmaIEtaIEtaClassEle [jecal] -> Fill ( see, wgt );
+      etaClassEle                   -> Fill ( eta, wgt );
 
       norm += wgt;
       if(see >= WP_inf[0] && see <= WP_sup[0])
@@ -104,7 +106,8 @@ void sPlotsPdfsComparison::Loop()
   if( m_isMC ) sprintf(buffer,"pdfs_histograms_MC_x%d.root",m_factor);
   else sprintf(buffer,"pdfs_histograms_data_x%d.root",m_factor);
   TFile *fileOut = TFile::Open(buffer,"recreate");
-  
+
+  etaClassEle -> Write();  
   for (int jecal=0; jecal<2; jecal++) {
     dPhiClassEle[jecal]->Write();
     dEtaClassEle[jecal]->Write();
@@ -173,22 +176,27 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
   // iecal = 0 --> barrel
   // iecal = 1 --> endcap
   char histo[200];
+
+  sprintf(histo,"etaClass_electrons");
+  etaClassEle = new TH1F(histo, histo, 10, -2.5, 2.5);
+  etaClassEle ->Sumw2();
+
   for (int iecal=0; iecal<2; iecal++) {
       
     sprintf(histo,"dPhiClass_electrons_%d",iecal);
-    dPhiClassEle[iecal] = new TH1F(histo, histo, 31, -0.15, 0.15);
+    dPhiClassEle[iecal] = new TH1F(histo, histo, 15, -0.15, 0.15);
     dPhiClassEle[iecal]->Sumw2();
     sprintf(histo,"dEtaClass_electrons_%d",iecal);
-    dEtaClassEle[iecal] = new TH1F(histo, histo, 31, -0.02, 0.02);
+    dEtaClassEle[iecal] = new TH1F(histo, histo, 15, -0.02, 0.02);
     dEtaClassEle[iecal]->Sumw2();
     sprintf(histo,"HoEClass_electrons_%d",iecal);
-    HoEClassEle[iecal] = new TH1F(histo, histo, 31, 0., 0.15);
+    HoEClassEle[iecal] = new TH1F(histo, histo, 15, 0., 0.15);
     HoEClassEle[iecal]->Sumw2();
     sprintf(histo,"EoPClass_electrons_%d",iecal);
-    EoPClassEle[iecal] = new TH1F(histo, histo, 31, 0., 10.);
+    EoPClassEle[iecal] = new TH1F(histo, histo, 15, 0., 10.);
     EoPClassEle[iecal]->Sumw2();
     sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",iecal);
-    sigmaIEtaIEtaClassEle[iecal] = new TH1F(histo, histo, 31, 0., 0.05);
+    sigmaIEtaIEtaClassEle[iecal] = new TH1F(histo, histo, 15, 0., 0.05);
     sigmaIEtaIEtaClassEle[iecal]->Sumw2();
   }
   
