@@ -391,9 +391,8 @@ bool CutBasedEleIDSelector::outputIso()
     m_electronCounter.IncrVar("hcalIso");
   }    
 
-  if(selection->getSwitch("combIso") && 
-     !selection->passCut("combIso", fabs(m_combIso))) {
-    return false; 
+  if(selection->getSwitch("combIso")) {
+    if(!selection->passCut("combIso", fabs(m_combIso))) return false; 
     m_electronCounter.IncrVar("combIso");
   }
 
@@ -602,10 +601,9 @@ bool CutBasedEleIDSelector::outputNoClassIso()
        !selection->passCut("hcalIso", fabs(m_hcalIso))) return false; 
     m_electronCounter.IncrVar("hcalIso");
   }
-    
-  if(selection->getSwitch("combIso") && 
-     !selection->passCut("combIso", fabs(m_combIso))) {
-    return false; 
+
+  if(selection->getSwitch("combIso")) {
+    if(!selection->passCut("combIso", fabs(m_combIso))) return false; 
     m_electronCounter.IncrVar("combIso");
   }
 
