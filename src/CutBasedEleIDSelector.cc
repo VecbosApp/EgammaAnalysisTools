@@ -200,13 +200,13 @@ void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir)
   m_electronCounter.AddVar("sigmaPhiPhi");
   m_electronCounter.AddVar("eOverPout");
   m_electronCounter.AddVar("eOverPin");
+  m_electronCounter.AddVar("ecalCleaning");
   m_electronCounter.AddVar("ecalIso");
   m_electronCounter.AddVar("trackerIso");
   m_electronCounter.AddVar("hcalIso");
   m_electronCounter.AddVar("combIso");
   m_electronCounter.AddVar("missHits");
   m_electronCounter.AddVar("vetoConv");
-  m_electronCounter.AddVar("ecalCleaning");
   m_electronCounter.AddVar("finalCustomEleID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyIso");
