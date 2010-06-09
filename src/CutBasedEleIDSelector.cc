@@ -128,8 +128,7 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
   m_electronCounter.AddVar("hcalIso");
   m_electronCounter.AddVar("combIso");
   m_electronCounter.AddVar("missHits");
-  m_electronCounter.AddVar("distConv");
-  m_electronCounter.AddVar("dcotConv");
+  m_electronCounter.AddVar("vetoConv");
   m_electronCounter.AddVar("finalCustomEleIDOnlyID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyIso");
   m_electronCounter.AddVar("finalCustomEleIDOnlyConv");
@@ -203,8 +202,7 @@ void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir)
   m_electronCounter.AddVar("hcalIso");
   m_electronCounter.AddVar("combIso");
   m_electronCounter.AddVar("missHits");
-  m_electronCounter.AddVar("distConv");
-  m_electronCounter.AddVar("dcotConv");
+  m_electronCounter.AddVar("vetoConv");
   m_electronCounter.AddVar("finalCustomEleID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyIso");
@@ -438,13 +436,9 @@ bool CutBasedEleIDSelector::outputConv()
      !selection->passCut("missHits", m_missingHits)) return false; 
   m_electronCounter.IncrVar("missHits");
 
-  if(selection->getSwitch("distConv") && 
-     !selection->passCut("distConv", m_distConv)) return false; 
-  m_electronCounter.IncrVar("distConv");
-
-  if(selection->getSwitch("dcotConv") && 
-     !selection->passCut("dcotConv", m_dcotConv)) return false; 
-  m_electronCounter.IncrVar("dcotConv");
+  if(selection->getSwitch("distConv") && selection->getSwitch("dcotConv") &&
+     (!selection->passCut("distConv", m_distConv) && !selection->passCut("dcotConv", m_dcotConv)) ) return false; 
+  m_electronCounter.IncrVar("vetoConv");
 
   m_electronCounter.IncrVar("finalCustomEleIDOnlyConv");
 
@@ -637,13 +631,9 @@ bool CutBasedEleIDSelector::outputNoClassConv()
      !selection->passCut("missHits", m_missingHits)) return false; 
   m_electronCounter.IncrVar("missHits");
 
-  if(selection->getSwitch("distConv") && 
-     !selection->passCut("distConv", m_distConv)) return false; 
-  m_electronCounter.IncrVar("distConv");
-
-  if(selection->getSwitch("dcotConv") && 
-     !selection->passCut("dcotConv", m_dcotConv)) return false; 
-  m_electronCounter.IncrVar("dcotConv");
+  if(selection->getSwitch("distConv") && selection->getSwitch("dcotConv") &&
+     (!selection->passCut("distConv", m_distConv) && !selection->passCut("dcotConv", m_dcotConv)) ) return false; 
+  m_electronCounter.IncrVar("vetoConv");
 
   m_electronCounter.IncrVar("finalCustomEleIDOnlyConv");
 
@@ -681,8 +671,7 @@ void CutBasedEleIDSelector::diplayEfficiencies() {
   m_electronCounter.Draw("finalCustomEleIDOnlyConv","electronsOnlyConv");
   std::cout << "====== CUTS EFFICIENCY ======" << std::endl;
   m_electronCounter.Draw("missHits", "electronsOnlyConv");
-  m_electronCounter.Draw("distConv", "missHits");
-  m_electronCounter.Draw("dcotConv", "distConv");
+  m_electronCounter.Draw("vetoConv", "missHits");
 
   std::cout << "++++++ FINAL EFFICIENCY +++++++" << std::endl;
   m_electronCounter.Draw("finalCustomEleID","electrons");
