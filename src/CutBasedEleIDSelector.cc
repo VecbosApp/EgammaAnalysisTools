@@ -33,6 +33,8 @@ CutBasedEleIDSelector::CutBasedEleIDSelector() {
 
   m_applyIDOnPFlow = true;
 
+  m_doEcalCleaning = false;
+
   // fiducial flag HAS to be set, otherwise the selector doesn't know which slection apply (EB or EE)
   m_fiducialflag = -1;
   
@@ -124,6 +126,7 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
   m_electronCounter.AddVar("sigmaPhiPhi");
   m_electronCounter.AddVar("eOverPout");
   m_electronCounter.AddVar("eOverPin");
+  m_electronCounter.AddVar("ecalCleaning");
   m_electronCounter.AddVar("trackerIso");
   m_electronCounter.AddVar("hcalIso");
   m_electronCounter.AddVar("combIso");
@@ -203,11 +206,21 @@ void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir)
   m_electronCounter.AddVar("combIso");
   m_electronCounter.AddVar("missHits");
   m_electronCounter.AddVar("vetoConv");
+  m_electronCounter.AddVar("ecalCleaning");
   m_electronCounter.AddVar("finalCustomEleID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyIso");
   m_electronCounter.AddVar("finalCustomEleIDOnlyConv");
   m_electronCounter.AddVar("likelihood");
+
+}
+
+void CutBasedEleIDSelector::ConfigureEcalCleaner(const char *configDir) {
+
+  m_doEcalCleaning = true;
+
+  m_cleaner = new EcalCleaner();
+  m_cleaner->Configure(configDir);
 
 }
 
@@ -333,7 +346,9 @@ bool CutBasedEleIDSelector::outputEleId() {
   if(selection->getSwitch("eOverPin") && 
      !selection->passCut("eOverPin", m_EOverPin)) return false; 
   m_electronCounter.IncrVar("eOverPin");
-  
+
+  if(m_doEcalCleaning && !m_cleaner->output()) return false;
+  m_electronCounter.IncrVar("ecalCleaning");
   m_electronCounter.IncrVar("finalCustomEleIDOnlyID");
 
   return true;
@@ -555,6 +570,9 @@ bool CutBasedEleIDSelector::outputNoClassEleId() {
      !selection->passCut("eOverPin", m_EOverPin)) return false; 
   m_electronCounter.IncrVar("eOverPin");
 
+  if(m_doEcalCleaning && !m_cleaner->output()) return false;
+  m_electronCounter.IncrVar("ecalCleaning");
+
   m_electronCounter.IncrVar("finalCustomEleIDOnlyID");
 
   return true;
@@ -640,7 +658,7 @@ bool CutBasedEleIDSelector::outputNoClassConv()
   return true;
 }
 
-void CutBasedEleIDSelector::diplayEfficiencies() {
+void CutBasedEleIDSelector::displayEfficiencies() {
 
   m_electronCounter.Draw();
 
@@ -658,6 +676,7 @@ void CutBasedEleIDSelector::diplayEfficiencies() {
   m_electronCounter.Draw("sigmaPhiPhi","sigmaEtaEta");
   m_electronCounter.Draw("eOverPout", "sigmaPhiPhi");
   m_electronCounter.Draw("eOverPin", "eOverPout");
+  m_electronCounter.Draw("ecalCleaning", "eOverPin");
 
   std::cout << "++++++ ISO PART +++++++" << std::endl;
   m_electronCounter.Draw("finalCustomEleIDOnlyIso","electronsOnlyIso");
@@ -677,4 +696,6 @@ void CutBasedEleIDSelector::diplayEfficiencies() {
   m_electronCounter.Draw("finalCustomEleID","electrons");
   m_electronCounter.Draw("likelihood","electrons");
   m_electronCounter.Draw("egammaCutBased", "electrons");
+
+  if(m_doEcalCleaning) m_cleaner->displayEfficiencies();
 }

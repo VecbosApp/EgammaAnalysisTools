@@ -3,6 +3,7 @@
 
 #include "CommonTools/include/Selection.hh"
 #include "CommonTools/include/Counters.hh"
+#include "EgammaAnalysisTools/include/EcalCleaner.hh"
 
 class CutBasedEleIDSelector {
 
@@ -16,6 +17,8 @@ public:
   void Configure(const char *configDir);
   //! configure from files (class independent)
   void ConfigureNoClass(const char *configDir);
+  //! configure the ECAL cleaner
+  void ConfigureEcalCleaner(const char *configDir);
   //! set event by event observables
   void SetHOverE(float HOverE) { m_HOverE = HOverE; m_useHOverE = true; }
   void SetS9S25(float S9S25) { m_S9S25 = S9S25; m_useS9S25 = true; }
@@ -62,7 +65,10 @@ public:
   //! get output of the selector (class independent) only Conv
   bool outputNoClassConv();
   //! display the electron efficiency
-  void diplayEfficiencies();
+  void displayEfficiencies();
+
+  //! ECAL cleaner (public to set the variables through CutBasedEleIDSelector)
+  EcalCleaner *m_cleaner;
 
 private:
 
@@ -89,6 +95,7 @@ private:
   bool m_electronClassInitialised;
   bool m_egammaCutBasedInitialised;
 
+  bool m_doEcalCleaning;
 
   float m_HOverE;
   float m_S9S25;
