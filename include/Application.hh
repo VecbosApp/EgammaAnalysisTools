@@ -5,5 +5,7 @@
 //   3 = compare Pdfs in MC and data sPlots
 //   4 = supercluster + MET studies for GSF tracking efficiency measurement
 //   5 = sPlots 
+//   6 = PF electron seeding efficiency study
+//   7 = PF electron seeding efficiency study (on general tracks)
 
 #define Application 5
