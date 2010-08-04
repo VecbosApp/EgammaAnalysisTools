@@ -78,6 +78,8 @@ $(OUTLIBCOMMON)Selection.o: $(INCLUDEDIRCOMMON)/CommonTools/src/Selection.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)Selection.o $<
 $(OUTLIB)CutBasedEleIDSelector.o: $(INCLUDEDIR)/src/CutBasedEleIDSelector.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CutBasedEleIDSelector.o $<
+$(OUTLIB)EcalCleaner.o: $(INCLUDEDIR)/src/EcalCleaner.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)EcalCleaner.o $<
 $(OUTLIBCOMMON)EfficiencyEvaluator.o: $(INCLUDEDIRCOMMON)/CommonTools/src/EfficiencyEvaluator.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)EfficiencyEvaluator.o $<
 $(OUTLIBCOMMON)Monitor.o: $(INCLUDEDIRCOMMON)/CommonTools/src/Monitor.cc
@@ -100,6 +102,10 @@ $(OUTLIB)SuperClusterWSelection.o: $(INCLUDEDIR)/src/SuperClusterWSelection.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)SuperClusterWSelection.o $<
 $(OUTLIB)McTruthEvent.o: ../src/McTruthEvent.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)McTruthEvent.o $<
+$(OUTLIB)PFElectronSeedingEfficiency.o: $(INCLUDEDIR)/src/PFElectronSeedingEfficiency.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)PFElectronSeedingEfficiency.o $<
+$(OUTLIB)PFElectronSeedingDistributions.o: $(INCLUDEDIR)/src/PFElectronSeedingDistributions.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)PFElectronSeedingDistributions.o $<
 
 #----------------------------------------------------#
 
@@ -109,6 +115,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIBCOMMON)Conditions.o \
 	$(OUTLIBCOMMON)Selection.o \
 	$(OUTLIB)CutBasedEleIDSelector.o \
+	$(OUTLIB)EcalCleaner.o \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o \
 	$(OUTLIBCOMMON)Counters.o \
 	$(OUTLIBCOMMON)Monitor.o \
@@ -119,7 +126,9 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)sPlotsPdfsComparison.o \
 	$(OUTLIB)IsolationPdfsProducer.o \
 	$(OUTLIB)SuperClusterWSelection.o \
-	$(OUTLIB)McTruthEvent.o
+	$(OUTLIB)McTruthEvent.o \
+	$(OUTLIB)PFElectronSeedingEfficiency.o \
+	$(OUTLIB)PFElectronSeedingDistributions.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
 CompareEff: $(INCLUDEDIR)/src/CompareEff.C \
@@ -146,6 +155,14 @@ MakeNoteIsolationPlots: $(INCLUDEDIR)/src/MakeNoteIsolationPlots.C
 CompareSignalPdfs: $(INCLUDEDIR)/src/CompareSignalPdfs.C
 	$(CXX) $(CXXFLAGS) -o CompareSignalPdfs $(GLIBS) $ $<
 
+makeSPlotsPdfs: $(INCLUDEDIR)/src/EgammaAnalysis.C \
+	$(OUTLIB)EgammaBase.o \
+	$(OUTLIB)sPlotsPdfsComparison.o
+	$(CXX) $(CXXFLAGS) -o makeSPlotsPdfs $(OUTLIB)EgammaBase.o $(OUTLIB)sPlotsPdfsComparison.o $(GLIBS) $ $<
+
+CompareSPlots: $(INCLUDEDIR)/src/ComparesPlotsPdfs.C 
+	$(CXX) $(CXXFLAGS) -o CompareSPlots $(GLIBS) $ $<
+
 CompareSignalIsolation: $(INCLUDEDIR)/src/CompareSignalIsolation.C
 	$(CXX) $(CXXFLAGS) -o CompareSignalIsolation $(GLIBS) $ $<
 
@@ -155,14 +172,17 @@ EgammaAnalysis.clean:
 clean:
 	rm -f $(OUTLIB)*.o $(OUTLIBCOMMON)*.o
 	rm -f EgammaAnalysis
-	rm -r CompareEff
+	rm -f CompareEff
 	rm -f CompareMisId
-	rm -r CompareClasses
-	rm -r MakeNotePdfPlots
-	rm -r MakeNoteBkgPdfPlots
-	rm -r CompareSignalPdfs
-	rm -r CompareSignalIsolation
-	rm -r MakeNoteIsolationPlots
+	rm -f CompareClasses
+	rm -f MakeNotePdfPlots
+	rm -f MakeNoteBkgPdfPlots
+	rm -f CompareSignalPdfs
+	rm -f CompareSignalIsolation
+	rm -f ComparesPlotsPdfs
+	rm -f makeSPlotsPdfs
+	rm -f CompareSPlots
+	rm -f MakeNoteIsolationPlots
 
 all:  EgammaAnalysis \
 	CompareEff \

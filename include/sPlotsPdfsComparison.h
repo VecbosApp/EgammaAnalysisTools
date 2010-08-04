@@ -46,7 +46,11 @@ public :
    Double_t        pfmt;
    Double_t        pt;
    Double_t        eta;
+   Double_t        phi;
+   Double_t        charge;
    Double_t        weight;
+   Double_t        nPFJets;
+   Double_t        nJets;
    Double_t        event;
 
    Float_t       f_trackerIso;
@@ -69,7 +73,11 @@ public :
    Float_t       f_pfmt;
    Float_t       f_pt;
    Float_t       f_eta;
+   Float_t       f_phi;
+   Int_t         f_charge;
    Float_t       f_weight;
+   Int_t         f_nPFJets;
+   Int_t         f_nJets;
    Float_t       f_event;
 
    // List of branches
@@ -97,7 +105,11 @@ public :
    TBranch        *b_pfmt;   //!
    TBranch        *b_pt;   //!
    TBranch        *b_eta;   //!
+   TBranch        *b_phi;   //!
+   TBranch        *b_charge;   //!
    TBranch        *b_weight;   //!
+   TBranch        *b_nPFJets;   //!
+   TBranch        *b_nJets;   //!
    TBranch        *b_event;   //!
 
    sPlotsPdfsComparison();
@@ -111,21 +123,21 @@ public :
    virtual void     Show(Long64_t entry = -1);
    virtual void     bookHistosVariableBinning();
    virtual void     bookHistosFixedBinning();
-   virtual void     SetFactor(int factor) { m_factor = factor;}
    virtual void     InitCuts();
 
  protected:
 
    bool m_isMC;
-   int m_factor;
-   
+
+   TH1F *etaClassEle;   
    TH1F *dPhiClassEle[2];
    TH1F *dEtaClassEle[2];
    TH1F *EoPClassEle[2];
    TH1F *HoEClassEle[2];
    TH1F *sigmaIEtaIEtaClassEle[2];
-   TH1F *etaClassEle;
-   
+   TH1F *phiClassEle[2];
+   TH1F *chargeClassEle[2];
+
    // cuts
    std::vector<float> WP70_EB_sup, WP70_EB_inf, WP70_EE_sup, WP70_EE_inf;
 
@@ -202,8 +214,12 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC)
      fChain->SetBranchAddress("pfmt", &f_pfmt, &b_pfmt);
      fChain->SetBranchAddress("pt", &f_pt, &b_pt);
      fChain->SetBranchAddress("eta", &f_eta, &b_eta);
+     fChain->SetBranchAddress("phi", &f_phi, &b_phi);
+     fChain->SetBranchAddress("charge", &f_charge, &b_charge);
      fChain->SetBranchAddress("weight", &f_weight, &b_weight);
      fChain->SetBranchAddress("event", &f_event, &b_event);
+     fChain->SetBranchAddress("nPFJets", &f_nPFJets, &b_nPFJets);
+     fChain->SetBranchAddress("nJets", &f_nJets, &b_nJets);
    } else {
      m_isMC = 0;
      fChain->SetBranchAddress("N_sig_sw", &N_sig_sw, &b_N_sig_sw);
@@ -230,8 +246,12 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC)
      fChain->SetBranchAddress("pfmt", &pfmt, &b_pfmt);
      fChain->SetBranchAddress("pt", &pt, &b_pt);
      fChain->SetBranchAddress("eta", &eta, &b_eta);
+     fChain->SetBranchAddress("phi", &phi, &b_phi);
+     fChain->SetBranchAddress("charge", &charge, &b_charge);
      fChain->SetBranchAddress("weight", &weight, &b_weight);
      fChain->SetBranchAddress("event", &event, &b_event);
+     fChain->SetBranchAddress("nPFJets", &nPFJets, &b_nPFJets);
+     fChain->SetBranchAddress("nJets", &nJets, &b_nJets);
    }
    Notify();
 }
