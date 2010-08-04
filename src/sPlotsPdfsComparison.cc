@@ -3,6 +3,7 @@
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
+#include <TMath.h>
 
 #include <iostream>
 #include <math.h>
@@ -24,8 +25,8 @@ void sPlotsPdfsComparison::Loop()
 
   bookHistosFixedBinning();
   InitCuts();
-  float sel, norm;
-  sel = norm = 0;
+  float selEB, selEE, normEB, normEE;
+  selEB = selEE = normEB = normEE = 0;
   
   Long64_t nentries = fChain->GetEntries();
   
@@ -41,13 +42,15 @@ void sPlotsPdfsComparison::Loop()
     
     int jecal;
     if(m_isMC) {
-      if (fabs(f_eta)<1.46)  jecal = 0;
-      else if (fabs(f_eta)>=1.46) jecal = 1;
+      if (fabs(f_eta)<1.479)  jecal = 0;
+      else if (fabs(f_eta)>=1.479) jecal = 1;
       else continue;
+      if(f_nJets>0 || f_pfmet/f_pt<0.3) continue;
     } else {
-      if (fabs(eta)<1.46)  jecal = 0;
-      else if (fabs(eta)>=1.46) jecal = 1;
+      if (fabs(eta)<1.479)  jecal = 0;
+      else if (fabs(eta)>=1.479) jecal = 1;
       else continue;
+      if(nJets>0 || pfmet/pt<0.3) continue;
     }
 
     // da cambiare (solo x dati, selezionare sgn o fondo)
@@ -58,9 +61,11 @@ void sPlotsPdfsComparison::Loop()
     if(jecal == 0) {
       WP_inf = WP70_EB_inf;
       WP_sup = WP70_EB_sup;
+      normEB += wgt;
     } else {
       WP_inf = WP70_EE_inf;
       WP_sup = WP70_EE_sup;
+      normEE += wgt;
     }
 
     if(m_isMC) {
@@ -70,13 +75,15 @@ void sPlotsPdfsComparison::Loop()
       HoEClassEle           [jecal] -> Fill ( f_hoe, wgt );
       sigmaIEtaIEtaClassEle [jecal] -> Fill ( f_see, wgt );
       etaClassEle                   -> Fill ( f_eta, wgt );
+      phiClassEle           [jecal] -> Fill ( f_phi, wgt );
+      chargeClassEle        [jecal] -> Fill ( f_charge, wgt );
       
-      norm += wgt;
-      if(f_see >= WP_inf[0] && f_see <= WP_sup[0])
-        //         f_dphi >= WP_inf[1] && f_dphi <= WP_sup[1] &&
-        //         f_deta >= WP_inf[2] && f_deta <= WP_sup[2] &&
-        //         f_hoe >= WP_inf[3] && f_hoe <= WP_sup[3]) 
-         sel += wgt;         
+      if(f_see >= WP_inf[0] && f_see <= WP_sup[0] &&
+         f_dphi >= WP_inf[1] && f_dphi <= WP_sup[1] &&
+         f_deta >= WP_inf[2] && f_deta <= WP_sup[2] &&
+         f_hoe >= WP_inf[3] && f_hoe <= WP_sup[3])
+        if(jecal == 0) selEB += wgt;         
+        else selEE += wgt;
 
     } else {
       dPhiClassEle          [jecal] -> Fill ( dphi, wgt );
@@ -85,35 +92,44 @@ void sPlotsPdfsComparison::Loop()
       HoEClassEle           [jecal] -> Fill ( hoe, wgt );
       sigmaIEtaIEtaClassEle [jecal] -> Fill ( see, wgt );
       etaClassEle                   -> Fill ( eta, wgt );
+      phiClassEle           [jecal] -> Fill ( phi, wgt );
+      chargeClassEle        [jecal] -> Fill ( charge, wgt );
 
-      norm += wgt;
-      if(see >= WP_inf[0] && see <= WP_sup[0])
-        //         dphi >= WP_inf[1] && dphi <= WP_sup[1] &&
-        //         deta >= WP_inf[2] && deta <= WP_sup[2] &&
-        //         hoe >= WP_inf[3] && hoe <= WP_sup[3]) 
-        sel += wgt;         
-
+      if(see >= WP_inf[0] && see <= WP_sup[0] &&
+         dphi >= WP_inf[1] && dphi <= WP_sup[1] &&
+         deta >= WP_inf[2] && deta <= WP_sup[2] &&
+         hoe >= WP_inf[3] && hoe <= WP_sup[3])
+        if(jecal == 0) selEB += wgt;         
+        else selEE += wgt;
     }
   } // loop over events
 
-  float eff = sel/norm;
-  float erreff = sqrt(eff*(1-eff)/fabs(norm));
+  float effEB = selEB/normEB;
+  float effEE = selEE/normEE;
+  float erreffEB = sqrt(effEB*(1-effEB)/fabs(normEB));
+  float erreffEE = sqrt(effEE*(1-effEE)/fabs(normEE));
 
-  std::cout << "EFFICIENCY = " << eff << " +/- " << erreff << std::endl; 
-  std::cout << "(selected events = " << sel << " over total of " << norm << " events " << std::endl;
+  std::cout << "EB EFFICIENCY = " << effEB << " +/- " << erreffEB << std::endl; 
+  std::cout << "(selected events = " << selEB << " over total of " << normEB << " events " << std::endl;
+
+  std::cout << "EE EFFICIENCY = " << effEE << " +/- " << erreffEE << std::endl; 
+  std::cout << "(selected events = " << selEE << " over total of " << normEE << " events " << std::endl;
 
   char buffer[200];
-  if( m_isMC ) sprintf(buffer,"pdfs_histograms_MC_x%d.root",m_factor);
-  else sprintf(buffer,"pdfs_histograms_data_x%d.root",m_factor);
+  if( m_isMC ) sprintf(buffer,"pdfs_histograms_MC.root");
+  else sprintf(buffer,"pdfs_histograms_data.root");
   TFile *fileOut = TFile::Open(buffer,"recreate");
 
-  etaClassEle -> Write();  
+  etaClassEle->Write();
+  
   for (int jecal=0; jecal<2; jecal++) {
     dPhiClassEle[jecal]->Write();
     dEtaClassEle[jecal]->Write();
     EoPClassEle[jecal]->Write();           
     HoEClassEle[jecal]->Write();
     sigmaIEtaIEtaClassEle[jecal]->Write();
+    phiClassEle[jecal]->Write();    
+    chargeClassEle[jecal]->Write();    
   }
   
   fileOut->Close();
@@ -145,9 +161,9 @@ void sPlotsPdfsComparison::bookHistosVariableBinning() {
   for (int iecal=0; iecal<2; iecal++) {
       
     sprintf(histo,"dPhiClass_electrons_%d",iecal);
-    dPhiClassEle[iecal] = new TH1F(histo, histo, 15, dPhiBins);
+    dPhiClassEle[iecal] = new TH1F(histo, histo, 10, dPhiBins);
     sprintf(histo,"dEtaClass_electrons_%d",iecal);
-    dEtaClassEle[iecal] = new TH1F(histo, histo, 15, dEtaBins);
+    dEtaClassEle[iecal] = new TH1F(histo, histo, 10, dEtaBins);
     sprintf(histo,"HoEClass_electrons_%d",iecal);
     HoEClassEle[iecal] = new TH1F(histo, histo, 5, HoEBins);
 
@@ -176,29 +192,60 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
   // iecal = 0 --> barrel
   // iecal = 1 --> endcap
   char histo[200];
+  //  for (int iecal=0; iecal<2; iecal++) {
 
   sprintf(histo,"etaClass_electrons");
-  etaClassEle = new TH1F(histo, histo, 10, -2.5, 2.5);
-  etaClassEle ->Sumw2();
-
-  for (int iecal=0; iecal<2; iecal++) {
+  etaClassEle = new TH1F(histo, histo, 30, -3.0, 3.0);
+  etaClassEle->Sumw2();
       
-    sprintf(histo,"dPhiClass_electrons_%d",iecal);
-    dPhiClassEle[iecal] = new TH1F(histo, histo, 15, -0.15, 0.15);
-    dPhiClassEle[iecal]->Sumw2();
-    sprintf(histo,"dEtaClass_electrons_%d",iecal);
-    dEtaClassEle[iecal] = new TH1F(histo, histo, 15, -0.02, 0.02);
-    dEtaClassEle[iecal]->Sumw2();
-    sprintf(histo,"HoEClass_electrons_%d",iecal);
-    HoEClassEle[iecal] = new TH1F(histo, histo, 15, 0., 0.15);
-    HoEClassEle[iecal]->Sumw2();
-    sprintf(histo,"EoPClass_electrons_%d",iecal);
-    EoPClassEle[iecal] = new TH1F(histo, histo, 15, 0., 10.);
-    EoPClassEle[iecal]->Sumw2();
-    sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",iecal);
-    sigmaIEtaIEtaClassEle[iecal] = new TH1F(histo, histo, 15, 0., 0.05);
-    sigmaIEtaIEtaClassEle[iecal]->Sumw2();
-  }
+  // EB histograms
+  sprintf(histo,"dPhiClass_electrons_%d",0);
+  dPhiClassEle[0] = new TH1F(histo, histo, 27, -0.05, 0.05);
+  dPhiClassEle[0]->Sumw2();
+  sprintf(histo,"dEtaClass_electrons_%d",0);
+  dEtaClassEle[0] = new TH1F(histo, histo, 27, -0.008, 0.008);
+  dEtaClassEle[0]->Sumw2();
+  sprintf(histo,"HoEClass_electrons_%d",0);
+  HoEClassEle[0] = new TH1F(histo, histo, 16, 0., 0.15);
+  HoEClassEle[0]->Sumw2();
+  sprintf(histo,"EoPClass_electrons_%d",0);
+  EoPClassEle[0] = new TH1F(histo, histo, 30, 0., 3.);
+  EoPClassEle[0]->Sumw2();
+  sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",0);
+  sigmaIEtaIEtaClassEle[0] = new TH1F(histo, histo, 30, 0., 0.03);
+  sigmaIEtaIEtaClassEle[0]->Sumw2();
+  sprintf(histo,"phiClass_electrons_%d",0);
+  phiClassEle[0] = new TH1F(histo, histo, 25, 0., 2*TMath::Pi());
+  phiClassEle[0]->Sumw2();
+  sprintf(histo,"chargeClass_electrons_%d",0);
+  chargeClassEle[0] = new TH1F(histo, histo, 2, -2., 2.);
+  chargeClassEle[0]->Sumw2();
+
+
+  // EE histograms
+  sprintf(histo,"dPhiClass_electrons_%d",1);
+  dPhiClassEle[1] = new TH1F(histo, histo, 27, -0.1, 0.1);
+  dPhiClassEle[1]->Sumw2();
+  sprintf(histo,"dEtaClass_electrons_%d",1);
+  dEtaClassEle[1] = new TH1F(histo, histo, 27, -0.03, 0.03);
+  dEtaClassEle[1]->Sumw2();
+  sprintf(histo,"HoEClass_electrons_%d",1);
+  HoEClassEle[1] = new TH1F(histo, histo, 16, 0., 0.15);
+  HoEClassEle[1]->Sumw2();
+  sprintf(histo,"EoPClass_electrons_%d",1);
+  EoPClassEle[1] = new TH1F(histo, histo, 30, 0., 5.);
+  EoPClassEle[1]->Sumw2();
+  sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",1);
+  sigmaIEtaIEtaClassEle[1] = new TH1F(histo, histo, 25, 0.01, 0.05);
+  sigmaIEtaIEtaClassEle[1]->Sumw2();
+  sprintf(histo,"phiClass_electrons_%d",1);
+  phiClassEle[1] = new TH1F(histo, histo, 25, 0., 2*TMath::Pi());
+  phiClassEle[1]->Sumw2();
+  sprintf(histo,"chargeClass_electrons_%d",1);
+  chargeClassEle[1] = new TH1F(histo, histo, 2, -2., 2.);
+  chargeClassEle[1]->Sumw2();
+
+    //  }
   
 }
 
@@ -206,23 +253,23 @@ void sPlotsPdfsComparison::InitCuts() {
 
   // see, dphi, deta, H/E
   WP70_EB_inf.push_back(0.0);  
-  WP70_EB_inf.push_back(-0.02);
-  WP70_EB_inf.push_back(-0.006);
+  WP70_EB_inf.push_back(-0.06);
+  WP70_EB_inf.push_back(-0.004);
   WP70_EB_inf.push_back(0.00);
 
   WP70_EB_sup.push_back(0.01);
-  WP70_EB_sup.push_back(0.02);
-  WP70_EB_sup.push_back(0.006);
-  WP70_EB_sup.push_back(0.02);
+  WP70_EB_sup.push_back(0.06);
+  WP70_EB_sup.push_back(0.004);
+  WP70_EB_sup.push_back(0.04);
 
   WP70_EE_inf.push_back(0.0);
-  WP70_EE_inf.push_back(-0.02);
-  WP70_EE_inf.push_back(-0.003);
+  WP70_EE_inf.push_back(-0.03);
+  WP70_EE_inf.push_back(-0.007);
   WP70_EE_inf.push_back(0.00);
 
   WP70_EE_sup.push_back(0.03);
-  WP70_EE_sup.push_back(0.02);
-  WP70_EE_sup.push_back(0.003);
-  WP70_EE_sup.push_back(0.0025);
+  WP70_EE_sup.push_back(0.03);
+  WP70_EE_sup.push_back(0.007);
+  WP70_EE_sup.push_back(0.025);
 
 }
