@@ -19,6 +19,8 @@ public:
   void ConfigureNoClass(const char *configDir);
   //! configure the ECAL cleaner
   void ConfigureEcalCleaner(const char *configDir);
+  //! get the non-class dependent selection (EB, EE)
+  Selection* GetSelectionNoClass(const char *EcalSubDet);
   //! set event by event observables
   void SetHOverE(float HOverE) { m_HOverE = HOverE; m_useHOverE = true; }
   void SetS9S25(float S9S25) { m_S9S25 = S9S25; m_useS9S25 = true; }

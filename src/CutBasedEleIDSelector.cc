@@ -3,6 +3,7 @@
 #include "CommonTools/include/Utils.hh"
 #include <iostream>
 #include <math.h>
+#include <string.h>
 
 using namespace bits;
 
@@ -221,6 +222,20 @@ void CutBasedEleIDSelector::ConfigureEcalCleaner(const char *configDir) {
 
   m_cleaner = new EcalCleaner();
   m_cleaner->Configure(configDir);
+
+}
+
+Selection* CutBasedEleIDSelector::GetSelectionNoClass(const char *EcalSubDet) {
+
+  if(m_EgammaCutIDSelection.size() != 2) {
+    std::cout << "CutBasedEleIDSelector::GetSelectionNoClass ERROR! The selection seems to be configured with classes" << std::endl;
+    return 0;
+  }
+  if(strcmp(EcalSubDet,"EB") == 0) return m_EgammaCutIDSelection[0];
+  else if(strcmp(EcalSubDet,"EE") == 0) return m_EgammaCutIDSelection[1];
+
+  std::cout << "CutBasedEleIDSelector::GetSelectionNoClass ERROR! Provide subdet string = EB / EE" << std::endl; 
+  return 0;
 
 }
 
