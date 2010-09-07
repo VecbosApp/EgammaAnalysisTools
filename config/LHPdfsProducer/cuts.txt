@@ -1,7 +1,6 @@
 ptHat		15	30
 etaEleAcc       -2.5    2.5
 ptEleAcc	5       1000
-relSumPtTracks  0       0.20
 meeWindow      60.0     110.0
 etaJetAcc       -2.5    2.5
 ptJetAcc	30	1000

@@ -5,7 +5,6 @@ ptHat			0
 meeWindow               1
 etaEleAcc               1
 ptEleAcc                1
-relSumPtTracks          1
 etaJetAcc               1
 ptJetAcc                1
 jetDeltaPhi		1
