@@ -124,6 +124,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIBCOMMON)Utils.o \
 	$(OUTLIB)RedEleIDTree.o \
 	$(OUTLIB)sPlotsPdfsComparison.o \
+	$(OUTLIB)LHPdfsProducer.o \
 	$(OUTLIB)IsolationPdfsProducer.o \
 	$(OUTLIB)SuperClusterWSelection.o \
 	$(OUTLIB)McTruthEvent.o \
