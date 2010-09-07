@@ -20,6 +20,8 @@ LHPdfsProducer::LHPdfsProducer(TTree *tree)
   std::string fileSwitches("config/LHPdfsProducer/switches.txt");
   
   m_selection = new Selection(fileCuts,fileSwitches);
+  m_selection->addSwitch("isData");
+  m_selection->addSwitch("goodRunLS");
   m_selection->addSwitch("requireTriggerSignal");
   m_selection->addSwitch("requireTriggerQCDBack");
   m_selection->addSwitch("applyIsolationOnProbe");
@@ -27,19 +29,22 @@ LHPdfsProducer::LHPdfsProducer(TTree *tree)
   m_selection->addCut("meeWindow");
   m_selection->addCut("etaEleAcc");
   m_selection->addCut("ptEleAcc");
-  m_selection->addCut("relSumPtTracks");
   m_selection->addCut("etaJetAcc");
   m_selection->addCut("ptJetAcc");
   m_selection->addCut("jetDeltaPhi");
   m_selection->addCut("jetInvMass");
   m_selection->addCut("antiIsolTracker");
   m_selection->addCut("antiIsolEcal");
+  m_selection->addStringParameter("electronIDType");
   m_selection->summary();
   cout << "done with cuts" << endl;
   
-  // single electron efficiency            
-  EgammaCutBasedID.Configure("config/looseEleId/");
-  cout << "done with eleID" << endl;
+  // single electron efficiency
+  //  EgammaCutBasedID.Configure("config/higgs"); // this is the class dependent e-ID
+  TString selectionString(m_selection->getStringParameter("electronIDType"));
+  cout << "=== CONFIGURING " << selectionString << " SYMMETRIC ELECTRON ID ===" << endl;
+  EgammaCutBasedID.ConfigureNoClass("config/"+selectionString);
+  EgammaCutBasedID.ConfigureEcalCleaner("config/");
 }
 
 LHPdfsProducer::~LHPdfsProducer() { }
@@ -164,36 +169,30 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
 
         // apply the electron ID loose on the tag electron
 	// float tagIdentified = anaUtils.electronIdVal(eleIdCutsEle[tag],eleIdRobustLoose);  
-	float tagIdentified = isEleID(tag);
-        if (tagIdentified) tagId++;
+	bool tagIdentified, tagIsolated, tagConvRej;
+        tagIdentified = tagIsolated = tagConvRej = false;
+        isEleID(tag,&tagIdentified,&tagIsolated,&tagConvRej);
+        if (tagIdentified && tagConvRej) tagId++;
 
         // apply tracker isolation on the tag electron 
-	float tagPt           = tagP4.Pt();
-	float relativeIsolTag = dr04TkSumPtEle[tag]/tagPt;
-        bool tagIsolated      = ( m_selection->passCut("relSumPtTracks",relativeIsolTag) );
 	if (tagIsolated) tagIsol++;
 
         // apply tracker isolation on the probe electron
-        bool probeIsolated = true;
-	float probePt      = probeP4.Pt();
-	float relativeIsolProbe = dr04TkSumPtEle[probe]/probePt;	
+        bool probeIdentified, probeIsolated, probeConvRej;
+        probeIdentified = probeIsolated = probeConvRej = true;
         if ( m_selection->getSwitch("applyIsolationOnProbe") ) {
-          probeIsolated = ( m_selection->passCut("relSumPtTracks",relativeIsolProbe) );
+          isEleID(probe,&probeIdentified,&probeIsolated,&probeConvRej);
         }
 	if(probeIsolated) probeIsol++;
 
 
 	// some eleID variables
-        float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaEle[probe]));
-        float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiEle[probe]));
-        float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiEle[probe]));
-        float s1s9          = s1s9Ele[probe];
-        float s9s25         = s9s25Ele[probe];
-        float lat           = latEle[probe];
-        float etaLat        = etaLatEle[probe];
-        float phiLat        = phiLatEle[probe];
-        float a20           = a20Ele[probe];
-        float a42           = a42Ele[probe];
+        int sc = superClusterIndexEle[probe];
+        float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaSC[probe]));
+        float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiSC[probe]));
+        float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiSC[probe]));
+        float s1s9          = eMaxSC[sc]/e3x3SC[sc];
+        float s9s25         = e3x3SC[sc]/e5x5SC[sc];
 	double dPhiCalo     = deltaPhiAtCaloEle[probe];
 	double dPhiVtx      = deltaPhiAtVtxEle[probe];
 	double dEtaVtx      = deltaEtaAtVtxEle[probe];
@@ -217,11 +216,6 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
           sigmaIPhiIPhiUnsplitEle [iecal][iptbin] -> Fill ( sigmaIPhiIPhi );
           s1s9UnsplitEle          [iecal][iptbin] -> Fill ( s1s9 );
           s9s25UnsplitEle         [iecal][iptbin] -> Fill ( s9s25 );
-          LATUnsplitEle           [iecal][iptbin] -> Fill ( lat );
-          etaLATUnsplitEle        [iecal][iptbin] -> Fill ( etaLat );
-          phiLATUnsplitEle        [iecal][iptbin] -> Fill ( phiLat );
-          a20UnsplitEle           [iecal][iptbin] -> Fill ( a20 );
-          a42UnsplitEle           [iecal][iptbin] -> Fill ( a42 );
 
           dPhiCaloClassEle      [iecal][iptbin][iclass] -> Fill ( dPhiCalo );
           dPhiVtxClassEle       [iecal][iptbin][iclass] -> Fill ( dPhiVtx );
@@ -233,11 +227,6 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
           sigmaIPhiIPhiClassEle [iecal][iptbin][iclass] -> Fill ( sigmaIPhiIPhi );
           s1s9ClassEle          [iecal][iptbin][iclass] -> Fill ( s1s9 );
           s9s25ClassEle         [iecal][iptbin][iclass] -> Fill ( s9s25 );
-          LATClassEle           [iecal][iptbin][iclass] -> Fill ( lat );
-          etaLATClassEle        [iecal][iptbin][iclass] -> Fill ( etaLat );
-          phiLATClassEle        [iecal][iptbin][iclass] -> Fill ( phiLat );
-          a20ClassEle           [iecal][iptbin][iclass] -> Fill ( a20 );
-          a42ClassEle           [iecal][iptbin][iclass] -> Fill ( a42 );
 
           dPhiCaloFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( dPhiCalo );
           dPhiVtxFullclassEle       [iecal][iptbin][ifullclass] -> Fill ( dPhiVtx );
@@ -249,17 +238,12 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
           sigmaIPhiIPhiFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaIPhiIPhi );
           s1s9FullclassEle          [iecal][iptbin][ifullclass] -> Fill ( s1s9 );
           s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
-          LATFullclassEle           [iecal][iptbin][ifullclass] -> Fill ( lat );
-          etaLATFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( etaLat );
-          phiLATFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( phiLat );
-          a20FullclassEle           [iecal][iptbin][ifullclass] -> Fill ( a20 );
-          a42FullclassEle           [iecal][iptbin][ifullclass] -> Fill ( a42 );
 	  
           // fill the reduced tree
 	  reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta);
           reducedTree.fillAttributesSignal(charge,eta,pt,okmass);
           reducedTree.fillCategories(iecal,iptbin,iclass);
-          reducedTree.fillMore(relativeIsolTag, relativeIsolProbe);
+          reducedTree.fillMore(dr03TkSumPtEle[tag]/tagP4.Pt(), dr03TkSumPtEle[probe]/probeP4.Pt());
           reducedTree.store();
 
         } // fill histograms
@@ -418,9 +402,10 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
       probeIsol1++;
 
       // some eleID variables
-      float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaEle[theClosestEle_mc1]));
-      float s1s9          = s1s9Ele[theClosestEle_mc1];
-      float s9s25         = s9s25Ele[theClosestEle_mc1];
+      int sc = superClusterIndexEle[theClosestEle_mc1];
+      float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaSC[sc]));
+      float s1s9          = eMaxSC[sc]/e3x3SC[sc];
+      float s9s25         = e3x3SC[sc]/e5x5SC[sc];
       double dPhiVtx      = deltaPhiAtVtxEle[theClosestEle_mc1];
       double dEtaVtx      = deltaEtaAtVtxEle[theClosestEle_mc1];
       double EoPout       = eSeedOverPoutEle[theClosestEle_mc1];
@@ -474,9 +459,10 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
       probeIsol2++;
 
       // some eleID variables
-      float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaEle[theClosestEle_mc2]));
-      float s1s9          = s1s9Ele[theClosestEle_mc2];
-      float s9s25         = s9s25Ele[theClosestEle_mc2];
+      int sc = superClusterIndexEle[theClosestEle_mc2];
+      float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaSC[sc]));
+      float s1s9          = eMaxSC[sc]/e3x3SC[sc];
+      float s9s25         = e3x3SC[sc]/e5x5SC[sc];
       double dPhiVtx      = deltaPhiAtVtxEle[theClosestEle_mc2];
       double dEtaVtx      = deltaEtaAtVtxEle[theClosestEle_mc2];
       double EoPout       = eSeedOverPoutEle[theClosestEle_mc2];
@@ -651,36 +637,30 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
 
         // apply the electron ID loose on the tag electron
 	// float tagIdentified = anaUtils.electronIdVal(eleIdCutsEle[tag],eleIdRobustLoose);  
-	float tagIdentified = isEleID(tag);
-        if (tagIdentified) tagId++;
+        bool tagIdentified, tagIsolated, tagConvRej;
+        tagIdentified = tagIsolated = tagConvRej = false;
+        isEleID(tag,&tagIdentified,&tagIsolated,&tagConvRej);
+        if (tagIdentified && tagConvRej) tagId++;
 
         // apply tracker isolation on the tag electron 
-	float tagPt           = tagP4.Pt();
-	float relativeIsolTag = dr04TkSumPtEle[tag]/tagPt;
-        bool tagIsolated      = ( m_selection->passCut("relSumPtTracks",relativeIsolTag) );
 	if (tagIsolated) tagIsol++;
 
         // apply tracker isolation on the probe electron
-        bool probeIsolated = true;
-	float probePt      = probeP4.Pt();
-	float relativeIsolProbe = dr04TkSumPtEle[probe]/probePt;	
+        bool probeIdentified, probeIsolated, probeConvRej;
+        probeIdentified = probeIsolated = probeConvRej = true;
         if ( m_selection->getSwitch("applyIsolationOnProbe") ) {
-          probeIsolated = ( m_selection->passCut("relSumPtTracks",relativeIsolProbe) );
+          isEleID(probe,&probeIdentified,&probeIsolated,&probeConvRej);
         }
 	if(probeIsolated) probeIsol++;
 
 
 	// some eleID variables
-        float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaEle[probe]));
-        float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiEle[probe]));
-        float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiEle[probe]));
-        float s1s9          = s1s9Ele[probe];
-        float s9s25         = s9s25Ele[probe];
-        float lat           = latEle[probe];
-        float etaLat        = etaLatEle[probe];
-        float phiLat        = phiLatEle[probe];
-        float a20           = a20Ele[probe];
-        float a42           = a42Ele[probe];
+        int sc = superClusterIndexEle[probe];
+        float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaSC[sc]));
+        float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiSC[sc]));
+        float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiSC[sc]));
+        float s1s9          = eMaxSC[sc]/e3x3SC[sc];
+        float s9s25         = e3x3SC[sc]/e5x5SC[sc];
 	double dPhiCalo     = deltaPhiAtCaloEle[probe];
 	double dPhiVtx      = deltaPhiAtVtxEle[probe];
 	double dEtaVtx      = deltaEtaAtVtxEle[probe];
@@ -718,11 +698,6 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
             sigmaIPhiIPhiUnsplitEle [iecal][iptbin] -> Fill ( sigmaIPhiIPhi );
             s1s9UnsplitEle          [iecal][iptbin] -> Fill ( s1s9 );
             s9s25UnsplitEle         [iecal][iptbin] -> Fill ( s9s25 );
-            LATUnsplitEle           [iecal][iptbin] -> Fill ( lat );
-            etaLATUnsplitEle        [iecal][iptbin] -> Fill ( etaLat );
-            phiLATUnsplitEle        [iecal][iptbin] -> Fill ( phiLat );
-            a20UnsplitEle           [iecal][iptbin] -> Fill ( a20 );
-            a42UnsplitEle           [iecal][iptbin] -> Fill ( a42 );
 
             dPhiCaloClassEle      [iecal][iptbin][iclass] -> Fill ( dPhiCalo );
             dPhiVtxClassEle       [iecal][iptbin][iclass] -> Fill ( dPhiVtx );
@@ -734,11 +709,6 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
             sigmaIPhiIPhiClassEle [iecal][iptbin][iclass] -> Fill ( sigmaIPhiIPhi );
             s1s9ClassEle          [iecal][iptbin][iclass] -> Fill ( s1s9 );
             s9s25ClassEle         [iecal][iptbin][iclass] -> Fill ( s9s25 );
-            LATClassEle           [iecal][iptbin][iclass] -> Fill ( lat );
-            etaLATClassEle        [iecal][iptbin][iclass] -> Fill ( etaLat );
-            phiLATClassEle        [iecal][iptbin][iclass] -> Fill ( phiLat );
-            a20ClassEle           [iecal][iptbin][iclass] -> Fill ( a20 );
-            a42ClassEle           [iecal][iptbin][iclass] -> Fill ( a42 );
 
             dPhiCaloFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( dPhiCalo );
             dPhiVtxFullclassEle       [iecal][iptbin][ifullclass] -> Fill ( dPhiVtx );
@@ -750,11 +720,6 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
             sigmaIPhiIPhiFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaIPhiIPhi );
             s1s9FullclassEle          [iecal][iptbin][ifullclass] -> Fill ( s1s9 );
             s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
-            LATFullclassEle           [iecal][iptbin][ifullclass] -> Fill ( lat );
-            etaLATFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( etaLat );
-            phiLATFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( phiLat );
-            a20FullclassEle           [iecal][iptbin][ifullclass] -> Fill ( a20 );
-            a42FullclassEle           [iecal][iptbin][ifullclass] -> Fill ( a42 );
 
 	  }
 
@@ -919,17 +884,19 @@ void LHPdfsProducer::LoopZwithMass(const char *treefilesuffix) {
       if (isolated1 && isolated2) probeIsol++;
 
       // some eleID variables
-      float sigmaIEtaIEta1 = sqrt(fabs(covIEtaIEtaEle[theClosestEle_mc1]));
-      float s1s91          = s1s9Ele[theClosestEle_mc1];
-      float s9s251         = s9s25Ele[theClosestEle_mc1];
+      int sc1 = superClusterIndexEle[theClosestEle_mc1];
+      float sigmaIEtaIEta1 = sqrt(fabs(covIEtaIEtaSC[sc1]));
+      float s1s91          = eMaxSC[sc1]/e3x3SC[sc1];
+      float s9s251         = e3x3SC[sc1]/e5x5SC[sc1];
       double dPhiVtx1      = deltaPhiAtVtxEle[theClosestEle_mc1];
       double dEtaVtx1      = deltaEtaAtVtxEle[theClosestEle_mc1];
       double EoPout1       = eSeedOverPoutEle[theClosestEle_mc1];
       double EoP1          = eSuperClusterOverPEle[theClosestEle_mc1];
       double HoE1          = hOverEEle[theClosestEle_mc1];
-      float sigmaIEtaIEta2 = sqrt(fabs(covIEtaIEtaEle[theClosestEle_mc2]));
-      float s1s92          = s1s9Ele[theClosestEle_mc2];
-      float s9s252         = s9s25Ele[theClosestEle_mc2];
+      int sc2 = superClusterIndexEle[theClosestEle_mc2];
+      float sigmaIEtaIEta2 = sqrt(fabs(covIEtaIEtaSC[sc2]));
+      float s1s92          = eMaxSC[sc2]/e3x3SC[sc2];
+      float s9s252         = e3x3SC[sc2]/e5x5SC[sc2];
       double dPhiVtx2      = deltaPhiAtVtxEle[theClosestEle_mc2];
       double dEtaVtx2      = deltaEtaAtVtxEle[theClosestEle_mc2];
       double EoPout2       = eSeedOverPoutEle[theClosestEle_mc2];
@@ -1029,16 +996,12 @@ void LHPdfsProducer::LoopQCD() {
         ifullclass = 3;
       }
         
-      float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaEle[iele]));
-      float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiEle[iele]));
-      float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiEle[iele]));
-      float s1s9   = s1s9Ele[iele];
-      float s9s25  = s9s25Ele[iele];
-      float lat    = latEle[iele];
-      float etaLat = etaLatEle[iele];
-      float phiLat = phiLatEle[iele];
-      float a20    = a20Ele[iele];
-      float a42    = a42Ele[iele];
+      int sc = superClusterIndexEle[iele];
+      float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaSC[sc]));
+      float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiSC[sc]));
+      float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiSC[sc]));
+      float s1s9   = eMaxSC[sc]/e3x3SC[sc];
+      float s9s25  = e3x3SC[sc]/e5x5SC[sc];
       double dPhiCalo = deltaPhiAtCaloEle[iele];
       double dPhiVtx  = deltaPhiAtVtxEle[iele];
       double dEtaVtx  = deltaEtaAtVtxEle[iele];
@@ -1056,11 +1019,6 @@ void LHPdfsProducer::LoopQCD() {
       sigmaIPhiIPhiUnsplitEle [iecal][iptbin] -> Fill ( sigmaIPhiIPhi );
       s1s9UnsplitEle          [iecal][iptbin] -> Fill ( s1s9 );
       s9s25UnsplitEle         [iecal][iptbin] -> Fill ( s9s25 );
-      LATUnsplitEle           [iecal][iptbin] -> Fill ( lat );
-      etaLATUnsplitEle        [iecal][iptbin] -> Fill ( etaLat );
-      phiLATUnsplitEle        [iecal][iptbin] -> Fill ( phiLat );
-      a20UnsplitEle           [iecal][iptbin] -> Fill ( a20 );
-      a42UnsplitEle           [iecal][iptbin] -> Fill ( a42 );
 
       dPhiCaloClassEle        [iecal][iptbin][iclass] -> Fill ( dPhiCalo );
       dPhiVtxClassEle         [iecal][iptbin][iclass] -> Fill ( dPhiVtx );
@@ -1072,11 +1030,6 @@ void LHPdfsProducer::LoopQCD() {
       sigmaIPhiIPhiClassEle   [iecal][iptbin][iclass] -> Fill ( sigmaIPhiIPhi );
       s1s9ClassEle            [iecal][iptbin][iclass] -> Fill ( s1s9 );
       s9s25ClassEle           [iecal][iptbin][iclass] -> Fill ( s9s25 );
-      LATClassEle             [iecal][iptbin][iclass] -> Fill ( lat );
-      etaLATClassEle          [iecal][iptbin][iclass] -> Fill ( etaLat );
-      phiLATClassEle          [iecal][iptbin][iclass] -> Fill ( phiLat );
-      a20ClassEle             [iecal][iptbin][iclass] -> Fill ( a20 );
-      a42ClassEle             [iecal][iptbin][iclass] -> Fill ( a42 );
 
       dPhiCaloFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( dPhiCalo );
       dPhiVtxFullclassEle       [iecal][iptbin][ifullclass] -> Fill ( dPhiVtx );
@@ -1088,11 +1041,6 @@ void LHPdfsProducer::LoopQCD() {
       sigmaIPhiIPhiFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaIPhiIPhi );
       s1s9FullclassEle          [iecal][iptbin][ifullclass] -> Fill ( s1s9 );
       s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
-      LATFullclassEle           [iecal][iptbin][ifullclass] -> Fill ( lat );
-      etaLATFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( etaLat );
-      phiLATFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( phiLat );
-      a20FullclassEle           [iecal][iptbin][ifullclass] -> Fill ( a20 );
-      a42FullclassEle           [iecal][iptbin][ifullclass] -> Fill ( a42 );
 
     } // loop on electrons
 
@@ -1166,9 +1114,10 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     if (probeCandidates.size()>0) oneele++;
 
     // selecting jets in the acceptance to work as tag
-    for (int ijet=0; ijet<nSisConeCorrJet; ijet++){    
-      if ( m_selection->getSwitch("etaJetAcc") && !m_selection->passCut("etaJetAcc",etaSisConeCorrJet[ijet]) ) continue;
-      if ( m_selection->getSwitch("etJetAcc")  && !m_selection->passCut("etJetAcc",etSisConeCorrJet[ijet]) )   continue;
+    for (int ijet=0; ijet<nAK5PFJet; ijet++){    
+      TVector3 p3Jet(pxAK5PFJet[ijet],pyAK5PFJet[ijet],pzAK5PFJet[ijet]);
+      if ( m_selection->getSwitch("etaJetAcc") && !m_selection->passCut("etaJetAcc",etaAK5PFJet[ijet]) ) continue;
+      if ( m_selection->getSwitch("etJetAcc")  && !m_selection->passCut("etJetAcc",p3Jet.Pt()) )   continue;
       tagCandidates.push_back(ijet);
     }
     if (tagCandidates.size()>0) onejet++;
@@ -1182,11 +1131,11 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     for (int iJet=0; iJet<tagCandidates.size(); iJet++){ 
 
       TLorentzVector p4Jet;
-      TVector3 p3Jet(pxSisConeCorrJet[tagCandidates[iJet]],pySisConeCorrJet[tagCandidates[iJet]],pzSisConeCorrJet[tagCandidates[iJet]]);
-      p4Jet.SetXYZT (pxSisConeCorrJet[tagCandidates[iJet]],pySisConeCorrJet[tagCandidates[iJet]],pzSisConeCorrJet[tagCandidates[iJet]], energySisConeCorrJet[tagCandidates[iJet]]);
+      TVector3 p3Jet(pxAK5PFJet[tagCandidates[iJet]],pyAK5PFJet[tagCandidates[iJet]],pzAK5PFJet[tagCandidates[iJet]]);
+      p4Jet.SetXYZT (pxAK5PFJet[tagCandidates[iJet]],pyAK5PFJet[tagCandidates[iJet]],pzAK5PFJet[tagCandidates[iJet]], energyAK5PFJet[tagCandidates[iJet]]);
 
       // we use the highest ET jet (with a potential probe) as a tag 
-      if (etSisConeCorrJet[tagCandidates[iJet]]<tagEt) continue;
+      if (p3Jet.Pt()<tagEt) continue;
 
       // we choose the probe with max Dphi wrt the tag
       float dPhiMax = -999.;
@@ -1210,7 +1159,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
 	deltaphi++;
 
 	// we have a potential probe and this is highest ET jet up to now -> it's our tag
-	tagEt  = etSisConeCorrJet[tagCandidates[iJet]];
+	tagEt  = p3Jet.Pt();
 	theTag = tagCandidates[iJet];
 	
 	// in case of several probes for this tag
@@ -1229,11 +1178,12 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     TLorentzVector p4Tag, p4Probe;	
     TVector3 p3Probe(pxEle[theProbe],pyEle[theProbe],pzEle[theProbe]);
     p4Probe.SetXYZT (pxEle[theProbe],pyEle[theProbe],pzEle[theProbe],energyEle[theProbe]);
-    TVector3 p3Tag(pxSisConeCorrJet[theTag],pySisConeCorrJet[theTag],pzSisConeCorrJet[theTag]);
-    p4Tag.SetXYZT (pxSisConeCorrJet[theTag],pySisConeCorrJet[theTag],pzSisConeCorrJet[theTag], energySisConeCorrJet[theTag]);
+    TVector3 p3Tag(pxAK5PFJet[theTag],pyAK5PFJet[theTag],pzAK5PFJet[theTag]);
+    p4Tag.SetXYZT (pxAK5PFJet[theTag],pyAK5PFJet[theTag],pzAK5PFJet[theTag], energyAK5PFJet[theTag]);
     float theDeltaPhi = fabs(p3Tag.DeltaPhi(p3Probe));
     float theInvMass  = (p4Tag+p4Probe).M();
-    float theMet      = etMet[0];
+    TVector3 p3Met(pxMet[0],pyMet[0],0.0);
+    float theMet      = p3Met.Pt();
     
     // reject events with >=2 electrons making a Z
     if ( nEle>=2 ) {
@@ -1295,16 +1245,12 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     if (iclass>-1) nocrack++;
           
     if (iclass>-1) {
-      float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaEle[theProbe]));
-      float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiEle[theProbe]));
-      float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiEle[theProbe]));
-      float s1s9      = s1s9Ele[theProbe];
-      float s9s25     = s9s25Ele[theProbe];
-      float lat       = latEle[theProbe];
-      float etaLat    = etaLatEle[theProbe];
-      float phiLat    = phiLatEle[theProbe];
-      float a20       = a20Ele[theProbe];
-      float a42       = a42Ele[theProbe];
+      int sc = superClusterIndexEle[theProbe];
+      float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaSC[sc]));
+      float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiSC[sc]));
+      float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiSC[sc]));
+      float s1s9      = eMaxSC[sc]/e3x3SC[sc];
+      float s9s25     = e3x3SC[sc]/e5x5SC[sc];
       double dPhiCalo = deltaPhiAtCaloEle[theProbe];
       double dPhiVtx  = deltaPhiAtVtxEle[theProbe];
       double dEtaVtx  = deltaEtaAtVtxEle[theProbe];
@@ -1322,11 +1268,6 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       sigmaIPhiIPhiUnsplitEle [iecal][iptbin] -> Fill ( sigmaIPhiIPhi );
       s1s9UnsplitEle          [iecal][iptbin] -> Fill ( s1s9 );
       s9s25UnsplitEle         [iecal][iptbin] -> Fill ( s9s25 );
-      LATUnsplitEle           [iecal][iptbin] -> Fill ( lat );
-      etaLATUnsplitEle        [iecal][iptbin] -> Fill ( etaLat );
-      phiLATUnsplitEle        [iecal][iptbin] -> Fill ( phiLat );
-      a20UnsplitEle           [iecal][iptbin] -> Fill ( a20 );
-      a42UnsplitEle           [iecal][iptbin] -> Fill ( a42 );
       
       dPhiCaloClassEle        [iecal][iptbin][iclass] -> Fill ( dPhiCalo );
       dPhiVtxClassEle         [iecal][iptbin][iclass] -> Fill ( dPhiVtx );
@@ -1338,11 +1279,6 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       sigmaIPhiIPhiClassEle   [iecal][iptbin][iclass] -> Fill ( sigmaIPhiIPhi );
       s1s9ClassEle            [iecal][iptbin][iclass] -> Fill ( s1s9 );
       s9s25ClassEle           [iecal][iptbin][iclass] -> Fill ( s9s25 );
-      LATClassEle             [iecal][iptbin][iclass] -> Fill ( lat );
-      etaLATClassEle          [iecal][iptbin][iclass] -> Fill ( etaLat );
-      phiLATClassEle          [iecal][iptbin][iclass] -> Fill ( phiLat );
-      a20ClassEle             [iecal][iptbin][iclass] -> Fill ( a20 );
-      a42ClassEle             [iecal][iptbin][iclass] -> Fill ( a42 );
       
       dPhiCaloFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( dPhiCalo );
       dPhiVtxFullclassEle       [iecal][iptbin][ifullclass] -> Fill ( dPhiVtx );
@@ -1354,11 +1290,6 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       sigmaIPhiIPhiFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaIPhiIPhi );
       s1s9FullclassEle          [iecal][iptbin][ifullclass] -> Fill ( s1s9 );
       s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
-      LATFullclassEle           [iecal][iptbin][ifullclass] -> Fill ( lat );
-      etaLATFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( etaLat );
-      phiLATFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( phiLat );
-      a20FullclassEle           [iecal][iptbin][ifullclass] -> Fill ( a20 );
-      a42FullclassEle           [iecal][iptbin][ifullclass] -> Fill ( a42 );
 
       // fill the reduced tree
       reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta);    
@@ -1475,25 +1406,20 @@ void LHPdfsProducer::LoopWjets() {
         ifullclass = 3;
       }
 
-      float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaEle[iele]));
-      float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiEle[iele]));
-      float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiEle[iele]));
-      float s1s9   = s1s9Ele[iele];
-      float s9s25  = s9s25Ele[iele];
-      float lat    = latEle[iele];
-      float etaLat = etaLatEle[iele];
-      float phiLat = phiLatEle[iele];
-      float a20 = a20Ele[iele];
-      float a42 = a42Ele[iele];
-
+      int sc = superClusterIndexEle[iele];
+      float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaSC[sc]));
+      float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiSC[sc]));
+      float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiSC[sc]));
+      float s1s9   = eMaxSC[sc]/e3x3SC[sc];
+      float s9s25  = e3x3SC[sc]/e5x5SC[sc];
       double dPhiCalo = deltaPhiAtCaloEle[iele];
       double dPhiVtx  = deltaPhiAtVtxEle[iele];
       double dEta     = deltaEtaAtVtxEle[iele];
       double EoPout   = eSeedOverPoutEle[iele];
       double EoP      = eSuperClusterOverPEle[iele];
       double HoE      = hOverEEle[iele];
-      double dxy      = eleTrackDxyEle[iele];
-      double dxySig   = eleTrackDxyEle[iele]/eleTrackDxyErrorEle[iele];
+      //      double dxy      = eleTrackDxyEle[iele];
+      //      double dxySig   = eleTrackDxyEle[iele]/eleTrackDxyErrorEle[iele];
       
       dPhiCaloUnsplitEle      [iecal][iptbin] -> Fill ( dPhiCalo );
       dPhiVtxUnsplitEle       [iecal][iptbin] -> Fill ( dPhiVtx );
@@ -1505,13 +1431,8 @@ void LHPdfsProducer::LoopWjets() {
       sigmaIPhiIPhiUnsplitEle [iecal][iptbin] -> Fill ( sigmaIPhiIPhi );
       s1s9UnsplitEle          [iecal][iptbin] -> Fill ( s1s9 );
       s9s25UnsplitEle         [iecal][iptbin] -> Fill ( s9s25 );
-      LATUnsplitEle           [iecal][iptbin] -> Fill ( lat );
-      etaLATUnsplitEle        [iecal][iptbin] -> Fill ( etaLat );
-      phiLATUnsplitEle        [iecal][iptbin] -> Fill ( phiLat );
-      a20UnsplitEle           [iecal][iptbin] -> Fill ( a20 );
-      a42UnsplitEle           [iecal][iptbin] -> Fill ( a42 );
-      dxyUnsplitEle           [iecal][iptbin] -> Fill ( dxy );
-      dxySigUnsplitEle        [iecal][iptbin] -> Fill ( dxySig );
+      //      dxyUnsplitEle           [iecal][iptbin] -> Fill ( dxy );
+      //      dxySigUnsplitEle        [iecal][iptbin] -> Fill ( dxySig );
 
       dPhiCaloClassEle      [iecal][iptbin][iclass] -> Fill ( dPhiCalo );
       dPhiVtxClassEle       [iecal][iptbin][iclass] -> Fill ( dPhiVtx );
@@ -1523,13 +1444,8 @@ void LHPdfsProducer::LoopWjets() {
       sigmaIPhiIPhiClassEle [iecal][iptbin][iclass] -> Fill ( sigmaIPhiIPhi );
       s1s9ClassEle          [iecal][iptbin][iclass] -> Fill ( s1s9 );
       s9s25ClassEle         [iecal][iptbin][iclass] -> Fill ( s9s25 );
-      LATClassEle           [iecal][iptbin][iclass] -> Fill ( lat );
-      etaLATClassEle        [iecal][iptbin][iclass] -> Fill ( etaLat );
-      phiLATClassEle        [iecal][iptbin][iclass] -> Fill ( phiLat );
-      a20ClassEle           [iecal][iptbin][iclass] -> Fill ( a20 );
-      a42ClassEle           [iecal][iptbin][iclass] -> Fill ( a42 );
-      dxyClassEle           [iecal][iptbin][iclass] -> Fill ( dxy );
-      dxySigClassEle        [iecal][iptbin][iclass] -> Fill ( dxySig );
+      //      dxyClassEle           [iecal][iptbin][iclass] -> Fill ( dxy );
+      //      dxySigClassEle        [iecal][iptbin][iclass] -> Fill ( dxySig );
 
       dPhiCaloFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( dPhiCalo );
       dPhiVtxFullclassEle       [iecal][iptbin][ifullclass] -> Fill ( dPhiVtx );
@@ -1541,13 +1457,8 @@ void LHPdfsProducer::LoopWjets() {
       sigmaIPhiIPhiFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaIPhiIPhi );
       s1s9FullclassEle          [iecal][iptbin][ifullclass] -> Fill ( s1s9 );
       s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
-      LATFullclassEle           [iecal][iptbin][ifullclass] -> Fill ( lat );
-      etaLATFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( etaLat );
-      phiLATFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( phiLat );
-      a20FullclassEle           [iecal][iptbin][ifullclass] -> Fill ( a20 );
-      a42FullclassEle           [iecal][iptbin][ifullclass] -> Fill ( a42 );
-      dxyFullclassEle           [iecal][iptbin][ifullclass] -> Fill ( dxy );
-      dxySigFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( dxySig );
+      //      dxyFullclassEle           [iecal][iptbin][ifullclass] -> Fill ( dxy );
+      //      dxySigFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( dxySig );
 
     } // loop on electrons
 
@@ -1649,9 +1560,9 @@ void LHPdfsProducer::LoopZjets(const char *outname) {
     muons[0]=-1, muons[1]=-1;
     if(nMuon>=2) { 
       for(int imu1=0; imu1<nMuon; imu1++) {
-        TLorentzVector muon1(pxMuon[imu1],pyMuon[imu1],pzMuon[imu1],momentumMuon[imu1]);
+        TLorentzVector muon1(pxMuon[imu1],pyMuon[imu1],pzMuon[imu1],energyMuon[imu1]);
         for(int imu2=imu1+1; imu2<nMuon; imu2++) {
-          TLorentzVector muon2(pxMuon[imu2],pyMuon[imu2],pzMuon[imu2],momentumMuon[imu2]);
+          TLorentzVector muon2(pxMuon[imu2],pyMuon[imu2],pzMuon[imu2],energyMuon[imu2]);
           
           float mass = (muon1+muon2).M();
           float pull=fabs(mass-91.1876);
@@ -1671,19 +1582,25 @@ void LHPdfsProducer::LoopZjets(const char *outname) {
     // or the same with muons
     if (electrons[0]=!-1 && electrons[1]!=-1) {
 
+      TVector3 p3Ele1(pxEle[electrons[0]],pyEle[electrons[0]],pzEle[electrons[0]]);
+      TVector3 p3Ele2(pxEle[electrons[1]],pyEle[electrons[1]],pzEle[electrons[1]]);
+
       if( minpullZee < 9.0 &&
           fabs(etaEle[electrons[0]]) < 2.5 &&
           fabs(etaEle[electrons[1]]) < 2.5 &&
-          etEle[electrons[0]] > 5.0 &&
-          etEle[electrons[1]] > 5.0 ) Ztag = true;
+          p3Ele1.Pt() > 5.0 &&
+          p3Ele2.Pt() > 5.0 ) Ztag = true;
 
     } else if (muons[0]!=-1 && muons[1]!=-1) {
+
+      TVector3 p3Mu1(pxEle[muons[0]],pyEle[muons[0]],pzEle[muons[0]]);
+      TVector3 p3Mu2(pxEle[muons[1]],pyEle[muons[1]],pzEle[muons[1]]);
       
       if( minpullZmumu < 9.0 &&
           fabs(etaMuon[muons[0]]) < 2.4 &&
           fabs(etaMuon[muons[1]]) < 2.4 &&
-          etMuon[muons[0]] > 5.0 &&
-          etMuon[muons[1]] > 5.0 ) Ztag = true;
+          p3Mu1.Pt() > 5.0 &&
+          p3Mu2.Pt() > 5.0 ) Ztag = true;
 
     }
 
@@ -1699,26 +1616,26 @@ void LHPdfsProducer::LoopZjets(const char *outname) {
 
       if( iele==electrons[0] || iele==electrons[1] ) continue;
 
-      if( fabs(etaEle[iele]) > 2.5 || etEle[iele] < 5.0 ) continue;
+      TVector3 eleP3(pxEle[iele],pyEle[iele],pzEle[iele]);
+
+      if( fabs(etaEle[iele]) > 2.5 || eleP3.Pt() < 5.0 ) continue;
       
       AllFakesEta->Fill(etaEle[iele]);
-      AllFakesPt->Fill(etEle[iele]);
+      AllFakesPt->Fill(eleP3.Pt());
 
-      TVector3 eleP3(pxEle[iele],pyEle[iele],pzEle[iele]);
-      
       // evaluate the purity of the jets: p=#ele(unmatched)/#ele
       if(mcEleMinusIndex>-1 && mcElePlusIndex>-1) {
         float dRPlus = mcElePlus.DeltaR(eleP3);
         float dRMinus = mcEleMinus.DeltaR(eleP3);
         if(dRPlus>0.3 && dRMinus>0.3) {
           UnmatchedFakesEta->Fill(etaEle[iele]);
-          UnmatchedFakesPt->Fill(etEle[iele]);
+          UnmatchedFakesPt->Fill(eleP3.Pt());
         }
       }
       
       /// define the bins in which can be splitted the PDFs
       int iecal = (fabs( etaEle[iele])<1.479) ? 0 : 1;
-      int iptbin = (etEle[iele]<15.0) ? 0 : 1;
+      int iptbin = (eleP3.Pt()<15.0) ? 0 : 1;
       
       int fullclassRaw = classificationEle[iele];
         
@@ -1742,25 +1659,20 @@ void LHPdfsProducer::LoopZjets(const char *outname) {
         ifullclass = 3;
       }
 
-      float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaEle[iele]));
-      float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiEle[iele]));
-      float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiEle[iele]));
-      float s1s9 = s1s9Ele[iele];
-      float s9s25 = s9s25Ele[iele];
-      float lat = latEle[iele];
-      float etaLat = etaLatEle[iele];
-      float phiLat = phiLatEle[iele];
-      float a20 = a20Ele[iele];
-      float a42 = a42Ele[iele];
-
+      int sc = superClusterIndexEle[iele];
+      float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaSC[sc]));
+      float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiSC[sc]));
+      float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiSC[sc]));
+      float s1s9 = eMaxSC[sc]/e3x3SC[sc];
+      float s9s25 = e3x3SC[sc]/e5x5SC[sc];
       double dPhiCalo = deltaPhiAtCaloEle[iele];
       double dPhiVtx = deltaPhiAtVtxEle[iele];
       double dEta = deltaEtaAtVtxEle[iele];
       double EoPout = eSeedOverPoutEle[iele];
       double EoP = eSuperClusterOverPEle[iele];
       double HoE = hOverEEle[iele];
-      double dxy = eleTrackDxyEle[iele];
-      double dxySig = eleTrackDxyEle[iele]/eleTrackDxyErrorEle[iele];
+      //      double dxy = eleTrackDxyEle[iele];
+      //      double dxySig = eleTrackDxyEle[iele]/eleTrackDxyErrorEle[iele];
 
       dPhiCaloUnsplitEle    [iecal][iptbin] -> Fill ( dPhiCalo );
       dPhiVtxUnsplitEle     [iecal][iptbin] -> Fill ( dPhiVtx );
@@ -1772,13 +1684,8 @@ void LHPdfsProducer::LoopZjets(const char *outname) {
       sigmaIPhiIPhiUnsplitEle [iecal][iptbin] -> Fill ( sigmaIPhiIPhi );
       s1s9UnsplitEle        [iecal][iptbin] -> Fill ( s1s9 );
       s9s25UnsplitEle       [iecal][iptbin] -> Fill ( s9s25 );
-      LATUnsplitEle         [iecal][iptbin] -> Fill ( lat );
-      etaLATUnsplitEle      [iecal][iptbin] -> Fill ( etaLat );
-      phiLATUnsplitEle      [iecal][iptbin] -> Fill ( phiLat );
-      a20UnsplitEle         [iecal][iptbin] -> Fill ( a20 );
-      a42UnsplitEle         [iecal][iptbin] -> Fill ( a42 );
-      dxyUnsplitEle         [iecal][iptbin] -> Fill ( dxy );
-      dxySigUnsplitEle      [iecal][iptbin] -> Fill ( dxySig );
+      //      dxyUnsplitEle         [iecal][iptbin] -> Fill ( dxy );
+      //      dxySigUnsplitEle      [iecal][iptbin] -> Fill ( dxySig );
 
       dPhiCaloClassEle    [iecal][iptbin][iclass] -> Fill ( dPhiCalo );
       dPhiVtxClassEle     [iecal][iptbin][iclass] -> Fill ( dPhiVtx );
@@ -1790,13 +1697,8 @@ void LHPdfsProducer::LoopZjets(const char *outname) {
       sigmaIPhiIPhiClassEle [iecal][iptbin][iclass] -> Fill ( sigmaIPhiIPhi );
       s1s9ClassEle        [iecal][iptbin][iclass] -> Fill ( s1s9 );
       s9s25ClassEle       [iecal][iptbin][iclass] -> Fill ( s9s25 );
-      LATClassEle         [iecal][iptbin][iclass] -> Fill ( lat );
-      etaLATClassEle      [iecal][iptbin][iclass] -> Fill ( etaLat );
-      phiLATClassEle      [iecal][iptbin][iclass] -> Fill ( phiLat );
-      a20ClassEle         [iecal][iptbin][iclass] -> Fill ( a20 );
-      a42ClassEle         [iecal][iptbin][iclass] -> Fill ( a42 );
-      dxyClassEle         [iecal][iptbin][iclass] -> Fill ( dxy );
-      dxySigClassEle      [iecal][iptbin][iclass] -> Fill ( dxySig );
+      //      dxyClassEle         [iecal][iptbin][iclass] -> Fill ( dxy );
+      //      dxySigClassEle      [iecal][iptbin][iclass] -> Fill ( dxySig );
 
       dPhiCaloFullclassEle    [iecal][iptbin][ifullclass] -> Fill ( dPhiCalo );
       dPhiVtxFullclassEle     [iecal][iptbin][ifullclass] -> Fill ( dPhiVtx );
@@ -1808,13 +1710,8 @@ void LHPdfsProducer::LoopZjets(const char *outname) {
       sigmaIPhiIPhiFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaIPhiIPhi );
       s1s9FullclassEle        [iecal][iptbin][ifullclass] -> Fill ( s1s9 );
       s9s25FullclassEle       [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
-      LATFullclassEle         [iecal][iptbin][ifullclass] -> Fill ( lat );
-      etaLATFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( etaLat );
-      phiLATFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( phiLat );
-      a20FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( a20 );
-      a42FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( a42 );
-      dxyFullclassEle         [iecal][iptbin][ifullclass] -> Fill ( dxy );
-      dxySigFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( dxySig );
+      //      dxyFullclassEle         [iecal][iptbin][ifullclass] -> Fill ( dxy );
+      //      dxySigFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( dxySig );
 
     } // loop on electrons
 
@@ -1866,20 +1763,10 @@ void LHPdfsProducer::bookHistos() {
   float s1s9Max  = 1.0;
   float s9s25Min = 0.5;
   float s9s25Max = 1.0;
-  float LATMin   = 0.0;
-  float LATMax   = 1.0;
-  float etaLATMin = 0.0;
-  float etaLATMax = 1.0;
-  float phiLATMin = 0.0;
-  float phiLATMax = 1.0;
-  float a20Min    = 0.0;
-  float a20Max    = 1.0;
-  float a42Min    = 0.0;
-  float a42Max    = 1.0;
-  float dxyMin    = -0.04;
-  float dxyMax    = 0.04;
-  float dxySigMin    = -10.0;
-  float dxySigMax    = 10.0;
+//   float dxyMin    = -0.04;
+//   float dxyMax    = 0.04;
+//   float dxySigMin    = -10.0;
+//   float dxySigMax    = 10.0;
 
   // booking histos eleID
   // iecal = 0 --> barrel
@@ -1912,20 +1799,9 @@ void LHPdfsProducer::bookHistos() {
       s1s9UnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, s1s9Min, s1s9Max);
       sprintf(histo,"s9s25Unsplit_electrons_%d_%d",iecal,iptbin);
       s9s25UnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, s9s25Min, s9s25Max);
-      sprintf(histo,"LATUnsplit_electrons_%d_%d",iecal,iptbin);
-      LATUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, LATMin, LATMax);
-      sprintf(histo,"etaLATUnsplit_electrons_%d_%d",iecal,iptbin);
-      etaLATUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, etaLATMin, etaLATMax);
-      sprintf(histo,"phiLATUnsplit_electrons_%d_%d",iecal,iptbin);
-      phiLATUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, phiLATMin, phiLATMax);
-      sprintf(histo,"a20Unsplit_electrons_%d_%d",iecal,iptbin);
-      a20UnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, a20Min, a20Max);
-      sprintf(histo,"a42Unsplit_electrons_%d_%d",iecal,iptbin);
-      a42UnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, a42Min, a42Max);
-      sprintf(histo,"dxyUnsplit_electrons_%d_%d",iecal,iptbin);
-      dxyUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, dxyMin, dxyMax);
-      sprintf(histo,"dxySigUnsplit_electrons_%d_%d",iecal,iptbin);
-      dxySigUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, dxySigMin, dxySigMax);
+//       dxyUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, dxyMin, dxyMax);
+//       sprintf(histo,"dxySigUnsplit_electrons_%d_%d",iecal,iptbin);
+//       dxySigUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, dxySigMin, dxySigMax);
 
       // iclass = 0: non-showering
       // iclass = 1: showering
@@ -1951,20 +1827,10 @@ void LHPdfsProducer::bookHistos() {
 	s1s9ClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, s1s9Min, s1s9Max);
 	sprintf(histo,"s9s25Class_electrons_%d_%d_%d",iecal,iptbin,iclass);
 	s9s25ClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, s9s25Min, s9s25Max);
-	sprintf(histo,"LATClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	LATClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, LATMin, LATMax);
-	sprintf(histo,"etaLATClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	etaLATClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, etaLATMin, etaLATMax);
-	sprintf(histo,"phiLATClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	phiLATClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, phiLATMin, phiLATMax);
-	sprintf(histo,"a20Class_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	a20ClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, a20Min, a20Max);
-	sprintf(histo,"a42Class_electrons_%d_%d_%d",iecal,iptbin,iclass);
-	a42ClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, a42Min, a42Max);
-        sprintf(histo,"dxyClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-        dxyClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, dxyMin, dxyMax);
-        sprintf(histo,"dxySigClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
-        dxySigClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, dxySigMin, dxySigMax);
+//         sprintf(histo,"dxyClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
+//         dxyClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, dxyMin, dxyMax);
+//         sprintf(histo,"dxySigClass_electrons_%d_%d_%d",iecal,iptbin,iclass);
+//         dxySigClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, dxySigMin, dxySigMax);
 
       }
 
@@ -1995,20 +1861,10 @@ void LHPdfsProducer::bookHistos() {
 	s1s9FullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, s1s9Min, s1s9Max);
 	sprintf(histo,"s9s25Fullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
 	s9s25FullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, s9s25Min, s9s25Max);
-	sprintf(histo,"LATFullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
-	LATFullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, LATMin, LATMax);
-	sprintf(histo,"etaLATFullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
-	etaLATFullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, etaLATMin, etaLATMax);
-	sprintf(histo,"phiLATFullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
-	phiLATFullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, phiLATMin, phiLATMax);
-	sprintf(histo,"a20Fullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
-	a20FullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, a20Min, a20Max);
-	sprintf(histo,"a42Fullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
-	a42FullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, a42Min, a42Max);
-        sprintf(histo,"dxyFullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
-        dxyFullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, dxyMin, dxyMax);
-        sprintf(histo,"dxySigFullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
-        dxySigFullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, dxySigMin, dxySigMax);
+//         sprintf(histo,"dxyFullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
+//         dxyFullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, dxyMin, dxyMax);
+//         sprintf(histo,"dxySigFullclass_electrons_%d_%d_%d",iecal,iptbin,ifullclass);
+//         dxySigFullclassEle[iecal][iptbin][ifullclass] = new TH1F(histo, histo, nbins, dxySigMin, dxySigMax);
 
       }
 
@@ -2042,13 +1898,8 @@ void LHPdfsProducer::saveHistos(const char *filename) {
       sigmaIPhiIPhiUnsplitEle[iecal][iptbin]->Write();
       s1s9UnsplitEle[iecal][iptbin]->Write();
       s9s25UnsplitEle[iecal][iptbin]->Write();
-      LATUnsplitEle[iecal][iptbin]->Write();
-      etaLATUnsplitEle[iecal][iptbin]->Write();
-      phiLATUnsplitEle[iecal][iptbin]->Write();
-      a20UnsplitEle[iecal][iptbin]->Write();
-      a42UnsplitEle[iecal][iptbin]->Write();
-      dxyUnsplitEle[iecal][iptbin]->Write();
-      dxySigUnsplitEle[iecal][iptbin]->Write();
+//       dxyUnsplitEle[iecal][iptbin]->Write();
+//       dxySigUnsplitEle[iecal][iptbin]->Write();
 
       for(int iclass=0; iclass<2; iclass++) {
       
@@ -2062,13 +1913,8 @@ void LHPdfsProducer::saveHistos(const char *filename) {
 	sigmaIPhiIPhiClassEle[iecal][iptbin][iclass]->Write();
 	s1s9ClassEle[iecal][iptbin][iclass]->Write();
 	s9s25ClassEle[iecal][iptbin][iclass]->Write();
-	LATClassEle[iecal][iptbin][iclass]->Write();
-	etaLATClassEle[iecal][iptbin][iclass]->Write();
-	phiLATClassEle[iecal][iptbin][iclass]->Write();
-	a20ClassEle[iecal][iptbin][iclass]->Write();
-	a42ClassEle[iecal][iptbin][iclass]->Write();
-	dxyClassEle[iecal][iptbin][iclass]->Write();
-	dxySigClassEle[iecal][iptbin][iclass]->Write();
+// 	dxyClassEle[iecal][iptbin][iclass]->Write();
+// 	dxySigClassEle[iecal][iptbin][iclass]->Write();
 
       }
 
@@ -2084,13 +1930,8 @@ void LHPdfsProducer::saveHistos(const char *filename) {
 	sigmaIPhiIPhiFullclassEle[iecal][iptbin][ifullclass]->Write();
 	s1s9FullclassEle[iecal][iptbin][ifullclass]->Write();
 	s9s25FullclassEle[iecal][iptbin][ifullclass]->Write();
-	LATFullclassEle[iecal][iptbin][ifullclass]->Write();
-	etaLATFullclassEle[iecal][iptbin][ifullclass]->Write();
-	phiLATFullclassEle[iecal][iptbin][ifullclass]->Write();
-	a20FullclassEle[iecal][iptbin][ifullclass]->Write();
-	a42FullclassEle[iecal][iptbin][ifullclass]->Write();
-	dxyFullclassEle[iecal][iptbin][ifullclass]->Write();
-	dxySigFullclassEle[iecal][iptbin][ifullclass]->Write();
+// 	dxyFullclassEle[iecal][iptbin][ifullclass]->Write();
+// 	dxySigFullclassEle[iecal][iptbin][ifullclass]->Write();
 
       }
 
@@ -2102,24 +1943,96 @@ void LHPdfsProducer::saveHistos(const char *filename) {
   
 }
 
-bool LHPdfsProducer::isEleID(int eleIndex) {
+void LHPdfsProducer::isEleID(int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput) {
 
-  TVector3 pTrkAtOuter(pxAtOuterEle[eleIndex],pyAtOuterEle[eleIndex],pzAtOuterEle[eleIndex]);
+  *eleIdOutput = *isolOutput = *convRejOutput = false;
+
+  Utils anaUtils;
+  int gsf = gsfTrackIndexEle[eleIndex];
+  TVector3 pTrkAtOuter(pxAtOuterGsfTrack[gsf],pyAtOuterGsfTrack[gsf],pzAtOuterGsfTrack[gsf]);
+  TVector3 p3Ele(pxEle[eleIndex],pyEle[eleIndex],pzEle[eleIndex]);
+  float pt = p3Ele.Pt();
+
+  // if is ECAL driven, take the electron ID variables from the standard electron
+  // above all, take the ECAL supercluster instead of PF super cluster
+  float HoE, s9s25, deta, dphiin, dphiout, fbrem, see, spp, eopout, eop;
+  float e1, e4SwissCross, fidFlagSC, seedRecHitFlag, seedTime, seedChi2;
+  bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[eleIndex], isEcalDriven);
+  HoE = hOverEEle[eleIndex];
+  deta = deltaEtaAtVtxEle[eleIndex];
+  dphiin = deltaPhiAtVtxEle[eleIndex];
+  dphiout = deltaPhiAtCaloEle[eleIndex];
+  fbrem = fbremEle[eleIndex];
+  eopout = eSeedOverPoutEle[eleIndex];
+  eop = eSuperClusterOverPEle[eleIndex];
+  if(ecaldriven) {
+    int sc = superClusterIndexEle[eleIndex];
+    s9s25 = e3x3SC[sc]/e5x5SC[sc];
+    see = sqrt(covIEtaIEtaSC[sc]);
+    spp = sqrt(covIPhiIPhiSC[sc]);
+    e1 = eMaxSC[sc];
+    e4SwissCross = e4SwissCrossSC[sc];
+    fidFlagSC = fiducialFlagsEle[eleIndex];
+    seedRecHitFlag = recoFlagSC[sc];
+    seedTime = timeSC[sc];
+    seedChi2 = chi2SC[sc];
+  } else {
+    int sc = PFsuperClusterIndexEle[eleIndex];
+    if(sc>-1) {
+      s9s25 = e3x3PFSC[sc]/e5x5PFSC[sc];
+      see = sqrt(covIEtaIEtaPFSC[sc]);
+      spp = sqrt(covIPhiIPhiPFSC[sc]);
+      e1 = eMaxSC[sc];
+      e4SwissCross = e4SwissCrossSC[sc];
+      fidFlagSC = fiducialFlagsEle[eleIndex];
+      seedRecHitFlag = recoFlagSC[sc];
+      seedTime = timeSC[sc];
+      seedChi2 = chi2SC[sc];
+    } else {
+      s9s25 = 999.;
+      see = 999.;
+      spp = 999.;
+    }
+  }
+
   EgammaCutBasedID.SetEcalFiducialRegion( fiducialFlagsEle[eleIndex] );
-  EgammaCutBasedID.SetHOverE( hOverEEle[eleIndex] );
-  EgammaCutBasedID.SetS9S25( s9s25Ele[eleIndex] );
-  EgammaCutBasedID.SetDEta( deltaEtaAtVtxEle[eleIndex] );
-  EgammaCutBasedID.SetDPhiIn( deltaPhiAtVtxEle[eleIndex] );
-  EgammaCutBasedID.SetDPhiOut( deltaPhiAtCaloEle[eleIndex] );
-  EgammaCutBasedID.SetInvEminusInvP( 1./ecalEle[eleIndex]-1./momentumEle[eleIndex] );
-  EgammaCutBasedID.SetBremFraction( fabs(momentumEle[eleIndex]-pTrkAtOuter.Mag())/momentumEle[eleIndex] );
-  EgammaCutBasedID.SetSigmaEtaEta( sqrt(covEtaEtaEle[eleIndex]) );
-  EgammaCutBasedID.SetSigmaPhiPhi( sqrt(covPhiPhiEle[eleIndex]) );
-  EgammaCutBasedID.SetEOverPout( eSeedOverPoutEle[eleIndex] );
-  EgammaCutBasedID.SetEOverPin( eSuperClusterOverPEle[eleIndex] );
+  EgammaCutBasedID.SetRecoFlag(recoFlagsEle[eleIndex]);
+  EgammaCutBasedID.applyElectronIDOnPFlowElectrons(true);
+  EgammaCutBasedID.SetHOverE( HoE );
+  EgammaCutBasedID.SetS9S25( s9s25 );
+  EgammaCutBasedID.SetDEta( deta );
+  EgammaCutBasedID.SetDPhiIn( dphiin );
+  EgammaCutBasedID.SetDPhiOut( dphiout );
+  EgammaCutBasedID.SetBremFraction( fbrem );
+  EgammaCutBasedID.SetSigmaEtaEta( see );
+  EgammaCutBasedID.SetSigmaPhiPhi( spp );
+  EgammaCutBasedID.SetEOverPout( eopout );
+  EgammaCutBasedID.SetEOverPin( eop );
   EgammaCutBasedID.SetElectronClass ( classificationEle[eleIndex] );
+  EgammaCutBasedID.SetEgammaCutBasedID ( anaUtils.electronIdVal(eleIdCutsEle[eleIndex],eleIdLoose) );
+  EgammaCutBasedID.SetLikelihood( eleIdLikelihoodEle[eleIndex] );
+  EgammaCutBasedID.SetEcalIsolation( dr03EcalRecHitSumEtEle[eleIndex] );
+  EgammaCutBasedID.SetTrkIsolation( dr03TkSumPtEle[eleIndex] );
+  EgammaCutBasedID.SetHcalIsolation( dr03HcalTowerSumEtEle[eleIndex] );
+  EgammaCutBasedID.SetCombinedIsolation( (dr03TkSumPtEle[eleIndex] + 
+                                          TMath::Max(0.0,dr03EcalRecHitSumEtEle[eleIndex]-1.0) + 
+                                          dr03HcalTowerSumEtEle[eleIndex]) / pt );
+  EgammaCutBasedID.SetMissingHits( expInnerLayersGsfTrack[gsf] );
+  EgammaCutBasedID.SetConvDist( fabs(convDistEle[eleIndex]) );
+  EgammaCutBasedID.SetConvDcot( fabs(convDcotEle[eleIndex]) );
 
-  bool isIdentified = EgammaCutBasedID.output();
+  // ECAL cleaning variables
+  EgammaCutBasedID.m_cleaner->SetE1(e1);
+  EgammaCutBasedID.m_cleaner->SetE4SwissCross(e4SwissCross);
+  EgammaCutBasedID.m_cleaner->SetFiducialFlag(fidFlagSC);
+  EgammaCutBasedID.m_cleaner->SetSeedFlag(seedRecHitFlag);
+  EgammaCutBasedID.m_cleaner->SetSeedTime(seedTime);
+  EgammaCutBasedID.m_cleaner->SetSeedChi2(seedChi2);
 
-  return isIdentified;
+  //  return EgammaCutBasedID.output(); // class dependent result
+  *eleIdOutput = EgammaCutBasedID.outputNoClassEleId();
+  *isolOutput = EgammaCutBasedID.outputNoClassIso();
+  *convRejOutput = EgammaCutBasedID.outputNoClassConv();
+
 }
+

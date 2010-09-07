@@ -37,13 +37,10 @@ public:
   //! loop over events doing bkg pdfs on Z+jets
   void LoopZjets(const char *filename);
   //! set the list of the required triggers
-  void requireTrigger          (std::vector<int> requiredTriggers)           { m_requiredTriggers = requiredTriggers; }
-  void requireSignalTrigger    (std::vector<int> requiredSignalTriggers)     { m_requiredSignalTriggers = requiredSignalTriggers; }
-  void requireBackgroundTrigger(std::vector<int> requiredBackgroundTriggers) { m_requiredBackgroundTriggers = requiredBackgroundTriggers; }
   //! save the pdfs in a ROOT file
   void saveHistos(const char *filename);
   //! returns the output of the custom cut electron ID                                                                                
-  bool isEleID(int eleIndex);
+  void isEleID(int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput);
 
 private:
   
@@ -61,9 +58,8 @@ private:
   int muons[2];
 
   //! the required trigger bits
-  std::vector<int> m_requiredTriggers;
-  std::vector<int> m_requiredSignalTriggers;
-  std::vector<int> m_requiredBackgroundTriggers;
+  std::vector<std::string> m_requiredSignalTriggers;
+  std::vector<std::string> m_requiredBackgroundTriggers;
 
   //! the configurable selection
   Selection *m_selection;
@@ -84,13 +80,8 @@ private:
   TH1F *sigmaIPhiIPhiUnsplitEle[2][2];
   TH1F *s1s9UnsplitEle[2][2];
   TH1F *s9s25UnsplitEle[2][2];
-  TH1F *LATUnsplitEle[2][2];
-  TH1F *etaLATUnsplitEle[2][2];
-  TH1F *phiLATUnsplitEle[2][2];
-  TH1F *a20UnsplitEle[2][2];
-  TH1F *a42UnsplitEle[2][2];
-  TH1F *dxyUnsplitEle[2][2];
-  TH1F *dxySigUnsplitEle[2][2];
+//   TH1F *dxyUnsplitEle[2][2];
+//   TH1F *dxySigUnsplitEle[2][2];
   
   /// Electrons class-splitted
   /// histo[ecalsubdet][ptbin][class]
@@ -105,13 +96,8 @@ private:
   TH1F *sigmaIPhiIPhiClassEle[2][2][2];
   TH1F *s1s9ClassEle[2][2][2];
   TH1F *s9s25ClassEle[2][2][2];
-  TH1F *LATClassEle[2][2][2];
-  TH1F *etaLATClassEle[2][2][2];
-  TH1F *phiLATClassEle[2][2][2];
-  TH1F *a20ClassEle[2][2][2];
-  TH1F *a42ClassEle[2][2][2];
-  TH1F *dxyClassEle[2][2][2];
-  TH1F *dxySigClassEle[2][2][2];
+//   TH1F *dxyClassEle[2][2][2];
+//   TH1F *dxySigClassEle[2][2][2];
 
   /// Electrons fullclass-splitted
   /// histo[ecalsubdet][ptbin][fullclass]
@@ -126,13 +112,8 @@ private:
   TH1F *sigmaIPhiIPhiFullclassEle[2][2][4];
   TH1F *s1s9FullclassEle[2][2][4];
   TH1F *s9s25FullclassEle[2][2][4];
-  TH1F *LATFullclassEle[2][2][4];
-  TH1F *etaLATFullclassEle[2][2][4];
-  TH1F *phiLATFullclassEle[2][2][4];
-  TH1F *a20FullclassEle[2][2][4];
-  TH1F *a42FullclassEle[2][2][4];
-  TH1F *dxyFullclassEle[2][2][4];
-  TH1F *dxySigFullclassEle[2][2][4];
+  //  TH1F *dxyFullclassEle[2][2][4];
+  //  TH1F *dxySigFullclassEle[2][2][4];
 
 };
 
