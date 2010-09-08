@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
   TH1F *EoPClassEle1[2];
   TH1F *HoEClassEle1[2];
   TH1F *sigmaIEtaIEtaClassEle1[2];
+  TH1F *fbremClassEle1[2];
   TH1F *etaClassEle1[2];
   TH1F *phiClassEle1[2];
   TH1F *chargeClassEle1[2];
@@ -61,6 +62,8 @@ int main(int argc, char* argv[]) {
     HoEClassEle1[iecal]         = (TH1F*)gDirectory->Get(histo); 
     sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",iecal);
     sigmaIEtaIEtaClassEle1[iecal] = (TH1F*)gDirectory->Get(histo); 
+    sprintf(histo,"fbremClass_electrons_%d",iecal);
+    fbremClassEle1[iecal] = (TH1F*)gDirectory->Get(histo); 
     // eta is the same for 0 and 1
     sprintf(histo,"etaClass_electrons");
     etaClassEle1[iecal]     = (TH1F*)gDirectory->Get(histo);
@@ -74,6 +77,7 @@ int main(int argc, char* argv[]) {
     EoPClassEle1[iecal]    -> SetMinimum(0.001);
     HoEClassEle1[iecal]   -> SetMinimum(0.001);
     sigmaIEtaIEtaClassEle1[iecal] -> SetMinimum(0.1);
+    fbremClassEle1[iecal] -> SetMinimum(0.001);
     etaClassEle1[iecal] -> SetMinimum(0.001);
     phiClassEle1[iecal] -> SetMinimum(0.001);
     chargeClassEle1[iecal] -> SetMinimum(0.001);
@@ -89,6 +93,7 @@ int main(int argc, char* argv[]) {
   TH1F *EoPClassEle2[2];
   TH1F *HoEClassEle2[2];
   TH1F *sigmaIEtaIEtaClassEle2[2];
+  TH1F *fbremClassEle2[2];
   TH1F *etaClassEle2[2];
   TH1F *phiClassEle2[2];
   TH1F *chargeClassEle2[2];
@@ -105,6 +110,8 @@ int main(int argc, char* argv[]) {
     HoEClassEle2[iecal]         = (TH1F*)gDirectory->Get(histo); 
     sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",iecal);
     sigmaIEtaIEtaClassEle2[iecal] = (TH1F*)gDirectory->Get(histo); 
+    sprintf(histo,"fbremClass_electrons_%d",iecal);
+    fbremClassEle2[iecal] = (TH1F*)gDirectory->Get(histo); 
     // eta is the same for 0 and 1
     sprintf(histo,"etaClass_electrons",iecal);
     etaClassEle2[iecal]     = (TH1F*)gDirectory->Get(histo);
@@ -118,6 +125,7 @@ int main(int argc, char* argv[]) {
     EoPClassEle2[iecal]    -> SetMinimum(0.001);
     HoEClassEle2[iecal]   -> SetMinimum(0.001);
     sigmaIEtaIEtaClassEle2[iecal] -> SetMinimum(0.1);
+    fbremClassEle2[iecal]   -> SetMinimum(0.001);
     etaClassEle2[iecal] -> SetMinimum(0.001);
     phiClassEle2[iecal] -> SetMinimum(0.001);
     chargeClassEle2[iecal] -> SetMinimum(0.001);
@@ -130,6 +138,7 @@ int main(int argc, char* argv[]) {
   makePlots(EoPClassEle1,EoPClassEle2,"EoP","E_{SC}/p_{in}");
   makePlots(HoEClassEle1,HoEClassEle2,"HoE","H/E");
   makePlots(sigmaIEtaIEtaClassEle1,sigmaIEtaIEtaClassEle2,"sigmaIEtaIEta","#sigma_{#eta#eta} (rad)");
+  makePlots(fbremClassEle1,fbremClassEle2,"fbrem","f_{brem}");
   makePlots(etaClassEle1,etaClassEle2,"eta","#eta");
   //  makePlots(phiClassEle1,phiClassEle2,"phi","#phi");
   makePlots(chargeClassEle1,chargeClassEle2,"charge","charge");
@@ -138,7 +147,7 @@ int main(int argc, char* argv[]) {
 
 void makePlots(TH1F *signalHistos1[2], TH1F *signalHistos2[2], const char *namevar, const char *axistitle) {
 
-  TString intLumi="198";
+  TString intLumi="2.67";
 
   int iptbin=1;
 
@@ -150,10 +159,12 @@ void makePlots(TH1F *signalHistos1[2], TH1F *signalHistos2[2], const char *namev
     // MC
     if(signalHistos1[iecal]) {
       signalHistos1[iecal]->SetLineWidth(2);
-      signalHistos1[iecal]->SetLineColor(kRed+1);
-      signalHistos1[iecal]->SetFillColor(kYellow+1);
-      signalHistos1[iecal]->Scale((float)signalHistos2[iecal]->GetSum()/(float)signalHistos1[iecal]->GetSum());
-      std::cout << "Normalized to " << (float)signalHistos2[iecal]->GetSum() << std::endl;
+//       signalHistos1[iecal]->SetLineColor(kRed+1);
+//       signalHistos1[iecal]->SetFillColor(kYellow+1);
+      signalHistos1[iecal]->SetLineColor(kAzure+3);
+      signalHistos1[iecal]->SetFillColor(kAzure+6);
+      signalHistos1[iecal]->Scale((float)signalHistos2[iecal]->Integral(1,signalHistos2[iecal]->GetNbinsX())/(float)signalHistos1[iecal]->Integral(1,signalHistos1[iecal]->GetNbinsX()));
+      std::cout << "Normalized to " << (float)signalHistos2[iecal]->Integral(1,signalHistos2[iecal]->GetNbinsX()) << std::endl;
     }
     // data
     if(signalHistos2[iecal]) {
@@ -161,7 +172,7 @@ void makePlots(TH1F *signalHistos1[2], TH1F *signalHistos2[2], const char *namev
       signalHistos2[iecal]->SetLineColor(kBlack);
       signalHistos2[iecal]->SetMarkerColor(kBlack);
       signalHistos2[iecal]->SetMarkerStyle(8);
-      signalHistos2[iecal]->SetMarkerSize(2);
+      signalHistos2[iecal]->SetMarkerSize(1.5);
       // signalHistos2[iecal]->Scale(1.0/signalHistos2[iecal]->Integral());
     }
 
@@ -190,7 +201,7 @@ void makePlots(TH1F *signalHistos1[2], TH1F *signalHistos2[2], const char *namev
     pt1.SetTextAlign(12);
     pt1.SetFillColor(0);
     pt1.SetBorderSize(0);
-    pt1.AddText("CMS Preliminary 2010, #sqrt{s}=7 TeV L_{int}="+intLumi+" nb^{-1}");
+    pt1.AddText("CMS Preliminary 2010, #sqrt{s}=7 TeV L_{int}="+intLumi+" pb^{-1}");
     pt1.Draw();
     //    c1.Update();
 
