@@ -27,9 +27,9 @@
 // #if Application == 1
 // #include "EgammaAnalysisTools/include/LikelihoodAnalysis.hh"
 // #endif
-// #if Application == 2
-// #include "EgammaAnalysisTools/include/LHPdfsProducer.hh"
-// #endif
+#if Application == 2
+#include "EgammaAnalysisTools/include/LHPdfsProducer.hh"
+#endif
 #if Application == 3
 #include "EgammaAnalysisTools/include/sPlotsPdfsComparison.hh"
 #endif
@@ -39,13 +39,6 @@
 #if Application == 5
 #include "EgammaAnalysisTools/include/sPlotsPdfsComparison.h"
 #endif
-#if Application == 6
-#include "EgammaAnalysisTools/include/PFElectronSeedingEfficiency.hh"
-#endif
-#if Application == 7
-#include "EgammaAnalysisTools/include/PFElectronSeedingDistributions.hh"
-#endif
-
 
 int main(int argc, char* argv[]) {
 
@@ -110,45 +103,38 @@ int main(int argc, char* argv[]) {
   
 // #endif
 
-// #if Application == 2
+#if Application == 2
 
-//   char title[1000];
+  char title[1000];
   
-//   LHPdfsProducer producer(theChain);
-
-//   TriggerMask maskSignal(treeCond);
-//   maskSignal.requireTrigger("HLT_Ele15_SW_L1R");
-//   maskSignal.requireTrigger("HLT_Ele20_SW_L1R");
-//   std::vector<int> requiredSignalTriggers = maskSignal.getBits();
-//   producer.requireSignalTrigger(requiredSignalTriggers);
+  LHPdfsProducer producer(theChain);
   
-//   TriggerMask maskBackground(treeCond);
-//   maskBackground.requireTrigger("HLT_DiJetAve30U_1E31");   
-//   maskBackground.requireTrigger("HLT_Jet30");   
-//   maskBackground.requireTrigger("HLT_Jet50");   
-//   std::vector<int> requiredBackgroundTriggers = maskBackground.getBits();
-//   producer.requireBackgroundTrigger(requiredBackgroundTriggers);
+  // TriggerMask maskSignal(treeCond);
+  // maskSignal.requireTrigger("HLT_Ele15_SW_L1R");
+  // maskSignal.requireTrigger("HLT_Ele20_SW_L1R");
+  // std::vector<int> requiredSignalTriggers = maskSignal.getBits();
+  // producer.requireSignalTrigger(requiredSignalTriggers);
 
-//   /*
-//   sprintf(title,"%s_zTandP_tree.root",outputFileName);  
-//   producer.LoopZTagAndProbe(title);
-//   sprintf(title,"%s_zTandP_histos.root",outputFileName);    
-//   producer.saveHistos(title);
-//   */
+  std::vector<std::string> mask;
+  mask.push_back("HLT_Jet15U");   
+  producer.setRequiredTriggers(mask);
+  
+  //  sprintf(title,"%s_zTandP_tree.root",outputFileName);  
+  // producer.LoopZTagAndProbe(title);
+  // sprintf(title,"%s_zTandP_histos.root",outputFileName);    
+  // producer.saveHistos(title);
+  
+  // sprintf(title,"%s_zMC_tree.root",outputFileName);  
+  // producer.LoopZTagAndProbeForMcTruth(title);
+  // sprintf(title,"%s_zMC_histos.root",outputFileName);    
+  // producer.saveHistos(title);
 
-//   sprintf(title,"%s_zMC_tree.root",outputFileName);  
-//   producer.LoopZTagAndProbeForMcTruth(title);
-//   sprintf(title,"%s_zMC_histos.root",outputFileName);    
-//   producer.saveHistos(title);
+  sprintf(title,"%s_qcdTandP_tree.root",outputFileName);  
+  producer.LoopQCDTagAndProbe(title);
+  sprintf(title,"%s_qcdTandP_histos.root",outputFileName);    
+  producer.saveHistos(title);
 
-//   /*
-//   sprintf(title,"%s_qcdTandP_tree.root",outputFileName);  
-//   producer.LoopQCDTagAndProbe(title);
-//   sprintf(title,"%s_qcdTandP_histos.root",outputFileName);    
-//   producer.saveHistos(title);
-//   */
-
-// #endif
+#endif
 
 #if Application == 3
 
@@ -183,24 +169,6 @@ int main(int argc, char* argv[]) {
   p.Init(tree, isMC);
   p.Loop();
 
-
-#endif
-
-#if Application == 6
-
-  PFElectronSeedingEfficiency seeding(theChain);
-  seeding.SetDatasetName(outputFileName);
-  seeding.Loop();
-  seeding.displayEfficiencies(outputFileName);
-
-#endif
-
-#if Application == 7
-
-  PFElectronSeedingDistributions seeding(theChain);
-  seeding.SetDatasetName(outputFileName);
-  seeding.Loop();
-  seeding.displayEfficiencies(outputFileName);
 
 #endif
 
