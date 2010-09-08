@@ -39,23 +39,30 @@ void sPlotsPdfsComparison::Loop()
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
+
+    // da cambiare (solo x dati, selezionare sgn o fondo)
+    float weight = (m_doSignal) ? N_sig_sw : N_qcd_sw;
+    float wgt = (m_isMC) ? f_weight : weight;
+    // float wgt = (m_isMC) ? 1.0 : N_qcd_sw;
     
     int jecal;
     if(m_isMC) {
+      if(wgt>500) continue;
       if (fabs(f_eta)<1.479)  jecal = 0;
       else if (fabs(f_eta)>=1.479) jecal = 1;
       else continue;
-      if(f_nJets>0 || f_pfmet/f_pt<0.3) continue;
+      if(m_doSignal) {
+        if(f_nJets>0 || f_pfmet/f_pt<0.3) continue;
+      }
     } else {
+      if(see<1e-4) continue; // remove residual spikes (if the cleaning is not done)
       if (fabs(eta)<1.479)  jecal = 0;
       else if (fabs(eta)>=1.479) jecal = 1;
       else continue;
-      if(nJets>0 || pfmet/pt<0.3) continue;
+      if(m_doSignal) {
+        if(nJets>0 || pfmet/pt<0.3) continue;
+      }
     }
-
-    // da cambiare (solo x dati, selezionare sgn o fondo)
-    float wgt = (m_isMC) ? 1.0 : N_sig_sw;
-    // float wgt = (m_isMC) ? 1.0 : N_qcd_sw;
 
     vector<float> WP_inf, WP_sup;
     if(jecal == 0) {
@@ -74,6 +81,7 @@ void sPlotsPdfsComparison::Loop()
       EoPClassEle           [jecal] -> Fill ( f_eop, wgt );
       HoEClassEle           [jecal] -> Fill ( f_hoe, wgt );
       sigmaIEtaIEtaClassEle [jecal] -> Fill ( f_see, wgt );
+      fbremClassEle         [jecal] -> Fill ( f_fbrem, wgt );
       etaClassEle                   -> Fill ( f_eta, wgt );
       phiClassEle           [jecal] -> Fill ( f_phi, wgt );
       chargeClassEle        [jecal] -> Fill ( f_charge, wgt );
@@ -91,6 +99,7 @@ void sPlotsPdfsComparison::Loop()
       EoPClassEle           [jecal] -> Fill ( eop, wgt );
       HoEClassEle           [jecal] -> Fill ( hoe, wgt );
       sigmaIEtaIEtaClassEle [jecal] -> Fill ( see, wgt );
+      fbremClassEle         [jecal] -> Fill ( fbrem, wgt );
       etaClassEle                   -> Fill ( eta, wgt );
       phiClassEle           [jecal] -> Fill ( phi, wgt );
       chargeClassEle        [jecal] -> Fill ( charge, wgt );
@@ -128,6 +137,7 @@ void sPlotsPdfsComparison::Loop()
     EoPClassEle[jecal]->Write();           
     HoEClassEle[jecal]->Write();
     sigmaIEtaIEtaClassEle[jecal]->Write();
+    fbremClassEle[jecal]->Write();
     phiClassEle[jecal]->Write();    
     chargeClassEle[jecal]->Write();    
   }
@@ -197,55 +207,112 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
   sprintf(histo,"etaClass_electrons");
   etaClassEle = new TH1F(histo, histo, 30, -3.0, 3.0);
   etaClassEle->Sumw2();
-      
-  // EB histograms
-  sprintf(histo,"dPhiClass_electrons_%d",0);
-  dPhiClassEle[0] = new TH1F(histo, histo, 27, -0.05, 0.05);
-  dPhiClassEle[0]->Sumw2();
-  sprintf(histo,"dEtaClass_electrons_%d",0);
-  dEtaClassEle[0] = new TH1F(histo, histo, 27, -0.008, 0.008);
-  dEtaClassEle[0]->Sumw2();
-  sprintf(histo,"HoEClass_electrons_%d",0);
-  HoEClassEle[0] = new TH1F(histo, histo, 16, 0., 0.15);
-  HoEClassEle[0]->Sumw2();
-  sprintf(histo,"EoPClass_electrons_%d",0);
-  EoPClassEle[0] = new TH1F(histo, histo, 30, 0., 3.);
-  EoPClassEle[0]->Sumw2();
-  sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",0);
-  sigmaIEtaIEtaClassEle[0] = new TH1F(histo, histo, 30, 0., 0.03);
-  sigmaIEtaIEtaClassEle[0]->Sumw2();
-  sprintf(histo,"phiClass_electrons_%d",0);
-  phiClassEle[0] = new TH1F(histo, histo, 25, 0., 2*TMath::Pi());
-  phiClassEle[0]->Sumw2();
-  sprintf(histo,"chargeClass_electrons_%d",0);
-  chargeClassEle[0] = new TH1F(histo, histo, 2, -2., 2.);
-  chargeClassEle[0]->Sumw2();
 
+  if(m_doSignal) {
+    // EB histograms
+    sprintf(histo,"dPhiClass_electrons_%d",0);
+    dPhiClassEle[0] = new TH1F(histo, histo, 50, -0.05, 0.05);
+    dPhiClassEle[0]->Sumw2();
+    sprintf(histo,"dEtaClass_electrons_%d",0);
+    dEtaClassEle[0] = new TH1F(histo, histo, 50, -0.008, 0.008);
+    dEtaClassEle[0]->Sumw2();
+    sprintf(histo,"HoEClass_electrons_%d",0);
+    HoEClassEle[0] = new TH1F(histo, histo, 50, 0., 0.15);
+    HoEClassEle[0]->Sumw2();
+    sprintf(histo,"EoPClass_electrons_%d",0);
+    EoPClassEle[0] = new TH1F(histo, histo, 50, 0., 3.);
+    EoPClassEle[0]->Sumw2();
+    sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",0);
+    sigmaIEtaIEtaClassEle[0] = new TH1F(histo, histo, 50, 0., 0.03);
+    sigmaIEtaIEtaClassEle[0]->Sumw2();
+    sprintf(histo,"fbremClass_electrons_%d",0);
+    fbremClassEle[0] = new TH1F(histo, histo, 40, -1.0, 1.0);
+    fbremClassEle[0]->Sumw2();
+    sprintf(histo,"phiClass_electrons_%d",0);
+    phiClassEle[0] = new TH1F(histo, histo, 50, 0., 2*TMath::Pi());
+    phiClassEle[0]->Sumw2();
+    sprintf(histo,"chargeClass_electrons_%d",0);
+    chargeClassEle[0] = new TH1F(histo, histo, 2, -2., 2.);
+    chargeClassEle[0]->Sumw2();
 
-  // EE histograms
-  sprintf(histo,"dPhiClass_electrons_%d",1);
-  dPhiClassEle[1] = new TH1F(histo, histo, 27, -0.1, 0.1);
-  dPhiClassEle[1]->Sumw2();
-  sprintf(histo,"dEtaClass_electrons_%d",1);
-  dEtaClassEle[1] = new TH1F(histo, histo, 27, -0.03, 0.03);
-  dEtaClassEle[1]->Sumw2();
-  sprintf(histo,"HoEClass_electrons_%d",1);
-  HoEClassEle[1] = new TH1F(histo, histo, 16, 0., 0.15);
-  HoEClassEle[1]->Sumw2();
-  sprintf(histo,"EoPClass_electrons_%d",1);
-  EoPClassEle[1] = new TH1F(histo, histo, 30, 0., 5.);
-  EoPClassEle[1]->Sumw2();
-  sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",1);
-  sigmaIEtaIEtaClassEle[1] = new TH1F(histo, histo, 25, 0.01, 0.05);
-  sigmaIEtaIEtaClassEle[1]->Sumw2();
-  sprintf(histo,"phiClass_electrons_%d",1);
-  phiClassEle[1] = new TH1F(histo, histo, 25, 0., 2*TMath::Pi());
-  phiClassEle[1]->Sumw2();
-  sprintf(histo,"chargeClass_electrons_%d",1);
-  chargeClassEle[1] = new TH1F(histo, histo, 2, -2., 2.);
-  chargeClassEle[1]->Sumw2();
+    // EE histograms
+    sprintf(histo,"dPhiClass_electrons_%d",1);
+    dPhiClassEle[1] = new TH1F(histo, histo, 50, -0.1, 0.1);
+    dPhiClassEle[1]->Sumw2();
+    sprintf(histo,"dEtaClass_electrons_%d",1);
+    dEtaClassEle[1] = new TH1F(histo, histo, 50, -0.03, 0.03);
+    dEtaClassEle[1]->Sumw2();
+    sprintf(histo,"HoEClass_electrons_%d",1);
+    HoEClassEle[1] = new TH1F(histo, histo, 50, 0., 0.15);
+    HoEClassEle[1]->Sumw2();
+    sprintf(histo,"EoPClass_electrons_%d",1);
+    EoPClassEle[1] = new TH1F(histo, histo, 50, 0., 5.);
+    EoPClassEle[1]->Sumw2();
+    sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",1);
+    sigmaIEtaIEtaClassEle[1] = new TH1F(histo, histo, 50, 0.01, 0.05);
+    sigmaIEtaIEtaClassEle[1]->Sumw2();
+    sprintf(histo,"fbremClass_electrons_%d",1);
+    fbremClassEle[1] = new TH1F(histo, histo, 30, -1.0, 1.0);
+    fbremClassEle[1]->Sumw2();
+    sprintf(histo,"phiClass_electrons_%d",1);
+    phiClassEle[1] = new TH1F(histo, histo, 50, 0., 2*TMath::Pi());
+    phiClassEle[1]->Sumw2();
+    sprintf(histo,"chargeClass_electrons_%d",1);
+    chargeClassEle[1] = new TH1F(histo, histo, 2, -2., 2.);
+    chargeClassEle[1]->Sumw2();
+  } else {
+    // EB histograms
+    sprintf(histo,"dPhiClass_electrons_%d",0);
+    dPhiClassEle[0] = new TH1F(histo, histo, 50, -0.15, 0.15);
+    dPhiClassEle[0]->Sumw2();
+    sprintf(histo,"dEtaClass_electrons_%d",0);
+    dEtaClassEle[0] = new TH1F(histo, histo, 50, -0.02, 0.02);
+    dEtaClassEle[0]->Sumw2();
+    sprintf(histo,"HoEClass_electrons_%d",0);
+    HoEClassEle[0] = new TH1F(histo, histo, 50, 0., 0.15);
+    HoEClassEle[0]->Sumw2();
+    sprintf(histo,"EoPClass_electrons_%d",0);
+    EoPClassEle[0] = new TH1F(histo, histo, 50, 0., 10.);
+    EoPClassEle[0]->Sumw2();
+    sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",0);
+    sigmaIEtaIEtaClassEle[0] = new TH1F(histo, histo, 50, 0., 0.03);
+    sigmaIEtaIEtaClassEle[0]->Sumw2();
+    sprintf(histo,"fbremClass_electrons_%d",0);
+    fbremClassEle[0] = new TH1F(histo, histo, 50, -1.0, 1.0);
+    fbremClassEle[0]->Sumw2();
+    sprintf(histo,"phiClass_electrons_%d",0);
+    phiClassEle[0] = new TH1F(histo, histo, 50, 0., 2*TMath::Pi());
+    phiClassEle[0]->Sumw2();
+    sprintf(histo,"chargeClass_electrons_%d",0);
+    chargeClassEle[0] = new TH1F(histo, histo, 2, -2., 2.);
+    chargeClassEle[0]->Sumw2();
 
-    //  }
+    // EE histograms
+    sprintf(histo,"dPhiClass_electrons_%d",1);
+    dPhiClassEle[1] = new TH1F(histo, histo, 50, -0.3, 0.3);
+    dPhiClassEle[1]->Sumw2();
+    sprintf(histo,"dEtaClass_electrons_%d",1);
+    dEtaClassEle[1] = new TH1F(histo, histo, 50, -0.02, 0.02);
+    dEtaClassEle[1]->Sumw2();
+    sprintf(histo,"HoEClass_electrons_%d",1);
+    HoEClassEle[1] = new TH1F(histo, histo, 50, 0., 0.15);
+    HoEClassEle[1]->Sumw2();
+    sprintf(histo,"EoPClass_electrons_%d",1);
+    EoPClassEle[1] = new TH1F(histo, histo, 50, 0., 10.);
+    EoPClassEle[1]->Sumw2();
+    sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",1);
+    sigmaIEtaIEtaClassEle[1] = new TH1F(histo, histo, 50, 0.01, 0.08);
+    sigmaIEtaIEtaClassEle[1]->Sumw2();
+    sprintf(histo,"fbremClass_electrons_%d",1);
+    fbremClassEle[1] = new TH1F(histo, histo, 50, -1.0, 1.0);
+    fbremClassEle[1]->Sumw2();
+    sprintf(histo,"phiClass_electrons_%d",1);
+    phiClassEle[1] = new TH1F(histo, histo, 50, 0., 2*TMath::Pi());
+    phiClassEle[1]->Sumw2();
+    sprintf(histo,"chargeClass_electrons_%d",1);
+    chargeClassEle[1] = new TH1F(histo, histo, 2, -2., 2.);
+    chargeClassEle[1]->Sumw2();
+  }
   
 }
 

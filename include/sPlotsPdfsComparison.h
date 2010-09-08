@@ -124,10 +124,12 @@ public :
    virtual void     bookHistosVariableBinning();
    virtual void     bookHistosFixedBinning();
    virtual void     InitCuts();
+   virtual void     doSignalsPlots(bool what) { m_doSignal = what; }
 
  protected:
 
    bool m_isMC;
+   bool m_doSignal;
 
    TH1F *etaClassEle;   
    TH1F *dPhiClassEle[2];
@@ -135,6 +137,7 @@ public :
    TH1F *EoPClassEle[2];
    TH1F *HoEClassEle[2];
    TH1F *sigmaIEtaIEtaClassEle[2];
+   TH1F *fbremClassEle[2];
    TH1F *phiClassEle[2];
    TH1F *chargeClassEle[2];
 
