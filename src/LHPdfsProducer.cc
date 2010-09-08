@@ -227,7 +227,22 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
 	double EoPout       = eSeedOverPoutEle[probe];
 	double EoP          = eSuperClusterOverPEle[probe];
 	double HoE          = hOverEEle[probe];
-
+        float dEtaVtxCorr   = dEtaVtx;
+        float dPhiVtxCorr   = dPhiVtx;
+        float fbrem         = fbremEle[probe];
+        if(m_selection->getSwitch("isData")) {
+          float theEta = probeP4.Eta();
+          float thePhi = probeP4.Phi();
+          dEtaVtxCorr   = dEtaVtx - detaCorrections(theEta, thePhi);
+          dPhiVtxCorr   = dPhiVtx - dphiCorrections(theEta, thePhi);
+        }
+        
+        // conversion rejection variables
+        int theMatchedTrack   = trackIndexEle[probe];
+        int theExpInnerLayers = expInnerLayersTrack[theMatchedTrack];
+        float convDcot        = convDcotEle[probe];
+        float convDist        = convDistEle[probe];
+        
 	
         /// fill the electron ID pdfs only if:
         /// the tag is loose isolated and identified (ALWAYS)
@@ -268,7 +283,7 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
           s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
 	  
           // fill the reduced tree
-	  reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta);
+          reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dEtaVtxCorr,dPhiVtx,dPhiVtxCorr,s9s25,s1s9,sigmaIEtaIEta,fbrem,theExpInnerLayers,convDcot,convDist); 
           reducedTree.fillAttributesSignal(charge,eta,pt,okmass);
           reducedTree.fillCategories(iecal,iptbin,iclass);
           reducedTree.fillMore(dr03TkSumPtEle[tag]/tagP4.Pt(), dr03TkSumPtEle[probe]/probeP4.Pt());
