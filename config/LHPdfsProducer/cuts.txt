@@ -8,3 +8,5 @@ jetDeltaPhi	0.3	1000
 jetInvMass	70	10000
 antiIsolTracker  5      10000
 antiIsolEcal     2      10000
+relSumPtTracks   0      0.20
+spikeFraction	 -9999	0.95

@@ -13,9 +13,27 @@
 #include "EgammaAnalysisTools/include/EgammaBase.h"
 #include "EgammaAnalysisTools/include/CutBasedEleIDSelector.hh"
 
+#include <TVector3.h>
+#include <TMath.h>
+#include <TF2.h>
+#include <TLorentzVector.h>
+#include <iostream>
+#include <string>
+#include <map>
+#include <fstream>
+#include <sstream>
+#include <unistd.h>
+
 class LHPdfsProducer : public EgammaBase {
 
 public:
+
+  typedef std::pair<unsigned int,unsigned int> aLSSegment;
+  typedef std::vector< std::pair<unsigned int,unsigned int> > LSSegments;
+  typedef unsigned int aRun;
+  typedef std::map< aRun, LSSegments > runsLSSegmentsMap;
+  typedef std::pair < aRun, LSSegments > aRunsLSSegmentsMapElement;
+
   //! constructor
   LHPdfsProducer(TTree *tree=0);
   //! destructor
@@ -36,34 +54,105 @@ public:
   void LoopWjets();
   //! loop over events doing bkg pdfs on Z+jets
   void LoopZjets(const char *filename);
-  //! set the list of the required triggers
   //! save the pdfs in a ROOT file
   void saveHistos(const char *filename);
   //! returns the output of the custom cut electron ID                                                                                
   void isEleID(int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput);
 
+  /// Fill RunLSMap according to json file 
+  void fillRunLSMap();
+  /// Set Good Run LS 
+  void setJsonGoodRunList(const string& jsonFilePath);
+  /// check if Run/LS is a good one 
+  bool isGoodRunLS();
+  /// reload TriggerMask if necessary (data file is changed). Should be called for each event inside the event loop
+  bool reloadTriggerMask(bool newVersion=false);
+  /// set the list of required trigger to produce the bitmask
+  void setRequiredTriggers(const std::vector<std::string>& reqTriggers);
+  //check if the event passed HLT. To be called per event
+  bool hasPassedHLT();
+  //get the value of the requested bits 
+  vector<int> getHLTOutput();
+
+  // correction for misalignment etc
+  float detaCorrections(float etaEle,float phiEle) {
+
+    if (fabs(etaEle)<1.479) return 0.;
+    
+    float alignPar[3]={0.,0.,0.};
+    
+    if ((etaEle)>=1.479) {
+      alignPar[0]= 0.52;
+      alignPar[1]= -0.81;
+      alignPar[2]= 0.81;
+    }
+    else if ((etaEle)<=-1.479) {
+      alignPar[0]= -0.02;
+      alignPar[1]= -0.81;
+      alignPar[2]= -0.94;
+    }
+    
+    int zIndex=etaEle>0 ? 1: -1;
+    float xSCNew =(zIndex* 330. * TMath::Cos(phiEle) / TMath::SinH(etaEle)) + alignPar[0];
+    float ySCNew =(zIndex* 330. * TMath::Sin(phiEle) / TMath::SinH(etaEle)) + alignPar[1];
+    float zSCNew = (zIndex * 330.) + alignPar[2];
+    
+    return etaEle-TVector3(xSCNew,ySCNew,zSCNew).Eta();
+  }
+  
+  float dphiCorrections(float etaEle,float phiEle) {
+    
+    if (fabs(etaEle)<1.479) return 0.;
+    
+    float alignPar[3]={0.,0.,0.};
+
+    if ((etaEle)>=1.479) {
+      alignPar[0]=0.52;
+      alignPar[1]=-0.81;
+      alignPar[2]=0.81;
+    }
+    else if ((etaEle)<=-1.479) {
+      alignPar[0]=-0.02;
+      alignPar[1]=-0.81;
+      alignPar[2]=-0.94;
+    }
+    
+    int zIndex=etaEle>0 ? 1: -1;
+    float xSCNew =(zIndex*330.) * TMath::Cos(phiEle) / (TMath::SinH(etaEle)) + alignPar[0];
+    float ySCNew =(zIndex*330.) * TMath::Sin(phiEle) / (TMath::SinH(etaEle)) + alignPar[1];
+    float zSCNew = (zIndex*330.) + alignPar[2];
+    
+    return phiEle-TVector3(xSCNew,ySCNew,zSCNew).Phi();
+  }
+
 private:
   
   //! book the histograms of the PDFs
   void bookHistos();
+  
+  //! for json
+  int isData_;
+  runsLSSegmentsMap goodRunLS;
+  std::string jsonFile;
+  std::string lastFile;
+
+  //! HLT
+  std::vector<std::string> requiredTriggers;
+  std::vector<int> m_requiredTriggers;
 
   //! contains the class-dependent electron ID cuts
   std::vector<Selection*> m_EgammaCutIDSelection;
 
-  //! to evaluate custom eleID                                                                                                               
+  //! to evaluate custom eleID 
   CutBasedEleIDSelector EgammaCutBasedID;
 
   //! the tag and the probe
   int electrons[2];
   int muons[2];
 
-  //! the required trigger bits
-  std::vector<std::string> m_requiredSignalTriggers;
-  std::vector<std::string> m_requiredBackgroundTriggers;
-
   //! the configurable selection
   Selection *m_selection;
-
+  
   // ---------- monitoring histograms ------------
   TH1F *m_Zmass;
 

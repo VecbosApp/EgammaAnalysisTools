@@ -11,7 +11,12 @@
 #include "EgammaAnalysisTools/include/RedEleIDTree.hh"
 #include "EgammaAnalysisTools/include/LHPdfsProducer.hh"
 
+#include "cajun/json/reader.h"
+#include "cajun/json/elements.h"
+#include <CommonTools/include/TriggerMask.hh>
+
 using namespace bits;
+using namespace std;
 
 LHPdfsProducer::LHPdfsProducer(TTree *tree)
   : EgammaBase(tree) {
@@ -35,12 +40,26 @@ LHPdfsProducer::LHPdfsProducer(TTree *tree)
   m_selection->addCut("jetInvMass");
   m_selection->addCut("antiIsolTracker");
   m_selection->addCut("antiIsolEcal");
+  m_selection->addCut("relSumPtTracks");
+  m_selection->addCut("spikeFraction");
   m_selection->addStringParameter("electronIDType");
   m_selection->summary();
   cout << "done with cuts" << endl;
   
+  // data or MC
+  isData_ = m_selection->getSwitch("isData");
+
+  // reading GoodRUN LS 
+  std::cout << "[GoodRunLS]::goodRunLS is " << m_selection->getSwitch("goodRunLS") << " isData is " <<  m_selection->getSwitch("isData") << std::endl;
+
+  // to read good run list
+  if (m_selection->getSwitch("goodRunLS") && m_selection->getSwitch("isData")) {
+    std::string goodRunGiasoneFile = "config/LHPdfsProducer/json/goodRunLS.json";
+    setJsonGoodRunList(goodRunGiasoneFile);
+    fillRunLSMap();
+  }
+
   // single electron efficiency
-  //  EgammaCutBasedID.Configure("config/higgs"); // this is the class dependent e-ID
   TString selectionString(m_selection->getStringParameter("electronIDType"));
   cout << "=== CONFIGURING " << selectionString << " SYMMETRIC ELECTRON ID ===" << endl;
   EgammaCutBasedID.ConfigureNoClass("config/"+selectionString);
@@ -79,6 +98,10 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
   int probeIsol   = 0;
   int tagProbeTot = 0;
 
+  // json 
+  unsigned int lastLumi=0;
+  unsigned int lastRun=0;
+
   // loop over entries
   Long64_t nbytes = 0, nb = 0;
   Long64_t nentries = fChain->GetEntries();
@@ -90,17 +113,33 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
-    Utils anaUtils;
+    // reload trigger mask
+    bool newTriggerMask = false;
+    if(isData_) newTriggerMask = true;
+    reloadTriggerMask(newTriggerMask);
     
-    allevents++;
-
-    // trigger: for october exercise skimmed samples, with HLT15 passed: can be switched off.
-    if ( m_selection->getSwitch("requireTriggerSignal") ) { 
-      bool passedHLT = anaUtils.getTriggersOR(m_requiredSignalTriggers, firedTrg);
-      if ( !passedHLT ) continue;   
+    // Good Run selection 
+    if (isData_ && m_selection->getSwitch("goodRunLS") && !isGoodRunLS()) {
+      if ( lastRun!= runNumber || lastLumi != lumiBlock) {
+        lastRun  = runNumber;
+        lastLumi = lumiBlock;
+	std::cout << "[GoodRunLS]::Run " << lastRun << " LS " << lastLumi << " is rejected" << std::endl;
+      }
+      continue;
     }
-    trigger++;
+    if (isData_ && m_selection->getSwitch("goodRunLS") && ( lastRun!= runNumber || lastLumi != lumiBlock) ) {
+      lastRun = runNumber;
+      lastLumi = lumiBlock;
+      std::cout << "[GoodRunLS]::Run " << lastRun << " LS " << lastLumi << " is OK" << std::endl;
+    }
+    allevents++;
     
+    // trigger
+    Utils anaUtils;
+    bool passedHLT = hasPassedHLT();
+    if ( m_selection->getSwitch("requireTriggerSignal") && !passedHLT ) continue;   
+    trigger++;
+
     // best tag-probe pair = mee closest to Z mass
     float minpull = 100000.;
     float mass    = 1000.;
@@ -310,10 +349,10 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
-
+    
     allevents++;
 
-    // the stable particle list is truncated, if there is a tau not possible to say what happens...                                   
+    // the stable particle list is truncated, if there is a tau not possible to say what happens... 
     bool tauPresence=false;
     for(int iMc=0; iMc<50; iMc++) {
       if ( (fabs(idMc[iMc])==15) ) { tauPresence=true; break; }
@@ -324,8 +363,8 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
     int mcInd1 = -1;
     int mcInd2 = -1;
     for(int iMc=0; iMc<nMc; iMc++) {
-      if ( (fabs(idMc[iMc])==11) && (fabs(idMc[mothMc[iMc]])==23) && mcInd1==-1 )              { mcInd1=iMc; continue; }
-      if ( (fabs(idMc[iMc])==11) && (fabs(idMc[mothMc[iMc]])==23) && mcInd1!=-1 && mcInd2==-1) { mcInd2=iMc; break; }
+      if ( (fabs(idMc[iMc])==11) && (fabs(idMc[mothMc[iMc]])==23) && mcInd1==-1 )              {mcInd1=iMc; continue;}
+      if ( (fabs(idMc[iMc])==11) && (fabs(idMc[mothMc[iMc]])==23) && mcInd1!=-1 && mcInd2==-1) {mcInd2=iMc; break;}
     }
     TVector3 _mcEle1(0,0,0);
     TVector3 _mcEle2(0,0,0);
@@ -334,12 +373,12 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
     if (mcInd1<0 || mcInd2<0) continue; 
     mc++;
 
-    // trigger: for october exercise skimmed samples, with HLT15 passed: can be switched off.
+    // this is for MC only. No json
+    bool newTriggerMask = false;
+    reloadTriggerMask(newTriggerMask);
     Utils anaUtils;
-    if ( m_selection->getSwitch("requireTriggerSignal") ) { 
-      bool passedHLT = anaUtils.getTriggersOR(m_requiredSignalTriggers, firedTrg);
-      if ( !passedHLT ) continue;   
-    }
+    bool passedHLT = hasPassedHLT();
+    if ( m_selection->getSwitch("requireTriggerSignal") && !passedHLT ) continue;   
     trigger++;
 
     // electrons matching MC truth
@@ -545,16 +584,13 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
-    Utils anaUtils;
-    
     allevents++;
-
     
     // to find the real electrons from Z (MC truth)
     int mcInd1 = -1;
     int mcInd2 = -1;
     for(int iMc=0; iMc<nMc; iMc++) {
-      if ( (fabs(idMc[iMc])==11) && (fabs(idMc[mothMc[iMc]])==23) && mcInd1==-1 )              { mcInd1=iMc; continue; }
+      if ( (fabs(idMc[iMc])==11) && (fabs(idMc[mothMc[iMc]])==23) && mcInd1==-1 )              { mcInd1=iMc; continue;}
       if ( (fabs(idMc[iMc])==11) && (fabs(idMc[mothMc[iMc]])==23) && mcInd1!=-1 && mcInd2==-1) { mcInd2=iMc; break; }
     }
     TVector3 _mcEle1(0,0,0);
@@ -562,12 +598,12 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
     if(mcInd1>-1) _mcEle1 = TVector3(pMc[mcInd1]*cos(phiMc[mcInd1])*sin(thetaMc[mcInd1]),pMc[mcInd1]*sin(phiMc[mcInd1])*sin(thetaMc[mcInd1]),pMc[mcInd1]*cos(thetaMc[mcInd1]));
     if(mcInd2>-1) _mcEle2 = TVector3(pMc[mcInd2]*cos(phiMc[mcInd2])*sin(thetaMc[mcInd2]),pMc[mcInd2]*sin(phiMc[mcInd2])*sin(thetaMc[mcInd2]),pMc[mcInd2]*cos(thetaMc[mcInd2]));
 
-
-    // trigger: for october exercise skimmed samples, with HLT15 passed: can be switched off.
-    if ( m_selection->getSwitch("requireTriggerSignal") ) { 
-      bool passedHLT = anaUtils.getTriggersOR(m_requiredSignalTriggers, firedTrg);
-      if ( !passedHLT ) continue;   
-    }
+    // this is for MC only: no json
+    bool newTriggerMask = false;
+    reloadTriggerMask(newTriggerMask);
+    Utils anaUtils;
+    bool passedHLT = hasPassedHLT();
+    if ( m_selection->getSwitch("requireTriggerSignal") && !passedHLT ) continue;   
     trigger++;
     
     // best tag-probe pair = mee closest to Z mass
@@ -788,7 +824,7 @@ void LHPdfsProducer::LoopZwithMass(const char *treefilesuffix) {
     int mcInd1 = -1;
     int mcInd2 = -1;
     for(int iMc=0; iMc<nMc; iMc++) {
-      if ( (fabs(idMc[iMc])==11) && (fabs(idMc[mothMc[iMc]])==23) && mcInd1==-1 )              { mcInd1=iMc; continue; }
+      if ( (fabs(idMc[iMc])==11) && (fabs(idMc[mothMc[iMc]])==23) && mcInd1==-1 )              { mcInd1=iMc; continue;}
       if ( (fabs(idMc[iMc])==11) && (fabs(idMc[mothMc[iMc]])==23) && mcInd1!=-1 && mcInd2==-1) { mcInd2=iMc; break; }
     }
     TVector3 _mcEle1(0,0,0);
@@ -798,12 +834,12 @@ void LHPdfsProducer::LoopZwithMass(const char *treefilesuffix) {
     if (mcInd1<0 || mcInd2<0) continue; 
     mc++;
 
-    // trigger: for october exercise skimmed samples, with HLT15 passed: can be switched off.
+    // this is for MC only: no json
+    bool newTriggerMask = false;
+    reloadTriggerMask(newTriggerMask);
     Utils anaUtils;
-    if ( m_selection->getSwitch("requireTriggerSignal") ) { 
-      bool passedHLT = anaUtils.getTriggersOR(m_requiredSignalTriggers, firedTrg);
-      if ( !passedHLT ) continue;   
-    }
+    bool passedHLT = hasPassedHLT();
+    if ( m_selection->getSwitch("requireTriggerSignal") && !passedHLT ) continue;   
     trigger++;
 
     // electrons matching MC truth
@@ -942,6 +978,10 @@ void LHPdfsProducer::LoopQCD() {
   if(fChain == 0) return;
   
   bookHistos();
+
+  // json 
+  unsigned int lastLumi=0;
+  unsigned int lastRun=0;
   
   Long64_t nbytes = 0, nb = 0;
   Long64_t nentries = fChain->GetEntries();
@@ -952,12 +992,30 @@ void LHPdfsProducer::LoopQCD() {
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
-
+    // reload trigger mask
+    bool newTriggerMask = false;
+    if(isData_) newTriggerMask = true;
+    reloadTriggerMask(newTriggerMask);
     
+    // Good Run selection 
+    if (isData_ && m_selection->getSwitch("goodRunLS") && !isGoodRunLS()) {
+      if ( lastRun!= runNumber || lastLumi != lumiBlock) {
+        lastRun  = runNumber;
+        lastLumi = lumiBlock;
+	std::cout << "[GoodRunLS]::Run " << lastRun << " LS " << lastLumi << " is rejected" << std::endl;
+      }
+      continue;
+    }    
+    if (isData_ && m_selection->getSwitch("goodRunLS") && ( lastRun!= runNumber || lastLumi != lumiBlock) ) {
+      lastRun = runNumber;
+      lastLumi = lumiBlock;
+      std::cout << "[GoodRunLS]::Run " << lastRun << " LS " << lastLumi << " is OK" << std::endl;
+    }
+
     // trigger
     Utils anaUtils;
-    // bool passedHLT = anaUtils.getTriggersOR(m_requiredBackgroundTriggers, firedTrg);
-    // if(!passedHLT) continue;
+    bool passedHLT = hasPassedHLT();
+    if ( m_selection->getSwitch("requireTriggerQCDBack") && !passedHLT ) continue;   
 
     // fill the PDFs for QCD with all the (isolated) reco'ed electrons
     for(int iele=0;iele<nEle;iele++) {
@@ -1076,6 +1134,10 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
   int trackerNotIsol = 0;
   int ecalNotIsol    = 0;
 
+  // json 
+  unsigned int lastLumi=0;
+  unsigned int lastRun=0;
+
   // loop over events
   Long64_t nbytes = 0, nb = 0;
   Long64_t nentries = fChain->GetEntries();
@@ -1084,31 +1146,60 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
-    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    nb = fChain->GetEntry(jentry);   
+    nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
+
+    // reload trigger mask
+    bool newTriggerMask = false;
+    if(isData_) newTriggerMask = true;
+    reloadTriggerMask(newTriggerMask);
+    
+    // Good Run selection 
+    if (isData_ && m_selection->getSwitch("goodRunLS") && !isGoodRunLS()) {
+      if ( lastRun!= runNumber || lastLumi != lumiBlock) {
+        lastRun  = runNumber;
+        lastLumi = lumiBlock;
+	std::cout << "[GoodRunLS]::Run " << lastRun << " LS " << lastLumi << " is rejected" << std::endl;
+      }
+      continue;
+    }
+    if (isData_ && m_selection->getSwitch("goodRunLS") && ( lastRun!= runNumber || lastLumi != lumiBlock) ) {
+      lastRun = runNumber;
+      lastLumi = lumiBlock;
+      std::cout << "[GoodRunLS]::Run " << lastRun << " LS " << lastLumi << " is OK" << std::endl;
+    }
+    
+    // count all events
     allevents++;
 
     // pT hat cut
     if( m_selection->getSwitch("ptHat") && (!m_selection->passCut("ptHat",genPtHat) ) ) continue;
     pthat++;
 
-    // QCD trigger
+    // QCD trigger 
     Utils anaUtilsQCD;
-    bool passedHLTQCD = anaUtilsQCD.getTriggersOR(m_requiredBackgroundTriggers, firedTrg);
+    bool passedHLTQCD = hasPassedHLT();
     if ( m_selection->getSwitch("requireTriggerQCDBack") && !passedHLTQCD ) continue;   
     trigger++;
-
+    
     // electrons and jets within acceptance
     vector<int> probeCandidates;
     vector<int> tagCandidates;
     
     // selecting electrons in the acceptance and possibly loose isolated to work as probe
+    // spikes removal applied here
     for(int iele=0; iele<nEle; iele++) {
       TLorentzVector electron(pxEle[iele],pyEle[iele],pzEle[iele],energyEle[iele]);
       float relativeIsol = dr04TkSumPtEle[iele]/electron.Pt();
       if( m_selection->getSwitch("etaEleAcc") && (!m_selection->passCut("etaEleAcc",etaEle[iele]) ) ) continue;
       if( m_selection->getSwitch("ptEleAcc")  && (!m_selection->passCut("ptEleAcc",electron.Pt()) ) ) continue;      
       if( m_selection->getSwitch("applyIsolationOnProbe") && !m_selection->passCut("relSumPtTracks",relativeIsol) ) continue;
+      // removing spikes
+      int theSuperCluster = superClusterIndexEle[iele];
+      float e4SwissCross  = e4SwissCrossSC[theSuperCluster];
+      float e1            = eMaxSC[theSuperCluster];
+      if(m_selection->getSwitch("spikeFraction") && !m_selection->passCut("spikeFraction", 1.0-e4SwissCross/e1) ) continue;
       probeCandidates.push_back(iele);
     }
     if (probeCandidates.size()>0) oneele++;
@@ -1257,7 +1348,23 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       double EoPout   = eSeedOverPoutEle[theProbe];
       double EoP      = eSuperClusterOverPEle[theProbe];
       double HoE      = hOverEEle[theProbe];
+      float dEtaVtxCorr   = dEtaVtx;
+      float dPhiVtxCorr   = dPhiVtx;
+      float fbrem         = fbremEle[theProbe];
+      if(m_selection->getSwitch("isData")) {
+	float theEta = eleP4.Eta();
+	float thePhi = eleP4.Phi();
+	dEtaVtxCorr   = dEtaVtx - detaCorrections(theEta, thePhi);
+	dPhiVtxCorr   = dPhiVtx - dphiCorrections(theEta, thePhi);
+      }
       
+      // conversion rejection variables
+      int theMatchedTrack   = trackIndexPFEle[theProbe];
+      int theExpInnerLayers = expInnerLayersTrack[theMatchedTrack];
+      float convDcot        = convDcotEle[theProbe];
+      float convDist        = convDistEle[theProbe];
+            
+      // histos
       dPhiCaloUnsplitEle      [iecal][iptbin] -> Fill ( dPhiCalo );
       dPhiVtxUnsplitEle       [iecal][iptbin] -> Fill ( dPhiVtx );
       dEtaUnsplitEle          [iecal][iptbin] -> Fill ( dEtaVtx );
@@ -1292,8 +1399,8 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
 
       // fill the reduced tree
-      reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta);    
-      reducedTree.fillAttributesBackground(charge,eta,pt,theDeltaPhi,theInvMass,theMet,genPtHat);
+      reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dEtaVtxCorr,dPhiVtx,dPhiVtxCorr,s9s25,s1s9,sigmaIEtaIEta,fbrem,theExpInnerLayers,convDcot,convDist); 
+      reducedTree.fillAttributesBackground(charge,eta,pt,theDeltaPhi,theInvMass,theMet,genPtHat,nbremsEle[theProbe]);
       reducedTree.fillCategories(iecal,iptbin,iclass);
       // reducedTree.fillGamma(absTrackerIsolGamma,absEcalIsolGamma,absHcalIsolGamma,isGamma);
       reducedTree.store();
@@ -1335,11 +1442,13 @@ void LHPdfsProducer::LoopWjets() {
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
-    
-    // trigger
-    // Utils anaUtils;
-    // bool passedHLT = anaUtils.getTriggersOR(m_requiredTriggers, firedTrg);
-    // if(!passedHLT) continue;
+
+    // this is for MC only
+    bool newTriggerMask = false;
+    reloadTriggerMask(newTriggerMask);
+    Utils anaUtils;
+    bool passedHLT = hasPassedHLT();
+    if ( m_selection->getSwitch("requireTriggerQCDBack") && !passedHLT ) continue;   
     
     bool tauPresence=false;
     
@@ -1497,10 +1606,12 @@ void LHPdfsProducer::LoopZjets(const char *outname) {
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
     
-    // trigger
-    // Utils anaUtils;
-    // bool passedHLT = anaUtils.getTriggersOR(m_requiredTriggers, firedTrg);
-    // if(!passedHLT) continue;
+    // this is pure MC...
+    bool newTriggerMask = false;
+    reloadTriggerMask(newTriggerMask);
+    Utils anaUtils;
+    bool passedHLT = hasPassedHLT();
+    if ( m_selection->getSwitch("requireTriggerSignal") && !passedHLT ) continue;   
 
     bool tauPresence=false;
     bool spuriousElectronsMadgraph=false;
@@ -2036,3 +2147,130 @@ void LHPdfsProducer::isEleID(int eleIndex, bool *eleIdOutput, bool *isolOutput, 
 
 }
 
+void LHPdfsProducer::setRequiredTriggers(const std::vector<std::string>& reqTriggers) {
+  requiredTriggers=reqTriggers;
+}
+
+bool LHPdfsProducer::hasPassedHLT() {
+  Utils anaUtils;
+  return anaUtils.getTriggersOR(m_requiredTriggers, firedTrg);
+}
+
+void LHPdfsProducer::setJsonGoodRunList(const string& jsonFilePath) {
+
+  jsonFile=jsonFilePath;
+}
+
+void LHPdfsProducer::fillRunLSMap() {
+  
+  if (jsonFile == "") {
+    std::cout << "Cannot fill RunLSMap. json file not configured" << std::endl;
+    return;
+  }
+  
+  std::ifstream jsonFileStream;
+  jsonFileStream.open(jsonFile.c_str());
+  if (!jsonFileStream.is_open()) {
+    std::cout << "Unable to open file " << jsonFile << std::endl;
+    return;
+  }
+  
+  json::Object elemRootFile;
+  json::Reader::Read(elemRootFile, jsonFileStream);
+
+  for (json::Object::const_iterator itRun=elemRootFile.Begin();itRun!=elemRootFile.End();++itRun) {
+
+    const json::Array& lsSegment = (*itRun).element;
+    LSSegments thisRunSegments;
+    for (json::Array::const_iterator lsIterator=lsSegment.Begin();lsIterator!=lsSegment.End();++lsIterator) {
+
+      json::Array lsSegment=(*lsIterator);
+      json::Number lsStart=lsSegment[0];
+      json::Number lsEnd=lsSegment[1];
+      aLSSegment thisSegment;
+      thisSegment.first=lsStart.Value();
+      thisSegment.second=lsEnd.Value();
+      thisRunSegments.push_back(thisSegment);
+    }
+    goodRunLS.insert(aRunsLSSegmentsMapElement(atoi((*itRun).name.c_str()),thisRunSegments));
+  }
+
+  std::cout << "[GoodRunLSMap]::Good Run LS map filled with " << goodRunLS.size() << " runs" << std::endl;
+  for (runsLSSegmentsMap::const_iterator itR=goodRunLS.begin(); itR!=goodRunLS.end(); ++itR) {
+    std::cout << "[GoodRunLSMap]::Run " << (*itR).first <<  " LS ranges are: ";
+    for (LSSegments::const_iterator iSeg=(*itR).second.begin();iSeg!=(*itR).second.end();++iSeg)
+      std::cout << "[" << (*iSeg).first << "," << (*iSeg).second << "] ";
+    std::cout << std::endl;
+  }
+}
+
+bool LHPdfsProducer::isGoodRunLS() {
+  
+  runsLSSegmentsMap::const_iterator thisRun=goodRunLS.find(runNumber);
+  if (thisRun == goodRunLS.end())
+    return false;
+  for (LSSegments::const_iterator iSeg=goodRunLS[runNumber].begin();iSeg!=goodRunLS[runNumber].end();++iSeg) {
+    if ( lumiBlock >= (*iSeg).first && lumiBlock <= (*iSeg).second)
+      return true;
+  }
+  return false;
+}
+
+bool LHPdfsProducer::reloadTriggerMask(bool newVersion) {
+
+  if(newVersion) {
+    std::vector<int> triggerMask;
+    for (std::vector< std::string >::const_iterator fIter=requiredTriggers.begin();fIter!=requiredTriggers.end();++fIter)
+      {
+        for(unsigned int i=0; i<nameHLT->size(); i++)
+          {
+            if( !strcmp ((*fIter).c_str(), nameHLT->at(i).c_str() ) )
+              {
+                triggerMask.push_back( indexHLT[i] ) ;
+                break;
+              }
+          }
+      }
+    m_requiredTriggers = triggerMask;
+  } else {
+    TString fileName=((TChain*)fChain)->GetFile()->GetName();
+    if ( TString(lastFile) != fileName )
+      {
+	
+	std::cout << "[ReloadTriggerMask]::File has changed reloading trigger mask" << std::endl;
+        lastFile = fileName;
+	
+	TTree *treeCond;
+	std::cout << "[ReloadTriggerMask]::Opening " << fileName << std::endl;
+        treeCond = (TTree*)((TChain*)fChain)->GetFile()->Get("Conditions");
+        int           nHLT_;
+	std::vector<std::string>  *nameHLT_;
+	std::vector<unsigned int> *indexHLT_;
+	
+        //To get the pointers for the vectors                                                                                                                                  
+        nameHLT_=0;
+        indexHLT_=0;
+	
+        treeCond->SetBranchAddress("nHLT", &nHLT_);
+        treeCond->SetBranchAddress("nameHLT", &nameHLT_);
+        treeCond->SetBranchAddress("indexHLT", &indexHLT_);
+        treeCond->GetEntry(0);
+	
+	std::vector<int> triggerMask;
+        for (std::vector< std::string >::const_iterator fIter=requiredTriggers.begin();fIter!=requiredTriggers.end();++fIter)
+          {
+            for(unsigned int i=0; i<nameHLT_->size(); i++)
+              {
+                if( !strcmp ((*fIter).c_str(), nameHLT_->at(i).c_str() ) )
+		  {
+                    triggerMask.push_back( indexHLT_->at(i) ) ;
+                    break;
+                  }
+              }
+          }
+        m_requiredTriggers = triggerMask;
+        for (int i=0;i<m_requiredTriggers.size();++i)
+	  std::cout << "[ReloadTriggerMask]::Requiring bit " << m_requiredTriggers[i] << " " << requiredTriggers[i] << std::endl;
+      }
+  }
+}

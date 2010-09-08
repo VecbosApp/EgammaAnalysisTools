@@ -1,3 +1,5 @@
+isData			0
+goodRunLS		0
 requireTriggerSignal	1
 requireTriggerQCDBack	1
 applyIsolationOnProbe   0
@@ -11,4 +13,6 @@ jetDeltaPhi		1
 jetInvMass		1
 antiIsolTracker		1
 antiIsolEcal		1
+relSumPtTracks		1
+spikeFraction		1
 
