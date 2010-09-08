@@ -15,4 +15,4 @@ antiIsolTracker		1
 antiIsolEcal		1
 relSumPtTracks		1
 spikeFraction		1
-
+electronIDType		WP80xWP95          
