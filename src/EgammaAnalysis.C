@@ -131,6 +131,8 @@ int main(int argc, char* argv[]) {
 
   sprintf(title,"%s_qcdTandP_tree.root",outputFileName);  
   producer.LoopQCDTagAndProbe(title);
+  sprintf(title,"%s_qcdTandP_counters.root",outputFileName);
+  producer.displayEfficiencies(title);
   sprintf(title,"%s_qcdTandP_histos.root",outputFileName);    
   producer.saveHistos(title);
 

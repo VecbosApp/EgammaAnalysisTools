@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "TH1F.h"
+#include "CommonTools/include/Counters.hh"
 #include "CommonTools/include/Selection.hh"
 #include "EgammaAnalysisTools/include/EgammaBase.h"
 #include "EgammaAnalysisTools/include/CutBasedEleIDSelector.hh"
@@ -58,6 +59,9 @@ public:
   void saveHistos(const char *filename);
   //! returns the output of the custom cut electron ID                                                                                
   void isEleID(int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput);
+
+  //! display the efficiency table 
+  void displayEfficiencies(const char *filename);
 
   /// Fill RunLSMap according to json file 
   void fillRunLSMap();
@@ -129,7 +133,10 @@ private:
   
   //! book the histograms of the PDFs
   void bookHistos();
-  
+
+  //! configurations
+  void configSelection(Selection* selection, Counters* counters);
+
   //! for json
   int isData_;
   runsLSSegmentsMap goodRunLS;
@@ -152,7 +159,8 @@ private:
 
   //! the configurable selection
   Selection *m_selection;
-  
+  Counters *m_counters;
+
   // ---------- monitoring histograms ------------
   TH1F *m_Zmass;
 

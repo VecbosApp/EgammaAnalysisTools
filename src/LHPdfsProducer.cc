@@ -28,27 +28,9 @@ LHPdfsProducer::LHPdfsProducer(TTree *tree)
   std::string fileSwitches("config/LHPdfsProducer/switches.txt");
   
   m_selection = new Selection(fileCuts,fileSwitches);
-  m_selection->addSwitch("isData");
-  m_selection->addSwitch("goodRunLS");
-  m_selection->addSwitch("requireTriggerSignal");
-  m_selection->addSwitch("requireTriggerQCDBack");
-  m_selection->addSwitch("applyIsolationOnProbe");
-  m_selection->addCut("ptHat");
-  m_selection->addCut("meeWindow");
-  m_selection->addCut("etaEleAcc");
-  m_selection->addCut("ptEleAcc");
-  m_selection->addCut("etaJetAcc");
-  m_selection->addCut("ptJetAcc");
-  m_selection->addCut("jetDeltaPhi");
-  m_selection->addCut("jetInvMass");
-  m_selection->addCut("antiIsolTracker");
-  m_selection->addCut("antiIsolEcal");
-  m_selection->addCut("relSumPtTracks");
-  m_selection->addCut("spikeFraction");
-  m_selection->addStringParameter("electronIDType");
-  m_selection->summary();
-  cout << "done with cuts" << endl;
-  
+  m_counters  = new Counters();
+  configSelection(m_selection,m_counters);
+
   // data or MC
   isData_ = m_selection->getSwitch("isData");
 
@@ -69,7 +51,11 @@ LHPdfsProducer::LHPdfsProducer(TTree *tree)
   EgammaCutBasedID.ConfigureEcalCleaner("config/");
 }
 
-LHPdfsProducer::~LHPdfsProducer() { }
+LHPdfsProducer::~LHPdfsProducer() { 
+  
+  delete m_selection;
+  delete m_counters;
+}
 
 
 // PDF for probe electrons within the acceptance and loose isolated in the tracker
@@ -1174,17 +1160,17 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     }
     
     // count all events
-    allevents++;
+    m_counters->IncrVar("allEvents");
 
     // pT hat cut
     if( m_selection->getSwitch("ptHat") && (!m_selection->passCut("ptHat",genPtHat) ) ) continue;
-    pthat++;
+    m_counters->IncrVar("pthat");
 
     // QCD trigger 
     Utils anaUtils;
     bool passedHLT = hasPassedHLT();
     if ( m_selection->getSwitch("requireTriggerQCDBack") && !passedHLT ) continue;   
-    trigger++;
+    m_counters->IncrVar("trigger");
     
     // electrons and jets within acceptance
     vector<int> probeCandidates;
@@ -1205,7 +1191,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       if(m_selection->getSwitch("spikeFraction") && !m_selection->passCut("spikeFraction", 1.0-e4SwissCross/e1) ) continue;
       probeCandidates.push_back(iele);
     }
-    if (probeCandidates.size()>0) oneele++;
+    if (probeCandidates.size()>0) m_counters->IncrVar("oneele");
 
     // selecting jets in the acceptance to work as tag
     for (int ijet=0; ijet<nAK5PFJet; ijet++){    
@@ -1214,7 +1200,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       if ( m_selection->getSwitch("etJetAcc")  && !m_selection->passCut("etJetAcc",p3Jet.Pt()) )   continue;
       tagCandidates.push_back(ijet);
     }
-    if (tagCandidates.size()>0) onejet++;
+    if (tagCandidates.size()>0) m_counters->IncrVar("onejet"); 
 
 
     // to select the highest Et jet in the event within the acceptance in eta (tag) matching a probe electron
@@ -1236,7 +1222,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
 
       for (int iEle=0; iEle<probeCandidates.size(); iEle++){       
 
-	eleTot++;
+	m_counters->IncrVar("eletot"); 
 
 	TLorentzVector p4Ele;	
 	TVector3 p3Ele(pxEle[probeCandidates[iEle]],pyEle[probeCandidates[iEle]],pzEle[probeCandidates[iEle]]);
@@ -1250,7 +1236,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
 	float deltaPhi = fabs(p3Jet.DeltaPhi(p3Ele));
 	float invMass  = (p4Jet+p4Ele).M();
 	if ( m_selection->getSwitch("jetDeltaPhi") && !m_selection->passCut("jetDeltaPhi", deltaPhi) ) continue;
-	deltaphi++;
+	m_counters->IncrVar("deltaphi"); 
 
 	// we have a potential probe and this is highest ET jet up to now -> it's our tag
 	tagEt  = p3Jet.Pt();
@@ -1266,7 +1252,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
   
     // we need a tag and a probe
     if (theTag<-800 || theProbe<-800) continue;
-    tagandprobe++;
+    m_counters->IncrVar("tagandprobe"); 
       
     // variables for the tree
     TLorentzVector p4Tag, p4Probe;	
@@ -1293,19 +1279,19 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       }
       if ( m_selection->getSwitch("jetInvMass")  && m_selection->passCut("jetInvMass", mass) ) continue;
     }
-    invmass++;
+    m_counters->IncrVar("invmass"); 
 
     // only for Gamma+jets: check if the probe is isolated and if it close to the MC gamma
     // to be commented out if not running on gamma+jets  
     int isGamma = 0;
-    // int mcGamma = -1;
-    // for(int iMc=0; iMc<10; iMc++) {   
-    //  if ( idMc[iMc]==22 && mcGamma<0) { mcGamma=iMc; }
-    //}
-    // if (mcGamma<0) { cout << "gamma not found" << endl; continue; }
-    // TVector3 p3McGamma(pMc[mcGamma]*cos(phiMc[mcGamma])*sin(thetaMc[mcGamma]),pMc[mcGamma]*sin(phiMc[mcGamma])*sin(thetaMc[mcGamma]),pMc[mcGamma]*cos(thetaMc[mcGamma]));
-    // float deltaR_GammaProbe = p3Probe.DeltaR(p3McGamma);
-    // if (deltaR_GammaProbe<0.3) isGamma = 1;
+    int mcGamma = -1;
+    for(int iMc=0; iMc<10; iMc++) {   
+      if ( idMc[iMc]==22 && mcGamma<0) { mcGamma=iMc; }
+    }
+    if (mcGamma<0) { cout << "gamma not found" << endl; continue; }
+    TVector3 p3McGamma(pMc[mcGamma]*cos(phiMc[mcGamma])*sin(thetaMc[mcGamma]),pMc[mcGamma]*sin(phiMc[mcGamma])*sin(thetaMc[mcGamma]),pMc[mcGamma]*cos(thetaMc[mcGamma]));
+    float deltaR_GammaProbe = p3Probe.DeltaR(p3McGamma);
+    if (deltaR_GammaProbe<0.3) isGamma = 1;
     float absTrackerIsolGamma = dr04TkSumPtEle[theProbe];
     float absEcalIsolGamma    = dr04EcalRecHitSumEtEle[theProbe];  
     float absHcalIsolGamma    = dr04HcalTowerSumEtEle[theProbe];   
@@ -1319,9 +1305,12 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
 
     // to reject gamma+jets events: looking for not isolated probes
     if ( m_selection->getSwitch("antiIsolTracker") && !m_selection->passCut("antiIsolTracker", absTrackerIsol) ) continue;
-    trackerNotIsol++;
+    m_counters->IncrVar("trackerNotIsol"); 
     if ( m_selection->getSwitch("antiIsolEcal") && !m_selection->passCut("antiIsolEcal", absEcalIsol) ) continue;
-    ecalNotIsol++;
+    m_counters->IncrVar("ecalNotIsol"); 
+
+    // full selection
+    m_counters->IncrVar("fullSelection");
 
     // fill the PDFs for QCD with the probe
     TLorentzVector eleP4(pxEle[theProbe],pyEle[theProbe],pzEle[theProbe],energyEle[theProbe]);
@@ -1411,22 +1400,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
 
   } // loop on events
 
-  // statistics
-  cout << "statistics from QCD tag and probe: "      << endl;
-  cout << "allevents      = "     << allevents       << endl;
-  cout << "pthat          = "     << pthat           << endl;
-  cout << "trigger        = "     << trigger         << endl;
-  cout << "one probe cand = "     << oneele          << endl;
-  cout << "one tag cand   = "     << onejet          << endl;
-  cout << "T and P found  = "     << tagandprobe     << endl; 
-  cout << "inv mass       = "     << invmass         << endl; 
-  cout << "anti isol, tracker = " << trackerNotIsol  << endl;
-  cout << "anti isol, ecal    = " << ecalNotIsol     << endl;
-  cout << "no crack       = "     << nocrack         << endl;
-  cout << "statistics from QCD tag and probe - electrons: " << endl;
-  cout << "eleTot         = "     << eleTot          << endl;
-  cout << "deltaPhi ok    = "     << deltaphi        << endl;
-  reducedTree.save();  
+  reducedTree.save();    
 }
 
 
@@ -2149,6 +2123,69 @@ void LHPdfsProducer::isEleID(int eleIndex, bool *eleIdOutput, bool *isolOutput, 
   *convRejOutput = EgammaCutBasedID.outputNoClassConv();
 
 }
+
+void LHPdfsProducer::configSelection(Selection* selection, Counters* counters) {
+
+  m_selection->addSwitch("isData");
+  m_selection->addSwitch("goodRunLS");
+  m_selection->addSwitch("requireTriggerSignal");
+  m_selection->addSwitch("requireTriggerQCDBack");
+  m_selection->addSwitch("applyIsolationOnProbe");
+  m_selection->addCut("ptHat");
+  m_selection->addCut("meeWindow");
+  m_selection->addCut("etaEleAcc");
+  m_selection->addCut("ptEleAcc");
+  m_selection->addCut("etaJetAcc");
+  m_selection->addCut("ptJetAcc");
+  m_selection->addCut("jetDeltaPhi");
+  m_selection->addCut("jetInvMass");
+  m_selection->addCut("antiIsolTracker");
+  m_selection->addCut("antiIsolEcal");
+  m_selection->addCut("relSumPtTracks");
+  m_selection->addCut("spikeFraction");
+  m_selection->addStringParameter("electronIDType");
+  m_selection->summary();
+
+  m_counters->SetTitle("EVENT COUNTER");
+  m_counters->AddVar("allEvents");
+  m_counters->AddVar("pthat");
+  m_counters->AddVar("trigger");
+  m_counters->AddVar("oneele");
+  m_counters->AddVar("onejet");
+  m_counters->AddVar("eletot");
+  m_counters->AddVar("deltaphi");
+  m_counters->AddVar("tagandprobe");
+  m_counters->AddVar("invmass");
+  m_counters->AddVar("trackerNotIsol");
+  m_counters->AddVar("ecalNotIsol");
+  m_counters->AddVar("fullSelection");
+}
+
+void LHPdfsProducer::displayEfficiencies(const char *counterSuffix) {
+
+  std::cout << "----------------------------------------" << std::endl;
+  std::cout << "+++ DETAILED EFFICIENCY +++ " << std::endl;
+
+  char namefile[500];
+  sprintf(namefile,"%s",counterSuffix);
+  
+  m_counters->Draw();  
+  m_counters->Draw("pthat","allEvents");
+  m_counters->Draw("trigger","pthat");
+  m_counters->Draw("oneele","trigger");
+  m_counters->Draw("onejet","oneele");
+  m_counters->Draw("eletot","onejet");
+  m_counters->Draw("deltaphi","eletot");
+  m_counters->Draw("tagandprobe","deltaphi");
+  m_counters->Draw("invmass","tagandprobe");
+  m_counters->Draw("trackerNotIsol","invmass");
+  m_counters->Draw("ecalNotIsol","trackerNotIsol");
+  m_counters->Draw("fullSelection","ecalNotIsol");
+
+  m_counters->Save(namefile,"recreate");
+}
+
+
 
 void LHPdfsProducer::setRequiredTriggers(const std::vector<std::string>& reqTriggers) {
   requiredTriggers=reqTriggers;
