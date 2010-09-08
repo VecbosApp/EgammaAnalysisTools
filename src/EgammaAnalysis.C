@@ -156,10 +156,18 @@ int main(int argc, char* argv[]) {
 
 #if Application == 5
 
+  int doSignalsPlots = 0;
   int isMC = 0;
   
-  TFile *fileData = TFile::Open((std::string("results_data/sPlots/Wenu_tree.root")).c_str());
-  TFile *fileMC = TFile::Open((std::string("results/treesW/WJetsMADGRAPH_Wenu.root")).c_str());
+  TFile *fileData, *fileMC;
+
+  if(doSignalsPlots) {
+    fileData = TFile::Open((std::string("results_data/sPlots/Wenu_tree.root")).c_str());
+    fileMC = TFile::Open((std::string("results/treesW/WJetsMADGRAPH_Wenu.root")).c_str());
+  } else {
+    fileData = TFile::Open((std::string("results_data/sPlots/Wenu_bkgFit_tree.root")).c_str());
+    fileMC = TFile::Open((std::string("results/treesW/QCD_Wenu.root")).c_str());    
+  }
 
   TTree *tree = 0;
   if(isMC) tree = (TTree*) fileMC->Get("T1");
@@ -167,8 +175,8 @@ int main(int argc, char* argv[]) {
 
   sPlotsPdfsComparison p;
   p.Init(tree, isMC);
+  p.doSignalsPlots(doSignalsPlots);
   p.Loop();
-
 
 #endif
 
