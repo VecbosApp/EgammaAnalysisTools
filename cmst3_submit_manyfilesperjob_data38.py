@@ -19,10 +19,11 @@ ijobmax = int(sys.argv[3])
 application = sys.argv[4]
 sample = sys.argv[5]
 dirname = sys.argv[7]
-# to write on the cmst3 cluster disks
+################################################
+# to write on local disks
 ################################################
 castordir = "/castor/cern.ch/user/m/meridian/VecBos7TeV/"+dirname+"/"
-diskoutputdir = "/cmsrm/pc18/crovelli/data/Egamma3.8.X/"+dirname+"/"
+diskoutputdir = "/cmsrm/pc18/crovelli/data/Egamma.3.8.X/"+dirname+"/"
 outputmain = castordir+"/"+process+"/"+output+"/"+sample
 diskoutputmain = diskoutputdir+"/"+process+"/"+output+"/"+sample
 # prepare job to write on the cmst3 cluster disks
@@ -84,7 +85,6 @@ while (len(inputfiles) > 0):
     outputfile.write('export STAGE_HOST=castorcms\n')
     outputfile.write('export STAGE_SVCCLASS=cmst3\n')
     #    outputfile.write('cd '+pwd)
-    outputfile.write('cp '+pwd+'/data/Z_calibFall08.root $WORKDIR\n')
     outputfile.write('cp -r '+pwd+"/"+process+"/"+output+"/"+dirname+'/config $WORKDIR\n')
     outputfile.write('cd $WORKDIR\n')
     outputfile.write(pwd+'/'+application+' '+inputfilename+" "+output+"_"+str(ijob)+"_ "+" -signal="+sample+"\n")
