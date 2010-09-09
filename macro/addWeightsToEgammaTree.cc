@@ -44,6 +44,7 @@ void addWeights(const char* filename, float weight) {
   float qcdPt;
   float qcdDeltaphi;
   float qcdMet;
+  float qcdInvmass;
   int qcdNBrem;
   float absTrackerIsolGammaCand;
   float absEcalIsolGammaCand;
@@ -67,6 +68,7 @@ void addWeights(const char* filename, float weight) {
   treeOrig->SetBranchAddress("qcdDeltaphi", &qcdDeltaphi);
   treeOrig->SetBranchAddress("qcdMet", &qcdMet);
   treeOrig->SetBranchAddress("qcdNBrem", &qcdNBrem);
+  treeOrig->SetBranchAddress("qcdInvmass", &qcdInvmass);
   treeOrig->SetBranchAddress("absTrackerIsolGammaCand", &absTrackerIsolGammaCand);
   treeOrig->SetBranchAddress("absEcalIsolGammaCand", &absEcalIsolGammaCand);
   treeOrig->SetBranchAddress("absHcalIsolGammaCand", &absHcalIsolGammaCand);
@@ -90,6 +92,7 @@ void addWeights(const char* filename, float weight) {
   treeNew->Branch("qcdDeltaphi", &qcdDeltaphi, "qcdDeltaphi/F");
   treeNew->Branch("qcdMet",   &qcdMet, "qcdMet/F");
   treeNew->Branch("qcdNBrem", &qcdNBrem, "qcdNBrem/I");
+  treeNew->Branch("qcdInvmass",   &qcdInvmass, "qcdInvmass/F");
   treeNew->Branch("absTrackerIsolGammaCand", &absTrackerIsolGammaCand, "absTrackerIsolGammaCand/F");
   treeNew->Branch("absEcalIsolGammaCand", &absEcalIsolGammaCand, "absEcalIsolGammaCand/F");
   treeNew->Branch("absHcalIsolGammaCand", &absHcalIsolGammaCand, "absHcalIsolGammaCand/F");
