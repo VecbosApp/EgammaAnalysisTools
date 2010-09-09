@@ -13,17 +13,18 @@
 #include <fstream>
 #include <string>
 #include <stdio.h>
-#include <cstdlib>
 
 // ROOT includes
 #include <TROOT.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <TChain.h>
+#include <TString.h>
 
 // Offline analysis includes
 #include "EgammaAnalysisTools/include/Application.hh"
 #include "CommonTools/include/TriggerMask.hh"
+
 // #if Application == 1
 // #include "EgammaAnalysisTools/include/LikelihoodAnalysis.hh"
 // #endif
@@ -69,23 +70,22 @@ int main(int argc, char* argv[]) {
   char MyRootFile[2000];  
   std::cout << "input: " << inputFileName << std::endl;
   ifstream *inputFile = new ifstream(inputFileName);
-
   // get the tree with the conditions from the first file
-  TTree *treeCond = new TTree();
-
-  int nfiles=1;
+  // TTree *treeCond = new TTree();
+  // int nfiles=1;
   while( !(inputFile->eof()) ){
     inputFile->getline(Buffer,500);
     if (!strstr(Buffer,"#") && !(strspn(Buffer," ") == strlen(Buffer)))
       {
 	sscanf(Buffer,"%s",MyRootFile);
-	theChain->Add(MyRootFile);
-	if ( nfiles==1 ) {
-	  TFile *firstfile = TFile::Open(MyRootFile);
-	  treeCond = (TTree*)firstfile->Get("Conditions");
-	}
+	theChain->Add("rfio:"+TString(MyRootFile));
+	// theChain->Add(TString(MyRootFile));
 	std::cout << "chaining " << MyRootFile << std::endl;
-	nfiles++;
+	// if ( nfiles==1 ) {
+	//  TFile *firstfile = TFile::Open(MyRootFile);
+	//  treeCond = (TTree*)firstfile->Get("Conditions");
+	//}
+	//nfiles++;
       }
   }
   inputFile->close();
