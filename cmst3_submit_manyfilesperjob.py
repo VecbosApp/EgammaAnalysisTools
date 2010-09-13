@@ -10,26 +10,17 @@ if len(sys.argv) != 7:
     sys.exit(1)
 process = sys.argv[1]
 dataset = sys.argv[2]
-inputlist = "../cmst3_33X/"+process+"/"+dataset+".list"
-#settingfile = "config/RSZZsettings.txt"
+inputlist = "../cmst3_35X/MC/"+process+"/"+dataset+".list"
 output = dataset
 # choose among cmt3 8nm 1nh 8nh 1nd 1nw 
-#queue = "cmst3"
-#queue = "cms8nht3"
 queue = sys.argv[6]
-#ijobmax = 40
 ijobmax = int(sys.argv[3])
-#application = "VecbosApp"
 application = sys.argv[4]
 sample = sys.argv[5]
-# to write on the cmst3 cluster disks
-################################################
-#castordir = "/castor/cern.ch/user/m/mpierini/CMST3/Vecbos/output/"
-#outputmain = castordir+output
 # to write on local disks
 ################################################
 castordir = "/castor/cern.ch/user/e/emanuele/VecBos33X/SCStudy/"
-diskoutputdir = "/cmsrm/pc21_2/emanuele/data/VecBos3.3.X/SCStudy/"
+diskoutputdir = "/cmsrm/pc18/crovelli/data/Egamma.3.5.X/"
 outputmain = castordir+"/"+process+"/"+output+"/"+sample
 diskoutputmain = diskoutputdir+"/"+process+"/"+output+"/"+sample
 # prepare job to write on the cmst3 cluster disks
