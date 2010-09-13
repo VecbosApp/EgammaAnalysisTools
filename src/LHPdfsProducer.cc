@@ -227,22 +227,7 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
 	double EoPout       = eSeedOverPoutEle[probe];
 	double EoP          = eSuperClusterOverPEle[probe];
 	double HoE          = hOverEEle[probe];
-        float dEtaVtxCorr   = dEtaVtx;
-        float dPhiVtxCorr   = dPhiVtx;
-        float fbrem         = fbremEle[probe];
-        if(m_selection->getSwitch("isData")) {
-          float theEta = probeP4.Eta();
-          float thePhi = probeP4.Phi();
-          dEtaVtxCorr   = dEtaVtx - detaCorrections(theEta, thePhi);
-          dPhiVtxCorr   = dPhiVtx - dphiCorrections(theEta, thePhi);
-        }
-        
-        // conversion rejection variables
-        int theMatchedTrack   = trackIndexEle[probe];
-        int theExpInnerLayers = expInnerLayersTrack[theMatchedTrack];
-        float convDcot        = convDcotEle[probe];
-        float convDist        = convDistEle[probe];
-        
+
 	
         /// fill the electron ID pdfs only if:
         /// the tag is loose isolated and identified (ALWAYS)
@@ -283,7 +268,7 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
           s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
 	  
           // fill the reduced tree
-          reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dEtaVtxCorr,dPhiVtx,dPhiVtxCorr,s9s25,s1s9,sigmaIEtaIEta,fbrem,theExpInnerLayers,convDcot,convDist); 
+	  reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta);
           reducedTree.fillAttributesSignal(charge,eta,pt,okmass);
           reducedTree.fillCategories(iecal,iptbin,iclass);
           reducedTree.fillMore(dr03TkSumPtEle[tag]/tagP4.Pt(), dr03TkSumPtEle[probe]/probeP4.Pt());
@@ -1116,7 +1101,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
   if(fChain == 0) return;
   
   bookHistos();
-  
+
   char treename[200];
   sprintf(treename,"%s",treefilesuffix);
   RedEleIDTree reducedTree(treename);
@@ -1125,18 +1110,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
   reducedTree.addGamma();        // to find the best cut for anti-isolationA
 
   // counters
-  int allevents      = 0;
-  int pthat          = 0;
-  int trigger        = 0;
-  int oneele         = 0;
-  int onejet         = 0;
-  int tagandprobe    = 0;
   int nocrack        = 0;
-  int eleTot         = 0;
-  int deltaphi       = 0;
-  int invmass        = 0;
-  int trackerNotIsol = 0;
-  int ecalNotIsol    = 0;
 
   // json 
   unsigned int lastLumi=0;
@@ -1186,7 +1160,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     bool passedHLT = hasPassedHLT();
     if ( m_selection->getSwitch("requireTriggerQCDBack") && !passedHLT ) continue;   
     m_counters->IncrVar("trigger");
-    
+
     // electrons and jets within acceptance
     vector<int> probeCandidates;
     vector<int> tagCandidates;
@@ -1299,14 +1273,16 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     // only for Gamma+jets: check if the probe is isolated and if it close to the MC gamma
     // to be commented out if not running on gamma+jets  
     int isGamma = 0;
-    int mcGamma = -1;
-    for(int iMc=0; iMc<10; iMc++) {   
-      if ( idMc[iMc]==22 && mcGamma<0) { mcGamma=iMc; }
-    }
-    if (mcGamma<0) { cout << "gamma not found" << endl; continue; }
-    TVector3 p3McGamma(pMc[mcGamma]*cos(phiMc[mcGamma])*sin(thetaMc[mcGamma]),pMc[mcGamma]*sin(phiMc[mcGamma])*sin(thetaMc[mcGamma]),pMc[mcGamma]*cos(thetaMc[mcGamma]));
-    float deltaR_GammaProbe = p3Probe.DeltaR(p3McGamma);
-    if (deltaR_GammaProbe<0.3) isGamma = 1;
+    /* 
+       int mcGamma = -1;
+       for(int iMc=0; iMc<10; iMc++) {   
+       if ( idMc[iMc]==22 && mcGamma<0) { mcGamma=iMc; }
+       }
+       if (mcGamma<0) { cout << "gamma not found" << endl; continue; }
+       TVector3 p3McGamma(pMc[mcGamma]*cos(phiMc[mcGamma])*sin(thetaMc[mcGamma]),pMc[mcGamma]*sin(phiMc[mcGamma])*sin(thetaMc[mcGamma]),pMc[mcGamma]*cos(thetaMc[mcGamma]));
+       float deltaR_GammaProbe = p3Probe.DeltaR(p3McGamma);
+       if (deltaR_GammaProbe<0.3) isGamma = 1;
+    */
     float absTrackerIsolGamma = dr04TkSumPtEle[theProbe];
     float absEcalIsolGamma    = dr04EcalRecHitSumEtEle[theProbe];  
     float absHcalIsolGamma    = dr04HcalTowerSumEtEle[theProbe];   
@@ -1366,7 +1342,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       }
       
       // conversion rejection variables
-      int theMatchedTrack   = trackIndexPFEle[theProbe];
+      int theMatchedTrack   = trackIndexEle[theProbe];
       int theExpInnerLayers = expInnerLayersTrack[theMatchedTrack];
       float convDcot        = convDcotEle[theProbe];
       float convDist        = convDistEle[theProbe];
@@ -2262,8 +2238,10 @@ void LHPdfsProducer::fillRunLSMap() {
 bool LHPdfsProducer::isGoodRunLS() {
   
   runsLSSegmentsMap::const_iterator thisRun=goodRunLS.find(runNumber);
-  if (thisRun == goodRunLS.end())
+
+  if (thisRun == goodRunLS.end()) 
     return false;
+  
   for (LSSegments::const_iterator iSeg=goodRunLS[runNumber].begin();iSeg!=goodRunLS[runNumber].end();++iSeg) {
     if ( lumiBlock >= (*iSeg).first && lumiBlock <= (*iSeg).second)
       return true;
