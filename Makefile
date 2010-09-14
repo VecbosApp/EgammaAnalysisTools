@@ -106,6 +106,14 @@ $(OUTLIB)PFElectronSeedingEfficiency.o: $(INCLUDEDIR)/src/PFElectronSeedingEffic
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)PFElectronSeedingEfficiency.o $<
 $(OUTLIB)PFElectronSeedingDistributions.o: $(INCLUDEDIR)/src/PFElectronSeedingDistributions.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)PFElectronSeedingDistributions.o $<
+$(OUTLIB)LikelihoodPdf.o: $(INCLUDEDIR)/src/LikelihoodPdf.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LikelihoodPdf.o $<
+$(OUTLIB)LikelihoodSpecies.o: $(INCLUDEDIR)/src/LikelihoodSpecies.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LikelihoodSpecies.o $<
+$(OUTLIB)LikelihoodPdfProduct.o: $(INCLUDEDIR)/src/LikelihoodPdfProduct.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LikelihoodPdfProduct.o $<
+$(OUTLIB)ElectronLikelihood.o: $(INCLUDEDIR)/src/ElectronLikelihood.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ElectronLikelihood.o $<
 
 #----------------------------------------------------#
 
@@ -131,6 +139,12 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)PFElectronSeedingEfficiency.o \
 	$(OUTLIB)PFElectronSeedingDistributions.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
+
+# ======= likelihood libs
+Likelihood: $(OUTLIB)LikelihoodPdf.o \
+	$(OUTLIB)LikelihoodSpecies.o \
+	$(OUTLIB)LikelihoodPdfProduct.o \
+	$(OUTLIB)ElectronLikelihood.o
 
 CompareEff: $(INCLUDEDIR)/src/CompareEff.C \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o
