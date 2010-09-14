@@ -19,20 +19,16 @@ public:
   void addGamma();
 
   //! fill the tree with electron id variables
-  void fillVariables(float EoPout, float EoP, float HoE, float DeltaEta, float DeltaPhi, float s9s25, float s1s9, float SigmaIEtaIEta);
-  void fillVariables(float EoPout, float EoP, float HoE, float DeltaEta, float DeltaEtaCorr, float DeltaPhi, float DeltaPhiCorr, float s9s25, float s1s9, float SigmaIEtaIEta, float fBrem, int nHits, float dcot, float dist);
+  void fillVariables(float EoPout, float EoP, float HoE, float DEta, float DPhi, float s9s25, float s1s9, float See, float Spp, float pt, float eta, int charge);
+  void fillVariables(float EoPout, float EoP, float HoE, float DEta, float DEtaUncorr, float DPhi, float DPhiUncorr, float s9s25, float s1s9, float See, float Spp, float fBrem, int nHits, float dcot, float dist, float pt, float eta, int charge);
 
   //! fill electron attributes + z mass for the tag and probe
   //! note: when both electrons from Z are probes, the same Z mass is repeated
-  void fillAttributesSignal(int charge, float eta, float pt, float zmass);
+  void fillAttributesSignal(float zmass);
   //! fill electron attributes + other quantities for background tag and probe
-  void fillAttributesBackground(int charge, float eta, float pt, float deltaphi, float invmass, float met, float pth);
-  void fillAttributesBackground(int charge, float eta, float pt, float deltaphi, float invmass, float met, float pth, int nBrem);
+  void fillAttributesBackground(float dphi, float invmass, float met, float pth);
   //! fill the splitting categories of the PDFs
-  //! iclass: 0=non-showering, 1=showering
-  //! iecal: 0=EB, 1=EE
-  //! iptbin: 0=<15 GeV, 1=>15GeV
-  void fillCategories(int iecal, int iptbin, int iclass); 
+  void fillCategories(int iecal, int iptbin, int iclass, int nbr);
   void fillMore(float rit, float rip);
   void fillGamma(float atg, float aeg, float ahg, int ig);
 
@@ -44,34 +40,32 @@ private:
   float myEoPout;
   float myEoP   ;
   float myHoE;
-  float myDeltaEta;
-  float myDeltaPhi;
-  float myDeltaEtaCorr;
-  float myDeltaPhiCorr;
+  float myDeta;
+  float myDphi;
+  float myDetaUncorr;
+  float myDphiUncorr;
   float mys9s25;
   float mys1s9 ;
-  float mySigmaIEtaIEta;
-  float myFBrem;
-  int myMissingHits;
-  float myConvDcot, myConvDist;
-
+  float mySee;
+  float mySpp;
+  float myFbrem;
+  int myMissHits;
+  float myDist, myDcot;
   int myCharge;
   float myEta;
   float myPt;
+
   float myZmass;
 
-  int myQCDCharge;
-  float myQCDEta;
-  float myQCDPt;
   float myQCDDeltaphi;
   float myQCDInvmass;
   float myQCDMet;
   float myQCDPtHat;
-  int   myQCDNBrem;
 
   int myiecal;
   int myiptbin;
   int myiclass;
+  int mynbrem;
 
   float myRelIsolTag;
   float myRelIsolProbe;

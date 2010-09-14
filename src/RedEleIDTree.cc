@@ -5,20 +5,24 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myFile = new TFile(filename,"RECREATE");
   myTree = new TTree("T1","eleID tree");
 
-  myTree->Branch("EoPout",        &myEoPout,        "EoPout/F");
-  myTree->Branch("EoP",           &myEoP,           "EoP/F");
-  myTree->Branch("HoE",           &myHoE,           "HoE/F");
-  myTree->Branch("deltaEta",      &myDeltaEta,      "deltaEta/F");
-  myTree->Branch("deltaPhi",      &myDeltaPhi,      "deltaPhi/F");
-  myTree->Branch("deltaEtaCorr",  &myDeltaEtaCorr,  "deltaEtaCorr/F");
-  myTree->Branch("deltaPhiCorr",  &myDeltaPhiCorr,  "deltaPhiCorr/F");
-  myTree->Branch("s9s25",         &mys9s25,         "s9s25/F");
-  myTree->Branch("s1s9" ,         &mys1s9,          "s1s9/F");
-  myTree->Branch("sigmaIEtaIEta", &mySigmaIEtaIEta, "sigmaIEtaIEta/F");
-  myTree->Branch("fBrem",         &myFBrem,         "fBrem/F");
-  myTree->Branch("missingHits",   &myMissingHits,   "missingHits/I");
-  myTree->Branch("convDcot",      &myConvDcot,      "convDcot/F");
-  myTree->Branch("convDist",      &myConvDist,      "convDist/F");
+  myTree->Branch("EoPout",          &myEoPout,          "EoPout/F");
+  myTree->Branch("EoP",             &myEoP,             "EoP/F");
+  myTree->Branch("HoE",             &myHoE,             "HoE/F");
+  myTree->Branch("deta",            &myDeta,            "deta/F");
+  myTree->Branch("dphi",            &myDphi,            "dphi/F");
+  myTree->Branch("detaUncorr",      &myDetaUncorr,      "detaUncorr/F");
+  myTree->Branch("dphiUncorr",      &myDphiUncorr,      "dphiUncorr/F");
+  myTree->Branch("s9s25",           &mys9s25,           "s9s25/F");
+  myTree->Branch("s1s9" ,           &mys1s9,            "s1s9/F");
+  myTree->Branch("see",             &mySee,             "see/F");
+  myTree->Branch("spp",             &mySpp,             "spp/F");
+  myTree->Branch("fbrem",           &myFbrem,           "fbrem/F");
+  myTree->Branch("missHits",        &myMissHits,        "missHits/I");
+  myTree->Branch("dist",            &myDist,            "dist/F");
+  myTree->Branch("dcot",            &myDcot,            "dcot/F");
+  myTree->Branch("pt",              &myPt,              "pt/F");
+  myTree->Branch("eta",             &myEta,             "eta/F");
+  myTree->Branch("charge",          &myCharge,          "charge/I");
 }
 
 RedEleIDTree::~RedEleIDTree() {
@@ -27,22 +31,15 @@ RedEleIDTree::~RedEleIDTree() {
 
 void RedEleIDTree::addAttributesSignal() {
 
-  myTree->Branch("charge",      &myCharge,      "charge/I");
-  myTree->Branch("eta",         &myEta,         "eta/F");
-  myTree->Branch("pt",          &myPt,          "pt/F");
   myTree->Branch("zmass",       &myZmass,       "zmass/F");
 }
 
 void RedEleIDTree::addAttributesBackground() {
 
-  myTree->Branch("qcdCharge",      &myQCDCharge,      "qcdCharge/I");
-  myTree->Branch("qcdEta",         &myQCDEta,         "qcdEta/F");
-  myTree->Branch("qcdPt",          &myQCDPt,          "qcdPt/F");
   myTree->Branch("qcdDeltaphi",    &myQCDDeltaphi,    "qcdDeltaphi/F");
   myTree->Branch("qcdInvmass",     &myQCDInvmass,     "qcdInvmass/F");
   myTree->Branch("qcdMet",         &myQCDMet,         "qcdMet/F");
   myTree->Branch("qcdPtHat",       &myQCDPtHat,       "qcdPtHat/F");
-  myTree->Branch("qcdNBrem",       &myQCDNBrem,       "qcdNBrem/I");
 }
 
 void RedEleIDTree::addCategories() {
@@ -50,10 +47,11 @@ void RedEleIDTree::addCategories() {
   myTree->Branch("iecal",      &myiecal,      "iecal/I");
   myTree->Branch("iptbin",     &myiptbin,     "iptbin/I");
   myTree->Branch("iclass",     &myiclass,     "iclass/I");
+  myTree->Branch("nbrem",      &mynbrem,      "nbrem/I");
 }
 
 void RedEleIDTree::addMore() {
-
+  
   myTree->Branch("relIsolTag",   &myRelIsolTag,   "relIsolTag/F");
   myTree->Branch("relIsolProbe", &myRelIsolProbe, "relIsolProbe/F");
 }
@@ -78,65 +76,63 @@ void RedEleIDTree::save() {
   myFile->Close();
 }
 
-void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float DeltaEta, float DeltaPhi, float s9s25, float s1s9, float SigmaIEtaIEta) {
+void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float Deta, float Dphi, float s9s25, float s1s9, float See, float Spp, float pt, float eta, int charge) {
 
   myEoPout=EoPout;
   myEoP=EoP;
   myHoE=HoE;
-  myDeltaEta=DeltaEta;
-  myDeltaPhi=DeltaPhi;
+  myDeta=Deta;
+  myDphi=Dphi;
   mys9s25=s9s25;
   mys1s9=s1s9;
-
-
-  mySigmaIEtaIEta=SigmaIEtaIEta;
-}
-
-void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float DeltaEta, float DeltaEtaCorr, float DeltaPhi, float DeltaPhiCorr, float s9s25, float s1s9, float SigmaIEtaIEta, float fBrem, int nHits, float dcot, float dist) {
-
-  myEoPout=EoPout;
-  myEoP=EoP;
-  myHoE=HoE;
-  myDeltaEta=DeltaEta;
-  myDeltaEtaCorr=DeltaEtaCorr;
-  myDeltaPhi=DeltaPhi;
-  myDeltaPhiCorr=DeltaPhiCorr;
-  mys9s25=s9s25;
-  mys1s9=s1s9;
-  mySigmaIEtaIEta=SigmaIEtaIEta;
-  myFBrem=fBrem;
-  myMissingHits=nHits;
-  myConvDcot=dcot; 
-  myConvDist=dist; 
-}
-
-void RedEleIDTree::fillAttributesSignal(int charge, float eta, float pt, float zmass) {
-
-  myCharge=charge;
-  myEta=eta;
+  mySee=See;
+  mySpp=Spp;
   myPt=pt;
-  myZmass=zmass;
-
+  myEta=eta;
+  myCharge=charge;
 }
 
-void RedEleIDTree::fillAttributesBackground(int charge, float eta, float pt, float deltaphi, float invmass, float met, float pth, int nBrem) {
+void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float Deta, float DetaUncorr, float Dphi, float DphiUncorr, float s9s25, float s1s9, float See, float Spp, float fbrem, int nHits, float dcot, float dist, float pt, float eta, int charge) {
 
-  myQCDCharge=charge;
-  myQCDEta=eta;
-  myQCDPt=pt;
+  myEoPout=EoPout;
+  myEoP=EoP;
+  myHoE=HoE;
+  myDeta=Deta;
+  myDetaUncorr=DetaUncorr;
+  myDphi=Dphi;
+  myDphiUncorr=DphiUncorr;
+  mys9s25=s9s25;
+  mys1s9=s1s9;
+  mySee=See;
+  mySpp=Spp;
+  myFbrem=fbrem;
+  myMissHits=nHits;
+  myDist=dist;
+  myDcot=dcot;
+  myPt=pt;
+  myEta=eta;
+  myCharge=charge;
+}
+
+void RedEleIDTree::fillAttributesSignal(float zmass) {
+
+  myZmass=zmass;
+}
+
+void RedEleIDTree::fillAttributesBackground(float deltaphi, float invmass, float met, float pth) {
+
   myQCDDeltaphi=deltaphi;
   myQCDInvmass=invmass;
   myQCDMet=met;
   myQCDPtHat=pth;
-  myQCDNBrem=nBrem;
 }
 
-void RedEleIDTree::fillCategories(int iecal, int iptbin, int iclass) {
+void RedEleIDTree::fillCategories(int iecal, int iptbin, int iclass, int nbr) {
 
   myiecal=iecal;
   myiptbin=iptbin;
   myiclass=iclass;
-
+  mynbrem=nbr;
 }
 
 void RedEleIDTree::fillMore(float rit, float rip) {

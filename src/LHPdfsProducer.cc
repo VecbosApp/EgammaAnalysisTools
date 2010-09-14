@@ -227,7 +227,7 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
 	double EoPout       = eSeedOverPoutEle[probe];
 	double EoP          = eSuperClusterOverPEle[probe];
 	double HoE          = hOverEEle[probe];
-
+	int nbrem           = nbremsEle[probe];
 	
         /// fill the electron ID pdfs only if:
         /// the tag is loose isolated and identified (ALWAYS)
@@ -268,9 +268,9 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
           s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
 	  
           // fill the reduced tree
-	  reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta);
-          reducedTree.fillAttributesSignal(charge,eta,pt,okmass);
-          reducedTree.fillCategories(iecal,iptbin,iclass);
+	  reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,pt,eta,charge);
+          reducedTree.fillAttributesSignal(okmass);
+          reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
           reducedTree.fillMore(dr03TkSumPtEle[tag]/tagP4.Pt(), dr03TkSumPtEle[probe]/probeP4.Pt());
           reducedTree.store();
 
@@ -432,6 +432,7 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
       // some eleID variables
       int sc = superClusterIndexEle[theClosestEle_mc1];
       float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaSC[sc]));
+      float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiSC[sc]));
       float s1s9          = eMaxSC[sc]/e3x3SC[sc];
       float s9s25         = e3x3SC[sc]/e5x5SC[sc];
       double dPhiVtx      = deltaPhiAtVtxEle[theClosestEle_mc1];
@@ -439,12 +440,13 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
       double EoPout       = eSeedOverPoutEle[theClosestEle_mc1];
       double EoP          = eSuperClusterOverPEle[theClosestEle_mc1];
       double HoE          = hOverEEle[theClosestEle_mc1];
+      int nbrem           = nbremsEle[theClosestEle_mc1];
 
       // fill the reduced tree     
       if( isolated1 && iclass>-1 ) {
-	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta);
-	reducedTree.fillAttributesSignal(charge,eta,pt,9999.);
-	reducedTree.fillCategories(iecal,iptbin,iclass);
+	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,pt,eta,charge);
+	reducedTree.fillAttributesSignal(9999.);
+	reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
 	reducedTree.store();
       } // fill tree
     } // ok 1st electron
@@ -489,6 +491,7 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
       // some eleID variables
       int sc = superClusterIndexEle[theClosestEle_mc2];
       float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaSC[sc]));
+      float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiSC[sc]));
       float s1s9          = eMaxSC[sc]/e3x3SC[sc];
       float s9s25         = e3x3SC[sc]/e5x5SC[sc];
       double dPhiVtx      = deltaPhiAtVtxEle[theClosestEle_mc2];
@@ -496,12 +499,13 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
       double EoPout       = eSeedOverPoutEle[theClosestEle_mc2];
       double EoP          = eSuperClusterOverPEle[theClosestEle_mc2];
       double HoE          = hOverEEle[theClosestEle_mc2];
+      int nbrem           = nbremsEle[theClosestEle_mc2];
 
       // fill the reduced tree     
       if( isolated2 && iclass>-1 ) {
-	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta);
-	reducedTree.fillAttributesSignal(charge,eta,pt,9999.);
-	reducedTree.fillCategories(iecal,iptbin,iclass);
+	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,pt,eta,charge);
+	reducedTree.fillAttributesSignal(9999.);
+	reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
 	reducedTree.store();
       } // fill tree
     } // ok 2nd electron
@@ -692,7 +696,7 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
 	double EoPout       = eSeedOverPoutEle[probe];
 	double EoP          = eSuperClusterOverPEle[probe];
 	double HoE          = hOverEEle[probe];
-
+	int nbrem           = nbremsEle[probe];
 	
         /// fill the electron ID pdfs only if:
         /// the tag is loose isolated and identified (ALWAYS)
@@ -708,9 +712,9 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
 
 	  // only if it matches with MC fill the reduced tree
 	  if (matchMc) { 
-	    reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta);
-	    reducedTree.fillAttributesSignal(charge,eta,pt,okmass);
-	    reducedTree.fillCategories(iecal,iptbin,iclass);
+	    reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,pt,eta,charge);
+	    reducedTree.fillAttributesSignal(okmass);
+	    reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
 	    reducedTree.store();
 
             dPhiCaloUnsplitEle      [iecal][iptbin] -> Fill ( dPhiCalo );
@@ -911,6 +915,7 @@ void LHPdfsProducer::LoopZwithMass(const char *treefilesuffix) {
       // some eleID variables
       int sc1 = superClusterIndexEle[theClosestEle_mc1];
       float sigmaIEtaIEta1 = sqrt(fabs(covIEtaIEtaSC[sc1]));
+      float sigmaIPhiIPhi1 = sqrt(fabs(covIPhiIPhiSC[sc1]));
       float s1s91          = eMaxSC[sc1]/e3x3SC[sc1];
       float s9s251         = e3x3SC[sc1]/e5x5SC[sc1];
       double dPhiVtx1      = deltaPhiAtVtxEle[theClosestEle_mc1];
@@ -918,8 +923,10 @@ void LHPdfsProducer::LoopZwithMass(const char *treefilesuffix) {
       double EoPout1       = eSeedOverPoutEle[theClosestEle_mc1];
       double EoP1          = eSuperClusterOverPEle[theClosestEle_mc1];
       double HoE1          = hOverEEle[theClosestEle_mc1];
+      int nbrem1           = nbremsEle[theClosestEle_mc1];
       int sc2 = superClusterIndexEle[theClosestEle_mc2];
       float sigmaIEtaIEta2 = sqrt(fabs(covIEtaIEtaSC[sc2]));
+      float sigmaIPhiIPhi2 = sqrt(fabs(covIPhiIPhiSC[sc2]));
       float s1s92          = eMaxSC[sc2]/e3x3SC[sc2];
       float s9s252         = e3x3SC[sc2]/e5x5SC[sc2];
       double dPhiVtx2      = deltaPhiAtVtxEle[theClosestEle_mc2];
@@ -927,18 +934,19 @@ void LHPdfsProducer::LoopZwithMass(const char *treefilesuffix) {
       double EoPout2       = eSeedOverPoutEle[theClosestEle_mc2];
       double EoP2          = eSuperClusterOverPEle[theClosestEle_mc2];
       double HoE2          = hOverEEle[theClosestEle_mc2];
+      int nbrem2           = nbremsEle[theClosestEle_mc2];
 
       float mass = (electron1+electron2).M();
       if( m_selection->passCut("meeWindow",mass) ) {
 
 	// fill the reduced tree     
 	if( isolated1 && isolated2 && iclass1>-1 && iclass2>-1 ) {
-	  reducedTree.fillVariables(EoPout1,EoP1,HoE1,dEtaVtx1,dPhiVtx1,s9s251,s1s91,sigmaIEtaIEta1);
-	  reducedTree.fillAttributesSignal(charge1,eta1,pt1,mass);
-	  reducedTree.fillCategories(iecal1,iptbin1,iclass1);
-	  reducedTree.fillVariables(EoPout2,EoP2,HoE2,dEtaVtx2,dPhiVtx2,s9s252,s1s92,sigmaIEtaIEta2);
-	  reducedTree.fillAttributesSignal(charge2,eta2,pt2,mass);
-	  reducedTree.fillCategories(iecal2,iptbin2,iclass2);
+	  reducedTree.fillVariables(EoPout1,EoP1,HoE1,dEtaVtx1,dPhiVtx1,s9s251,s1s91,sigmaIEtaIEta1,sigmaIPhiIPhi1,pt1,eta1,charge1);
+	  reducedTree.fillAttributesSignal(mass);
+	  reducedTree.fillCategories(iecal1,iptbin1,iclass1,nbrem1);
+	  reducedTree.fillVariables(EoPout2,EoP2,HoE2,dEtaVtx2,dPhiVtx2,s9s252,s1s92,sigmaIEtaIEta2,sigmaIPhiIPhi2,pt2,eta2,charge2);
+	  reducedTree.fillAttributesSignal(mass);
+	  reducedTree.fillCategories(iecal2,iptbin2,iclass2,nbrem2);
 	  
 	  reducedTree.store();
 	} // fill tree
@@ -1110,11 +1118,11 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
   reducedTree.addGamma();        // to find the best cut for anti-isolationA
 
   // counters
-  int nocrack        = 0;
+  int nocrack = 0;
 
   // json 
-  unsigned int lastLumi=0;
-  unsigned int lastRun=0;
+  unsigned int lastLumi = 0;
+  unsigned int lastRun  = 0;
 
   // loop over events
   Long64_t nbytes = 0, nb = 0;
@@ -1323,17 +1331,18 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       float sigmaIEtaIEta = sqrt(fabs(covIEtaIEtaSC[sc]));
       float sigmaIEtaIPhi = sqrt(fabs(covIEtaIPhiSC[sc]));
       float sigmaIPhiIPhi = sqrt(fabs(covIPhiIPhiSC[sc]));
-      float s1s9      = eMaxSC[sc]/e3x3SC[sc];
-      float s9s25     = e3x3SC[sc]/e5x5SC[sc];
-      double dPhiCalo = deltaPhiAtCaloEle[theProbe];
-      double dPhiVtx  = deltaPhiAtVtxEle[theProbe];
-      double dEtaVtx  = deltaEtaAtVtxEle[theProbe];
-      double EoPout   = eSeedOverPoutEle[theProbe];
-      double EoP      = eSuperClusterOverPEle[theProbe];
-      double HoE      = hOverEEle[theProbe];
-      float dEtaVtxCorr   = dEtaVtx;
-      float dPhiVtxCorr   = dPhiVtx;
-      float fbrem         = fbremEle[theProbe];
+      float s1s9        = eMaxSC[sc]/e3x3SC[sc];
+      float s9s25       = e3x3SC[sc]/e5x5SC[sc];
+      double dPhiCalo   = deltaPhiAtCaloEle[theProbe];
+      double dPhiVtx    = deltaPhiAtVtxEle[theProbe];
+      double dEtaVtx    = deltaEtaAtVtxEle[theProbe];
+      double EoPout     = eSeedOverPoutEle[theProbe];
+      double EoP        = eSuperClusterOverPEle[theProbe];
+      double HoE        = hOverEEle[theProbe];
+      float dEtaVtxCorr = dEtaVtx;
+      float dPhiVtxCorr = dPhiVtx;
+      float fbrem       = fbremEle[theProbe];
+      int nbrem         = nbremsEle[theProbe];
       if(m_selection->getSwitch("isData")) {
 	float theEta = eleP4.Eta();
 	float thePhi = eleP4.Phi();
@@ -1382,10 +1391,14 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
 
       // fill the reduced tree
-      reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dEtaVtxCorr,dPhiVtx,dPhiVtxCorr,s9s25,s1s9,sigmaIEtaIEta,fbrem,theExpInnerLayers,convDcot,convDist); 
-      reducedTree.fillAttributesBackground(charge,eta,pt,theDeltaPhi,theInvMass,theMet,genPtHat,nbremsEle[theProbe]);
-      reducedTree.fillCategories(iecal,iptbin,iclass);
+      reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtxCorr,dEtaVtx,dPhiVtxCorr,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,theExpInnerLayers,convDcot,convDist,pt,eta,charge); 
+
+      reducedTree.fillAttributesBackground(theDeltaPhi,theInvMass,theMet,genPtHat);
+
+      reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
+
       reducedTree.fillGamma(absTrackerIsolGamma,absEcalIsolGamma,absHcalIsolGamma,isGamma);
+
       reducedTree.store();
     } // no crack
 
@@ -1508,8 +1521,6 @@ void LHPdfsProducer::LoopWjets() {
       sigmaIPhiIPhiUnsplitEle [iecal][iptbin] -> Fill ( sigmaIPhiIPhi );
       s1s9UnsplitEle          [iecal][iptbin] -> Fill ( s1s9 );
       s9s25UnsplitEle         [iecal][iptbin] -> Fill ( s9s25 );
-      //      dxyUnsplitEle           [iecal][iptbin] -> Fill ( dxy );
-      //      dxySigUnsplitEle        [iecal][iptbin] -> Fill ( dxySig );
 
       dPhiCaloClassEle      [iecal][iptbin][iclass] -> Fill ( dPhiCalo );
       dPhiVtxClassEle       [iecal][iptbin][iclass] -> Fill ( dPhiVtx );
@@ -1521,8 +1532,6 @@ void LHPdfsProducer::LoopWjets() {
       sigmaIPhiIPhiClassEle [iecal][iptbin][iclass] -> Fill ( sigmaIPhiIPhi );
       s1s9ClassEle          [iecal][iptbin][iclass] -> Fill ( s1s9 );
       s9s25ClassEle         [iecal][iptbin][iclass] -> Fill ( s9s25 );
-      //      dxyClassEle           [iecal][iptbin][iclass] -> Fill ( dxy );
-      //      dxySigClassEle        [iecal][iptbin][iclass] -> Fill ( dxySig );
 
       dPhiCaloFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( dPhiCalo );
       dPhiVtxFullclassEle       [iecal][iptbin][ifullclass] -> Fill ( dPhiVtx );
@@ -1534,8 +1543,6 @@ void LHPdfsProducer::LoopWjets() {
       sigmaIPhiIPhiFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaIPhiIPhi );
       s1s9FullclassEle          [iecal][iptbin][ifullclass] -> Fill ( s1s9 );
       s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
-      //      dxyFullclassEle           [iecal][iptbin][ifullclass] -> Fill ( dxy );
-      //      dxySigFullclassEle        [iecal][iptbin][ifullclass] -> Fill ( dxySig );
 
     } // loop on electrons
 
@@ -1750,8 +1757,6 @@ void LHPdfsProducer::LoopZjets(const char *outname) {
       double EoPout = eSeedOverPoutEle[iele];
       double EoP = eSuperClusterOverPEle[iele];
       double HoE = hOverEEle[iele];
-      //      double dxy = eleTrackDxyEle[iele];
-      //      double dxySig = eleTrackDxyEle[iele]/eleTrackDxyErrorEle[iele];
 
       dPhiCaloUnsplitEle    [iecal][iptbin] -> Fill ( dPhiCalo );
       dPhiVtxUnsplitEle     [iecal][iptbin] -> Fill ( dPhiVtx );
@@ -1763,8 +1768,6 @@ void LHPdfsProducer::LoopZjets(const char *outname) {
       sigmaIPhiIPhiUnsplitEle [iecal][iptbin] -> Fill ( sigmaIPhiIPhi );
       s1s9UnsplitEle        [iecal][iptbin] -> Fill ( s1s9 );
       s9s25UnsplitEle       [iecal][iptbin] -> Fill ( s9s25 );
-      //      dxyUnsplitEle         [iecal][iptbin] -> Fill ( dxy );
-      //      dxySigUnsplitEle      [iecal][iptbin] -> Fill ( dxySig );
 
       dPhiCaloClassEle    [iecal][iptbin][iclass] -> Fill ( dPhiCalo );
       dPhiVtxClassEle     [iecal][iptbin][iclass] -> Fill ( dPhiVtx );
@@ -1776,8 +1779,6 @@ void LHPdfsProducer::LoopZjets(const char *outname) {
       sigmaIPhiIPhiClassEle [iecal][iptbin][iclass] -> Fill ( sigmaIPhiIPhi );
       s1s9ClassEle        [iecal][iptbin][iclass] -> Fill ( s1s9 );
       s9s25ClassEle       [iecal][iptbin][iclass] -> Fill ( s9s25 );
-      //      dxyClassEle         [iecal][iptbin][iclass] -> Fill ( dxy );
-      //      dxySigClassEle      [iecal][iptbin][iclass] -> Fill ( dxySig );
 
       dPhiCaloFullclassEle    [iecal][iptbin][ifullclass] -> Fill ( dPhiCalo );
       dPhiVtxFullclassEle     [iecal][iptbin][ifullclass] -> Fill ( dPhiVtx );
@@ -1789,8 +1790,6 @@ void LHPdfsProducer::LoopZjets(const char *outname) {
       sigmaIPhiIPhiFullclassEle [iecal][iptbin][ifullclass] -> Fill ( sigmaIPhiIPhi );
       s1s9FullclassEle        [iecal][iptbin][ifullclass] -> Fill ( s1s9 );
       s9s25FullclassEle       [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
-      //      dxyFullclassEle         [iecal][iptbin][ifullclass] -> Fill ( dxy );
-      //      dxySigFullclassEle      [iecal][iptbin][ifullclass] -> Fill ( dxySig );
 
     } // loop on electrons
 
