@@ -52,6 +52,26 @@ public :
    Double_t        nPFJets;
    Double_t        nJets;
    Double_t        event;
+   Double_t        isIdWP70;
+   Double_t        isIdWP80;
+   Double_t        isIdWP85;
+   Double_t        isIdWP90;
+   Double_t        isIdWP95;
+   Double_t        isIsoWP70;
+   Double_t        isIsoWP80;
+   Double_t        isIsoWP85;
+   Double_t        isIsoWP90;
+   Double_t        isIsoWP95;
+   Double_t        isConvRejWP70;
+   Double_t        isConvRejWP80;
+   Double_t        isConvRejWP85;
+   Double_t        isConvRejWP90;
+   Double_t        isConvRejWP95;
+   Double_t        isWP70;
+   Double_t        isWP80;
+   Double_t        isWP85;
+   Double_t        isWP90;
+   Double_t        isWP95;
 
    Float_t       f_trackerIso;
    Float_t       f_ecalJIso;
@@ -79,6 +99,52 @@ public :
    Int_t         f_nPFJets;
    Int_t         f_nJets;
    Float_t       f_event;
+   Float_t       f_isIdWP70;
+   Float_t       f_isIdWP80;
+   Float_t       f_isIdWP85;
+   Float_t       f_isIdWP90;
+   Float_t       f_isIdWP95;
+   Float_t       f_isIsoWP70;
+   Float_t       f_isIsoWP80;
+   Float_t       f_isIsoWP85;
+   Float_t       f_isIsoWP90;
+   Float_t       f_isIsoWP95;
+   Float_t       f_isConvRejWP70;
+   Float_t       f_isConvRejWP80;
+   Float_t       f_isConvRejWP85;
+   Float_t       f_isConvRejWP90;
+   Float_t       f_isConvRejWP95;
+   Float_t       f_isWP70;
+   Float_t       f_isWP80;
+   Float_t       f_isWP85;
+   Float_t       f_isWP90;
+   Float_t       f_isWP95;
+
+   // Declaration of leaf types for Z T & P
+   Double_t      ztap_N_sig_sw;
+   Double_t      ztap_L_N_sig;
+   Double_t      ztap_N_bkg_sw;
+   Double_t      ztap_L_N_bkg;
+   Double_t      ztap_eopout;
+   Double_t      ztap_eop;
+   Double_t      ztap_hoe;
+   Double_t      ztap_deta;
+   Double_t      ztap_dphi;
+   Double_t      ztap_s9s25;
+   Double_t      ztap_s1s9;
+   Double_t      ztap_see;
+   Double_t      ztap_fbrem;
+   Double_t      ztap_missingHits;
+   Double_t      ztap_convDcot;
+   Double_t      ztap_convDist;
+   Double_t      ztap_zmass;
+   Double_t      ztap_charge;
+   Double_t      ztap_eta;
+   Double_t      ztap_pt;
+   Double_t      ztap_iecal;
+   Double_t      ztap_iptbin;
+   Double_t      ztap_iclass;
+   Double_t      ztap_weight;
 
    // List of branches
    TBranch        *b_N_sig_sw;   //!
@@ -111,38 +177,98 @@ public :
    TBranch        *b_nPFJets;   //!
    TBranch        *b_nJets;   //!
    TBranch        *b_event;   //!
+   TBranch        *b_isIdWP70;   //!
+   TBranch        *b_isIdWP80;   //!
+   TBranch        *b_isIdWP85;   //!
+   TBranch        *b_isIdWP90;   //!
+   TBranch        *b_isIdWP95;   //!
+   TBranch        *b_isIsoWP70;   //!
+   TBranch        *b_isIsoWP80;   //!
+   TBranch        *b_isIsoWP85;   //!
+   TBranch        *b_isIsoWP90;   //!
+   TBranch        *b_isIsoWP95;   //!
+   TBranch        *b_isConvRejWP70;   //!
+   TBranch        *b_isConvRejWP80;   //!
+   TBranch        *b_isConvRejWP85;   //!
+   TBranch        *b_isConvRejWP90;   //!
+   TBranch        *b_isConvRejWP95;   //!
+   TBranch        *b_isWP70;   //!
+   TBranch        *b_isWP80;   //!
+   TBranch        *b_isWP85;   //!
+   TBranch        *b_isWP90;   //!
+   TBranch        *b_isWP95;   //!
+
+   // List of branches for Z T & P
+   TBranch        *b_N_bkg_sw;   //!
+   TBranch        *b_L_N_bkg;   //!
+   TBranch        *b_EoPout;   //!
+   TBranch        *b_EoP;   //!
+   TBranch        *b_HoE;   //!
+   TBranch        *b_deltaEtaCorr;   //!
+   TBranch        *b_deltaPhiCorr;   //!
+   TBranch        *b_s9s25;   //!
+   TBranch        *b_s1s9;   //!
+   TBranch        *b_sigmaIEtaIEta;   //!
+   TBranch        *b_fBrem;   //!
+   TBranch        *b_missingHits;   //!
+   TBranch        *b_convDcot;   //!
+   TBranch        *b_convDist;   //!
+   TBranch        *b_zmass;   //!
+   TBranch        *b_iecal;   //!
+   TBranch        *b_iptbin;   //!
+   TBranch        *b_iclass;   //!
 
    sPlotsPdfsComparison();
    virtual ~sPlotsPdfsComparison();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
-   virtual void     Init(TTree *treel, int isMC=1);
+   virtual void     Init(TTree *treel, int isMC=1, int isZTaP=0);
    virtual void     Loop();
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
    virtual void     bookHistosVariableBinning();
    virtual void     bookHistosFixedBinning();
-   virtual void     InitCuts();
+   virtual void     bookFullHistos();
    virtual void     doSignalsPlots(bool what) { m_doSignal = what; }
 
  protected:
 
    bool m_isMC;
    bool m_doSignal;
+   bool m_isDataZTaP;
 
-   TH1F *etaClassEle;   
-   TH1F *dPhiClassEle[2];
-   TH1F *dEtaClassEle[2];
-   TH1F *EoPClassEle[2];
-   TH1F *HoEClassEle[2];
-   TH1F *sigmaIEtaIEtaClassEle[2];
-   TH1F *fbremClassEle[2];
-   TH1F *phiClassEle[2];
-   TH1F *chargeClassEle[2];
+   TH1F *etaEle;   
+   TH1F *dPhiEle[2];
+   TH1F *dEtaEle[2];
+   TH1F *EoPEle[2];
+   TH1F *HoEEle[2];
+   TH1F *sigmaIEtaIEtaEle[2];
+   TH1F *fbremEle[2];
+   TH1F *phiEle[2];
+   TH1F *chargeEle[2];
 
-   // cuts
-   std::vector<float> WP70_EB_sup, WP70_EB_inf, WP70_EE_sup, WP70_EE_inf;
+  // ---------- monitoring histograms ------------
+
+  /// Electrons: not splitted
+  /// histo[ecalsubdet][ptbin]
+  TH1F *dPhiUnsplitEle[2][2];
+  TH1F *dEtaUnsplitEle[2][2];
+  TH1F *EoPUnsplitEle[2][2];
+  TH1F *HoEUnsplitEle[2][2];  
+  TH1F *sigmaIEtaIEtaUnsplitEle[2][2];
+  TH1F *sigmaIPhiIPhiUnsplitEle[2][2];
+  TH1F *fBremUnsplitEle[2][2];
+  
+  /// Electrons class-splitted
+  /// histo[ecalsubdet][ptbin][class]
+  TH1F *dPhiClassEle[2][2][2];
+  TH1F *dEtaClassEle[2][2][2];
+  TH1F *EoPClassEle[2][2][2];
+  TH1F *HoEClassEle[2][2][2];
+  TH1F *sigmaIEtaIEtaClassEle[2][2][2];
+  TH1F *sigmaIPhiIPhiClassEle[2][2][2];
+  TH1F *fBremClassEle[2][2][2];
 
 };
 
@@ -178,7 +304,7 @@ Long64_t sPlotsPdfsComparison::LoadTree(Long64_t entry)
    return centry;
 }
 
-void sPlotsPdfsComparison::Init(TTree *tree, int isMC)
+void sPlotsPdfsComparison::Init(TTree *tree, int isMC, int data_ZTaP)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -223,6 +349,26 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC)
      fChain->SetBranchAddress("event", &f_event, &b_event);
      fChain->SetBranchAddress("nPFJets", &f_nPFJets, &b_nPFJets);
      fChain->SetBranchAddress("nJets", &f_nJets, &b_nJets);
+     fChain->SetBranchAddress("isIdWP70", &f_isIdWP70, &b_isIdWP70);
+     fChain->SetBranchAddress("isIdWP80", &f_isIdWP80, &b_isIdWP80);
+     fChain->SetBranchAddress("isIdWP85", &f_isIdWP85, &b_isIdWP85);
+     fChain->SetBranchAddress("isIdWP90", &f_isIdWP90, &b_isIdWP90);
+     fChain->SetBranchAddress("isIdWP95", &f_isIdWP95, &b_isIdWP95);
+     fChain->SetBranchAddress("isIsoWP70", &f_isIsoWP70, &b_isIsoWP70);
+     fChain->SetBranchAddress("isIsoWP80", &f_isIsoWP80, &b_isIsoWP80);
+     fChain->SetBranchAddress("isIsoWP85", &f_isIsoWP85, &b_isIsoWP85);
+     fChain->SetBranchAddress("isIsoWP90", &f_isIsoWP90, &b_isIsoWP90);
+     fChain->SetBranchAddress("isIsoWP95", &f_isIsoWP95, &b_isIsoWP95);
+     fChain->SetBranchAddress("isConvRejWP70", &f_isConvRejWP70, &b_isConvRejWP70);
+     fChain->SetBranchAddress("isConvRejWP80", &f_isConvRejWP80, &b_isConvRejWP80);
+     fChain->SetBranchAddress("isConvRejWP85", &f_isConvRejWP85, &b_isConvRejWP85);
+     fChain->SetBranchAddress("isConvRejWP90", &f_isConvRejWP90, &b_isConvRejWP90);
+     fChain->SetBranchAddress("isConvRejWP95", &f_isConvRejWP95, &b_isConvRejWP95);
+     fChain->SetBranchAddress("isWP70", &f_isWP70, &b_isWP70);
+     fChain->SetBranchAddress("isWP80", &f_isWP80, &b_isWP80);
+     fChain->SetBranchAddress("isWP85", &f_isWP85, &b_isWP85);
+     fChain->SetBranchAddress("isWP90", &f_isWP90, &b_isWP90);
+     fChain->SetBranchAddress("isWP95", &f_isWP95, &b_isWP95);
    } else {
      m_isMC = 0;
      fChain->SetBranchAddress("N_sig_sw", &N_sig_sw, &b_N_sig_sw);
@@ -255,7 +401,55 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC)
      fChain->SetBranchAddress("event", &event, &b_event);
      fChain->SetBranchAddress("nPFJets", &nPFJets, &b_nPFJets);
      fChain->SetBranchAddress("nJets", &nJets, &b_nJets);
+     fChain->SetBranchAddress("isIdWP70", &isIdWP70, &b_isIdWP70);
+     fChain->SetBranchAddress("isIdWP80", &isIdWP80, &b_isIdWP80);
+     fChain->SetBranchAddress("isIdWP85", &isIdWP85, &b_isIdWP85);
+     fChain->SetBranchAddress("isIdWP90", &isIdWP90, &b_isIdWP90);
+     fChain->SetBranchAddress("isIdWP95", &isIdWP95, &b_isIdWP95);
+     fChain->SetBranchAddress("isIsoWP70", &isIsoWP70, &b_isIsoWP70);
+     fChain->SetBranchAddress("isIsoWP80", &isIsoWP80, &b_isIsoWP80);
+     fChain->SetBranchAddress("isIsoWP85", &isIsoWP85, &b_isIsoWP85);
+     fChain->SetBranchAddress("isIsoWP90", &isIsoWP90, &b_isIsoWP90);
+     fChain->SetBranchAddress("isIsoWP95", &isIsoWP95, &b_isIsoWP95);
+     fChain->SetBranchAddress("isConvRejWP70", &isConvRejWP70, &b_isConvRejWP70);
+     fChain->SetBranchAddress("isConvRejWP80", &isConvRejWP80, &b_isConvRejWP80);
+     fChain->SetBranchAddress("isConvRejWP85", &isConvRejWP85, &b_isConvRejWP85);
+     fChain->SetBranchAddress("isConvRejWP90", &isConvRejWP90, &b_isConvRejWP90);
+     fChain->SetBranchAddress("isConvRejWP95", &isConvRejWP95, &b_isConvRejWP95);
+     fChain->SetBranchAddress("isWP70", &isWP70, &b_isWP70);
+     fChain->SetBranchAddress("isWP80", &isWP80, &b_isWP80);
+     fChain->SetBranchAddress("isWP85", &isWP85, &b_isWP85);
+     fChain->SetBranchAddress("isWP90", &isWP90, &b_isWP90);
+     fChain->SetBranchAddress("isWP95", &isWP95, &b_isWP95);
    }
+
+   if(data_ZTaP) {
+     m_isDataZTaP = 1;
+     fChain->SetBranchAddress("N_sig_sw", &ztap_N_sig_sw, &b_N_sig_sw);
+     fChain->SetBranchAddress("L_N_sig", &ztap_L_N_sig, &b_L_N_sig);
+     fChain->SetBranchAddress("N_bkg_sw", &ztap_N_bkg_sw, &b_N_bkg_sw);
+     fChain->SetBranchAddress("L_N_bkg", &ztap_L_N_bkg, &b_L_N_bkg);
+     fChain->SetBranchAddress("EoPout", &ztap_eopout, &b_EoPout);
+     fChain->SetBranchAddress("EoP", &ztap_eop, &b_EoP);
+     fChain->SetBranchAddress("HoE", &ztap_hoe, &b_HoE);
+     fChain->SetBranchAddress("deltaEtaCorr", &ztap_deta, &b_deltaEtaCorr);
+     fChain->SetBranchAddress("deltaPhiCorr", &ztap_dphi, &b_deltaPhiCorr);
+     fChain->SetBranchAddress("s9s25", &ztap_s9s25, &b_s9s25);
+     fChain->SetBranchAddress("s1s9", &ztap_s1s9, &b_s1s9);
+     fChain->SetBranchAddress("sigmaIEtaIEta", &ztap_see, &b_sigmaIEtaIEta);
+     fChain->SetBranchAddress("fBrem", &ztap_fbrem, &b_fBrem);
+     fChain->SetBranchAddress("missingHits", &ztap_missingHits, &b_missingHits);
+     fChain->SetBranchAddress("convDcot", &ztap_convDcot, &b_convDcot);
+     fChain->SetBranchAddress("convDist", &ztap_convDist, &b_convDist);
+     fChain->SetBranchAddress("zmass", &ztap_zmass, &b_zmass);
+     fChain->SetBranchAddress("charge", &ztap_charge, &b_charge);
+     fChain->SetBranchAddress("eta", &ztap_eta, &b_eta);
+     fChain->SetBranchAddress("pt", &ztap_pt, &b_pt);
+     fChain->SetBranchAddress("iecal", &ztap_iecal, &b_iecal);
+     fChain->SetBranchAddress("iptbin", &ztap_iptbin, &b_iptbin);
+     fChain->SetBranchAddress("iclass", &ztap_iclass, &b_iclass);
+     fChain->SetBranchAddress("weight", &ztap_weight, &b_weight);
+   } else {m_isDataZTaP=0;}
    Notify();
 }
 
