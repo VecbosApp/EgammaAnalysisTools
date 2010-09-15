@@ -6,8 +6,6 @@
 #include <TCanvas.h>
 #include <TLegend.h>
 
-#include <RooDataSet.h>
-
 using namespace std;
 
 void makePlot(const char* name, const char* title, float min, float max, int iecal, int nbins=50);
@@ -16,76 +14,92 @@ void makeAllPlots() {
 
   // barrel
   makePlot("EoPout","E_{seed}/P_{out}",0,20,0);
-  makePlot("HoE","H/E",0,1,0);
-  makePlot("deltaEta","#DELTA #eta",-0.02,0.02,0);
-  makePlot("deltaPhi","#DELTA #phi",-0.1,0.1,0);
-  makePlot("s9s25","s9 / s25",0,1,0);
-  makePlot("sigmaIEtaIEta","#sigma_{i#eta i#eta}",0,0.1,0);
+  makePlot("EoP",   "E/P",             0,20,0);
+  makePlot("HoE",   "H/E",             0,1,0);
+  makePlot("deta",  "#Delta #eta",-0.02,0.02,0);
+  makePlot("dphi",  "#Delta #phi",-0.1,0.1,0);
+  makePlot("see",   "#sigma_{i#eta i#eta}",0,0.1,0);
+  makePlot("pt",    "p_{T}",0,100.,0);
+  makePlot("eta",   "#eta",-2.5,2.5,0);
+  makePlot("fbrem", "fbrem",-1.,1.,0);
 
   // endcap
   makePlot("EoPout","E_{seed}/P_{out}",0,20,1);
-  makePlot("HoE","H/E",0,1,1);
-  makePlot("deltaEta","#DELTA #eta",-0.02,0.02,1);
-  makePlot("deltaPhi","#DELTA #phi",-0.1,0.1,1);
-  makePlot("s9s25","s9 / s25",0,1,1);
-  makePlot("sigmaIEtaIEta","#sigma_{i#eta i#eta}",0,0.1,1);
+  makePlot("EoP",   "E/P",             0,20,1);
+  makePlot("HoE",   "H/E",             0,1,1);
+  makePlot("deta",  "#Delta #eta",-0.02,0.02,1);
+  makePlot("dphi",  "#Delta #phi",-0.1,0.1,1);
+  makePlot("see",   "#sigma_{i#eta i#eta}",0,0.1,1);
+  makePlot("pt",    "p_{T}",0,100.,1);
+  makePlot("eta",   "#eta",-2.5,2.5,1);
+  makePlot("fbrem", "fbrem",-1.,1.,1);
 
+  // all
+  makePlot("pt",  "p_{T}",0,100.,2);
+  makePlot("eta", "#eta",-2.5,2.5,2);
 }
 
 void makePlot(const char* name, const char* title, float min, float max, int iecal, int nbins) {
+  
+  TFile *fileQCD = TFile::Open("results/trees/QCD_tree.root");
+  TTree *treeQCD = (TTree*) fileQCD->Get("T1");
+  
+  TFile *filePhotonJet = TFile::Open("results/trees/GammaJets_tree.root");
+  TTree *treePhotonJet = (TTree*)filePhotonJet->Get("T1");
 
-  TFile *fileQCD = TFile::Open("datasets_QCDTaP/qcdSignal.root");
-  RooDataSet *dataQCD = (RooDataSet*) fileQCD->Get("T1");
-  fileQCD->Close();
-
-  TFile *filePhotonJet = TFile::Open("datasets_QCDTaP/photonJet.root");
-  RooDataSet *dataPhotonJet = (RooDataSet*)filePhotonJet->Get("T1");
-  filePhotonJet->Close();
-
+    
   char nameQCD[200];
   sprintf(nameQCD, "%s_qcd", name);
-
+  
   char namePhotonJet[200];
   sprintf(namePhotonJet, "%s_photonjet", name);
 
-  TH1F *hQCD = new TH1F(nameQCD, title, nbins, min, max);
+  TH1F *hQCD       = new TH1F(nameQCD,       title, nbins, min, max);
   TH1F *hPhotonJet = new TH1F(namePhotonJet, title, nbins, min, max);
 
-  TTree *treeQCD = (TTree*)&dataQCD->tree();
-  TTree *treePhotonJet = (TTree*)&dataPhotonJet->tree();
+  if(iecal==0)  treeQCD->Project(nameQCD,name,"weight*(abs(eta)<1.476)*(pt>20)");
+  if(iecal==1)  treeQCD->Project(nameQCD,name,"weight*(abs(eta)>1.476)*(pt>20)");
+  if(iecal==2)  treeQCD->Project(nameQCD,name,"weight*(pt>20)");
 
-  char cut[200];
-  sprintf(cut,"iecal==%d",iecal);
+  if (iecal==0) treePhotonJet->Project(namePhotonJet,name,"weight*(abs(eta)<1.476)*(weight<700)*(pt>20)");
+  if (iecal==1) treePhotonJet->Project(namePhotonJet,name,"weight*(abs(eta)>1.476)*(weight<700)*(pt>20)");
+  if (iecal==2) treePhotonJet->Project(namePhotonJet,name,"weight*(weight<700)*(pt>20)");
 
-  treeQCD->Project(nameQCD,name,cut);
-  treePhotonJet->Project(namePhotonJet,name,cut);
-
+  float intQCD = hQCD->Integral();
+  float intPJ  = hPhotonJet->Integral();
+  hQCD->Sumw2();
+  hQCD->Scale( 1./intQCD );
   hPhotonJet->Sumw2();
-  hQCD->Scale( 1./float(hQCD->Integral()) );
-  hPhotonJet->Scale( 1./float(hPhotonJet->Integral()) );
-  
-  hQCD->SetLineColor(kBlue+3);
+  hPhotonJet->Scale( 1./intPJ );
+  cout << "normalized = " << hQCD->Integral() << " " << hPhotonJet->Integral() << endl;
+
+  hQCD->SetFillColor(3);
   hQCD->SetLineWidth(2);
   hPhotonJet->SetLineWidth(2);
   
   hQCD->GetXaxis()->SetTitle(title);
   hQCD->GetYaxis()->SetTitle("a.u.");
 
-  TCanvas c("c","c",400,400);
-  hQCD->Draw();
+  TCanvas c = new TCanvas("c","c",400,400);
+  hQCD->Draw("hist");
   hPhotonJet->Draw("same pe1");
 
   TLegend* leg = new TLegend(0.15,0.75,0.40,0.90);
-  leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
+  leg->SetFillStyle(0); 
+  leg->SetBorderSize(0); 
+  leg->SetTextSize(0.03);
   leg->SetFillColor(0);
-  leg->AddEntry(hQCD,"fake from QCD di-jets","l");
-  leg->AddEntry(hPhotonJet,"fake from #gamma + jets,","pl");
+  leg->AddEntry(hQCD,"QCD di-jets","f");
+  leg->AddEntry(hPhotonJet,"#gamma + jets,","l");
   leg->Draw();
 
   char nameFig[200];
-  if(iecal==0) sprintf(nameFig,"%s_qcd_vs_photonjet_EB.eps", name);
-  else if(iecal==1) sprintf(nameFig,"%s_qcd_vs_photonjet_EE.eps", name);
-  else sprintf(nameFig,"iecalnotset.dummy");
+  if(iecal==0) sprintf(nameFig,"%s_EB.eps", name);
+  if(iecal==1) sprintf(nameFig,"%s_EE.eps", name);
+  if(iecal==2) sprintf(nameFig,"%s_all.eps", name);
   c.SaveAs(nameFig);
-
+  if(iecal==0) sprintf(nameFig,"%s_EB.root", name);
+  if(iecal==1) sprintf(nameFig,"%s_EE.root", name);
+  if(iecal==2) sprintf(nameFig,"%s_all.root", name);
+  c.SaveAs(nameFig);
 }
