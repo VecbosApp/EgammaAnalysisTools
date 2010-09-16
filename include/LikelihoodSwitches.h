@@ -4,11 +4,11 @@
 struct LikelihoodSwitches {
 
   LikelihoodSwitches () :
-    m_useEoverP (true) ,
+    m_useEoverP (false) ,
     m_useDeltaEta (true) ,
     m_useDeltaPhi (true) ,
     m_useHoverE (true) ,
-    m_useFBrem (true) ,
+    m_useFBrem (false) ,
     m_useSigmaEtaEta (true) ,
     m_useSigmaPhiPhi (false) {} ;
 

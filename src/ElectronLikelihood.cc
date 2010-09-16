@@ -314,7 +314,7 @@ ElectronLikelihood::result (const LikelihoodMeasurements electron) const
   std::vector<float> measurements ;
   if(m_eleIDSwitches.m_useDeltaPhi) measurements.push_back( electron.deltaPhi );
   if(m_eleIDSwitches.m_useDeltaEta) measurements.push_back( electron.deltaEta );
-  if(m_eleIDSwitches.m_useEoverP) measurements.push_back( electron.sSuperClusterOverP );
+  if(m_eleIDSwitches.m_useEoverP) measurements.push_back( electron.eSuperClusterOverP );
   if(m_eleIDSwitches.m_useHoverE) measurements.push_back( electron.hadronicOverEm );
   if(m_eleIDSwitches.m_useSigmaEtaEta) measurements.push_back( electron.sigmaIEtaIEta );
   if(m_eleIDSwitches.m_useSigmaPhiPhi) measurements.push_back( electron.sigmaIPhiIPhi );
@@ -322,7 +322,7 @@ ElectronLikelihood::result (const LikelihoodMeasurements electron) const
 
   // Split using only the 1 / >1 cluster
   int nBremClusters=electron.nBremClusters;
-  int bitVal=nBremClusters ;
+  int bitVal = (nBremClusters==1) ? 0 : 1 ;
   
   char className[20] ;
   if(m_signalWeightSplitting.compare("class")==0) {

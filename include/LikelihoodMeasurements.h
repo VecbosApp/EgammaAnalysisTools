@@ -7,7 +7,7 @@ struct LikelihoodMeasurements {
   float deltaPhi,
     deltaEta,
     eSeedClusterOverPout,
-    sSuperClusterOverP,
+    eSuperClusterOverP,
     hadronicOverEm,
     sigmaIEtaIEta,
     sigmaIPhiIPhi,

@@ -120,8 +120,8 @@ LikelihoodPdfProduct::getSpeciesProb(const char* specName,
       break;
     }
   }
-  std::cout << "Species: " << specName
-            << " bare probability = " << bareProb
-            << " with a priori probability = " << priorWeight << std::endl;
+//   std::cout << "Species: " << specName
+//             << " bare probability = " << bareProb
+//             << " with a priori probability = " << priorWeight << std::endl;
   return priorWeight*bareProb;
 }
