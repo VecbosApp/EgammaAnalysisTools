@@ -15,8 +15,8 @@ void countEvents() {
 
   cout << "nametree = " << nametree << endl;
   
-  TChain *chains[22];
-  for(int isample=0; isample<22; isample++) {
+  TChain *chains[23];
+  for(int isample=0; isample<23; isample++) {
     chains[isample] = new TChain(nametree);
   }
 
@@ -34,20 +34,22 @@ void countEvents() {
   chains[7]->Add("results/QCD/QCD_BCtoE_Pt30to80/4/*counters.root");
   chains[8]->Add("results/QCD/QCD_BCtoE_Pt80to170/4/*counters.root");
 
-  chains[9]->Add("results/SingleTop/SingleTop_sChannel-madgraph/4/*counters.root");
-  chains[10]->Add("results/SingleTop/SingleTop_tChannel-madgraph/4/*counters.root");
-  chains[11]->Add("results/SingleTop/SingleTop_tWChannel-madgraph/4/*counters.root");
+  chains[9]->Add("results/QCD/QCD_Pt-20_TuneD6T/4/*counters.root");
 
-  chains[12]->Add("results/PhotonJet/PhotonJet_Pt0to15/4/*counters.root");
-  chains[13]->Add("results/PhotonJet/PhotonJet_Pt15to20/4/*counters.root");
-  chains[14]->Add("results/PhotonJet/PhotonJet_Pt20to30/4/*counters.root");
-  chains[15]->Add("results/PhotonJet/PhotonJet_Pt30to50/4/*counters.root");
-  chains[16]->Add("results/PhotonJet/PhotonJet_Pt50to80/4/*counters.root");
-  chains[17]->Add("results/PhotonJet/PhotonJet_Pt80to120/4/*counters.root");
-  chains[18]->Add("results/PhotonJet/PhotonJet_Pt120to170/4/*counters.root");
-  chains[19]->Add("results/PhotonJet/PhotonJet_Pt170to300/4/*counters.root");
-  chains[20]->Add("results/PhotonJet/PhotonJet_Pt300to500/4/*counters.root");
-  chains[21]->Add("results/PhotonJet/PhotonJet_Pt500toInf/4/*counters.root");
+  chains[10]->Add("results/SingleTop/SingleTop_sChannel-madgraph/4/*counters.root");
+  chains[11]->Add("results/SingleTop/SingleTop_tChannel-madgraph/4/*counters.root");
+  chains[12]->Add("results/SingleTop/SingleTop_tWChannel-madgraph/4/*counters.root");
+
+  chains[13]->Add("results/PhotonJet/PhotonJet_Pt0to15/4/*counters.root");
+  chains[14]->Add("results/PhotonJet/PhotonJet_Pt15to20/4/*counters.root");
+  chains[15]->Add("results/PhotonJet/PhotonJet_Pt20to30/4/*counters.root");
+  chains[16]->Add("results/PhotonJet/PhotonJet_Pt30to50/4/*counters.root");
+  chains[17]->Add("results/PhotonJet/PhotonJet_Pt50to80/4/*counters.root");
+  chains[18]->Add("results/PhotonJet/PhotonJet_Pt80to120/4/*counters.root");
+  chains[19]->Add("results/PhotonJet/PhotonJet_Pt120to170/4/*counters.root");
+  chains[20]->Add("results/PhotonJet/PhotonJet_Pt170to300/4/*counters.root");
+  chains[21]->Add("results/PhotonJet/PhotonJet_Pt300to500/4/*counters.root");
+  chains[22]->Add("results/PhotonJet/PhotonJet_Pt500toInf/4/*counters.root");
 
   cout << "chains added. " << endl;
 
@@ -67,6 +69,8 @@ void countEvents() {
   sampleName.push_back("QCD_QCD_BCtoE_Pt30to80");
   sampleName.push_back("QCD_QCD_BCtoE_Pt80to170");
 
+  sampleName.push_back("QCD_QCD_Pt-20_TuneD6T");
+
   sampleName.push_back("SingleTop_SingleTop_sChannel_madgraph");
   sampleName.push_back("SingleTop_SingleTop_tChannel_madgraph");
   sampleName.push_back("SingleTop_SingleTop_tWChannel_madgraph");
@@ -84,13 +88,13 @@ void countEvents() {
 
 
 
-  float nEv[22];
+  float nEv[23];
 
-  for(int isample=0; isample<22; isample++) {
+  for(int isample=0; isample<23; isample++) {
     nEv[isample] = 0.0;
   }
 
-  for(int isample=0; isample<22; isample++) {
+  for(int isample=0; isample<23; isample++) {
 
     cout << "\tProcessing sample # " << isample << "..." << endl;
 
@@ -115,7 +119,7 @@ void countEvents() {
     }
   }
 
-  for(int isample=0; isample<22; isample++) {
+  for(int isample=0; isample<23; isample++) {
     cout << "Events processed for sample: " << sampleName[isample] << " = " << nEv[isample] << endl;
   }
   

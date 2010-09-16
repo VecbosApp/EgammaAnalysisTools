@@ -13,6 +13,8 @@ hadd results/merged/QCD_BCtoE_Pt20to30_tree.root        results/QCD/QCD_BCtoE_Pt
 hadd results/merged/QCD_BCtoE_Pt30to80_tree.root        results/QCD/QCD_BCtoE_Pt30to80/4/QCD_BCtoE_Pt30to80_*_tree.root
 hadd results/merged/QCD_BCtoE_Pt80to170_tree.root       results/QCD/QCD_BCtoE_Pt80to170/4/QCD_BCtoE_Pt80to170_*_tree.root
 
+hadd results/merged/QCD_Pt-20_TuneD6T_tree.root         results/QCD/QCD_Pt-20_TuneD6T/4/QCD_Pt-20_TuneD6T_*_tree.root
+
 hadd results/merged/TTbar_madgraph_tree.root  results/TTbar/TTbarJets-madgraph/4/TTbarJets-madgraph_*_tree.root
 
 hadd results/merged/PhotonJet_Pt0to15_tree.root    results/PhotonJet/PhotonJet_Pt0to15/4/PhotonJet_Pt0to15_*_tree.root

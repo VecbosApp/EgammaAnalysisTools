@@ -10,8 +10,11 @@ cp results/merged/WJetsMADGRAPH_tree.root results/trees
 # Z alone
 cp results/merged/ZJetsMADGRAPH_tree.root results/trees
 
-# merging all the QCD
+# merging all the enriched QCD
 hadd results/trees/QCD_tree.root  results/merged/QCD_*_tree.root 
+
+# for a test: QCD not enriched pT>20 alone
+cp results/merged/QCD_Pt-20_TuneD6T_tree.root results/trees
 
 # merging all gamma+jets
 hadd results/trees/GammaJets_tree.root results/merged/PhotonJet_*_tree.root 

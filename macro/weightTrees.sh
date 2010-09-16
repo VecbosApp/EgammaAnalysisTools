@@ -15,12 +15,14 @@ addWeights("results/merged/ZJetsMADGRAPH_tree.root",  0.00294516);
 addWeights("results/merged/TTbar_madgraph_tree.root", 0.000122721);
 
 addWeights("results/merged/QCD_EMEnriched_Pt20to30_tree.root",  0.0567193);
-addWeights("results/merged/QCD_EMEnriched_Pt30to80_tree.root",  0.104823);
+addWeights("results/merged/QCD_EMEnriched_Pt30to80_tree.root",  0.103998);
 addWeights("results/merged/QCD_EMEnriched_Pt80to170_tree.root", 0.0267058);
 
 addWeights("results/merged/QCD_BCtoE_Pt20to30_tree.root",  0.047912);
 addWeights("results/merged/QCD_BCtoE_Pt30to80_tree.root",  0.158477);
 addWeights("results/merged/QCD_BCtoE_Pt80to170_tree.root", 1.08628);
+
+addWeights("results/merged/QCD_Pt-20_TuneD6T_tree.root", 12.6954);
 
 addWeights("results/merged/PhotonJet_Pt0to15_tree.root",  732.746);
 addWeights("results/merged/PhotonJet_Pt15to20_tree.root",   1.05656);
