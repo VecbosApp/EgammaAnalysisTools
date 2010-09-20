@@ -435,51 +435,51 @@ void sPlotsPdfsComparison::bookFullHistos() {
       
       char histo[200];
 
-      sprintf(histo,"dPhiUnsplit_%s_%d_%d",hypothesis,iecal,iptbin);
+      sprintf(histo,"dPhiUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       dPhiUnsplitEle[iecal][iptbin]     = new TH1F(histo, histo, nbins, dPhiMin, dPhiMax);
-      sprintf(histo,"dEtaUnsplit_%s_%d_%d",hypothesis,iecal,iptbin);
+      sprintf(histo,"dEtaUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       dEtaUnsplitEle[iecal][iptbin]        = new TH1F(histo, histo, nbins, dEtaMin, dEtaMax);
-      sprintf(histo,"EoPUnsplit_%s_%d_%d",hypothesis,iecal,iptbin);
+      sprintf(histo,"EoPUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       EoPUnsplitEle[iecal][iptbin]      = new TH1F(histo, histo, nbins, EoPMin, EoPMax);
-      sprintf(histo,"HoEUnsplit_%s_%d_%d",hypothesis,iecal,iptbin);
+      sprintf(histo,"HoEUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       HoEUnsplitEle[iecal][iptbin]         = new TH1F(histo, histo, nbins, HoEMin, HoEMax);
       if(iecal==0) {
-        sprintf(histo,"sigmaIEtaIEtaUnsplit_%s_%d_%d",hypothesis,iecal,iptbin);
+        sprintf(histo,"sigmaIEtaIEtaUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
         sigmaIEtaIEtaUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, sigmaIEtaIEtaEBMin, sigmaIEtaIEtaEBMax);
-        sprintf(histo,"sigmaIPhiIPhiUnsplit_%s_%d_%d",hypothesis,iecal,iptbin);
+        sprintf(histo,"sigmaIPhiIPhiUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
         sigmaIPhiIPhiUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, sigmaIPhiIPhiEBMin, sigmaIPhiIPhiEBMax);
       } else {
-        sprintf(histo,"sigmaIEtaIEtaUnsplit_%s_%d_%d",hypothesis,iecal,iptbin);
+        sprintf(histo,"sigmaIEtaIEtaUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
         sigmaIEtaIEtaUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, sigmaIEtaIEtaEEMin, sigmaIEtaIEtaEEMax);
-        sprintf(histo,"sigmaIPhiIPhiUnsplit_%s_%d_%d",hypothesis,iecal,iptbin);
+        sprintf(histo,"sigmaIPhiIPhiUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
         sigmaIPhiIPhiUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, sigmaIPhiIPhiEEMin, sigmaIPhiIPhiEEMax);
       }
-      sprintf(histo,"fBremUnsplit_%s_%d_%d",hypothesis,iecal,iptbin);
+      sprintf(histo,"fBremUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       fBremUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, fBremMin, fBremMax);
 
       // iclass = 0: 0 - brem clusters
       // iclass = 1: >=1 - brem clusters
       for(int iclass=0; iclass<2; iclass++) {
-	sprintf(histo,"dPhiClass_%s_%d_%d_%d",hypothesis,iecal,iptbin,iclass);
+	sprintf(histo,"dPhiClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
 	dPhiClassEle[iecal][iptbin][iclass]     = new TH1F(histo, histo, nbins, dPhiMin, dPhiMax);
-	sprintf(histo,"dEtaClass_%s_%d_%d_%d",hypothesis,iecal,iptbin,iclass);
+	sprintf(histo,"dEtaClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
 	dEtaClassEle[iecal][iptbin][iclass]        = new TH1F(histo, histo, nbins, dEtaMin, dEtaMax);
-	sprintf(histo,"EoPClass_%s_%d_%d_%d",hypothesis,iecal,iptbin,iclass);
+	sprintf(histo,"EoPClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
 	EoPClassEle[iecal][iptbin][iclass]      = new TH1F(histo, histo, nbins, EoPMin, EoPMax);
-	sprintf(histo,"HoEClass_%s_%d_%d_%d",hypothesis,iecal,iptbin,iclass);
+	sprintf(histo,"HoEClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
 	HoEClassEle[iecal][iptbin][iclass]         = new TH1F(histo, histo, nbins, HoEMin, HoEMax);
         if(iecal==0) {
-          sprintf(histo,"sigmaIEtaIEtaClass_electrons_%s_%d_%d_%d",hypothesis,iecal,iptbin,iclass);
+          sprintf(histo,"sigmaIEtaIEtaClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
           sigmaIEtaIEtaClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, sigmaIEtaIEtaEBMin, sigmaIEtaIEtaEBMax);
-          sprintf(histo,"sigmaIPhiIPhiClass_electrons_%s_%d_%d_%d",hypothesis,iecal,iptbin,iclass);
+          sprintf(histo,"sigmaIPhiIPhiClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
           sigmaIPhiIPhiClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, sigmaIPhiIPhiEBMin, sigmaIPhiIPhiEBMax);
         } else {
-          sprintf(histo,"sigmaIEtaIEtaClass_electrons_%s_%d_%d_%d",hypothesis,iecal,iptbin,iclass);
+          sprintf(histo,"sigmaIEtaIEtaClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
           sigmaIEtaIEtaClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, sigmaIEtaIEtaEEMin, sigmaIEtaIEtaEEMax);
-          sprintf(histo,"sigmaIPhiIPhiClass_electrons_%s_%d_%d_%d",hypothesis,iecal,iptbin,iclass);
+          sprintf(histo,"sigmaIPhiIPhiClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
           sigmaIPhiIPhiClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, sigmaIPhiIPhiEEMin, sigmaIPhiIPhiEEMax);
         }
-        sprintf(histo,"fBremClass_%s_%d_%d_%d",hypothesis,iecal,iptbin,iclass);
+        sprintf(histo,"fBremClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
         fBremClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, fBremMin, fBremMax);
 
       }
