@@ -36,8 +36,10 @@ public :
    Double_t        dphi;
    Double_t        hoe;
    Double_t        see;
+   Double_t        spp;
    Double_t        eop;
    Double_t        fbrem;
+   Double_t        nbrem;
    Double_t        met;
    Double_t        tcmet;
    Double_t        pfmet;
@@ -83,8 +85,10 @@ public :
    Float_t       f_dphi;
    Float_t       f_hoe;
    Float_t       f_see;
+   Float_t       f_spp;
    Float_t       f_eop;
    Float_t       f_fbrem;
+   Int_t         f_nbrem;
    Float_t       f_met;
    Float_t       f_tcmet;
    Float_t       f_pfmet;
@@ -161,8 +165,10 @@ public :
    TBranch        *b_dphi;   //!
    TBranch        *b_hoe;   //!
    TBranch        *b_see;   //!
+   TBranch        *b_spp;   //!
    TBranch        *b_eop;   //!
    TBranch        *b_fbrem;   //!
+   TBranch        *b_nbrem;   //!
    TBranch        *b_met;   //!
    TBranch        *b_tcmet;   //!
    TBranch        *b_pfmet;   //!
@@ -333,8 +339,10 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC, int data_ZTaP)
      fChain->SetBranchAddress("dphi", &f_dphi, &b_dphi);
      fChain->SetBranchAddress("hoe", &f_hoe, &b_hoe);
      fChain->SetBranchAddress("see", &f_see, &b_see);
+     fChain->SetBranchAddress("spp", &f_spp, &b_spp);
      fChain->SetBranchAddress("eop", &f_eop, &b_eop);
      fChain->SetBranchAddress("fbrem", &f_fbrem, &b_fbrem);
+     fChain->SetBranchAddress("nbrem", &f_nbrem, &b_nbrem);
      fChain->SetBranchAddress("met", &f_met, &b_met);
      fChain->SetBranchAddress("tcmet", &f_tcmet, &b_tcmet);
      fChain->SetBranchAddress("pfmet", &f_pfmet, &b_pfmet);
@@ -347,8 +355,8 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC, int data_ZTaP)
      fChain->SetBranchAddress("charge", &f_charge, &b_charge);
      fChain->SetBranchAddress("weight", &f_weight, &b_weight);
      fChain->SetBranchAddress("event", &f_event, &b_event);
-     fChain->SetBranchAddress("nPFJets", &f_nPFJets, &b_nPFJets);
-     fChain->SetBranchAddress("nJets", &f_nJets, &b_nJets);
+     fChain->SetBranchAddress("nPFJetsHi", &f_nPFJets, &b_nPFJets);
+     fChain->SetBranchAddress("nJetsHi", &f_nJets, &b_nJets);
      fChain->SetBranchAddress("isIdWP70", &f_isIdWP70, &b_isIdWP70);
      fChain->SetBranchAddress("isIdWP80", &f_isIdWP80, &b_isIdWP80);
      fChain->SetBranchAddress("isIdWP85", &f_isIdWP85, &b_isIdWP85);
@@ -385,8 +393,10 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC, int data_ZTaP)
      fChain->SetBranchAddress("dphi", &dphi, &b_dphi);
      fChain->SetBranchAddress("hoe", &hoe, &b_hoe);
      fChain->SetBranchAddress("see", &see, &b_see);
+     fChain->SetBranchAddress("spp", &spp, &b_spp);
      fChain->SetBranchAddress("eop", &eop, &b_eop);
      fChain->SetBranchAddress("fbrem", &fbrem, &b_fbrem);
+     fChain->SetBranchAddress("nbrem", &nbrem, &b_nbrem);
      fChain->SetBranchAddress("met", &met, &b_met);
      fChain->SetBranchAddress("tcmet", &tcmet, &b_tcmet);
      fChain->SetBranchAddress("pfmet", &pfmet, &b_pfmet);
@@ -399,8 +409,8 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC, int data_ZTaP)
      fChain->SetBranchAddress("charge", &charge, &b_charge);
      fChain->SetBranchAddress("weight", &weight, &b_weight);
      fChain->SetBranchAddress("event", &event, &b_event);
-     fChain->SetBranchAddress("nPFJets", &nPFJets, &b_nPFJets);
-     fChain->SetBranchAddress("nJets", &nJets, &b_nJets);
+     fChain->SetBranchAddress("nPFJetsHi", &nPFJets, &b_nPFJets);
+     fChain->SetBranchAddress("nJetsHi", &nJets, &b_nJets);
      fChain->SetBranchAddress("isIdWP70", &isIdWP70, &b_isIdWP70);
      fChain->SetBranchAddress("isIdWP80", &isIdWP80, &b_isIdWP80);
      fChain->SetBranchAddress("isIdWP85", &isIdWP85, &b_isIdWP85);

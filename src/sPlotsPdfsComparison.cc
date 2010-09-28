@@ -55,8 +55,7 @@ void sPlotsPdfsComparison::Loop()
         if(f_pt>=10 && f_pt<=20) jptbin = 0;
         else if(f_pt>20) jptbin = 1;
         else continue;
-        // temporary!!!!!!
-        if(f_classification==0) jclass = 0;
+        if(f_nbrem==0) jclass = 0;
         else jclass = 1;
         if(m_doSignal) {
           if(f_nJets>0 || f_pfmet/f_pt<0.3 || f_isIsoWP80<0) continue;
@@ -69,8 +68,7 @@ void sPlotsPdfsComparison::Loop()
         if(pt>=10 && pt<=20) jptbin = 0;
         else if(pt>20) jptbin = 1;
         else continue;
-        // temporary!!!!!!
-        if(classification==0) jclass = 0;
+        if(nbrem==0) jclass = 0;
         else jclass = 1;
         if(m_doSignal) {
           if(nJets>0 || pfmet/pt<0.3 || isIsoWP80<0) continue;
@@ -100,7 +98,7 @@ void sPlotsPdfsComparison::Loop()
         EoPUnsplitEle [jecal][jptbin] -> Fill ( f_eop, wgt );
         HoEUnsplitEle  [jecal][jptbin] -> Fill ( f_hoe, wgt );
         sigmaIEtaIEtaUnsplitEle [jecal][jptbin] -> Fill ( f_see, wgt );
-        sigmaIPhiIPhiUnsplitEle [jecal][jptbin] -> Fill ( f_see, wgt ); /// temporary!!!!
+        sigmaIPhiIPhiUnsplitEle [jecal][jptbin] -> Fill ( f_spp, wgt ); 
         fBremUnsplitEle [jecal][jptbin] -> Fill ( f_fbrem, wgt );
 
         dPhiClassEle [jecal][jptbin][jclass] -> Fill ( f_dphi, wgt );
@@ -108,7 +106,7 @@ void sPlotsPdfsComparison::Loop()
         EoPClassEle [jecal][jptbin][jclass] -> Fill ( f_eop, wgt );
         HoEClassEle  [jecal][jptbin][jclass] -> Fill ( f_hoe, wgt );
         sigmaIEtaIEtaClassEle [jecal][jptbin][jclass] -> Fill ( f_see, wgt );
-        sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( f_see, wgt ); /// temporary!!!!
+        sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( f_spp, wgt ); 
         fBremClassEle [jecal][jptbin][jclass] -> Fill ( f_fbrem, wgt );
 
       } else {
@@ -128,7 +126,7 @@ void sPlotsPdfsComparison::Loop()
         EoPUnsplitEle [jecal][jptbin] -> Fill ( eop, wgt );
         HoEUnsplitEle  [jecal][jptbin] -> Fill ( hoe, wgt );
         sigmaIEtaIEtaUnsplitEle [jecal][jptbin] -> Fill ( see, wgt );
-        sigmaIPhiIPhiUnsplitEle [jecal][jptbin] -> Fill ( see, wgt ); /// temporary!!!!
+        sigmaIPhiIPhiUnsplitEle [jecal][jptbin] -> Fill ( spp, wgt );
         fBremUnsplitEle [jecal][jptbin] -> Fill ( fbrem, wgt );
 
         dPhiClassEle [jecal][jptbin][jclass] -> Fill ( dphi, wgt );
@@ -136,7 +134,7 @@ void sPlotsPdfsComparison::Loop()
         EoPClassEle [jecal][jptbin][jclass] -> Fill ( eop, wgt );
         HoEClassEle  [jecal][jptbin][jclass] -> Fill ( hoe, wgt );
         sigmaIEtaIEtaClassEle [jecal][jptbin][jclass] -> Fill ( see, wgt );
-        sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( see, wgt ); /// temporary!!!!
+        sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( spp, wgt );
         fBremClassEle [jecal][jptbin][jclass] -> Fill ( fbrem, wgt );
 
       }
