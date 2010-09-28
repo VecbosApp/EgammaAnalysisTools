@@ -8,7 +8,7 @@ struct LikelihoodSwitches {
     m_useDeltaEta (true) ,
     m_useDeltaPhi (true) ,
     m_useHoverE (true) ,
-    m_useFBrem (false) ,
+    m_useFBrem (true) ,
     m_useSigmaEtaEta (true) ,
     m_useSigmaPhiPhi (false) {} ;
 
