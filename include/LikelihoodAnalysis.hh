@@ -25,7 +25,7 @@ public:
   //! reproduce the egamma cut based ID (for debugging)
   void reproduceEgammaCutID();
   //! produce the ID efficiency eta/pT distributions
-  void estimateIDEfficiency(const char *outname);
+  void estimateIDEfficiency(const char *outname="job0");
   //! produce the mis-ID eta/pT distributions
   void estimateFakeRate(const char *outname="job0");
 

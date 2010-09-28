@@ -76,6 +76,8 @@ float LikelihoodAnalysis::findEquivalentLHCut(float wantEfficiency) {
 
 void LikelihoodAnalysis::reproduceEgammaCutID() {
 
+
+  // not fully migrated to 38X !!!
   CutBasedEleIDSelector EgammaLooseCutBasedID;
   EgammaLooseCutBasedID.Configure("config/looseEleId"); 
 
@@ -94,17 +96,23 @@ void LikelihoodAnalysis::reproduceEgammaCutID() {
     int iSelected = -1;
     for(int iele=0; iele<nEle; iele++) {
 
-      TVector3 pTrkAtOuter(pxAtOuterEle[iele],pyAtOuterEle[iele],pzAtOuterEle[iele]);
+      int gsf = gsfTrackIndexEle[iele];
+      TVector3 pTrkAtOuter(pxAtOuterGsfTrack[gsf],pyAtOuterGsfTrack[gsf],pzAtOuterGsfTrack[gsf]);
+
+      int sc = superClusterIndexEle[iele];
+      float s9s25 = e3x3SC[sc]/e5x5SC[sc];
+      float spp = sqrt(covIPhiIPhiSC[sc]);
+      float see = sqrt(covIEtaIEtaSC[sc]);
 
       EgammaLooseCutBasedID.SetHOverE( hOverEEle[iele] );
-      EgammaLooseCutBasedID.SetS9S25( s9s25Ele[iele] );
+      EgammaLooseCutBasedID.SetS9S25( s9s25 );
       EgammaLooseCutBasedID.SetDEta( deltaEtaAtVtxEle[iele] );
       EgammaLooseCutBasedID.SetDPhiIn( deltaPhiAtVtxEle[iele] );
       EgammaLooseCutBasedID.SetDPhiOut( deltaPhiAtCaloEle[iele] );
-      EgammaLooseCutBasedID.SetInvEminusInvP( 1./ecalEle[iele]-1./momentumEle[iele] );
-      EgammaLooseCutBasedID.SetBremFraction( fabs(momentumEle[iele]-pTrkAtOuter.Mag())/momentumEle[iele] );
-      EgammaLooseCutBasedID.SetSigmaEtaEta( sqrt(covEtaEtaEle[iele]) );
-      EgammaLooseCutBasedID.SetSigmaPhiPhi( sqrt(covPhiPhiEle[iele]) );
+      EgammaLooseCutBasedID.SetInvEminusInvP( 1./energyEle[iele]-1./pTrkAtOuter.Mag() );
+      EgammaLooseCutBasedID.SetBremFraction( fbremEle[iele] );
+      EgammaLooseCutBasedID.SetSigmaEtaEta( see );
+      EgammaLooseCutBasedID.SetSigmaPhiPhi( spp );
       EgammaLooseCutBasedID.SetEOverPout( eSeedOverPoutEle[iele] );
       EgammaLooseCutBasedID.SetEOverPin( eSuperClusterOverPEle[iele] );
       EgammaLooseCutBasedID.SetElectronClass ( classificationEle[iele] );
@@ -120,7 +128,7 @@ void LikelihoodAnalysis::reproduceEgammaCutID() {
 
   }
 
-  EgammaLooseCutBasedID.diplayEfficiencies();
+  EgammaLooseCutBasedID.displayEfficiencies();
 
 
 }
@@ -376,19 +384,19 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 //     int nJetsReco=0;
 //     int nEleReco=0;
 
-    for ( int jet=0; jet<nSisConeJet; jet++ ) {
+    for ( int jet=0; jet<nAK5PFJet; jet++ ) {
 
-      TVector3 p3Jet(pxSisConeJet[jet],pySisConeJet[jet],pzSisConeJet[jet]);
+      TVector3 p3Jet(pxAK5PFJet[jet],pyAK5PFJet[jet],pzAK5PFJet[jet]);
 
-       if ( fabs(etaSisConeJet[jet]) < 2.5 && etSisConeJet[jet] > 10.0 ) {
+      if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 10.0 ) {
         
         float deltaR = 1000;
         if(mceleindex>-1) deltaR = p3Jet.DeltaR(mcEle);
 
         // remove from denominator the electron reconstructed as jet
         if( deltaR>0.3 ) { 
-          FakeableJetsEta->Fill( etaSisConeJet[jet] );
-          FakeableJetsPt->Fill( etSisConeJet[jet] );
+          FakeableJetsEta->Fill( p3Jet.Eta() );
+          FakeableJetsPt->Fill( p3Jet.Pt() );
           //          nJetsReco++;
         }
 
@@ -397,10 +405,11 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
     }
 
     for ( int ele=0; ele<nEle; ele++ ) {
-      
-      if ( fabs(etaEle[ele]) < 2.5 && etEle[ele] > 10.0 ) {
 
-        TVector3 p3Ele(pxEle[ele], pyEle[ele], pzEle[ele]);
+      TVector3 p3Ele(pxEle[ele], pyEle[ele], pzEle[ele]);
+      
+      if ( fabs(etaEle[ele]) < 2.5 && p3Ele.Pt() > 10.0 ) {
+
       
         float deltaR = 1000;
         if(mceleindex>-1) deltaR = p3Ele.DeltaR(mcEle);
@@ -410,11 +419,11 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
         float dREleJet_min = 1000;
         int closestJet=-1;
 
-        for ( int jet=0; jet<nSisConeJet; jet++ ) {
+        for ( int jet=0; jet<nAK5PFJet; jet++ ) {
 
-          if ( fabs(etaSisConeJet[jet]) < 2.5 && etSisConeJet[jet] > 10.0 ) {          
+          TVector3 p3Jet(pxAK5PFJet[jet],pyAK5PFJet[jet],pzAK5PFJet[jet]);
 
-            TVector3 p3Jet(pxSisConeJet[jet],pySisConeJet[jet],pzSisConeJet[jet]);
+          if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 10.0 ) {          
             
             float dREleJet = p3Jet.DeltaR(p3Ele);
             if(dREleJet<dREleJet_min) {
@@ -430,8 +439,10 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
         if(closestJet > -1) {
 
-          float etFake=etSisConeJet[closestJet];
-          float etaFake=etaSisConeJet[closestJet];
+          TVector3 p3ClosestJet(pxAK5PFJet[closestJet],pyAK5PFJet[closestJet],pzAK5PFJet[closestJet]);
+
+          float etFake=p3ClosestJet.Pt();
+          float etaFake=p3ClosestJet.Eta();
 
           RecoEta->Fill(etaFake);
           RecoPt->Fill(etFake);

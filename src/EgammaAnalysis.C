@@ -13,6 +13,7 @@
 #include <fstream>
 #include <string>
 #include <stdio.h>
+#include <stdlib.h>
 
 // ROOT includes
 #include <TROOT.h>
@@ -25,9 +26,9 @@
 #include "EgammaAnalysisTools/include/Application.hh"
 #include "CommonTools/include/TriggerMask.hh"
 
-// #if Application == 1
-// #include "EgammaAnalysisTools/include/LikelihoodAnalysis.hh"
-// #endif
+#if Application == 1
+#include "EgammaAnalysisTools/include/LikelihoodAnalysis.hh"
+#endif
 #if Application == 2
 #include "EgammaAnalysisTools/include/LHPdfsProducer.hh"
 #endif
@@ -92,16 +93,16 @@ int main(int argc, char* argv[]) {
   delete inputFile;
 #endif
 
-// #if Application == 1
+#if Application == 1
 
-//   LikelihoodAnalysis analysis(theChain);
-//   analysis.reproduceEgammaCutID();
-//   //  analysis.findEquivalentLHCut( 0.79935 );        // tight eleID
-//   //  analysis.findEquivalentLHCut( 0.957 );       // loose eleID
-//   //  analysis.estimateIDEfficiency();
-//   //  analysis.estimateFakeRate();
+  LikelihoodAnalysis analysis(theChain);
+  // analysis.reproduceEgammaCutID();
+  //  analysis.findEquivalentLHCut( 0.79935 );        // tight eleID
+  //  analysis.findEquivalentLHCut( 0.957 );       // loose eleID
+  analysis.estimateIDEfficiency();
+  //  analysis.estimateFakeRate();
   
-// #endif
+#endif
 
 #if Application == 2
 

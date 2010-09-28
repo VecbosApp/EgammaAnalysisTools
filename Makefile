@@ -136,6 +136,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)IsolationPdfsProducer.o \
 	$(OUTLIB)SuperClusterWSelection.o \
 	$(OUTLIB)McTruthEvent.o \
+	$(OUTLIB)LikelihoodAnalysis.o \
 	$(OUTLIB)PFElectronSeedingEfficiency.o \
 	$(OUTLIB)PFElectronSeedingDistributions.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
