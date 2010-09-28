@@ -39,7 +39,7 @@ LikelihoodPdf::split(std::map<std::string,float> splitFractions,
   else if(splitFractions.size()>0) {
     std::map<std::string,float>::const_iterator splitCatItr;
     for(splitCatItr=splitFractions.begin();splitCatItr!=splitFractions.end();splitCatItr++) {
-      sprintf(buffer,"%sClass_%s_subdet%d_ptbin%d",_name.c_str(),_species.c_str(),_ecalsubdet,_ptbin);
+      sprintf(buffer,"%sUnsplit_%s_subdet%d_ptbin%d",_name.c_str(),_species.c_str(),_ecalsubdet,_ptbin);
       std::string totPdfName = std::string(buffer);
       _splitRule.insert( std::make_pair(splitCatItr->first,totPdfName) );
     }
@@ -76,33 +76,15 @@ LikelihoodPdf::getVal(float x, std::string gsfClass,
 		      bool normalized) {
   _tdirectory->cd();
   TH1F *thePdf=0;
-  if(_splitPdf.size()>1) {
-//     std::cout<< "The PDF " << _name
-//              << " is SPLITTED by category " << gsfClass << std::endl;
-    thePdf=_splitPdf.find(gsfClass)->second;
-  }
-  else {
-//     std::cout << "The PDF " << _name
-//               << " is UNSPLITTED" << std::endl;
-    thePdf=_splitPdf.find("NOSPLIT")->second;
-  }
+  if(_splitPdf.size()>1) thePdf=_splitPdf.find(gsfClass)->second;
+  else thePdf=_splitPdf.find("NOSPLIT")->second;
   
   float prob=-1;
 
   if(normalized)
-    prob=thePdf->GetBinContent(findBin(x,thePdf))/thePdf->Integral();
+    prob=thePdf->GetBinContent(findBin(x,thePdf))/thePdf->Integral(0,thePdf->GetNbinsX()+1);
   else
     prob=thePdf->GetBinContent(findBin(x,thePdf));
-
-//   std::cout << "sanity check: PDF name = " << _name
-//             << " for species = " << _species
-//             << " for class = " << gsfClass 
-//             << " bin content = " << thePdf->GetBinContent(findBin(x,thePdf))
-//             << " normalization = " << thePdf->Integral()
-//             << " prob = " << prob << std::endl;
-//   std::cout << "From likelihood with ecalsubdet = " << _ecalsubdet
-//             << " ptbin = " << _ptbin << std::endl;
- 
 
   return prob;
 }
