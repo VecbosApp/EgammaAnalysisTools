@@ -68,6 +68,8 @@ OUTLIBCOMMON     = $(INCLUDEDIRCOMMON)/CommonTools/lib/
 
 $(OUTLIB)EgammaBase.o: $(INCLUDEDIR)/src/EgammaBase.C
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)EgammaBase.o $<
+$(OUTLIB)Egamma.o: $(INCLUDEDIR)/src/Egamma.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)Egamma.o $<
 $(OUTLIBCOMMON)Conditions.o: $(INCLUDEDIRCOMMON)/CommonTools/src/Conditions.C
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)Conditions.o $<
 $(OUTLIBCOMMON)Utils.o: $(INCLUDEDIRCOMMON)/CommonTools/src/Utils.cc
@@ -120,6 +122,7 @@ $(OUTLIB)ElectronLikelihood.o: $(INCLUDEDIR)/src/ElectronLikelihood.cc
 # ==================== EgammaAnalysis =============================================
 EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)EgammaBase.o \
+	$(OUTLIB)Egamma.o \
 	$(OUTLIBCOMMON)Conditions.o \
 	$(OUTLIBCOMMON)Selection.o \
 	$(OUTLIB)CutBasedEleIDSelector.o \
@@ -136,6 +139,10 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)IsolationPdfsProducer.o \
 	$(OUTLIB)SuperClusterWSelection.o \
 	$(OUTLIB)McTruthEvent.o \
+	$(OUTLIB)LikelihoodPdf.o \
+	$(OUTLIB)LikelihoodSpecies.o \
+	$(OUTLIB)LikelihoodPdfProduct.o \
+	$(OUTLIB)ElectronLikelihood.o \
 	$(OUTLIB)LikelihoodAnalysis.o \
 	$(OUTLIB)PFElectronSeedingEfficiency.o \
 	$(OUTLIB)PFElectronSeedingDistributions.o
