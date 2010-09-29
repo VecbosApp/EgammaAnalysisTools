@@ -48,14 +48,18 @@ void drawEta(const char* filename) {
 
   TH1F *FakeableJetsEta = (TH1F*)efficiencyFileEta->Get("FakeableJetsEta");
   TH1F *RecoEta = (TH1F*)efficiencyFileEta->Get("RecoEta");
-  TH1F *CutIdEta = (TH1F*)efficiencyFileEta->Get("CutIdEta");
+  TH1F *CutIdWP80Eta = (TH1F*)efficiencyFileEta->Get("CutIdWP80Eta");
+  TH1F *CutIdTightCICEta = (TH1F*)efficiencyFileEta->Get("CutIdTightCICEta");
+  TH1F *CutIdSuperTightCICEta = (TH1F*)efficiencyFileEta->Get("CutIdSuperTightCICEta");
   TH1F *LHIdLooseEta = (TH1F*)efficiencyFileEta->Get("LHIdLooseEta");
   TH1F *LHIdTightEta = (TH1F*)efficiencyFileEta->Get("LHIdTightEta");
 
   EfficiencyEvaluator ElectronFakeRateEta("elemisid-eta.root");
   ElectronFakeRateEta.AddNumerator(FakeableJetsEta);
   ElectronFakeRateEta.AddNumerator(RecoEta);
-  ElectronFakeRateEta.AddNumerator(CutIdEta);
+  ElectronFakeRateEta.AddNumerator(CutIdWP80Eta);
+  ElectronFakeRateEta.AddNumerator(CutIdTightCICEta);
+  ElectronFakeRateEta.AddNumerator(CutIdSuperTightCICEta);
   ElectronFakeRateEta.AddNumerator(LHIdLooseEta);
   ElectronFakeRateEta.AddNumerator(LHIdTightEta);
   ElectronFakeRateEta.SetDenominator(FakeableJetsEta);
@@ -68,15 +72,15 @@ void drawEta(const char* filename) {
   efficiency[1]->SetLineColor(2);
   efficiency[2]->SetLineColor(4);
   efficiency[3]->SetLineColor(6);
-  efficiency[4]->SetLineColor(7);
+  efficiency[6]->SetLineColor(8);
 
   TLegend* leg = new TLegend(0.15,0.75,0.40,0.90);
   leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
   leg->SetFillColor(0);
   leg->AddEntry(efficiency[1],"reconstrunction");
-  leg->AddEntry(efficiency[2],"Loose Category standard");
-  leg->AddEntry(efficiency[3],"Loose Likelihood");
-  leg->AddEntry(efficiency[4],"Tight Likelihood");
+  leg->AddEntry(efficiency[2],"WP80 Cuts");
+  //  leg->AddEntry(efficiency[3],"Tight CIC Cuts");
+  leg->AddEntry(efficiency[6],"Tight Likelihood");
 
   efficiency[1]->SetMinimum(0.0001);
   efficiency[1]->SetMaximum(1.0);
@@ -84,9 +88,9 @@ void drawEta(const char* filename) {
   efficiency[1]->GetXaxis()->SetTitle("#eta of closest jet");
   efficiency[1]->GetYaxis()->SetTitle("Electron mis-id from Jets");
   efficiency[1]->Draw("hist");
-  for(int i=2; i<5; i++) {
-    efficiency[i]->Draw("same hist");
-  }
+  efficiency[2]->Draw("same hist");
+  //  efficiency[3]->Draw("same hist");
+  efficiency[6]->Draw("same hist");
   leg->Draw();
 
   c1.SaveAs("elemisid-eta.eps");
@@ -101,14 +105,18 @@ void drawPt(const char* filename) {
 
   TH1F *FakeableJetsPt = (TH1F*)efficiencyFilePt->Get("FakeableJetsPt");
   TH1F *RecoPt = (TH1F*)efficiencyFilePt->Get("RecoPt");
-  TH1F *CutIdPt = (TH1F*)efficiencyFilePt->Get("CutIdPt");
+  TH1F *CutIdWP80Pt = (TH1F*)efficiencyFilePt->Get("CutIdWP80Pt");
+  TH1F *CutIdTightCICPt = (TH1F*)efficiencyFilePt->Get("CutIdTightCICPt");
+  TH1F *CutIdSuperTightCICPt = (TH1F*)efficiencyFilePt->Get("CutIdSuperTightCICPt");
   TH1F *LHIdLoosePt = (TH1F*)efficiencyFilePt->Get("LHIdLoosePt");
   TH1F *LHIdTightPt = (TH1F*)efficiencyFilePt->Get("LHIdTightPt");
 
   EfficiencyEvaluator ElectronFakeRatePt("elemisid-pt.root");
   ElectronFakeRatePt.AddNumerator(FakeableJetsPt);
   ElectronFakeRatePt.AddNumerator(RecoPt);
-  ElectronFakeRatePt.AddNumerator(CutIdPt);
+  ElectronFakeRatePt.AddNumerator(CutIdWP80Pt);
+  ElectronFakeRatePt.AddNumerator(CutIdTightCICPt);
+  ElectronFakeRatePt.AddNumerator(CutIdSuperTightCICPt);
   ElectronFakeRatePt.AddNumerator(LHIdLoosePt);
   ElectronFakeRatePt.AddNumerator(LHIdTightPt);
   ElectronFakeRatePt.SetDenominator(FakeableJetsPt);
@@ -120,16 +128,15 @@ void drawPt(const char* filename) {
   c1.SetLogy();
   efficiency[1]->SetLineColor(2);
   efficiency[2]->SetLineColor(4);
-  efficiency[3]->SetLineColor(6);
-  efficiency[4]->SetLineColor(7);
+  efficiency[6]->SetLineColor(8);
 
   TLegend* leg = new TLegend(0.15,0.75,0.40,0.90);
   leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
   leg->SetFillColor(0);
   leg->AddEntry(efficiency[1],"reconstrunction");
-  leg->AddEntry(efficiency[2],"Loose Category standard");
-  leg->AddEntry(efficiency[3],"Loose Likelihood");
-  leg->AddEntry(efficiency[4],"Tight Likelihood");
+  leg->AddEntry(efficiency[2],"WP80 Cuts");
+  //  leg->AddEntry(efficiency[3],"Tight CIC Cuts");
+  leg->AddEntry(efficiency[6],"Tight Likelihood");
 
   efficiency[1]->SetMinimum(0.0001);
   efficiency[1]->SetMaximum(1.0);
@@ -137,9 +144,9 @@ void drawPt(const char* filename) {
   efficiency[1]->GetXaxis()->SetTitle("p_{T} of closest jet [GeV]");
   efficiency[1]->GetYaxis()->SetTitle("Electron mis-id from Jets");
   efficiency[1]->Draw("hist");
-  for(int i=2; i<5; i++) {
-    efficiency[i]->Draw("same hist");
-  }
+  efficiency[2]->Draw("same hist");
+  //  efficiency[3]->Draw("same hist");
+  efficiency[6]->Draw("same hist");
   leg->Draw();
 
   c1.SaveAs("elemisid-pt.eps");
