@@ -9,9 +9,11 @@
 #include <vector>
 
 #include "CommonTools/include/Selection.hh"
-#include "EgammaAnalysisTools/include/EgammaBase.h"
+#include "EgammaAnalysisTools/include/CutBasedEleIDSelector.hh"
+#include "EgammaAnalysisTools/include/Egamma.h"
+#include "EgammaAnalysisTools/include/ElectronLikelihood.h"
 
-class LikelihoodAnalysis : public EgammaBase {
+class LikelihoodAnalysis : public Egamma {
 
 public:
   //! constructor
@@ -28,14 +30,26 @@ public:
   void estimateIDEfficiency(const char *outname="job0");
   //! produce the mis-ID eta/pT distributions
   void estimateFakeRate(const char *outname="job0");
+  //! produce the mis-ID eta/pT distributions from QCD di-jets
+  void estimateFakeRateQCD(const char *outname="job0");
 
 private:
 
   //! apply the custom offline electron ID
-  bool getCustomEleID(int eleIndex, const char *fileCuts, const char *fileSwitches);
+  void isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput);
+  
+  float SigmaiEiE(int electron);
+  float SigmaiPiP(int electron);
+  
+  float likelihoodRatio(int eleIndex, ElectronLikelihood &lh);
+
+  CutBasedEleIDSelector EgammaCutBasedID;
+  ElectronLikelihood *LH;
 
   //! contains the class-dependent electron ID cuts
   std::vector<Selection*> m_EgammaCutIDSelection;
+  
+  bool _isData;
 
 };
 
