@@ -314,9 +314,8 @@ bool CutBasedEleIDSelector::outputEleId() {
      m_egammaCutBased ) m_electronCounter.IncrVar("egammaCutBased");
 
   if(selection->getSwitch("likelihood") && 
-     selection->passCut("likelihood", fabs(m_Likelihood) )) {  
-    m_electronCounter.IncrVar("likelihood");
-  }
+     !selection->passCut("likelihood", fabs(m_Likelihood) )) return false;
+  m_electronCounter.IncrVar("likelihood");
 
   if(selection->getSwitch("hOverE") && 
      !selection->passCut("hOverE", fabs(m_HOverE) )) return false;  
@@ -537,10 +536,9 @@ bool CutBasedEleIDSelector::outputNoClassEleId() {
      m_egammaCutBased ) m_electronCounter.IncrVar("egammaCutBased");
 
   if(selection->getSwitch("likelihood") && 
-     selection->passCut("likelihood", fabs(m_Likelihood) )) {  
-    m_electronCounter.IncrVar("likelihood");
-  }
-
+     !selection->passCut("likelihood", fabs(m_Likelihood) )) return false;
+  m_electronCounter.IncrVar("likelihood");
+  
   if(selection->getSwitch("hOverE") && 
      !selection->passCut("hOverE", fabs(m_HOverE) )) return false;  
   m_electronCounter.IncrVar("hOverE");
