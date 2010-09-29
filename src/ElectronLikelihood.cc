@@ -322,7 +322,7 @@ ElectronLikelihood::result (const LikelihoodMeasurements electron) const
 
   // Split using only the 1 / >1 cluster
   int nBremClusters=electron.nBremClusters;
-  int bitVal = (nBremClusters==1) ? 0 : 1 ;
+  int bitVal = (nBremClusters==0) ? 0 : 1 ;
   
   char className[20] ;
   if(m_signalWeightSplitting.compare("class")==0) {
