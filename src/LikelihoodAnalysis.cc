@@ -651,13 +651,13 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
         leadingJet = jet;
       }
     }
-    
+
     // consider the other as fakes (denominator)
-    for ( int jet=0; jet<nAK5PFJet && jet!=leadingJet; jet++ ) {
+    for ( int jet=0; jet<nAK5PFJet; jet++ ) {
       TVector3 p3Jet(pxAK5PFJet[jet],pyAK5PFJet[jet],pzAK5PFJet[jet]);
-      if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 20.0 ) {
-          FakeableJetsEta->Fill( p3Jet.Eta() );
-          FakeableJetsPt->Fill( p3Jet.Pt() );
+      if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 20.0 && jet!=leadingJet ) {
+        FakeableJetsEta->Fill( p3Jet.Eta() );
+        FakeableJetsPt->Fill( p3Jet.Pt() );
       }
     }
 
@@ -669,9 +669,9 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
         float dREleJet_min = 1000;
         int closestJet=-1;
 
-        for ( int jet=0; jet<nAK5PFJet && jet!=leadingJet; jet++ ) {
+        for ( int jet=0; jet<nAK5PFJet; jet++ ) {
           TVector3 p3Jet(pxAK5PFJet[jet],pyAK5PFJet[jet],pzAK5PFJet[jet]);
-          if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 20.0 ) {          
+          if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 20.0 && jet!=leadingJet ) {          
             float dREleJet = p3Jet.DeltaR(p3Ele);
             if(dREleJet<dREleJet_min) {
               closestJet=jet;
