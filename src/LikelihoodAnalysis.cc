@@ -603,6 +603,11 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
   unsigned int lastLumi = 0;
   unsigned int lastRun  = 0;
 
+  // QCD trigger 
+  requiredTriggers.push_back("HLT_Jet15U");
+  requiredTriggers.push_back("HLT_Jet30U");
+  requiredTriggers.push_back("HLT_Jet50U");
+
   Long64_t nbytes = 0, nb = 0;
   Long64_t nentries = fChain->GetEntries();
   std::cout << "Number of entries = " << nentries << std::endl;
@@ -633,10 +638,6 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
       std::cout << "[GoodRunLS]::Run " << lastRun << " LS " << lastLumi << " is OK" << std::endl;
     }
 
-    // QCD trigger 
-    requiredTriggers.push_back("HLT_Jet15U");
-    requiredTriggers.push_back("HLT_Jet30U");
-    requiredTriggers.push_back("HLT_Jet50U");
     Utils anaUtils;
     bool passedHLT = hasPassedHLT();
     if ( !passedHLT ) continue;   
