@@ -397,14 +397,14 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
 
 void sPlotsPdfsComparison::bookFullHistos() {
 
-  int nbins = 50;
+  int nbins = 200;
 
-  float dPhiMin  = -0.05; // pixelMatchGsfElectron pre-selection: |dPhi| < 0.1
-  float dPhiMax  =  0.05;
-  float dEtaMin     = -0.008;
-  float dEtaMax     =  0.008;
+  float dPhiMin  = -0.1; // pixelMatchGsfElectron pre-selection: |dPhi| < 0.1
+  float dPhiMax  =  0.1;
+  float dEtaMin     = -0.015;
+  float dEtaMax     =  0.015;
   float EoPMin   =  0.0;
-  float EoPMax   =  5.0;
+  float EoPMax   =  10.0;
   float HoEMin      =  0.0; // zero-suppression in HCAL
   float HoEMax      =  0.15; // pixelMatchGsfElectron pre-selection: H/E<0.15
   float sigmaIEtaIEtaEBMin = 0.0;
