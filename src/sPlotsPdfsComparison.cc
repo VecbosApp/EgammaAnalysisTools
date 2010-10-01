@@ -4,6 +4,7 @@
 #include <TStyle.h>
 #include <TCanvas.h>
 #include <TMath.h>
+#include <TRandom3.h>
 
 #include <iostream>
 #include <math.h>
@@ -81,6 +82,13 @@ void sPlotsPdfsComparison::Loop()
         else continue;
       }
 
+      // populate the unusued PDFs with uniform distribution (including the under/over-flows)
+      float minSPP = sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0)-1.0;
+      float maxSPP = sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetNbinsX()+1)+1.0;
+      float minFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0)-1.0;
+      float maxFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(fBremClassEle [jecal][jptbin][jclass]->GetNbinsX()+1)+1.0;
+      TRandom3 rnd(jentry);
+      
       if(m_isMC) {
         dPhiEle          [jecal] -> Fill ( f_dphi, wgt );
         dEtaEle          [jecal] -> Fill ( f_deta, wgt );
@@ -106,9 +114,14 @@ void sPlotsPdfsComparison::Loop()
         EoPClassEle [jecal][jptbin][jclass] -> Fill ( f_eop, wgt );
         HoEClassEle  [jecal][jptbin][jclass] -> Fill ( f_hoe, wgt );
         sigmaIEtaIEtaClassEle [jecal][jptbin][jclass] -> Fill ( f_see, wgt );
-        sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( f_spp, wgt ); 
-        fBremClassEle [jecal][jptbin][jclass] -> Fill ( f_fbrem, wgt );
-
+        
+        if(jclass==0) {
+          sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( f_spp, wgt ); 
+          fBremClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minFBrem,maxFBrem) );
+        } else {
+          sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minSPP,maxSPP) );
+          fBremClassEle [jecal][jptbin][jclass] -> Fill ( f_fbrem, wgt );
+        }
       } else {
         dPhiEle          [jecal] -> Fill ( dphi, wgt );
         dEtaEle          [jecal] -> Fill ( deta, wgt );
@@ -134,9 +147,13 @@ void sPlotsPdfsComparison::Loop()
         EoPClassEle [jecal][jptbin][jclass] -> Fill ( eop, wgt );
         HoEClassEle  [jecal][jptbin][jclass] -> Fill ( hoe, wgt );
         sigmaIEtaIEtaClassEle [jecal][jptbin][jclass] -> Fill ( see, wgt );
-        sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( spp, wgt );
-        fBremClassEle [jecal][jptbin][jclass] -> Fill ( fbrem, wgt );
-
+        if(jclass==0) {
+          sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( spp, wgt ); 
+          fBremClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minFBrem,maxFBrem) );
+        } else {
+          sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minSPP,maxSPP) );
+          fBremClassEle [jecal][jptbin][jclass] -> Fill ( fbrem, wgt );
+        }
       }
     } else {
       if (fabs(ztap_eta)<1.479)  jecal = 0;
