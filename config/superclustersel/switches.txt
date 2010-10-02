@@ -1,9 +1,0 @@
-isData          0
-mcTruth         1
-goodRunLS       0
-trigger         0
-eventRange      1
-etaSCAcc        1
-ptSCAcc         1
-HoE             1
-Mt              1
