@@ -1,5 +1,0 @@
-eventRange      0       10000
-etaSCAcc        -2.5    2.5
-ptSCAcc         15      7000
-HoE             0       0.15
-Mt              10      7000
