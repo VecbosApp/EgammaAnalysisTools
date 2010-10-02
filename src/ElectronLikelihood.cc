@@ -299,16 +299,8 @@ ElectronLikelihood::result (const LikelihoodMeasurements electron) const
 
   //=======================================================
   // used classification:
-  // golden                     =>  0
-  // big brem                   => 10
-  // narrow                     => 20
-  // showering nbrem 0          => 30
-  // showering nbrem 1          => 31
-  // showering nbrem 2          => 32
-  // showering nbrem 3          => 33
-  // showering nbrem 4 ou plus  => 34
-  // cracks                     => 40
-  // endcap                     => barrel + 100
+  // nbrem clusters = 0         =>  0
+  // nbrem clusters >= 1        =>  1
   //=======================================================
 
   std::vector<float> measurements ;
