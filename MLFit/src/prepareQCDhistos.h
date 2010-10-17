@@ -117,9 +117,9 @@ public :
 #ifdef prepareQCDhistos_cxx
 prepareQCDhistos::prepareQCDhistos(TTree *tree) {
   if (tree == 0) {
-    TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("results_data/dataset_jetmettau_mergedTree.root");
+    TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("results/trees/QCD_Pt-20_TuneD6T_tree.root");
     if (!f) {
-      f = new TFile("results_data/dataset_jetmettau_mergedTree.root");
+      f = new TFile("results/trees/QCD_Pt-20_TuneD6T_tree.root");
     }
     tree = (TTree*)gDirectory->Get("T1");  
   }

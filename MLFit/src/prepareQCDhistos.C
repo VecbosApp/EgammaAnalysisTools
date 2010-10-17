@@ -3,6 +3,7 @@
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
+#include <TRandom3.h>
 
 void prepareQCDhistos::Loop() {
 
@@ -40,22 +41,32 @@ void prepareQCDhistos::Loop() {
     if(nbrem==0) jclass = 0;
     else jclass = 1;
     
-    // filling histos
+    // filling histos: unsplit
     dPhiUnsplitEle  [jecal][jptbin] -> Fill ( dphi );
     dEtaUnsplitEle  [jecal][jptbin] -> Fill ( deta );
     EoPUnsplitEle   [jecal][jptbin] -> Fill ( EoP );
     HoEUnsplitEle   [jecal][jptbin] -> Fill ( HoE );
-    fBremUnsplitEle [jecal][jptbin] -> Fill ( fbrem );
     sigmaIEtaIEtaUnsplitEle [jecal][jptbin] -> Fill ( see );
+    fBremUnsplitEle [jecal][jptbin] -> Fill ( fbrem );
     sigmaIPhiIPhiUnsplitEle [jecal][jptbin] -> Fill ( spp );
     
+    // splitted
     dPhiClassEle  [jecal][jptbin][jclass] -> Fill ( dphi );
     dEtaClassEle  [jecal][jptbin][jclass] -> Fill ( deta );
     EoPClassEle   [jecal][jptbin][jclass] -> Fill ( EoP );
     HoEClassEle   [jecal][jptbin][jclass] -> Fill ( HoE );
-    fBremClassEle [jecal][jptbin][jclass] -> Fill ( fbrem );
     sigmaIEtaIEtaClassEle [jecal][jptbin][jclass] -> Fill ( see );
-    sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( spp );
+
+    // where not used, flat distribution
+    float minSPP   = sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0)-1.0;
+    float maxSPP   = sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetNbinsX()+1)+1.0;
+    float minFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0)-1.0;
+    float maxFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(fBremClassEle [jecal][jptbin][jclass]->GetNbinsX()+1)+1.0;
+    TRandom3 rnd(jentry);
+    if (jclass==0) fBremClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minFBrem,maxFBrem) );
+    if (jclass==1) fBremClassEle [jecal][jptbin][jclass] -> Fill ( fbrem );
+    if( jclass==0) sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( spp );
+    if( jclass==1) sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minSPP,maxSPP) );
     
   } // end loop over entries
 
@@ -97,14 +108,14 @@ void prepareQCDhistos::Loop() {
 
 void prepareQCDhistos::bookFullHistos() {
 
-  int nbins = 50;
+  int nbins = 200;
   
-  float dPhiMin  = -0.05; // pixelMatchGsfElectron pre-selection: |dPhi| < 0.1
-  float dPhiMax  =  0.05;
-  float dEtaMin  = -0.008;
-  float dEtaMax  =  0.008;
+  float dPhiMin  = -0.1; // pixelMatchGsfElectron pre-selection: |dPhi| < 0.1
+  float dPhiMax  =  0.1;
+  float dEtaMin  = -0.015;
+  float dEtaMax  =  0.015;
   float EoPMin   =  0.0;
-  float EoPMax   =  5.0;
+  float EoPMax   =  10.0;
   float HoEMin   =  0.0;   // zero-suppression in HCAL
   float HoEMax   =  0.15;  // pixelMatchGsfElectron pre-selection: H/E<0.15
   float sigmaIEtaIEtaEBMin = 0.0;
@@ -129,51 +140,51 @@ void prepareQCDhistos::bookFullHistos() {
       
       char histo[200];
       
-      sprintf(histo,"dPhiUnsplit_hadrons_%d_%d",iecal,iptbin);
+      sprintf(histo,"dPhiUnsplit_hadrons_subdet%d_ptbin%d",iecal,iptbin);
       dPhiUnsplitEle[iecal][iptbin]     = new TH1F(histo, histo, nbins, dPhiMin, dPhiMax);
-      sprintf(histo,"dEtaUnsplit_hadrons_%d_%d",iecal,iptbin);
+      sprintf(histo,"dEtaUnsplit_hadrons_subdet%d_ptbin%d",iecal,iptbin);
       dEtaUnsplitEle[iecal][iptbin]        = new TH1F(histo, histo, nbins, dEtaMin, dEtaMax);
-      sprintf(histo,"EoPUnsplit_hadrons_%d_%d",iecal,iptbin);
+      sprintf(histo,"EoPUnsplit_hadrons_subdet%d_ptbin%d",iecal,iptbin);
       EoPUnsplitEle[iecal][iptbin]      = new TH1F(histo, histo, nbins, EoPMin, EoPMax);
-      sprintf(histo,"HoEUnsplit_hadrons_%d_%d",iecal,iptbin);
+      sprintf(histo,"HoEUnsplit_hadrons_subdet%d_ptbin%d",iecal,iptbin);
       HoEUnsplitEle[iecal][iptbin]      = new TH1F(histo, histo, nbins, HoEMin, HoEMax);
       if(iecal==0) {
-        sprintf(histo,"sigmaIEtaIEtaUnsplit_hadrons_%d_%d",iecal,iptbin);
+        sprintf(histo,"sigmaIEtaIEtaUnsplit_hadrons_subdet%d_ptbin%d",iecal,iptbin);
         sigmaIEtaIEtaUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, sigmaIEtaIEtaEBMin, sigmaIEtaIEtaEBMax);
-        sprintf(histo,"sigmaIPhiIPhiUnsplit_hadrons_%d_%d",iecal,iptbin);
+        sprintf(histo,"sigmaIPhiIPhiUnsplit_hadrons_subdet%d_ptbin%d",iecal,iptbin);
         sigmaIPhiIPhiUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, sigmaIPhiIPhiEBMin, sigmaIPhiIPhiEBMax);
       } else {
-        sprintf(histo,"sigmaIEtaIEtaUnsplit_hadrons_%d_%d",iecal,iptbin);
+        sprintf(histo,"sigmaIEtaIEtaUnsplit_hadrons_subdet%d_ptbin%d",iecal,iptbin);
         sigmaIEtaIEtaUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, sigmaIEtaIEtaEEMin, sigmaIEtaIEtaEEMax);
-        sprintf(histo,"sigmaIPhiIPhiUnsplit_hadrons_%d_%d",iecal,iptbin);
+        sprintf(histo,"sigmaIPhiIPhiUnsplit_hadrons_subdet%d_ptbin%d",iecal,iptbin);
         sigmaIPhiIPhiUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, sigmaIPhiIPhiEEMin, sigmaIPhiIPhiEEMax);
       }
-      sprintf(histo,"fBremUnsplit_hadrons_%d_%d",iecal,iptbin);
+      sprintf(histo,"fBremUnsplit_hadrons_subdet%d_ptbin%d",iecal,iptbin);
       fBremUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, fBremMin, fBremMax);
 
       // iclass = 0: 0 - brem clusters
       // iclass = 1: >=1 - brem clusters
       for(int iclass=0; iclass<2; iclass++) {
-	sprintf(histo,"dPhiClass_hadrons_%d_%d_%d",iecal,iptbin,iclass);
+	sprintf(histo,"dPhiClass_hadrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
 	dPhiClassEle[iecal][iptbin][iclass]     = new TH1F(histo, histo, nbins, dPhiMin, dPhiMax);
-	sprintf(histo,"dEtaClass_hadrons_%d_%d_%d",iecal,iptbin,iclass);
+	sprintf(histo,"dEtaClass_hadrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
 	dEtaClassEle[iecal][iptbin][iclass]        = new TH1F(histo, histo, nbins, dEtaMin, dEtaMax);
-	sprintf(histo,"EoPClass_hadrons_%d_%d_%d",iecal,iptbin,iclass);
+	sprintf(histo,"EoPClass_hadrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
 	EoPClassEle[iecal][iptbin][iclass]      = new TH1F(histo, histo, nbins, EoPMin, EoPMax);
-	sprintf(histo,"HoEClass_hadrons_%d_%d_%d",iecal,iptbin,iclass);
+	sprintf(histo,"HoEClass_hadrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
 	HoEClassEle[iecal][iptbin][iclass]         = new TH1F(histo, histo, nbins, HoEMin, HoEMax);
         if(iecal==0) {
-          sprintf(histo,"sigmaIEtaIEtaClass_hadrons%d_%d_%d",iecal,iptbin,iclass);
+          sprintf(histo,"sigmaIEtaIEtaClass_hadrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
           sigmaIEtaIEtaClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, sigmaIEtaIEtaEBMin, sigmaIEtaIEtaEBMax);
-          sprintf(histo,"sigmaIPhiIPhiClass_hadrons%d_%d_%d",iecal,iptbin,iclass);
+          sprintf(histo,"sigmaIPhiIPhiClass_hadrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
           sigmaIPhiIPhiClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, sigmaIPhiIPhiEBMin, sigmaIPhiIPhiEBMax);
         } else {
-          sprintf(histo,"sigmaIEtaIEtaClass_hadrons%d_%d_%d",iecal,iptbin,iclass);
+          sprintf(histo,"sigmaIEtaIEtaClass_hadrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
           sigmaIEtaIEtaClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, sigmaIEtaIEtaEEMin, sigmaIEtaIEtaEEMax);
-          sprintf(histo,"sigmaIPhiIPhiClass_hadrons%d_%d_%d",iecal,iptbin,iclass);
+          sprintf(histo,"sigmaIPhiIPhiClass_hadrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
           sigmaIPhiIPhiClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, sigmaIPhiIPhiEEMin, sigmaIPhiIPhiEEMax);
         }
-        sprintf(histo,"fBremClass_hadrons_%d_%d_%d",iecal,iptbin,iclass);
+        sprintf(histo,"fBremClass_hadrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
         fBremClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, fBremMin, fBremMax);
       }
     }
