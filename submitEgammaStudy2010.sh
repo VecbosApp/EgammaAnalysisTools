@@ -27,9 +27,14 @@ python cmst3_submit_manyfilesperjob.py QCD QCD_EMEnriched_Pt30to80 121 EgammaAna
 python cmst3_submit_manyfilesperjob.py QCD QCD_EMEnriched_Pt80to170 10 EgammaAnalysis 4 8nh
 echo "done QCD di-jets."
 
+echo "submitting QCD not enriched..." 
+python cmst3_submit_manyfilesperjob.py QCD QCD_Pt-20_TuneD6T 10 EgammaAnalysis 4 8nh
+echo "done QCD not enriched" 
+
 echo "SUBMITTING TTBAR and single top"
 python cmst3_submit_manyfilesperjob.py TTbar TTbarJets-madgraph 3 EgammaAnalysis 4 8nh
 python cmst3_submit_manyfilesperjob.py SingleTop SingleTop_sChannel-madgraph  1 EgammaAnalysis 4 8nh
 python cmst3_submit_manyfilesperjob.py SingleTop SingleTop_tChannel-madgraph  1 EgammaAnalysis 4 8nh
 python cmst3_submit_manyfilesperjob.py SingleTop SingleTop_tWChannel-madgraph 1 EgammaAnalysis 4 8nh
 echo "DONE TTBAR and SINGLE TOP."
+
