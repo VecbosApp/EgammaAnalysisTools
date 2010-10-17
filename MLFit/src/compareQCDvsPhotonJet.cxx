@@ -13,26 +13,26 @@ void makePlot(const char* name, const char* title, float min, float max, int iec
 void makeAllPlots() {
 
   // barrel
-  makePlot("EoPout","E_{seed}/P_{out}",0,20,0);
-  makePlot("EoP",   "E/P",             0,20,0);
+  makePlot("EoPout","E_{seed}/P_{out}",0,5,0);
+  makePlot("EoP",   "E/P",             0,5,0);
   makePlot("HoE",   "H/E",             0,1,0);
   makePlot("deta",  "#Delta #eta",-0.02,0.02,0);
   makePlot("dphi",  "#Delta #phi",-0.1,0.1,0);
-  makePlot("see",   "#sigma_{i#eta i#eta}",0,0.1,0);
+  makePlot("see",   "#sigma_{i#eta i#eta}",0,0.05,0);
   makePlot("pt",    "p_{T}",0,100.,0);
   makePlot("eta",   "#eta",-2.5,2.5,0);
-  makePlot("fbrem", "fbrem",-1.,1.,0);
+  makePlot("fbrem", "fbrem",-0.2,1.,0);
 
   // endcap
-  makePlot("EoPout","E_{seed}/P_{out}",0,20,1);
-  makePlot("EoP",   "E/P",             0,20,1);
+  makePlot("EoPout","E_{seed}/P_{out}",0,5,1);
+  makePlot("EoP",   "E/P",             0,5,1);
   makePlot("HoE",   "H/E",             0,1,1);
   makePlot("deta",  "#Delta #eta",-0.02,0.02,1);
   makePlot("dphi",  "#Delta #phi",-0.1,0.1,1);
-  makePlot("see",   "#sigma_{i#eta i#eta}",0,0.1,1);
+  makePlot("see",   "#sigma_{i#eta i#eta}",0,0.05,1);
   makePlot("pt",    "p_{T}",0,100.,1);
   makePlot("eta",   "#eta",-2.5,2.5,1);
-  makePlot("fbrem", "fbrem",-1.,1.,1);
+  makePlot("fbrem", "fbrem",-0.2,1.,1);
 
   // all
   makePlot("pt",  "p_{T}",0,100.,2);
@@ -44,7 +44,8 @@ void makePlot(const char* name, const char* title, float min, float max, int iec
   TFile *fileQCD = TFile::Open("results/trees/QCD_tree.root");
   TTree *treeQCD = (TTree*) fileQCD->Get("T1");
   
-  TFile *filePhotonJet = TFile::Open("results/trees/GammaJets_tree.root");
+  // TFile *filePhotonJet = TFile::Open("results/trees/GammaJets_tree.root");
+  TFile *filePhotonJet = TFile::Open("results/trees/QCD_Pt-20_TuneD6T_tree.root");
   TTree *treePhotonJet = (TTree*)filePhotonJet->Get("T1");
 
     
@@ -73,7 +74,7 @@ void makePlot(const char* name, const char* title, float min, float max, int iec
   hPhotonJet->Scale( 1./intPJ );
   cout << "normalized = " << hQCD->Integral() << " " << hPhotonJet->Integral() << endl;
 
-  hQCD->SetFillColor(3);
+  hQCD->SetFillColor(kBlue);
   hQCD->SetLineWidth(2);
   hPhotonJet->SetLineWidth(2);
   
@@ -89,8 +90,10 @@ void makePlot(const char* name, const char* title, float min, float max, int iec
   leg->SetBorderSize(0); 
   leg->SetTextSize(0.03);
   leg->SetFillColor(0);
-  leg->AddEntry(hQCD,"QCD di-jets","f");
-  leg->AddEntry(hPhotonJet,"#gamma + jets,","l");
+  // leg->AddEntry(hQCD,"QCD di-jets","f");
+  // leg->AddEntry(hPhotonJet,"#gamma + jets,","l");
+  leg->AddEntry(hQCD,"enriched","f");
+  leg->AddEntry(hPhotonJet,"not enriched","l");
   leg->Draw();
 
   char nameFig[200];
