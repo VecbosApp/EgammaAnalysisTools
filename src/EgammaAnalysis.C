@@ -118,6 +118,8 @@ int main(int argc, char* argv[]) {
 
   std::vector<std::string> mask;
   mask.push_back("HLT_Jet15U");   
+  mask.push_back("HLT_Jet30U");   
+  mask.push_back("HLT_Jet50U");   
   producer.setRequiredTriggers(mask);
   
   //  sprintf(title,"%s_zTandP_tree.root",outputFileName);  
