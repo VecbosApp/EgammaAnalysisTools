@@ -10,8 +10,6 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myTree->Branch("HoE",             &myHoE,             "HoE/F");
   myTree->Branch("deta",            &myDeta,            "deta/F");
   myTree->Branch("dphi",            &myDphi,            "dphi/F");
-  myTree->Branch("detaUncorr",      &myDetaUncorr,      "detaUncorr/F");
-  myTree->Branch("dphiUncorr",      &myDphiUncorr,      "dphiUncorr/F");
   myTree->Branch("s9s25",           &mys9s25,           "s9s25/F");
   myTree->Branch("s1s9" ,           &mys1s9,            "s1s9/F");
   myTree->Branch("see",             &mySee,             "see/F");
@@ -92,15 +90,13 @@ void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float Deta,
   myCharge=charge;
 }
 
-void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float Deta, float DetaUncorr, float Dphi, float DphiUncorr, float s9s25, float s1s9, float See, float Spp, float fbrem, int nHits, float dcot, float dist, float pt, float eta, int charge) {
+void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float Deta, float Dphi, float s9s25, float s1s9, float See, float Spp, float fbrem, int nHits, float dcot, float dist, float pt, float eta, int charge) {
 
   myEoPout=EoPout;
   myEoP=EoP;
   myHoE=HoE;
   myDeta=Deta;
-  myDetaUncorr=DetaUncorr;
   myDphi=Dphi;
-  myDphiUncorr=DphiUncorr;
   mys9s25=s9s25;
   mys1s9=s1s9;
   mySee=See;

@@ -1261,6 +1261,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     float theInvMass  = (p4Tag+p4Probe).M();
     TVector3 p3Met(pxMet[0],pyMet[0],0.0);
     float theMet      = p3Met.Pt();
+    if ( m_selection->getSwitch("met")  && !m_selection->passCut("met", theMet) ) continue;
     
     // reject events with >=2 electrons making a Z
     if ( nEle>=2 ) {
@@ -1339,16 +1340,8 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       double EoPout     = eSeedOverPoutEle[theProbe];
       double EoP        = eSuperClusterOverPEle[theProbe];
       double HoE        = hOverEEle[theProbe];
-      float dEtaVtxCorr = dEtaVtx;
-      float dPhiVtxCorr = dPhiVtx;
       float fbrem       = fbremEle[theProbe];
       int nbrem         = nbremsEle[theProbe];
-      if(m_selection->getSwitch("isData")) {
-	float theEta = eleP4.Eta();
-	float thePhi = eleP4.Phi();
-	dEtaVtxCorr   = dEtaVtx - detaCorrections(theEta, thePhi);
-	dPhiVtxCorr   = dPhiVtx - dphiCorrections(theEta, thePhi);
-      }
       
       // conversion rejection variables
       int theMatchedTrack   = trackIndexEle[theProbe];
@@ -1391,7 +1384,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
 
       // fill the reduced tree
-      reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtxCorr,dEtaVtx,dPhiVtxCorr,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,theExpInnerLayers,convDcot,convDist,pt,eta,charge); 
+      reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,theExpInnerLayers,convDcot,convDist,pt,eta,charge); 
 
       reducedTree.fillAttributesBackground(theDeltaPhi,theInvMass,theMet,genPtHat);
 

@@ -20,7 +20,7 @@ public:
 
   //! fill the tree with electron id variables
   void fillVariables(float EoPout, float EoP, float HoE, float DEta, float DPhi, float s9s25, float s1s9, float See, float Spp, float pt, float eta, int charge);
-  void fillVariables(float EoPout, float EoP, float HoE, float DEta, float DEtaUncorr, float DPhi, float DPhiUncorr, float s9s25, float s1s9, float See, float Spp, float fBrem, int nHits, float dcot, float dist, float pt, float eta, int charge);
+  void fillVariables(float EoPout, float EoP, float HoE, float DEta, float DPhi, float s9s25, float s1s9, float See, float Spp, float fBrem, int nHits, float dcot, float dist, float pt, float eta, int charge);
 
   //! fill electron attributes + z mass for the tag and probe
   //! note: when both electrons from Z are probes, the same Z mass is repeated
@@ -42,8 +42,6 @@ private:
   float myHoE;
   float myDeta;
   float myDphi;
-  float myDetaUncorr;
-  float myDphiUncorr;
   float mys9s25;
   float mys1s9 ;
   float mySee;

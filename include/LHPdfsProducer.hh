@@ -78,57 +78,6 @@ public:
   //get the value of the requested bits 
   vector<int> getHLTOutput();
 
-  // correction for misalignment etc
-  float detaCorrections(float etaEle,float phiEle) {
-
-    if (fabs(etaEle)<1.479) return 0.;
-    
-    float alignPar[3]={0.,0.,0.};
-    
-    if ((etaEle)>=1.479) {
-      alignPar[0]= 0.52;
-      alignPar[1]= -0.81;
-      alignPar[2]= 0.81;
-    }
-    else if ((etaEle)<=-1.479) {
-      alignPar[0]= -0.02;
-      alignPar[1]= -0.81;
-      alignPar[2]= -0.94;
-    }
-    
-    int zIndex=etaEle>0 ? 1: -1;
-    float xSCNew =(zIndex* 330. * TMath::Cos(phiEle) / TMath::SinH(etaEle)) + alignPar[0];
-    float ySCNew =(zIndex* 330. * TMath::Sin(phiEle) / TMath::SinH(etaEle)) + alignPar[1];
-    float zSCNew = (zIndex * 330.) + alignPar[2];
-    
-    return etaEle-TVector3(xSCNew,ySCNew,zSCNew).Eta();
-  }
-  
-  float dphiCorrections(float etaEle,float phiEle) {
-    
-    if (fabs(etaEle)<1.479) return 0.;
-    
-    float alignPar[3]={0.,0.,0.};
-
-    if ((etaEle)>=1.479) {
-      alignPar[0]=0.52;
-      alignPar[1]=-0.81;
-      alignPar[2]=0.81;
-    }
-    else if ((etaEle)<=-1.479) {
-      alignPar[0]=-0.02;
-      alignPar[1]=-0.81;
-      alignPar[2]=-0.94;
-    }
-    
-    int zIndex=etaEle>0 ? 1: -1;
-    float xSCNew =(zIndex*330.) * TMath::Cos(phiEle) / (TMath::SinH(etaEle)) + alignPar[0];
-    float ySCNew =(zIndex*330.) * TMath::Sin(phiEle) / (TMath::SinH(etaEle)) + alignPar[1];
-    float zSCNew = (zIndex*330.) + alignPar[2];
-    
-    return phiEle-TVector3(xSCNew,ySCNew,zSCNew).Phi();
-  }
-
 private:
   
   //! book the histograms of the PDFs
