@@ -178,10 +178,8 @@ MakeNoteIsolationPlots: $(INCLUDEDIR)/src/MakeNoteIsolationPlots.C
 CompareSignalPdfs: $(INCLUDEDIR)/src/CompareSignalPdfs.C
 	$(CXX) $(CXXFLAGS) -o CompareSignalPdfs $(GLIBS) $ $<
 
-makeSPlotsPdfs: $(INCLUDEDIR)/src/EgammaAnalysis.C \
-	$(OUTLIB)EgammaBase.o \
-	$(OUTLIB)sPlotsPdfsComparison.o
-	$(CXX) $(CXXFLAGS) -o makeSPlotsPdfs $(OUTLIB)EgammaBase.o $(OUTLIB)sPlotsPdfsComparison.o $(GLIBS) $ $<
+makeSPlotsPdfs: $(INCLUDEDIR)/src/ComparesPlotsPdfs.C
+	$(CXX) $(CXXFLAGS) -o makeSPlotsPdfs $(GLIBS) $ $<
 
 CompareSPlots: $(INCLUDEDIR)/src/ComparesPlotsPdfs.C 
 	$(CXX) $(CXXFLAGS) -o CompareSPlots $(GLIBS) $ $<
