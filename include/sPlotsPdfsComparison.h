@@ -16,6 +16,8 @@
 #include <iostream>
 #include <vector>
 
+#include "EgammaAnalysisTools/include/ElectronLikelihood.h"
+
 class sPlotsPdfsComparison {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
@@ -237,6 +239,7 @@ public :
    virtual void     bookHistosFixedBinning();
    virtual void     bookFullHistos();
    virtual void     doSignalsPlots(bool what) { m_doSignal = what; }
+   virtual float    likelihoodRatio(int isMc, ElectronLikelihood &lh);
 
  protected:
 
@@ -253,6 +256,7 @@ public :
    TH1F *fbremEle[2];
    TH1F *phiEle[2];
    TH1F *chargeEle[2];
+   TH1F *lhEle[2];
 
   // ---------- monitoring histograms ------------
 
@@ -265,6 +269,7 @@ public :
   TH1F *sigmaIEtaIEtaUnsplitEle[2][2];
   TH1F *sigmaIPhiIPhiUnsplitEle[2][2];
   TH1F *fBremUnsplitEle[2][2];
+  TH1F *lhUnsplitEle[2][2];
   
   /// Electrons class-splitted
   /// histo[ecalsubdet][ptbin][class]
@@ -275,6 +280,10 @@ public :
   TH1F *sigmaIEtaIEtaClassEle[2][2][2];
   TH1F *sigmaIPhiIPhiClassEle[2][2][2];
   TH1F *fBremClassEle[2][2][2];
+  TH1F *lhClassEle[2][2][2];
+
+  // the likelihood algorithm
+  ElectronLikelihood *LH;
 
 };
 

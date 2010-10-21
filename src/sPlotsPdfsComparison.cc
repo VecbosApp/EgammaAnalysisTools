@@ -27,6 +27,16 @@ void sPlotsPdfsComparison::Loop()
   bookHistosFixedBinning();
   bookFullHistos();  
 
+  // configuring electron likelihood
+  TFile *fileLH = TFile::Open("pdfs_MC.root");
+  TDirectory *LHdir = fileLH->GetDirectory("/");
+  LikelihoodSwitches defaultSwitches;
+  defaultSwitches.m_useFBrem = true;
+  defaultSwitches.m_useEoverP = false;
+  defaultSwitches.m_useSigmaPhiPhi = true;
+  LH = new ElectronLikelihood(&(*LHdir), &(*LHdir), &(*LHdir), &(*LHdir),
+                              defaultSwitches, std::string("class"),std::string("class"),true,true);
+
   Long64_t nentries = fChain->GetEntries();
   
   int firstEvent = 0;
@@ -56,6 +66,9 @@ void sPlotsPdfsComparison::Loop()
         if(f_pt>=10 && f_pt<=20) jptbin = 0;
         else if(f_pt>20) jptbin = 1;
         else continue;
+        
+        //        if(f_pt<25 || f_pt>45) continue;
+
         if(f_nbrem==0) jclass = 0;
         else jclass = 1;
         if(m_doSignal) {
@@ -114,7 +127,7 @@ void sPlotsPdfsComparison::Loop()
         EoPClassEle [jecal][jptbin][jclass] -> Fill ( f_eop, wgt );
         HoEClassEle  [jecal][jptbin][jclass] -> Fill ( f_hoe, wgt );
         sigmaIEtaIEtaClassEle [jecal][jptbin][jclass] -> Fill ( f_see, wgt );
-        
+            
         if(jclass==0) {
           sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( f_spp, wgt ); 
           fBremClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minFBrem,maxFBrem) );
@@ -155,6 +168,11 @@ void sPlotsPdfsComparison::Loop()
           fBremClassEle [jecal][jptbin][jclass] -> Fill ( fbrem, wgt );
         }
       }
+      // the likelihood output
+      float f_lh = likelihoodRatio(m_isMC,*LH);
+      lhEle [jecal] -> Fill ( f_lh, wgt );
+      lhUnsplitEle [jecal][jptbin] -> Fill ( f_lh, wgt );
+      lhClassEle [jecal][jptbin][jclass] -> Fill ( f_lh, wgt );
     } else {
       if (fabs(ztap_eta)<1.479)  jecal = 0;
       else if (fabs(ztap_eta)>=1.479) jecal = 1;
@@ -203,6 +221,7 @@ void sPlotsPdfsComparison::Loop()
     fbremEle[jecal]->Write();
     phiEle[jecal]->Write();    
     chargeEle[jecal]->Write();    
+    lhEle[jecal]->Write();
   }
   
   fileOut->Close();
@@ -222,6 +241,7 @@ void sPlotsPdfsComparison::Loop()
       sigmaIEtaIEtaUnsplitEle[iecal][iptbin]->Write();
       sigmaIPhiIPhiUnsplitEle[iecal][iptbin]->Write();
       fBremUnsplitEle[iecal][iptbin]->Write();
+      lhUnsplitEle[iecal][iptbin]->Write();
 
       for(int iclass=0; iclass<2; iclass++) {
       
@@ -232,6 +252,7 @@ void sPlotsPdfsComparison::Loop()
 	sigmaIEtaIEtaClassEle[iecal][iptbin][iclass]->Write();
 	sigmaIPhiIPhiClassEle[iecal][iptbin][iclass]->Write();
         fBremClassEle[iecal][iptbin][iclass]->Write();
+        lhClassEle[iecal][iptbin][iclass]->Write();
 
       }
     }
@@ -330,6 +351,9 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     sprintf(histo,"chargeClass_electrons_%d",0);
     chargeEle[0] = new TH1F(histo, histo, 2, -2., 2.);
     chargeEle[0]->Sumw2();
+    sprintf(histo,"lhClass_electrons_%d",0);
+    lhEle[0] = new TH1F(histo, histo, 50, 0., 1.);
+    lhEle[0]->Sumw2();
 
     // EE histograms
     sprintf(histo,"dPhiClass_electrons_%d",1);
@@ -356,6 +380,9 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     sprintf(histo,"chargeClass_electrons_%d",1);
     chargeEle[1] = new TH1F(histo, histo, 2, -2., 2.);
     chargeEle[1]->Sumw2();
+    sprintf(histo,"lhClass_electrons_%d",1);
+    lhEle[1] = new TH1F(histo, histo, 50, 0., 1.);
+    lhEle[1]->Sumw2();
   } else {
     // EB histograms
     sprintf(histo,"dPhiClass_electrons_%d",0);
@@ -382,6 +409,9 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     sprintf(histo,"chargeClass_electrons_%d",0);
     chargeEle[0] = new TH1F(histo, histo, 2, -2., 2.);
     chargeEle[0]->Sumw2();
+    sprintf(histo,"lhClass_electrons_%d",0);
+    lhEle[0] = new TH1F(histo, histo, 50, 0., 1.);
+    lhEle[0]->Sumw2();
 
     // EE histograms
     sprintf(histo,"dPhiClass_electrons_%d",1);
@@ -408,6 +438,9 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     sprintf(histo,"chargeClass_electrons_%d",1);
     chargeEle[1] = new TH1F(histo, histo, 2, -2., 2.);
     chargeEle[1]->Sumw2();
+    sprintf(histo,"lhClass_electrons_%d",1);
+    lhEle[1] = new TH1F(histo, histo, 50, 0., 1.);
+    lhEle[1]->Sumw2();
   }
   
 }
@@ -434,6 +467,8 @@ void sPlotsPdfsComparison::bookFullHistos() {
   float sigmaIPhiIPhiEEMax = 0.05;
   float fBremMin = 0.0;
   float fBremMax = 1.0;
+  float lhMin = 0.0;
+  float lhMax = 1.0;
 
   char hypothesis[200];
   if(m_doSignal) sprintf(hypothesis,"electrons");
@@ -471,6 +506,8 @@ void sPlotsPdfsComparison::bookFullHistos() {
       }
       sprintf(histo,"fBremUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       fBremUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, fBremMin, fBremMax);
+      sprintf(histo,"lhUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
+      lhUnsplitEle[iecal][iptbin]     = new TH1F(histo, histo, nbins, lhMin, lhMax);
 
       // iclass = 0: 0 - brem clusters
       // iclass = 1: >=1 - brem clusters
@@ -496,8 +533,40 @@ void sPlotsPdfsComparison::bookFullHistos() {
         }
         sprintf(histo,"fBremClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
         fBremClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, fBremMin, fBremMax);
+	sprintf(histo,"lhClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
+	lhClassEle[iecal][iptbin][iclass]     = new TH1F(histo, histo, nbins, lhMin, lhMax);
 
       }
     }
   }
+}
+
+float sPlotsPdfsComparison::likelihoodRatio(int isMc, ElectronLikelihood &lh) {
+  LikelihoodMeasurements measurements;
+  if(isMc) {
+    measurements.pt = f_pt;
+    measurements.subdet = (fabs(f_eta)<1.479) ? 0 : 1;
+    measurements.deltaPhi = f_dphi;
+    measurements.deltaEta = f_deta;
+    measurements.eSeedClusterOverPout = -1;
+    measurements.eSuperClusterOverP = f_eop;
+    measurements.hadronicOverEm = f_hoe;
+    measurements.sigmaIEtaIEta = f_see;
+    measurements.sigmaIPhiIPhi = f_spp;
+    measurements.fBrem = f_fbrem;
+    measurements.nBremClusters = f_nbrem;
+  } else {
+    measurements.pt = pt;
+    measurements.subdet = (fabs(eta)<1.479) ? 0 : 1;
+    measurements.deltaPhi = dphi;
+    measurements.deltaEta = deta;
+    measurements.eSeedClusterOverPout = -1;
+    measurements.eSuperClusterOverP = eop;
+    measurements.hadronicOverEm = hoe;
+    measurements.sigmaIEtaIEta = see;
+    measurements.sigmaIPhiIPhi = spp;
+    measurements.fBrem = fbrem;
+    measurements.nBremClusters = nbrem;
+  }
+  return lh.result(measurements);
 }
