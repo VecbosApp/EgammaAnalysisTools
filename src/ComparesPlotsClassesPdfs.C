@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 // ROOT includes
@@ -17,6 +18,7 @@
 #include <TAxis.h>
 
 using namespace std;
+int MODE;
 
 void makePlots(TH1F *signalHistos1[2][2], TH1F *signalHistos2[2][2], const char *namevar, const char *axistitle);
 
@@ -24,13 +26,15 @@ int main(int argc, char* argv[]) {
 
   char inputFileNameSignal1[150];
   char inputFileNameSignal2[150];
-  if ( argc < 3 ){
+  if ( argc < 4 ){
     std::cout << "missing argument!" << std::endl; 
-    std::cout << "usage: MakeNotePdfPlots fileSignalMC.root fileSignalDATA.root" << std::endl;
+    std::cout << "usage: MakeNotePdfPlots fileSignalMC.root fileSignalDATA.root 0" << std::endl;
+    std::cout << "third argument = 0 ==> signal, MC vs data. 1 ==> signal vs bkg" << std::endl;
     return 1;
   }
   strcpy(inputFileNameSignal1,argv[1]);
   strcpy(inputFileNameSignal2,argv[2]);
+  MODE = atoi(argv[3]);
 
   gROOT->SetStyle("Plain");
   gStyle->SetOptStat(0);
@@ -43,6 +47,7 @@ int main(int argc, char* argv[]) {
   TH1F *EoPClassEle1[2][2];
   TH1F *HoEClassEle1[2][2];
   TH1F *sigmaIEtaIEtaClassEle1[2][2];
+  TH1F *sigmaIPhiIPhiClassEle1[2][2];
   TH1F *fbremClassEle1[2][2];
   TH1F *lhClassEle1[2][2];
 
@@ -65,6 +70,8 @@ int main(int argc, char* argv[]) {
       HoEClassEle1[iecal][iclass]         = (TH1F*)gDirectory->Get(histo); 
       sprintf(histo,"sigmaIEtaIEtaClass_electrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
       sigmaIEtaIEtaClassEle1[iecal][iclass] = (TH1F*)gDirectory->Get(histo); 
+      sprintf(histo,"sigmaIPhiIPhiClass_electrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
+      sigmaIPhiIPhiClassEle1[iecal][iclass] = (TH1F*)gDirectory->Get(histo); 
       sprintf(histo,"fBremClass_electrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
       fbremClassEle1[iecal][iclass] = (TH1F*)gDirectory->Get(histo); 
       sprintf(histo,"lhClass_electrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
@@ -75,6 +82,7 @@ int main(int argc, char* argv[]) {
       EoPClassEle1[iecal][iclass]    -> SetMinimum(0.001);
       HoEClassEle1[iecal][iclass]   -> SetMinimum(0.001);
       sigmaIEtaIEtaClassEle1[iecal][iclass] -> SetMinimum(0.1);
+      sigmaIPhiIPhiClassEle1[iecal][iclass] -> SetMinimum(0.1);
       fbremClassEle1[iecal][iclass] -> SetMinimum(0.001);
       lhClassEle1[iecal][iclass] -> SetMinimum(0.001);
     
@@ -89,6 +97,7 @@ int main(int argc, char* argv[]) {
   TH1F *EoPClassEle2[2][2];
   TH1F *HoEClassEle2[2][2];
   TH1F *sigmaIEtaIEtaClassEle2[2][2];
+  TH1F *sigmaIPhiIPhiClassEle2[2][2];
   TH1F *fbremClassEle2[2][2];
   TH1F *lhClassEle2[2][2];
 
@@ -98,19 +107,25 @@ int main(int argc, char* argv[]) {
     // iclass = 1: >=1 - brem clusters
     for(int iclass=0; iclass<2; iclass++) {
       
-      sprintf(histo,"dPhiClass_electrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
+      char hypothesis[200];
+      if(MODE==0) sprintf(hypothesis,"electrons");
+      else sprintf(hypothesis,"hadrons");
+      
+      sprintf(histo,"dPhiClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
       dPhiClassEle2[iecal][iclass]     = (TH1F*)gDirectory->Get(histo);
-      sprintf(histo,"dEtaClass_electrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
+      sprintf(histo,"dEtaClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
       dEtaClassEle2[iecal][iclass]        = (TH1F*)gDirectory->Get(histo);
-      sprintf(histo,"EoPClass_electrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
+      sprintf(histo,"EoPClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
       EoPClassEle2[iecal][iclass]      = (TH1F*)gDirectory->Get(histo); 
-      sprintf(histo,"HoEClass_electrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
+      sprintf(histo,"HoEClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
       HoEClassEle2[iecal][iclass]         = (TH1F*)gDirectory->Get(histo); 
-      sprintf(histo,"sigmaIEtaIEtaClass_electrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
+      sprintf(histo,"sigmaIEtaIEtaClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
       sigmaIEtaIEtaClassEle2[iecal][iclass] = (TH1F*)gDirectory->Get(histo); 
-      sprintf(histo,"fBremClass_electrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
+      sprintf(histo,"sigmaIPhiIPhiClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
+      sigmaIPhiIPhiClassEle2[iecal][iclass] = (TH1F*)gDirectory->Get(histo); 
+      sprintf(histo,"fBremClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
       fbremClassEle2[iecal][iclass] = (TH1F*)gDirectory->Get(histo); 
-      sprintf(histo,"lhClass_electrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
+      sprintf(histo,"lhClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
       lhClassEle2[iecal][iclass] = (TH1F*)gDirectory->Get(histo); 
 
       dPhiClassEle2[iecal][iclass]   -> SetMinimum(0.001);
@@ -118,6 +133,7 @@ int main(int argc, char* argv[]) {
       EoPClassEle2[iecal][iclass]    -> SetMinimum(0.001);
       HoEClassEle2[iecal][iclass]   -> SetMinimum(0.001);
       sigmaIEtaIEtaClassEle2[iecal][iclass] -> SetMinimum(0.1);
+      sigmaIPhiIPhiClassEle2[iecal][iclass] -> SetMinimum(0.1);
       fbremClassEle2[iecal][iclass]   -> SetMinimum(0.001);
       lhClassEle2[iecal][iclass] -> SetMinimum(0.001);
 
@@ -129,6 +145,7 @@ int main(int argc, char* argv[]) {
   makePlots(EoPClassEle1,EoPClassEle2,"EoP","E_{SC}/p_{in}");
   makePlots(HoEClassEle1,HoEClassEle2,"HoE","H/E");
   makePlots(sigmaIEtaIEtaClassEle1,sigmaIEtaIEtaClassEle2,"sigmaIEtaIEta","#sigma_{#eta#eta} (rad)");
+  makePlots(sigmaIPhiIPhiClassEle1,sigmaIPhiIPhiClassEle2,"sigmaIPhiIPhi","#sigma_{#phi#phi} (rad)");
   makePlots(fbremClassEle1,fbremClassEle2,"fbrem","f_{brem}");
   makePlots(lhClassEle1,lhClassEle2,"lh","LH output");
 
@@ -149,12 +166,17 @@ void makePlots(TH1F *signalHistos1[2][2], TH1F *signalHistos2[2][2], const char 
     // iclass = 1: >=1 - brem clusters
     for(int iclass=0; iclass<2; iclass++) {
 
-    // data
+    // data (MODE=0) or bkg (MODE=1)
     if(signalHistos2[iecal][iclass]) {
       signalHistos2[iecal][iclass]->Rebin(5);
       signalHistos2[iecal][iclass]->SetLineWidth(2);
-      signalHistos2[iecal][iclass]->SetLineColor(kRed+1+3*iclass);
-      signalHistos2[iecal][iclass]->SetMarkerColor(kRed+1+3*iclass);
+      if(MODE==0) {
+        signalHistos2[iecal][iclass]->SetLineColor(kRed+1+3*iclass);
+        signalHistos2[iecal][iclass]->SetMarkerColor(kRed+1+3*iclass);
+      } else {
+        signalHistos2[iecal][iclass]->SetLineColor(kViolet+1+3*iclass);
+        signalHistos2[iecal][iclass]->SetMarkerColor(kViolet+1+3*iclass);
+      }
       signalHistos2[iecal][iclass]->SetMarkerStyle(8);
       signalHistos2[iecal][iclass]->SetMarkerSize(1.0);
     }
@@ -186,10 +208,15 @@ void makePlots(TH1F *signalHistos1[2][2], TH1F *signalHistos2[2][2], const char 
      
     signalHistos1[iecal][iclass]->GetYaxis()->SetTitle("Events/"+TString(yaxDiv));
     }
-    signalHistos1[iecal][1]->Draw("hist");
-    signalHistos1[iecal][0]->Draw("hist same");
-    signalHistos2[iecal][1]->Draw("pE1 same");
-    signalHistos2[iecal][0]->Draw("pE1 same");
+    TString nameH0 = TString(signalHistos1[iecal][0]->GetName());
+    TString nameH1 = TString(signalHistos1[iecal][1]->GetName());
+    if(!nameH1.Contains("IPhiIPhi")) signalHistos1[iecal][1]->Draw("hist");
+    if(!nameH0.Contains("fBrem")) {
+      if(nameH1.Contains("IPhiIPhi")) signalHistos1[iecal][0]->Draw("hist");
+      else signalHistos1[iecal][0]->Draw("hist same");
+    }
+    if(!nameH1.Contains("IPhiIPhi")) signalHistos2[iecal][1]->Draw("pE1 same");
+    if(!nameH0.Contains("fBrem")) signalHistos2[iecal][0]->Draw("pE1 same");
 
     TPaveText pt1(0.1,0.92,0.8,0.97,"NDC");
     //	  pt1.SetTextFont(72);
@@ -214,21 +241,31 @@ void makePlots(TH1F *signalHistos1[2][2], TH1F *signalHistos2[2][2], const char 
     TLegend* leg = new TLegend(0.65,0.75,0.90,0.90);
     leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
     leg->SetFillColor(0);
-    leg->AddEntry(signalHistos1[iecal][0],"MC 0 brem");
-    leg->AddEntry(signalHistos1[iecal][1],"MC brem");
-    leg->AddEntry(signalHistos2[iecal][0],"data 0 brem");
-    leg->AddEntry(signalHistos2[iecal][1],"data brem");
+    if(MODE==0) {
+      leg->AddEntry(signalHistos1[iecal][0],"MC 0 brem");
+      leg->AddEntry(signalHistos1[iecal][1],"MC brem");
+      leg->AddEntry(signalHistos2[iecal][0],"data 0 brem");
+      leg->AddEntry(signalHistos2[iecal][1],"data brem");
+    } else {
+      leg->AddEntry(signalHistos1[iecal][0],"Signal MC 0 brem");
+      leg->AddEntry(signalHistos1[iecal][1],"Signal MC brem");
+      leg->AddEntry(signalHistos2[iecal][0],"Bkg MC 0 brem");
+      leg->AddEntry(signalHistos2[iecal][1],"Bkg MC brem");
+    }
     leg->Draw();
 
     char epsfilename[200];
     char rootfilename[200];
+    char suffix[200];
+    if(MODE==1) sprintf(suffix,"_sigVsBkg");
+    else sprintf(suffix,"");
     if(iecal==0) {
-      sprintf(epsfilename,"sPlotsData/%s_EB.png",namevar);
-      sprintf(rootfilename,"sPlotsData/%s_EB.eps",namevar);
+      sprintf(epsfilename,"sPlotsData/%s_EB%s.png",namevar,suffix);
+      sprintf(rootfilename,"sPlotsData/%s_EB%s.eps",namevar,suffix);
     }
     else if(iecal==1) {
-      sprintf(epsfilename,"sPlotsData/%s_EE.png",namevar); 
-      sprintf(rootfilename,"sPlotsData/%s_EE.eps",namevar);
+      sprintf(epsfilename,"sPlotsData/%s_EE%s.png",namevar,suffix); 
+      sprintf(rootfilename,"sPlotsData/%s_EE%s.eps",namevar,suffix);
     }
     c1.SaveAs(epsfilename);
     c1.SaveAs(rootfilename);
