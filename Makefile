@@ -181,6 +181,9 @@ CompareSignalPdfs: $(INCLUDEDIR)/src/CompareSignalPdfs.C
 makeSPlotsPdfs: $(INCLUDEDIR)/src/ComparesPlotsPdfs.C
 	$(CXX) $(CXXFLAGS) -o makeSPlotsPdfs $(GLIBS) $ $<
 
+makeSPlotsClassesPdfs: $(INCLUDEDIR)/src/ComparesPlotsClassesPdfs.C
+	$(CXX) $(CXXFLAGS) -o makeSPlotsClassesPdfs $(GLIBS) $ $<
+
 CompareSPlots: $(INCLUDEDIR)/src/ComparesPlotsPdfs.C 
 	$(CXX) $(CXXFLAGS) -o CompareSPlots $(GLIBS) $ $<
 
