@@ -80,6 +80,8 @@ $(OUTLIBCOMMON)Selection.o: $(INCLUDEDIRCOMMON)/CommonTools/src/Selection.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)Selection.o $<
 $(OUTLIB)CutBasedEleIDSelector.o: $(INCLUDEDIR)/src/CutBasedEleIDSelector.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CutBasedEleIDSelector.o $<
+$(OUTLIB)CiCBasedEleSelector.o: $(INCLUDEDIR)/src/CiCBasedEleSelector.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CiCBasedEleSelector.o $<
 $(OUTLIB)EcalCleaner.o: $(INCLUDEDIR)/src/EcalCleaner.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)EcalCleaner.o $<
 $(OUTLIBCOMMON)EfficiencyEvaluator.o: $(INCLUDEDIRCOMMON)/CommonTools/src/EfficiencyEvaluator.cc
@@ -125,6 +127,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)Egamma.o \
 	$(OUTLIBCOMMON)Conditions.o \
 	$(OUTLIBCOMMON)Selection.o \
+	$(OUTLIB)CiCBasedEleSelector.o \
 	$(OUTLIB)CutBasedEleIDSelector.o \
 	$(OUTLIB)EcalCleaner.o \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o \
@@ -187,6 +190,9 @@ makeSPlotsClassesPdfs: $(INCLUDEDIR)/src/ComparesPlotsClassesPdfs.C
 CompareSPlots: $(INCLUDEDIR)/src/ComparesPlotsPdfs.C 
 	$(CXX) $(CXXFLAGS) -o CompareSPlots $(GLIBS) $ $<
 
+ComparesPlotsClassesPdfs: $(INCLUDEDIR)/src/ComparesPlotsClassesPdfs.C 
+	$(CXX) $(CXXFLAGS) -o ComparesPlotsClassesPdfs $(GLIBS) $ $<
+
 CompareSignalIsolation: $(INCLUDEDIR)/src/CompareSignalIsolation.C
 	$(CXX) $(CXXFLAGS) -o CompareSignalIsolation $(GLIBS) $ $<
 
@@ -206,6 +212,7 @@ clean:
 	rm -f ComparesPlotsPdfs
 	rm -f makeSPlotsPdfs
 	rm -f CompareSPlots
+	rm -f ComparesPlotsClassesPdfs
 	rm -f MakeNoteIsolationPlots
 
 all:  EgammaAnalysis \
@@ -216,5 +223,6 @@ all:  EgammaAnalysis \
 	MakeNoteBkgPdfPlots \
 	CompareSignalPdfs \
 	CompareSignalIsolation \
+	ComparesPlotsClassesPdfs \
 	MakeNoteIsolationPlots
 
