@@ -99,8 +99,8 @@ int main(int argc, char* argv[]) {
   // analysis.reproduceEgammaCutID();
   //  analysis.findEquivalentLHCut( 0.79935 );        // tight eleID
   //  analysis.findEquivalentLHCut( 0.957 );       // loose eleID
-  analysis.estimateIDEfficiency();
-  //  analysis.estimateFakeRate();
+  //analysis.estimateIDEfficiency(outputFileName);
+  analysis.estimateFakeRateQCD(outputFileName);
   
 #endif
 
@@ -161,8 +161,11 @@ int main(int argc, char* argv[]) {
 
 #if Application == 5
 
-  int doSignalsPlots = 0;
-  int isMC = 0;
+  int doSignalsPlots = 1;
+  int isMC = 1;
+  int typeClass = 2;
+  int isTP = 0;
+  int randomizeNotUsedPdf=0;
   
   TFile *fileData, *fileMC;
 
@@ -178,8 +181,15 @@ int main(int argc, char* argv[]) {
   if(isMC) tree = (TTree*) fileMC->Get("T1");
   else tree = (TTree*) fileData->Get("dataset");
 
+  std::cout << "tree " << tree << std::endl;
+  if (!tree)
+    {
+      std::cout << "Tree not found" << std::endl;
+      exit(-1);
+    }
+
   sPlotsPdfsComparison p;
-  p.Init(tree, isMC);
+  p.Init(tree, isMC, isTP, randomizeNotUsedPdf, typeClass);
   p.doSignalsPlots(doSignalsPlots);
   p.Loop();
 

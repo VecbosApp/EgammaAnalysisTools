@@ -10,6 +10,7 @@
 
 #include "CommonTools/include/Selection.hh"
 #include "EgammaAnalysisTools/include/CutBasedEleIDSelector.hh"
+#include "EgammaAnalysisTools/include/CiCBasedEleSelector.hh"
 #include "EgammaAnalysisTools/include/Egamma.h"
 #include "EgammaAnalysisTools/include/ElectronLikelihood.h"
 
@@ -37,13 +38,23 @@ private:
 
   //! apply the custom offline electron ID
   void isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput);
+
+  //! apply the custom offline electron ID
+  void isEleID(CiCBasedEleSelector *selector, int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput);
   
   float SigmaiEiE(int electron);
   float SigmaiPiP(int electron);
   
   float likelihoodRatio(int eleIndex, ElectronLikelihood &lh);
 
-  CutBasedEleIDSelector EgammaCutBasedID;
+  std::vector<CutBasedEleIDSelector> EgammaCutBasedID;
+  std::vector<CiCBasedEleSelector> EgammaCiCBasedID;
+  std::vector<CutBasedEleIDSelector> EgammaLHBasedID;
+
+  std::vector<std::string> EgammaCutBasedIDWPs;
+  std::vector<std::string> EgammaCiCBasedIDWPs;
+  std::vector<std::string> EgammaLHBasedIDWPs;
+
   ElectronLikelihood *LH;
 
   //! contains the class-dependent electron ID cuts

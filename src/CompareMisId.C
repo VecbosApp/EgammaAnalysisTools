@@ -15,18 +15,44 @@
 // Offline analysis includes
 #include "CommonTools/include/EfficiencyEvaluator.hh"
 
+#include <string>
+
 using namespace std;
+
+std::vector<std::string> EgammaCutBasedIDWPs;
+std::vector<std::string> EgammaCiCBasedIDWPs;
+std::vector<std::string> EgammaLHBasedIDWPs;
 
 void drawEta(const char* filename);
 void drawPt(const char* filename);
 
+
+
+
 int main(int argc, char* argv[]) {
+
+  EgammaCutBasedIDWPs.push_back("WP95");
+  EgammaCutBasedIDWPs.push_back("WP90");
+  EgammaCutBasedIDWPs.push_back("WP80");
+  //  EgammaCutBasedIDWPs.push_back("WP70");
+
+  //  EgammaCiCBasedIDWPs.push_back("CiCVeryLoose");
+  EgammaCiCBasedIDWPs.push_back("CiCLoose");
+  EgammaCiCBasedIDWPs.push_back("CiCMedium");
+  EgammaCiCBasedIDWPs.push_back("CiCSuperTight");
+  //  EgammaCiCBasedIDWPs.push_back("CiCHyperTight");
+
+  EgammaLHBasedIDWPs.push_back("LHVeryLoose");
+  EgammaLHBasedIDWPs.push_back("LHLoose");
+  EgammaLHBasedIDWPs.push_back("LHMedium");
+  //EgammaLHBasedIDWPs.push_back("LHTight");
+  //  EgammaLHBasedIDWPs.push_back("LHHyperTight");
 
   char inputFileNameEta[150];
   char inputFileNamePt[150];
   if ( argc < 3 ){
     std::cout << "missing argument!" << std::endl; 
-    std::cout << "usage: compareMisid inputFileEta.root inputFilePt.root" << std::endl;
+    std::cout << "usage: compareFake inputFileEta.root inputFilePt.root" << std::endl;
     return 1;
   }
   strcpy(inputFileNameEta,argv[1]);
@@ -37,8 +63,6 @@ int main(int argc, char* argv[]) {
 
   drawEta(inputFileNameEta);
   drawPt(inputFileNamePt);
-
-
 }
 
 
@@ -46,110 +70,180 @@ void drawEta(const char* filename) {
 
   TFile *efficiencyFileEta = TFile::Open(filename);
 
-  TH1F *FakeableJetsEta = (TH1F*)efficiencyFileEta->Get("FakeableJetsEta");
+  //  TH1F *GenEta = (TH1F*)efficiencyFileEta->Get("GenEta");
   TH1F *RecoEta = (TH1F*)efficiencyFileEta->Get("RecoEta");
-  TH1F *CutIdWP80Eta = (TH1F*)efficiencyFileEta->Get("CutIdWP80Eta");
-  TH1F *CutIdTightCICEta = (TH1F*)efficiencyFileEta->Get("CutIdTightCICEta");
-  TH1F *CutIdSuperTightCICEta = (TH1F*)efficiencyFileEta->Get("CutIdSuperTightCICEta");
-  TH1F *LHIdLooseEta = (TH1F*)efficiencyFileEta->Get("LHIdLooseEta");
-  TH1F *LHIdTightEta = (TH1F*)efficiencyFileEta->Get("LHIdTightEta");
+  RecoEta->Rebin(4);
+  std::vector<TH1F*> CutIdEta;
+  for (int i=0;i<EgammaCutBasedIDWPs.size();++i)
+    {
+      TH1F* aHisto = (TH1F*)efficiencyFileEta->Get("CutId"+TString(EgammaCutBasedIDWPs[i])+"Eta");
+      aHisto->Rebin(4);
+      CutIdEta.push_back(aHisto);
+    }
+  std::vector<TH1F*> LHIdEta;
+  for (int i=0;i<EgammaLHBasedIDWPs.size();++i)
+    {
+      TH1F* aHisto = (TH1F*)efficiencyFileEta->Get("LHId"+TString(EgammaLHBasedIDWPs[i])+"Eta");
+      aHisto->Rebin(4);
+      LHIdEta.push_back(aHisto);
+    }
+  std::vector<TH1F*> CiCIdEta;
+  for (int i=0;i<EgammaCiCBasedIDWPs.size();++i)
+    {
+      TH1F* aHisto = (TH1F*)efficiencyFileEta->Get("CiCId"+TString(EgammaCiCBasedIDWPs[i])+"Eta");
+      aHisto->Rebin(4);
+      CiCIdEta.push_back(aHisto);
+    }
 
-  EfficiencyEvaluator ElectronFakeRateEta("elemisid-eta.root");
-  ElectronFakeRateEta.AddNumerator(FakeableJetsEta);
-  ElectronFakeRateEta.AddNumerator(RecoEta);
-  ElectronFakeRateEta.AddNumerator(CutIdWP80Eta);
-  ElectronFakeRateEta.AddNumerator(CutIdTightCICEta);
-  ElectronFakeRateEta.AddNumerator(CutIdSuperTightCICEta);
-  ElectronFakeRateEta.AddNumerator(LHIdLooseEta);
-  ElectronFakeRateEta.AddNumerator(LHIdTightEta);
-  ElectronFakeRateEta.SetDenominator(FakeableJetsEta);
-  ElectronFakeRateEta.ComputeEfficiencies();
+
+
+
+  EfficiencyEvaluator ElectronEfficiencyEta("elefake-eta.root");
+  //  ElectronEfficiencyEta.AddNumerator(GenEta);
+  //  ElectronEfficiencyEta.AddNumerator(RecoEta);
+  for (int i=0;i<CutIdEta.size();++i)
+    ElectronEfficiencyEta.AddNumerator(CutIdEta[i]);
+  for (int i=0;i<LHIdEta.size();++i)
+    ElectronEfficiencyEta.AddNumerator(LHIdEta[i]);
+  for (int i=0;i<CiCIdEta.size();++i)
+    ElectronEfficiencyEta.AddNumerator(CiCIdEta[i]);
+  ElectronEfficiencyEta.SetDenominator(RecoEta);
+  ElectronEfficiencyEta.ComputeEfficiencies();
   
-  vector<TH1F*> efficiency = ElectronFakeRateEta.GetCumulativeEfficiencies();
+  vector<TH1F*> efficiency = ElectronEfficiencyEta.GetCumulativeEfficiencies();
 
-  TCanvas c1;
-  c1.SetLogy();
-  efficiency[1]->SetLineColor(2);
-  efficiency[2]->SetLineColor(4);
-  efficiency[3]->SetLineColor(6);
-  efficiency[6]->SetLineColor(8);
-
-  TLegend* leg = new TLegend(0.15,0.75,0.40,0.90);
-  leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
-  leg->SetFillColor(0);
-  leg->AddEntry(efficiency[1],"reconstrunction");
-  leg->AddEntry(efficiency[2],"WP80 Cuts");
-  //  leg->AddEntry(efficiency[3],"Tight CIC Cuts");
-  leg->AddEntry(efficiency[6],"Tight Likelihood");
-
-  efficiency[1]->SetMinimum(0.0001);
-  efficiency[1]->SetMaximum(1.0);
-  efficiency[1]->SetTitle("");
-  efficiency[1]->GetXaxis()->SetTitle("#eta of closest jet");
-  efficiency[1]->GetYaxis()->SetTitle("Electron mis-id from Jets");
-  efficiency[1]->Draw("hist");
-  efficiency[2]->Draw("same hist");
-  //  efficiency[3]->Draw("same hist");
-  efficiency[6]->Draw("same hist");
-  leg->Draw();
-
-  c1.SaveAs("elemisid-eta.eps");
-  c1.SaveAs("elemisid-eta.root");
-
+  for (int tightness=0;tightness<CutIdEta.size();++tightness)
+    { 
+      TCanvas c1;
+      c1.SetLogy();
+      efficiency[0+tightness]->SetLineColor(1);
+      efficiency[0+tightness]->SetMarkerColor(1);
+      efficiency[CutIdEta.size()+tightness]->SetLineColor(2);
+      efficiency[CutIdEta.size()+tightness]->SetMarkerColor(2);
+      efficiency[CutIdEta.size()+LHIdEta.size()+tightness]->SetLineColor(4);
+      efficiency[CutIdEta.size()+LHIdEta.size()+tightness]->SetMarkerColor(4);
+      //  efficiency[6]->SetLineColor(8);
+      
+      TLegend* leg = new TLegend(0.15,0.75,0.40,0.9);
+      leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
+      leg->SetFillColor(0);
+      leg->AddEntry(efficiency[0+tightness],EgammaCutBasedIDWPs[0+tightness].c_str());
+      leg->AddEntry(efficiency[CutIdEta.size()+tightness],EgammaLHBasedIDWPs[0+tightness].c_str());
+      //  leg->AddEntry(efficiency[3],"Tight CIC Cuts");
+      leg->AddEntry(efficiency[CutIdEta.size()+LHIdEta.size()+tightness],EgammaCiCBasedIDWPs[0+tightness].c_str());
+      
+      efficiency[0+tightness]->SetMinimum(0.0001);
+      efficiency[0+tightness]->SetMaximum(1.);
+      efficiency[0+tightness]->SetMarkerStyle(20);
+      efficiency[0+tightness]->SetMarkerSize(1.05);
+      efficiency[0+tightness]->SetTitle("");
+      efficiency[0+tightness]->GetXaxis()->SetTitle("electron #eta");
+      efficiency[0+tightness]->GetYaxis()->SetTitle("Efficiency");
+      efficiency[0+tightness]->Draw("PEhist");
+      efficiency[CutIdEta.size()+tightness]->Draw("PEhistsame");
+      efficiency[CutIdEta.size()+tightness]->SetMarkerStyle(21);
+      efficiency[CutIdEta.size()+tightness]->SetMarkerSize(1.05);
+      //  efficiency[3+tightness]->Draw("same hist");
+      efficiency[CutIdEta.size()+LHIdEta.size()+tightness]->Draw("PEhistsame");
+      efficiency[CutIdEta.size()+LHIdEta.size()+tightness]->SetMarkerStyle(21);
+      efficiency[CutIdEta.size()+LHIdEta.size()+tightness]->SetMarkerSize(1.05);
+      leg->Draw();
+      
+      char tightLevel[10];
+      sprintf(tightLevel,"%d",tightness);
+      c1.SaveAs("elefake-eta-tightness"+TString(tightLevel)+".eps");
+      c1.SaveAs("elefake-eta-tightness"+TString(tightLevel)+".root");
+      c1.SaveAs("elefake-eta-tightness"+TString(tightLevel)+".png");
+    }
 }
 
 
 void drawPt(const char* filename) {
-
   TFile *efficiencyFilePt = TFile::Open(filename);
 
-  TH1F *FakeableJetsPt = (TH1F*)efficiencyFilePt->Get("FakeableJetsPt");
+  //  TH1F *GenPt = (TH1F*)efficiencyFilePt->Get("GenPt");
   TH1F *RecoPt = (TH1F*)efficiencyFilePt->Get("RecoPt");
-  TH1F *CutIdWP80Pt = (TH1F*)efficiencyFilePt->Get("CutIdWP80Pt");
-  TH1F *CutIdTightCICPt = (TH1F*)efficiencyFilePt->Get("CutIdTightCICPt");
-  TH1F *CutIdSuperTightCICPt = (TH1F*)efficiencyFilePt->Get("CutIdSuperTightCICPt");
-  TH1F *LHIdLoosePt = (TH1F*)efficiencyFilePt->Get("LHIdLoosePt");
-  TH1F *LHIdTightPt = (TH1F*)efficiencyFilePt->Get("LHIdTightPt");
 
-  EfficiencyEvaluator ElectronFakeRatePt("elemisid-pt.root");
-  ElectronFakeRatePt.AddNumerator(FakeableJetsPt);
-  ElectronFakeRatePt.AddNumerator(RecoPt);
-  ElectronFakeRatePt.AddNumerator(CutIdWP80Pt);
-  ElectronFakeRatePt.AddNumerator(CutIdTightCICPt);
-  ElectronFakeRatePt.AddNumerator(CutIdSuperTightCICPt);
-  ElectronFakeRatePt.AddNumerator(LHIdLoosePt);
-  ElectronFakeRatePt.AddNumerator(LHIdTightPt);
-  ElectronFakeRatePt.SetDenominator(FakeableJetsPt);
-  ElectronFakeRatePt.ComputeEfficiencies();
+  std::vector<TH1F*> CutIdPt;
+  for (int i=0;i<EgammaCutBasedIDWPs.size();++i)
+    {
+      TH1F* aHisto = (TH1F*)efficiencyFilePt->Get("CutId"+TString(EgammaCutBasedIDWPs[i])+"Pt");
+      CutIdPt.push_back(aHisto);
+    }
+  std::vector<TH1F*> LHIdPt;
+  for (int i=0;i<EgammaLHBasedIDWPs.size();++i)
+    {
+      TH1F* aHisto = (TH1F*)efficiencyFilePt->Get("LHId"+TString(EgammaLHBasedIDWPs[i])+"Pt");
+      LHIdPt.push_back(aHisto);
+    }
+  std::vector<TH1F*> CiCIdPt;
+  for (int i=0;i<EgammaCiCBasedIDWPs.size();++i)
+    {
+      TH1F* aHisto = (TH1F*)efficiencyFilePt->Get("CiCId"+TString(EgammaCiCBasedIDWPs[i])+"Pt");
+      CiCIdPt.push_back(aHisto);
+    }
 
-  vector<TH1F*> efficiency = ElectronFakeRatePt.GetCumulativeEfficiencies();
 
-  TCanvas c1;
-  c1.SetLogy();
-  efficiency[1]->SetLineColor(2);
-  efficiency[2]->SetLineColor(4);
-  efficiency[6]->SetLineColor(8);
 
-  TLegend* leg = new TLegend(0.15,0.75,0.40,0.90);
-  leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
-  leg->SetFillColor(0);
-  leg->AddEntry(efficiency[1],"reconstrunction");
-  leg->AddEntry(efficiency[2],"WP80 Cuts");
-  //  leg->AddEntry(efficiency[3],"Tight CIC Cuts");
-  leg->AddEntry(efficiency[6],"Tight Likelihood");
 
-  efficiency[1]->SetMinimum(0.0001);
-  efficiency[1]->SetMaximum(1.0);
-  efficiency[1]->SetTitle("");
-  efficiency[1]->GetXaxis()->SetTitle("p_{T} of closest jet [GeV]");
-  efficiency[1]->GetYaxis()->SetTitle("Electron mis-id from Jets");
-  efficiency[1]->Draw("hist");
-  efficiency[2]->Draw("same hist");
-  //  efficiency[3]->Draw("same hist");
-  efficiency[6]->Draw("same hist");
-  leg->Draw();
+  EfficiencyEvaluator ElectronEfficiencyPt("elefake-pt.root");
+  //  ElectronEfficiencyPt.AddNumerator(GenPt);
+  //  ElectronEfficiencyPt.AddNumerator(RecoPt);
+  for (int i=0;i<CutIdPt.size();++i)
+    ElectronEfficiencyPt.AddNumerator(CutIdPt[i]);
+  for (int i=0;i<LHIdPt.size();++i)
+    ElectronEfficiencyPt.AddNumerator(LHIdPt[i]);
+  for (int i=0;i<CiCIdPt.size();++i)
+    ElectronEfficiencyPt.AddNumerator(CiCIdPt[i]);
+  ElectronEfficiencyPt.SetDenominator(RecoPt);
+  ElectronEfficiencyPt.ComputeEfficiencies();
+  
+  vector<TH1F*> efficiency = ElectronEfficiencyPt.GetCumulativeEfficiencies();
 
-  c1.SaveAs("elemisid-pt.eps");
-  c1.SaveAs("elemisid-pt.root");
+  for (int tightness=0;tightness<CutIdPt.size();++tightness)
+    { 
+      TCanvas c1;
+      c1.SetLogy();
+      efficiency[0+tightness]->SetLineColor(1);
+      efficiency[0+tightness]->SetMarkerColor(1);
+      efficiency[CutIdPt.size()+tightness]->SetLineColor(2);
+      efficiency[CutIdPt.size()+tightness]->SetMarkerColor(2);
+      efficiency[CutIdPt.size()+LHIdPt.size()+tightness]->SetLineColor(4);
+      efficiency[CutIdPt.size()+LHIdPt.size()+tightness]->SetMarkerColor(4);
+      //  efficiency[6]->SetLineColor(8);
+      
+      TLegend* leg = new TLegend(0.15,0.75,0.40,0.9);
+      leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
+      leg->SetFillColor(0);
+      leg->AddEntry(efficiency[0+tightness],EgammaCutBasedIDWPs[0+tightness].c_str());
+      leg->AddEntry(efficiency[CutIdPt.size()+tightness],EgammaLHBasedIDWPs[0+tightness].c_str());
+      //  leg->AddEntry(efficiency[3],"Tight CIC Cuts");
+      leg->AddEntry(efficiency[CutIdPt.size()+LHIdPt.size()+tightness],EgammaCiCBasedIDWPs[0+tightness].c_str());
+
+
+      efficiency[0+tightness]->SetMinimum(0.0001);
+      efficiency[0+tightness]->SetMaximum(1.);
+      efficiency[0+tightness]->SetMarkerStyle(20);
+      efficiency[0+tightness]->SetMarkerSize(1.05);
+      efficiency[0+tightness]->SetTitle("");
+      efficiency[0+tightness]->GetXaxis()->SetTitle("electron #pt");
+      efficiency[0+tightness]->GetYaxis()->SetTitle("Efficiency");
+      efficiency[0+tightness]->Draw("PEhist");
+      efficiency[CutIdPt.size()+tightness]->Draw("PEhistsame");
+      efficiency[CutIdPt.size()+tightness]->SetMarkerStyle(21);
+      efficiency[CutIdPt.size()+tightness]->SetMarkerSize(1.05);
+      //  efficiency[3+tightness]->Draw("same hist");
+      efficiency[CutIdPt.size()+LHIdPt.size()+tightness]->Draw("PEhistsame");
+      efficiency[CutIdPt.size()+LHIdPt.size()+tightness]->SetMarkerStyle(21);
+      efficiency[CutIdPt.size()+LHIdPt.size()+tightness]->SetMarkerSize(1.05);
+      leg->Draw();
+      
+      char tightLevel[10];
+      sprintf(tightLevel,"%d",tightness);
+      c1.SaveAs("elefake-pt-tightness"+TString(tightLevel)+".eps");
+      c1.SaveAs("elefake-pt-tightness"+TString(tightLevel)+".root");
+      c1.SaveAs("elefake-pt-tightness"+TString(tightLevel)+".png");
+    }
+
 
 }
