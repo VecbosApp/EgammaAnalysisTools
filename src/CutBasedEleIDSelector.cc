@@ -179,7 +179,8 @@ void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir)
     eleSelection->addCut("missHits");
     eleSelection->addCut("distConv");
     eleSelection->addCut("dcotConv");
-    eleSelection->addCut("likelihood");
+    eleSelection->addCut("likelihood0");
+    eleSelection->addCut("likelihood1");
     eleSelection->summary();
   }
 
@@ -208,11 +209,12 @@ void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir)
   m_electronCounter.AddVar("combIso");
   m_electronCounter.AddVar("missHits");
   m_electronCounter.AddVar("vetoConv");
+  m_electronCounter.AddVar("likelihood");
   m_electronCounter.AddVar("finalCustomEleID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyIso");
   m_electronCounter.AddVar("finalCustomEleIDOnlyConv");
-  m_electronCounter.AddVar("likelihood");
+
 
 }
 
@@ -535,8 +537,12 @@ bool CutBasedEleIDSelector::outputNoClassEleId() {
   if(selection->getSwitch("egammaCutBased") && 
      m_egammaCutBased ) m_electronCounter.IncrVar("egammaCutBased");
 
-  if(selection->getSwitch("likelihood") && 
-     !selection->passCut("likelihood", fabs(m_Likelihood) )) return false;
+  if(selection->getSwitch("likelihood0") && 
+     ( m_NBrem == 0 && !selection->passCut("likelihood0", m_Likelihood ) ) 
+     ) return false;
+  if(selection->getSwitch("likelihood1") && 
+     ( m_NBrem > 0 && !selection->passCut("likelihood1", m_Likelihood ) ) 
+     ) return false;
   m_electronCounter.IncrVar("likelihood");
   
   if(selection->getSwitch("hOverE") && 
@@ -628,7 +634,7 @@ bool CutBasedEleIDSelector::outputNoClassIso()
   }
 
   if(selection->getSwitch("combIso")) {
-    if(!selection->passCut("combIso", fabs(m_combIso))) return false; 
+    if(  ( !selection->passCut("combIso", fabs(m_combIso) ) ) ) return false; 
     m_electronCounter.IncrVar("combIso");
   }
 

@@ -35,6 +35,7 @@ public:
   void SetEOverPin(float EOverPin) { m_EOverPin = EOverPin; m_useEOverPin = true; }
   void SetElectronClass(int electronClass) { m_electronClass = electronClass; m_electronClassInitialised = true; }
   void SetLikelihood(float Likelihood) { m_Likelihood = Likelihood; m_useLikelihood = true; }
+  void SetNBrem(float nbrem) { m_NBrem = nbrem; }
   void SetEcalFiducialRegion(int word) { m_fiducialflag = word; }
   void SetRecoFlag(int word) { m_recoflag = word; }
   void SetEcalIsolation(float ecalIso) { m_ecalIso = ecalIso; m_useEcalIso = true; }
@@ -111,6 +112,7 @@ private:
   float m_EOverPout;
   float m_EOverPin;
   float m_Likelihood;
+  float m_NBrem;
   float m_ecalIso;
   float m_trackerIso;
   float m_hcalIso;

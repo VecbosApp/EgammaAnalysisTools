@@ -23,9 +23,28 @@ CiCBasedEleSelector::CiCBasedEleSelector() {
 
 CiCBasedEleSelector::~CiCBasedEleSelector() {}
 
-void CiCBasedEleSelector::Configure(int type, bool useEtBins, bool specialCategories)
+void CiCBasedEleSelector::Configure(std::string type, bool useEtBins, bool specialCategories)
 {
-  m_eIDLevel = type;
+
+  if (type == "CiCVeryLoose")
+    m_eIDLevel = 0;
+  else if (type == "CiCLoose")
+    m_eIDLevel = 1;
+  else if (type == "CiCMedium")
+    m_eIDLevel = 2;
+  else if (type == "CiCTight")
+    m_eIDLevel = 3;
+  else if (type == "CiCSuperTight")
+    m_eIDLevel = 4;
+  else if (type == "CiCHyperTight")
+    m_eIDLevel = 5;
+  else if (type == "CiCHyperTight2")
+    m_eIDLevel = 6;
+  else if (type == "CiCHyperTight3")
+    m_eIDLevel = 7;
+  else if (type == "CiCHyperTight4")
+    m_eIDLevel = 8;
+  
   m_useEtBins = useEtBins;
   m_specialCategories = specialCategories;
 
@@ -51,9 +70,8 @@ void CiCBasedEleSelector::ConfigureEcalCleaner(const char *configDir) {
 
 
 bool CiCBasedEleSelector::output() {
-  if ( !m_useClass ) {
-    ElectronClassification();
-  }
+  ElectronClassification();
+
   m_electronCounter.IncrVar("electrons");
 
   if (!outputEleId())
@@ -77,18 +95,20 @@ void CiCBasedEleSelector::ElectronClassification()
 
   Utils anaUtils;
   bool isPFlowOnly = !anaUtils.electronRecoType(m_recoflag, isEcalDriven);
+  
   bool ebElectron = anaUtils.fiducialFlagECAL(m_fiducialflag, isEB);
+  bool eeElectron = anaUtils.fiducialFlagECAL(m_fiducialflag, isEE);
+  
   float fbrem = m_BremFraction;
   float eopin = m_EOverPin;
-
 
   if (ebElectron) {
     if (m_BremFraction>=0.12 && m_EOverPin >0.9 && m_EOverPin < 1.2)    // bremming barrel
       m_cat = 0;
-    else if (m_specialCategories && ((m_SCEta >  .445   && m_SCEta <  .45  ) ||      // barrel crack electrons
-                                   (m_SCEta >  .79    && m_SCEta <  .81  ) ||
-                                   (m_SCEta > 1.137   && m_SCEta < 1.157 ) ||
-                                   (m_SCEta > 1.47285 && m_SCEta < 1.4744)))
+    else if (m_specialCategories && ((fabs(m_SCEta) >  .445   && fabs(m_SCEta) <  .45  ) ||      // barrel crack electrons
+                                   (fabs(m_SCEta) >  .79    && fabs(m_SCEta) <  .81  ) ||
+                                   (fabs(m_SCEta) > 1.137   && fabs(m_SCEta) < 1.157 ) ||
+                                   (fabs(m_SCEta) > 1.47285 && fabs(m_SCEta) < 1.4744)))
       m_cat = 6;                                       
     else if (isPFlowOnly)              // tracker driven electrons
       m_cat = 8;
@@ -99,7 +119,7 @@ void CiCBasedEleSelector::ElectronClassification()
   } else {
     if (m_BremFraction>=0.2 && m_EOverPin >0.82 && m_EOverPin < 1.22)   // bremming endcap
       m_cat = 3;
-    else if (m_specialCategories && (m_SCEta > 1.5 && m_SCEta < 1.58))                // endcap crack electrons
+    else if (m_specialCategories && (fabs(m_SCEta) > 1.5 && fabs(m_SCEta) < 1.58))                // endcap crack electrons
       m_cat = 7;                                       
     else if (isPFlowOnly)              // tracker driven electrons
       m_cat = 8;
@@ -120,6 +140,7 @@ void CiCBasedEleSelector::ElectronClassification()
     }  
   
   m_useClass=true;
+
 }
 
 bool CiCBasedEleSelector::reset()
@@ -136,7 +157,6 @@ bool CiCBasedEleSelector::reset()
   m_BremFraction=-1;
   m_SigmaEtaEta=-1;
   m_EOverPin=-1;
-  m_NBrem=-1;
   m_ecalIso=-1;
   m_trackerIso=-1;
   m_hcalIso=-1;
@@ -149,9 +169,8 @@ bool CiCBasedEleSelector::reset()
 
 bool CiCBasedEleSelector::outputEleId() {
 
-  if ( !m_useClass ) {
-    ElectronClassification();
-  }
+  ElectronClassification();
+
 
   m_electronCounter.IncrVar("electronsOnlyID");
 
@@ -163,19 +182,19 @@ bool CiCBasedEleSelector::outputEleId() {
     return false;
   }
   
-  if (
-      (
-       m_HOverE < cuthoe[m_ptBin][m_eIDLevel][m_cat]) &&
-      (m_SigmaEtaEta < cutsee[m_ptBin][m_eIDLevel][m_cat]) &&
-      (fabs(m_DPhiIn) < cutdphiin[m_ptBin][m_eIDLevel][m_cat])  &&
-      (fabs(m_DEta) < cutdetain[m_ptBin][m_eIDLevel][m_cat]) &&
-      (eseedopincor > cuteseedopcor[m_ptBin][m_eIDLevel][m_cat]) &&
-      (m_SCEt > cutet[m_ptBin][m_eIDLevel][m_cat])
-      ) 
-    {
+
+   if (
+       (m_HOverE < cuthoe[m_ptBin][m_eIDLevel][m_cat]) &&
+       (m_SigmaEtaEta < cutsee[m_ptBin][m_eIDLevel][m_cat]) &&
+       (fabs(m_DPhiIn) < cutdphiin[m_ptBin][m_eIDLevel][m_cat])  &&
+       (fabs(m_DEta) < cutdetain[m_ptBin][m_eIDLevel][m_cat]) &&
+       (eseedopincor > cuteseedopcor[m_ptBin][m_eIDLevel][m_cat]) &&
+       (m_SCEt > cutet[m_ptBin][m_eIDLevel][m_cat])
+       ) 
+     {
       m_electronCounter.IncrVar("finalCustomEleIDOnlyID");  
       return true;
-    }
+     }
   
   return false;
 }
@@ -184,9 +203,7 @@ bool CiCBasedEleSelector::outputEleId() {
 bool CiCBasedEleSelector::outputIso() 
 {
 
-  if ( !m_useClass ) {
-    ElectronClassification();
-  }
+  ElectronClassification();
 
   m_electronCounter.IncrVar("electronsOnlyIso");
   
@@ -207,9 +224,7 @@ bool CiCBasedEleSelector::outputIso()
 
 bool CiCBasedEleSelector::outputConv()
 {
-  if ( !m_useClass ) {
-    ElectronClassification();
-  }
+  ElectronClassification();
   
   m_electronCounter.IncrVar("electronsOnlyConv");
   

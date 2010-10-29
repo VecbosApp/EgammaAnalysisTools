@@ -14,7 +14,7 @@ public:
   //! destructor
   virtual ~CiCBasedEleSelector();   
   //! configure from files (class dependent)
-  void Configure(int type, bool useEtBins, bool specialCategories);
+  void Configure(std::string type, bool useEtBins, bool specialCategories);
   //! configure the ECAL cleaner
   void ConfigureEcalCleaner(const char *configDir);
   //! get the non-class dependent selection (EB, EE)
@@ -69,7 +69,6 @@ private:
   float m_BremFraction;
   float m_SigmaEtaEta;
   float m_EOverPin;
-  float m_NBrem;
   float m_ecalIso;
   float m_trackerIso;
   float m_hcalIso;
