@@ -72,7 +72,7 @@ void sPlotsPdfsComparison::Loop()
         if(f_nbrem==0) jclass = 0;
         else jclass = 1;
         if(m_doSignal) {
-          if(f_nJets>0 || f_pfmet/f_pt<0.3 || f_isIsoWP80<0) continue;
+          if(jptbin==1 && (f_nJets>0 || f_pfmet/f_pt<0.3 || f_isIsoWP80<0)) continue;
         }
       } else {
         if(see<1e-4) continue; // remove residual spikes (if the cleaning is not done)
@@ -101,7 +101,7 @@ void sPlotsPdfsComparison::Loop()
       float minFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0)-1.0;
       float maxFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(fBremClassEle [jecal][jptbin][jclass]->GetNbinsX()+1)+1.0;
       TRandom3 rnd(jentry);
-      
+     
       if(m_isMC) {
         dPhiEle          [jecal] -> Fill ( f_dphi, wgt );
         dEtaEle          [jecal] -> Fill ( f_deta, wgt );
@@ -464,7 +464,7 @@ void sPlotsPdfsComparison::bookFullHistos() {
   float sigmaIPhiIPhiEBMin = 0.0;
   float sigmaIPhiIPhiEBMax = 0.03;
   float sigmaIPhiIPhiEEMin = 0.01;
-  float sigmaIPhiIPhiEEMax = 0.05;
+  float sigmaIPhiIPhiEEMax = 0.09;
   float fBremMin = 0.0;
   float fBremMax = 1.0;
   float lhMin = 0.0;
