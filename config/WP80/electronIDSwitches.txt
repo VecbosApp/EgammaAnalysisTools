@@ -17,4 +17,6 @@ invEminusInvP	0
 bremFraction	0
 sigmaPhiPhi	0
 likelihood      0
+likelihood0      0
+likelihood1      0
 egammaCutBased	0

@@ -3,8 +3,8 @@ trackerIso 	 -100 	 0.04
 ecalIso 	 -100 	 0.05 
 hcalIso 	 -100 	 0.025 
 sigmaEtaEta 	 0.0 	 0.03 
-dphiIn 	 0.0 	 0.04 
-deta 	 0.0 	 999999.
+dphiIn 	 0.0 	 0.03 
+deta 	 0.0 	 0.007
 hOverE 	 0.0 	 0.025 
 missHits 	 0.0 	 0.0 
 distConv 	 0.02 100000 
@@ -16,4 +16,5 @@ dphiOut         0.0             999.
 invEminusInvP   0.0             1000
 bremFraction    0.0             999.
 sigmaPhiPhi     0.0             999.
-likelihood      0.0             1.0
+likelihood0      0.0             1.0
+likelihood1      0.0             1.0

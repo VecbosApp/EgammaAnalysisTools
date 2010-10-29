@@ -4,7 +4,7 @@ ecalIso 	 -100 	 0.06
 hcalIso 	 -100 	 0.05 
 sigmaEtaEta 	 0.0 	 0.03 
 dphiIn 	 0.0 	 0.7 
-deta 	 0.0 	 9999999.
+deta 	 0.0 	 0.01
 hOverE 	 0.0 	 0.07 
 missHits 	 0.0 	 1.0 
 distConv 	 0.0 100000 
@@ -16,4 +16,5 @@ dphiOut         0.0             999.
 invEminusInvP   0.0             1000
 bremFraction    0.0             999.
 sigmaPhiPhi     0.0             999.
-likelihood      0.0             1.0
+likelihood0      0.0             1.0
+likelihood1      0.0             1.0
