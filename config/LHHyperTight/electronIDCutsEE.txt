@@ -1,4 +1,4 @@
-combIso    	     0.0            0.052
+combIso    	     0.0            0.033
 trackerIso 	 -100 	 0.04
 ecalIso 	 -100 	 0.05 
 hcalIso 	 -100 	 0.025 
@@ -16,5 +16,5 @@ dphiOut         0.0             999.
 invEminusInvP   0.0             1000
 bremFraction    0.0             999.
 sigmaPhiPhi     0.0             999.
-likelihood0      0.775             1.0
-likelihood1      0.960             1.0
+likelihood0      0.958             1.0
+likelihood1      0.990             1.0
