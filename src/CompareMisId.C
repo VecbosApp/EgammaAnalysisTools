@@ -14,45 +14,56 @@
 
 // Offline analysis includes
 #include "CommonTools/include/EfficiencyEvaluator.hh"
-
+#include "TString.h"
 #include <string>
 
 using namespace std;
 
-std::vector<std::string> EgammaCutBasedIDWPs;
-std::vector<std::string> EgammaCiCBasedIDWPs;
-std::vector<std::string> EgammaLHBasedIDWPs;
+std::vector<TString> EgammaCutBasedIDWPs;
+std::vector<TString> EgammaCiCBasedIDWPs;
+std::vector<TString> EgammaLHBasedIDWPs;
 
-void drawEta(const char* filename);
-void drawPt(const char* filename);
+
+void drawEta(const char* filename,TString type);
+void drawPt(const char* filename,TString type);
 
 
 
 
 int main(int argc, char* argv[]) {
 
-  EgammaCutBasedIDWPs.push_back("WP95");
-  EgammaCutBasedIDWPs.push_back("WP90");
-  EgammaCutBasedIDWPs.push_back("WP80");
-  //  EgammaCutBasedIDWPs.push_back("WP70");
+  TString IDpart;
+   if (argv[3])
+     {
+       char idpar[100];
+       strcpy(idpar,argv[3]);
+       IDpart=TString(idpar);
+     }
+   else
+     IDpart="";
 
-  //  EgammaCiCBasedIDWPs.push_back("CiCVeryLoose");
-  EgammaCiCBasedIDWPs.push_back("CiCLoose");
-  EgammaCiCBasedIDWPs.push_back("CiCMedium");
-  EgammaCiCBasedIDWPs.push_back("CiCSuperTight");
-  //  EgammaCiCBasedIDWPs.push_back("CiCHyperTight");
+   EgammaCutBasedIDWPs.push_back("WP95"+TString(IDpart));;
+   EgammaCutBasedIDWPs.push_back("WP90"+TString(IDpart));;
+  EgammaCutBasedIDWPs.push_back("WP80"+TString(IDpart));;
+  EgammaCutBasedIDWPs.push_back("WP70"+TString(IDpart));;    
+  //  EgammaCiCBasedIDWPs.push_back(TString("CiCVeryLoose")+TString(IDpart));;
+  //  EgammaCiCBasedIDWPs.push_back(TString("CiCLoose")+TString(IDpart));;
+  EgammaCiCBasedIDWPs.push_back(TString("CiCLoose")+TString(IDpart));;
+  EgammaCiCBasedIDWPs.push_back(TString("CiCTight")+TString(IDpart));;
+  EgammaCiCBasedIDWPs.push_back(TString("CiCSuperTight")+TString(IDpart));;
+  EgammaCiCBasedIDWPs.push_back(TString("CiCHyperTight")+TString(IDpart));;
+  //  EgammaCiCBasedIDWPs.push_back(TString("CiCHyperTight2")+TString(IDpart));;
 
-  EgammaLHBasedIDWPs.push_back("LHVeryLoose");
-  EgammaLHBasedIDWPs.push_back("LHLoose");
-  EgammaLHBasedIDWPs.push_back("LHMedium");
-  //EgammaLHBasedIDWPs.push_back("LHTight");
-  //  EgammaLHBasedIDWPs.push_back("LHHyperTight");
+  EgammaLHBasedIDWPs.push_back(TString("LHVeryLoose")+TString(IDpart));;
+  EgammaLHBasedIDWPs.push_back(TString("LHLoose")+TString(IDpart));;
+  EgammaLHBasedIDWPs.push_back(TString("LHMedium")+TString(IDpart));;
+  EgammaLHBasedIDWPs.push_back(TString("LHTight")+TString(IDpart));;
 
   char inputFileNameEta[150];
   char inputFileNamePt[150];
   if ( argc < 3 ){
     std::cout << "missing argument!" << std::endl; 
-    std::cout << "usage: compareFake inputFileEta.root inputFilePt.root" << std::endl;
+    std::cout << "usage: compareFake inputFileEta.root inputFilePt.root <optional id part>" << std::endl;
     return 1;
   }
   strcpy(inputFileNameEta,argv[1]);
@@ -61,36 +72,47 @@ int main(int argc, char* argv[]) {
   gROOT->SetStyle("Plain");
   gStyle->SetOptStat(0);
 
-  drawEta(inputFileNameEta);
-  drawPt(inputFileNamePt);
+  char input[300];
+//   sprintf(input,"%s.root",inputFileNameEta);
+//   drawEta(input,"");
+  sprintf(input,"%sHighPt.root",inputFileNameEta);
+  drawEta(input,"HighPt");
+  sprintf(input,"%sLowPt.root",inputFileNameEta);
+  drawEta(input,"LowPt");
+//   sprintf(input,"%s.root",inputFileNamePt);
+//   drawPt(input, "");
+  sprintf(input,"%sBarrel.root",inputFileNamePt);
+  drawPt(input, "Barrel");
+  sprintf(input,"%sEndcap.root",inputFileNamePt);
+  drawPt(input, "Endcap");
 }
 
 
-void drawEta(const char* filename) {
+void drawEta(const char* filename, TString type) {
 
   TFile *efficiencyFileEta = TFile::Open(filename);
 
-  //  TH1F *GenEta = (TH1F*)efficiencyFileEta->Get("GenEta");
-  TH1F *RecoEta = (TH1F*)efficiencyFileEta->Get("RecoEta");
+  //  TH1F *GenEta = (TH1F*)efficiencyFileEta->Get("GenEta"+type);
+  TH1F *RecoEta = (TH1F*)efficiencyFileEta->Get("RecoEta"+type);
   RecoEta->Rebin(4);
   std::vector<TH1F*> CutIdEta;
   for (int i=0;i<EgammaCutBasedIDWPs.size();++i)
     {
-      TH1F* aHisto = (TH1F*)efficiencyFileEta->Get("CutId"+TString(EgammaCutBasedIDWPs[i])+"Eta");
+      TH1F* aHisto = (TH1F*)efficiencyFileEta->Get("CutId"+TString(EgammaCutBasedIDWPs[i])+"Eta"+type);
       aHisto->Rebin(4);
       CutIdEta.push_back(aHisto);
     }
   std::vector<TH1F*> LHIdEta;
   for (int i=0;i<EgammaLHBasedIDWPs.size();++i)
     {
-      TH1F* aHisto = (TH1F*)efficiencyFileEta->Get("LHId"+TString(EgammaLHBasedIDWPs[i])+"Eta");
+      TH1F* aHisto = (TH1F*)efficiencyFileEta->Get("LHId"+TString(EgammaLHBasedIDWPs[i])+"Eta"+type);
       aHisto->Rebin(4);
       LHIdEta.push_back(aHisto);
     }
   std::vector<TH1F*> CiCIdEta;
   for (int i=0;i<EgammaCiCBasedIDWPs.size();++i)
     {
-      TH1F* aHisto = (TH1F*)efficiencyFileEta->Get("CiCId"+TString(EgammaCiCBasedIDWPs[i])+"Eta");
+      TH1F* aHisto = (TH1F*)efficiencyFileEta->Get("CiCId"+TString(EgammaCiCBasedIDWPs[i])+"Eta"+type);
       aHisto->Rebin(4);
       CiCIdEta.push_back(aHisto);
     }
@@ -98,7 +120,7 @@ void drawEta(const char* filename) {
 
 
 
-  EfficiencyEvaluator ElectronEfficiencyEta("elefake-eta.root");
+  EfficiencyEvaluator ElectronEfficiencyEta("elefake-eta-"+type+".root");
   //  ElectronEfficiencyEta.AddNumerator(GenEta);
   //  ElectronEfficiencyEta.AddNumerator(RecoEta);
   for (int i=0;i<CutIdEta.size();++i)
@@ -127,12 +149,12 @@ void drawEta(const char* filename) {
       TLegend* leg = new TLegend(0.15,0.75,0.40,0.9);
       leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
       leg->SetFillColor(0);
-      leg->AddEntry(efficiency[0+tightness],EgammaCutBasedIDWPs[0+tightness].c_str());
-      leg->AddEntry(efficiency[CutIdEta.size()+tightness],EgammaLHBasedIDWPs[0+tightness].c_str());
+      leg->AddEntry(efficiency[0+tightness],EgammaCutBasedIDWPs[0+tightness].Data());
+      leg->AddEntry(efficiency[CutIdEta.size()+tightness],EgammaLHBasedIDWPs[0+tightness].Data());
       //  leg->AddEntry(efficiency[3],"Tight CIC Cuts");
-      leg->AddEntry(efficiency[CutIdEta.size()+LHIdEta.size()+tightness],EgammaCiCBasedIDWPs[0+tightness].c_str());
+      leg->AddEntry(efficiency[CutIdEta.size()+LHIdEta.size()+tightness],EgammaCiCBasedIDWPs[0+tightness].Data());
       
-      efficiency[0+tightness]->SetMinimum(0.0001);
+      efficiency[0+tightness]->SetMinimum(0.00001);
       efficiency[0+tightness]->SetMaximum(1.);
       efficiency[0+tightness]->SetMarkerStyle(20);
       efficiency[0+tightness]->SetMarkerSize(1.05);
@@ -151,42 +173,42 @@ void drawEta(const char* filename) {
       
       char tightLevel[10];
       sprintf(tightLevel,"%d",tightness);
-      c1.SaveAs("elefake-eta-tightness"+TString(tightLevel)+".eps");
-      c1.SaveAs("elefake-eta-tightness"+TString(tightLevel)+".root");
-      c1.SaveAs("elefake-eta-tightness"+TString(tightLevel)+".png");
+      c1.SaveAs("elefake-eta-"+type+"-tightness"+TString(tightLevel)+".eps");
+      c1.SaveAs("elefake-eta-"+type+"tightness"+TString(tightLevel)+".root");
+      c1.SaveAs("elefake-eta-"+type+"tightness"+TString(tightLevel)+".png");
     }
 }
 
 
-void drawPt(const char* filename) {
+void drawPt(const char* filename, TString type) {
   TFile *efficiencyFilePt = TFile::Open(filename);
 
   //  TH1F *GenPt = (TH1F*)efficiencyFilePt->Get("GenPt");
-  TH1F *RecoPt = (TH1F*)efficiencyFilePt->Get("RecoPt");
+  TH1F *RecoPt = (TH1F*)efficiencyFilePt->Get("RecoPt"+type);
 
   std::vector<TH1F*> CutIdPt;
   for (int i=0;i<EgammaCutBasedIDWPs.size();++i)
     {
-      TH1F* aHisto = (TH1F*)efficiencyFilePt->Get("CutId"+TString(EgammaCutBasedIDWPs[i])+"Pt");
+      TH1F* aHisto = (TH1F*)efficiencyFilePt->Get("CutId"+TString(EgammaCutBasedIDWPs[i])+"Pt"+type);
       CutIdPt.push_back(aHisto);
     }
   std::vector<TH1F*> LHIdPt;
   for (int i=0;i<EgammaLHBasedIDWPs.size();++i)
     {
-      TH1F* aHisto = (TH1F*)efficiencyFilePt->Get("LHId"+TString(EgammaLHBasedIDWPs[i])+"Pt");
+      TH1F* aHisto = (TH1F*)efficiencyFilePt->Get("LHId"+TString(EgammaLHBasedIDWPs[i])+"Pt"+type);
       LHIdPt.push_back(aHisto);
     }
   std::vector<TH1F*> CiCIdPt;
   for (int i=0;i<EgammaCiCBasedIDWPs.size();++i)
     {
-      TH1F* aHisto = (TH1F*)efficiencyFilePt->Get("CiCId"+TString(EgammaCiCBasedIDWPs[i])+"Pt");
+      TH1F* aHisto = (TH1F*)efficiencyFilePt->Get("CiCId"+TString(EgammaCiCBasedIDWPs[i])+"Pt"+type);
       CiCIdPt.push_back(aHisto);
     }
 
 
 
 
-  EfficiencyEvaluator ElectronEfficiencyPt("elefake-pt.root");
+  EfficiencyEvaluator ElectronEfficiencyPt("elefake-pt-"+type+".root");
   //  ElectronEfficiencyPt.AddNumerator(GenPt);
   //  ElectronEfficiencyPt.AddNumerator(RecoPt);
   for (int i=0;i<CutIdPt.size();++i)
@@ -215,13 +237,13 @@ void drawPt(const char* filename) {
       TLegend* leg = new TLegend(0.15,0.75,0.40,0.9);
       leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
       leg->SetFillColor(0);
-      leg->AddEntry(efficiency[0+tightness],EgammaCutBasedIDWPs[0+tightness].c_str());
-      leg->AddEntry(efficiency[CutIdPt.size()+tightness],EgammaLHBasedIDWPs[0+tightness].c_str());
+      leg->AddEntry(efficiency[0+tightness],EgammaCutBasedIDWPs[0+tightness].Data());
+      leg->AddEntry(efficiency[CutIdPt.size()+tightness],EgammaLHBasedIDWPs[0+tightness].Data());
       //  leg->AddEntry(efficiency[3],"Tight CIC Cuts");
-      leg->AddEntry(efficiency[CutIdPt.size()+LHIdPt.size()+tightness],EgammaCiCBasedIDWPs[0+tightness].c_str());
+      leg->AddEntry(efficiency[CutIdPt.size()+LHIdPt.size()+tightness],EgammaCiCBasedIDWPs[0+tightness].Data());
 
 
-      efficiency[0+tightness]->SetMinimum(0.0001);
+      efficiency[0+tightness]->SetMinimum(0.00001);
       efficiency[0+tightness]->SetMaximum(1.);
       efficiency[0+tightness]->SetMarkerStyle(20);
       efficiency[0+tightness]->SetMarkerSize(1.05);
@@ -240,9 +262,9 @@ void drawPt(const char* filename) {
       
       char tightLevel[10];
       sprintf(tightLevel,"%d",tightness);
-      c1.SaveAs("elefake-pt-tightness"+TString(tightLevel)+".eps");
-      c1.SaveAs("elefake-pt-tightness"+TString(tightLevel)+".root");
-      c1.SaveAs("elefake-pt-tightness"+TString(tightLevel)+".png");
+      c1.SaveAs("elefake-pt-"+type+"-tightness"+TString(tightLevel)+".eps");
+      c1.SaveAs("elefake-pt-"+type+"tightness"+TString(tightLevel)+".root");
+      c1.SaveAs("elefake-pt-"+type+"tightness"+TString(tightLevel)+".png");
     }
 
 

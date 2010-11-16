@@ -23,7 +23,7 @@ CiCBasedEleSelector::CiCBasedEleSelector() {
 
 CiCBasedEleSelector::~CiCBasedEleSelector() {}
 
-void CiCBasedEleSelector::Configure(std::string type, bool useEtBins, bool specialCategories)
+void CiCBasedEleSelector::Configure(std::string type, bool useEtBins, bool specialCategories, int version)
 {
 
   if (type == "CiCVeryLoose")
@@ -44,7 +44,8 @@ void CiCBasedEleSelector::Configure(std::string type, bool useEtBins, bool speci
     m_eIDLevel = 7;
   else if (type == "CiCHyperTight4")
     m_eIDLevel = 8;
-  
+
+  m_version = version;
   m_useEtBins = useEtBins;
   m_specialCategories = specialCategories;
 
@@ -184,6 +185,7 @@ bool CiCBasedEleSelector::outputEleId() {
   
 
    if (
+       m_version == 1 && 
        (m_HOverE < cuthoe[m_ptBin][m_eIDLevel][m_cat]) &&
        (m_SigmaEtaEta < cutsee[m_ptBin][m_eIDLevel][m_cat]) &&
        (fabs(m_DPhiIn) < cutdphiin[m_ptBin][m_eIDLevel][m_cat])  &&
@@ -194,7 +196,21 @@ bool CiCBasedEleSelector::outputEleId() {
      {
       m_electronCounter.IncrVar("finalCustomEleIDOnlyID");  
       return true;
-     }
+     } 
+   else
+     if (
+	 m_version == 2 && 
+	 compute_eid_cut(m_HOverE, m_SCEt, cuthoelv03[0][m_eIDLevel][m_cat], cuthoev03[0][m_eIDLevel][m_cat], false) &&
+	 compute_eid_cut(m_SigmaEtaEta, m_SCEt, cutseelv03[0][m_eIDLevel][m_cat], cutseev03[0][m_eIDLevel][m_cat], false) &&
+	 compute_eid_cut(fabs(m_DPhiIn), m_SCEt, cutdphiinlv03[0][m_eIDLevel][m_cat], cutdphiinv03[0][m_eIDLevel][m_cat], false) &&
+	 compute_eid_cut(fabs(m_DEta), m_SCEt, cutdetainlv03[0][m_eIDLevel][m_cat], cutdetainv03[0][m_eIDLevel][m_cat], false) &&
+	 eseedopincor > cuteseedopcorv03[0][m_eIDLevel][m_cat] 
+	 )
+       {
+	 m_electronCounter.IncrVar("finalCustomEleIDOnlyID");  
+	 return true;
+       } 
+
   
   return false;
 }
@@ -208,17 +224,30 @@ bool CiCBasedEleSelector::outputIso()
   m_electronCounter.IncrVar("electronsOnlyIso");
   
   float iso_sum = m_trackerIso + m_ecalIso + m_hcalIso;   
+
+  if(fabs(m_SCEta)>1.5) 
+    iso_sum += (fabs(m_SCEta)-1.5)*1.09;
+
+  float iso_sumoet = iso_sum*(40./m_SCEt);
   float iso_sum_scaled = iso_sum*pow(40./m_SCEt, 2); 
-  
-  if (
-      (iso_sum < cutiso_sum[m_ptBin][m_eIDLevel][m_cat]) &&
-      (iso_sum_scaled < cutiso_sumoet[m_ptBin][m_eIDLevel][m_cat])
-      )
+
+  if ( m_version == 1 &&
+       (iso_sum < cutiso_sum[m_ptBin][m_eIDLevel][m_cat]) &&
+       (iso_sum_scaled < cutiso_sumoet[m_ptBin][m_eIDLevel][m_cat])
+       )
     {
       m_electronCounter.IncrVar("finalCustomEleIDOnlyIso");  
       return true;
     }
-
+  else if ( m_version == 2 && 
+	    compute_eid_cut(iso_sumoet, m_SCEt, cutiso_sumoetlv03[0][m_eIDLevel][m_cat], cutiso_sumoetv03[0][m_eIDLevel][m_cat], false) &&
+	    (iso_sum < cutiso_sumv03[0][m_eIDLevel][m_cat])
+	    )
+    {
+      m_electronCounter.IncrVar("finalCustomEleIDOnlyIso");  
+      return true;
+    }
+  
   return false;
 }
 
@@ -230,12 +259,22 @@ bool CiCBasedEleSelector::outputConv()
   
   float dcotdist = ((0.04 - std::max(fabs(m_distConv), fabs(m_dcotConv))) > 0?(0.04 - std::max(fabs(m_distConv), fabs(m_dcotConv))):0);
   
-  if ((float(m_missingHits) < cutfmishits[m_ptBin][m_eIDLevel][m_cat]) && (dcotdist < cutdcotdist[m_ptBin][m_eIDLevel][m_cat]))
+  if ( m_version == 1 &&
+       (float(m_missingHits) < cutfmishits[m_ptBin][m_eIDLevel][m_cat]) && (dcotdist < cutdcotdist[m_ptBin][m_eIDLevel][m_cat])
+       )
     {
       m_electronCounter.IncrVar("finalCustomEleIDOnlyConv");  
       return true;
     }
-
+  else
+    if ( m_version == 2 &&
+	 float(m_missingHits) < cutfmishitsv03[0][m_eIDLevel][m_cat]
+	 )
+      {
+	m_electronCounter.IncrVar("finalCustomEleIDOnlyConv");  
+	return true;
+      } 
+  
   return false;
 }
 
@@ -250,4 +289,31 @@ void CiCBasedEleSelector::displayEfficiencies() {
   std::cout << "++++++ FINAL EFFICIENCY +++++++" << std::endl;
   m_electronCounter.Draw("finalCustomEleID","electrons");
   if(m_doEcalCleaning) m_cleaner->displayEfficiencies();
+}
+
+// Linearization of the cut
+bool CiCBasedEleSelector::compute_eid_cut(float x, float et, float cut_min, float cut_max, bool gtn) {
+
+  float et_min = 10;
+  float et_max = 40;
+
+  bool accept = false;
+  float cut = cut_max;    //  the cut at et=40 GeV
+
+  if(et < et_max) {
+    cut = cut_min + (1/et_min - 1/et)*(cut_max - cut_min)/(1/et_min - 1/et_max);
+  } 
+  
+  if(et < et_min) {
+    cut = cut_min;
+  } 
+
+  if(gtn) {   // useful for e/p cut which is gt
+    accept = (x >= cut);
+  } 
+  else {
+    accept = (x <= cut);
+  }
+
+  return accept;
 }
