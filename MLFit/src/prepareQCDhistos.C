@@ -4,6 +4,10 @@
 #include <TStyle.h>
 #include <TCanvas.h>
 #include <TRandom3.h>
+#include <iostream>
+#include <math.h>
+
+using namespace std;
 
 void prepareQCDhistos::Loop() {
 
@@ -12,6 +16,15 @@ void prepareQCDhistos::Loop() {
   // histos booking
   bookFullHistos();
 
+  // configuring electron likelihood
+  TFile *fileLH = TFile::Open("pdfs_MC.root");
+  TDirectory *LHdir = fileLH->GetDirectory("/");
+  LikelihoodSwitches defaultSwitches;
+  defaultSwitches.m_useFBrem = true;
+  defaultSwitches.m_useEoverP = false;
+  defaultSwitches.m_useSigmaPhiPhi = true;
+  LH = new ElectronLikelihood(&(*LHdir), &(*LHdir), &(*LHdir), &(*LHdir),
+                              defaultSwitches, std::string("class"),std::string("class"),true,true);
 
   Long64_t nentries = fChain->GetEntriesFast();
   int firstEvent = 0;
@@ -27,7 +40,7 @@ void prepareQCDhistos::Loop() {
 
     // remove residual spikes (if the cleaning is not done)    
     if(see<1e-4) continue; 
-
+    
     // eta, pt and class 
     int jecal, jptbin, jclass;
     if (fabs(eta)<1.479) jecal = 0;
@@ -63,10 +76,21 @@ void prepareQCDhistos::Loop() {
     float minFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0)-1.0;
     float maxFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(fBremClassEle [jecal][jptbin][jclass]->GetNbinsX()+1)+1.0;
     TRandom3 rnd(jentry);
+    // to create PDFs 
     if (jclass==0) fBremClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minFBrem,maxFBrem) );
-    if (jclass==1) fBremClassEle [jecal][jptbin][jclass] -> Fill ( fbrem );
+    // for performance plots
+    // if (jclass==0) fBremClassEle [jecal][jptbin][jclass] -> Fill ( fbrem );
+    if (jclass==1) fBremClassEle [jecal][jptbin][jclass] -> Fill ( fbrem );    
     if( jclass==0) sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( spp );
+    // to create PDFs     
     if( jclass==1) sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minSPP,maxSPP) );
+    // for performance plots 
+    // if( jclass==1) sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( spp );
+
+    // the likelihood output
+    float f_lh = likelihoodRatio(*LH);
+    lhUnsplitEle [jecal][jptbin] -> Fill ( f_lh );
+    lhClassEle [jecal][jptbin][jclass] -> Fill ( f_lh );
     
   } // end loop over entries
 
@@ -74,8 +98,8 @@ void prepareQCDhistos::Loop() {
   // saving likelihood pdfs
   char buffer[200];
   char bufferLikelihood[200];
-  sprintf(buffer,"pdfsQCD_histograms_data.root");
-  sprintf(bufferLikelihood,"pdfsQCD_data.root");
+  sprintf(buffer,"pdfsQCD_histograms.root");
+  sprintf(bufferLikelihood,"pdfsQCD.root");
   
   TFile *fileOut2 = TFile::Open(bufferLikelihood, "recreate");
   
@@ -90,6 +114,7 @@ void prepareQCDhistos::Loop() {
       fBremUnsplitEle[iecal][iptbin]-> Write();
       sigmaIEtaIEtaUnsplitEle[iecal][iptbin] -> Write();
       sigmaIPhiIPhiUnsplitEle[iecal][iptbin] -> Write();
+      lhUnsplitEle[iecal][iptbin]->Write();
 
       for(int iclass=0; iclass<2; iclass++) {
       	dPhiClassEle[iecal][iptbin][iclass] -> Write();
@@ -99,6 +124,7 @@ void prepareQCDhistos::Loop() {
         fBremClassEle[iecal][iptbin][iclass]-> Write();
 	sigmaIEtaIEtaClassEle[iecal][iptbin][iclass] -> Write();
 	sigmaIPhiIPhiClassEle[iecal][iptbin][iclass] -> Write();
+	lhClassEle[iecal][iptbin][iclass]->Write();
       }
     }
   }
@@ -125,9 +151,11 @@ void prepareQCDhistos::bookFullHistos() {
   float sigmaIPhiIPhiEBMin = 0.0;
   float sigmaIPhiIPhiEBMax = 0.03;
   float sigmaIPhiIPhiEEMin = 0.01;
-  float sigmaIPhiIPhiEEMax = 0.05;
+  float sigmaIPhiIPhiEEMax = 0.09;
   float fBremMin = 0.0;
   float fBremMax = 1.0;
+  float lhMin = 0.0;
+  float lhMax = 1.0;
 
   // booking histos eleID
   // iecal = 0 --> barrel
@@ -162,6 +190,9 @@ void prepareQCDhistos::bookFullHistos() {
       sprintf(histo,"fBremUnsplit_hadrons_subdet%d_ptbin%d",iecal,iptbin);
       fBremUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, fBremMin, fBremMax);
 
+      sprintf(histo,"lhUnsplit_hadrons_subdet%d_ptbin%d",iecal,iptbin);
+      lhUnsplitEle[iecal][iptbin]     = new TH1F(histo, histo, nbins, lhMin, lhMax);
+
       // iclass = 0: 0 - brem clusters
       // iclass = 1: >=1 - brem clusters
       for(int iclass=0; iclass<2; iclass++) {
@@ -186,7 +217,28 @@ void prepareQCDhistos::bookFullHistos() {
         }
         sprintf(histo,"fBremClass_hadrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
         fBremClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, fBremMin, fBremMax);
+
+	sprintf(histo,"lhClass_hadrons_subdet%d_ptbin%d_class%d",iecal,iptbin,iclass);
+	lhClassEle[iecal][iptbin][iclass]     = new TH1F(histo, histo, nbins, lhMin, lhMax);
       }
     }
   }
+}
+
+float prepareQCDhistos::likelihoodRatio(ElectronLikelihood &lh) {
+
+  LikelihoodMeasurements measurements;
+
+  measurements.pt = pt;
+  measurements.subdet = (fabs(eta)<1.479) ? 0 : 1;
+  measurements.deltaPhi = dphi;
+  measurements.deltaEta = deta;
+  measurements.eSeedClusterOverPout = -1;
+  measurements.eSuperClusterOverP = EoP;
+  measurements.hadronicOverEm = HoE;
+  measurements.sigmaIEtaIEta = see;
+  measurements.sigmaIPhiIPhi = spp;
+  measurements.fBrem = fbrem;
+  measurements.nBremClusters = nbrem;
+  return lh.result(measurements);
 }

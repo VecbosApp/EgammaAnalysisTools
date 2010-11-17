@@ -32,9 +32,7 @@ void addWeights(const char* filename, float weight) {
   float EoP;
   float HoE;
   float deta;
-  float detaUncorr;
   float dphi;
-  float dphiUncorr;
   float see;
   float spp;
   float fbrem;
@@ -49,9 +47,7 @@ void addWeights(const char* filename, float weight) {
   treeOrig->SetBranchAddress("EoP", &EoP);
   treeOrig->SetBranchAddress("HoE", &HoE);
   treeOrig->SetBranchAddress("deta", &deta);
-  treeOrig->SetBranchAddress("detaUncorr", &detaUncorr);
   treeOrig->SetBranchAddress("dphi", &dphi);
-  treeOrig->SetBranchAddress("dphiUncorr", &dphiUncorr);
   treeOrig->SetBranchAddress("see", &see);
   treeOrig->SetBranchAddress("spp", &spp);
   treeOrig->SetBranchAddress("fbrem", &fbrem);
@@ -68,8 +64,6 @@ void addWeights(const char* filename, float weight) {
   treeNew->Branch("HoE", &HoE, "HoE/F");
   treeNew->Branch("deta",     &deta, "deta/F");
   treeNew->Branch("dphi",     &dphi, "dphi/F");
-  treeNew->Branch("detaUncorr", &detaUncorr, "detaUncorr/F");
-  treeNew->Branch("dphiUncorr", &dphiUncorr, "dphiUncorr/F");
   treeNew->Branch("see", &see, "see/F");
   treeNew->Branch("spp", &spp, "spp/F");
   treeNew->Branch("fbrem",    &fbrem, "fbrem/F");

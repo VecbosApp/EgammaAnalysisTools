@@ -11,6 +11,9 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+#include <TH1F.h>
+
+#include "EgammaAnalysisTools/include/ElectronLikelihood.h"
 
 class prepareQCDhistos {
 public :
@@ -23,8 +26,6 @@ public :
   Float_t         HoE;
   Float_t         deta;
   Float_t         dphi;
-  Float_t         detaUncorr;
-  Float_t         dphiUncorr;
   Float_t         s9s25;
   Float_t         s1s9;
   Float_t         see;
@@ -55,8 +56,6 @@ public :
   TBranch        *b_HoE;   //!
   TBranch        *b_deta;   //!
   TBranch        *b_dphi;   //!
-  TBranch        *b_detaUncorr;   //!
-  TBranch        *b_dphiUncorr;   //!
   TBranch        *b_s9s25;   //!
   TBranch        *b_s1s9;   //!
   TBranch        *b_see;   //!
@@ -92,6 +91,7 @@ public :
   virtual void     Show(Long64_t entry = -1);
 
   void bookFullHistos();
+  virtual float likelihoodRatio(ElectronLikelihood &lh);
   
   // histos [ecalsubdet][ptbin]
   TH1F *dPhiUnsplitEle[2][2];
@@ -101,6 +101,7 @@ public :
   TH1F *sigmaIEtaIEtaUnsplitEle[2][2];
   TH1F *sigmaIPhiIPhiUnsplitEle[2][2];
   TH1F *fBremUnsplitEle[2][2];
+  TH1F *lhUnsplitEle[2][2];
   
   // histos [ecalsubdet][ptbin][class]
   TH1F *dPhiClassEle[2][2][2];
@@ -110,6 +111,10 @@ public :
   TH1F *sigmaIEtaIEtaClassEle[2][2][2];
   TH1F *sigmaIPhiIPhiClassEle[2][2][2];
   TH1F *fBremClassEle[2][2][2];
+  TH1F *lhClassEle[2][2][2];
+
+  // the likelihood algorithm
+  ElectronLikelihood *LH;
 };
 
 #endif
@@ -118,8 +123,10 @@ public :
 prepareQCDhistos::prepareQCDhistos(TTree *tree) {
   if (tree == 0) {
     TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("results/trees/QCD_Pt-20_TuneD6T_tree.root");
+    // TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("results_data/mergedTree.root");
     if (!f) {
       f = new TFile("results/trees/QCD_Pt-20_TuneD6T_tree.root");
+      // f = new TFile("results_data/mergedTree.root");
     }
     tree = (TTree*)gDirectory->Get("T1");  
   }
@@ -163,8 +170,6 @@ void prepareQCDhistos::Init(TTree *tree) {
   fChain->SetBranchAddress("HoE", &HoE, &b_HoE);
   fChain->SetBranchAddress("deta", &deta, &b_deta);
   fChain->SetBranchAddress("dphi", &dphi, &b_dphi);
-  fChain->SetBranchAddress("detaUncorr", &detaUncorr, &b_detaUncorr);
-  fChain->SetBranchAddress("dphiUncorr", &dphiUncorr, &b_dphiUncorr);
   fChain->SetBranchAddress("s9s25", &s9s25, &b_s9s25);
   fChain->SetBranchAddress("s1s9", &s1s9, &b_s1s9);
   fChain->SetBranchAddress("see", &see, &b_see);
