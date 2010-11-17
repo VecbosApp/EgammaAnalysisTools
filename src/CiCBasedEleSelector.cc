@@ -210,6 +210,21 @@ bool CiCBasedEleSelector::outputEleId() {
 	 m_electronCounter.IncrVar("finalCustomEleIDOnlyID");  
 	 return true;
        } 
+   else
+     if (
+	 //Fixed isolation version
+	 m_version == 3 && 
+	 compute_eid_cut(m_HOverE, m_SCEt, cuthoelv04[0][m_eIDLevel][m_cat], cuthoev04[0][m_eIDLevel][m_cat], false) &&
+	 compute_eid_cut(m_SigmaEtaEta, m_SCEt, cutseelv04[0][m_eIDLevel][m_cat], cutseev04[0][m_eIDLevel][m_cat], false) &&
+	 compute_eid_cut(fabs(m_DPhiIn), m_SCEt, cutdphiinlv04[0][m_eIDLevel][m_cat], cutdphiinv04[0][m_eIDLevel][m_cat], false) &&
+	 compute_eid_cut(fabs(m_DEta), m_SCEt, cutdetainlv04[0][m_eIDLevel][m_cat], cutdetainv04[0][m_eIDLevel][m_cat], false) &&
+	 eseedopincor > cuteseedopcorv04[0][m_eIDLevel][m_cat] 
+	 )
+       {
+	 m_electronCounter.IncrVar("finalCustomEleIDOnlyID");  
+	 return true;
+       } 
+
 
   
   return false;
@@ -247,6 +262,14 @@ bool CiCBasedEleSelector::outputIso()
       m_electronCounter.IncrVar("finalCustomEleIDOnlyIso");  
       return true;
     }
+  else if ( m_version == 3 && 
+	    compute_eid_cut(iso_sumoet, m_SCEt, cutiso_sumoetlv04[0][m_eIDLevel][m_cat], cutiso_sumoetv04[0][m_eIDLevel][m_cat], false) &&
+	    (iso_sum < cutiso_sumv04[0][m_eIDLevel][m_cat])
+	    )
+    {
+      m_electronCounter.IncrVar("finalCustomEleIDOnlyIso");  
+      return true;
+    }
   
   return false;
 }
@@ -269,6 +292,14 @@ bool CiCBasedEleSelector::outputConv()
   else
     if ( m_version == 2 &&
 	 float(m_missingHits) < cutfmishitsv03[0][m_eIDLevel][m_cat]
+	 )
+      {
+	m_electronCounter.IncrVar("finalCustomEleIDOnlyConv");  
+	return true;
+      } 
+  else
+    if ( m_version == 3 &&
+	 float(m_missingHits) < cutfmishitsv04[0][m_eIDLevel][m_cat]
 	 )
       {
 	m_electronCounter.IncrVar("finalCustomEleIDOnlyConv");  

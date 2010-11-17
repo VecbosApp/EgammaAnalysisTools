@@ -14,7 +14,7 @@ public:
   //! destructor
   virtual ~CiCBasedEleSelector();   
   //! configure from files (class dependent)
-  void Configure(std::string type, bool useEtBins, bool specialCategories);
+  void Configure(std::string type, bool useEtBins, bool specialCategories, int version);
   //! configure the ECAL cleaner
   void ConfigureEcalCleaner(const char *configDir);
   //! get the non-class dependent selection (EB, EE)
@@ -53,6 +53,8 @@ public:
 
   void displayEfficiencies();
 
+  bool compute_eid_cut(float x, float et, float cut_min, float cut_max, bool gtn);
+
   //! ECAL cleaner (public to set the variables through CiCBasedEleSelector)
   EcalCleaner *m_cleaner;
 
@@ -84,6 +86,7 @@ private:
   bool m_useEtBins;
   bool m_specialCategories;
 
+  int m_version;
   int m_eIDLevel;
 
   //! counters for the efficiencies display, based on electron candidates
