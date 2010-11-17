@@ -1262,6 +1262,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     TVector3 p3Met(pxMet[0],pyMet[0],0.0);
     float theMet      = p3Met.Pt();
     if ( m_selection->getSwitch("met")  && !m_selection->passCut("met", theMet) ) continue;
+    m_counters->IncrVar("met"); 
     
     // reject events with >=2 electrons making a Z
     if ( nEle>=2 ) {
@@ -2122,6 +2123,7 @@ void LHPdfsProducer::configSelection(Selection* selection, Counters* counters) {
   m_selection->addCut("ptJetAcc");
   m_selection->addCut("jetDeltaPhi");
   m_selection->addCut("jetInvMass");
+  m_selection->addCut("met");
   m_selection->addCut("antiIsolTracker");
   m_selection->addCut("antiIsolEcal");
   m_selection->addCut("relSumPtTracks");
@@ -2138,6 +2140,7 @@ void LHPdfsProducer::configSelection(Selection* selection, Counters* counters) {
   m_counters->AddVar("eletot");
   m_counters->AddVar("deltaphi");
   m_counters->AddVar("tagandprobe");
+  m_counters->AddVar("met");
   m_counters->AddVar("invmass");
   m_counters->AddVar("trackerNotIsol");
   m_counters->AddVar("ecalNotIsol");
@@ -2160,7 +2163,8 @@ void LHPdfsProducer::displayEfficiencies(const char *counterSuffix) {
   m_counters->Draw("eletot","onejet");
   m_counters->Draw("deltaphi","eletot");
   m_counters->Draw("tagandprobe","deltaphi");
-  m_counters->Draw("invmass","tagandprobe");
+  m_counters->Draw("met","tagandprobe");
+  m_counters->Draw("invmass","met");
   m_counters->Draw("trackerNotIsol","invmass");
   m_counters->Draw("ecalNotIsol","trackerNotIsol");
   m_counters->Draw("fullSelection","ecalNotIsol");
