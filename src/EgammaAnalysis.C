@@ -41,6 +41,9 @@
 #if Application == 5
 #include "EgammaAnalysisTools/include/sPlotsPdfsComparison.h"
 #endif
+#if Application == 6
+#include "EgammaAnalysisTools/MLFit/src/prepareQCDhistos.h"
+#endif
 
 int main(int argc, char* argv[]) {
 
@@ -118,8 +121,8 @@ int main(int argc, char* argv[]) {
 
   std::vector<std::string> mask;
   mask.push_back("HLT_Jet15U");   
-  mask.push_back("HLT_Jet30U");   
-  mask.push_back("HLT_Jet50U");   
+  // mask.push_back("HLT_Jet30U");   
+  // mask.push_back("HLT_Jet50U");   
   producer.setRequiredTriggers(mask);
   
   //  sprintf(title,"%s_zTandP_tree.root",outputFileName);  
@@ -191,6 +194,24 @@ int main(int argc, char* argv[]) {
   sPlotsPdfsComparison p;
   p.Init(tree, isMC, isTP, randomizeNotUsedPdf, typeClass);
   p.doSignalsPlots(doSignalsPlots);
+  p.Loop();
+
+#endif
+
+#if Application == 6
+
+  int isMC = 1;
+  
+  TFile *fileData, *fileMC;
+  fileData = TFile::Open((std::string("results_data/mergedTree.root")).c_str());
+  fileMC = TFile::Open((std::string("results/trees/QCD_Pt-20_TuneD6T_tree.root")).c_str());
+
+  TTree *tree = 0;
+  if (isMC) tree = (TTree*) fileMC->Get("T1");
+  else tree = (TTree*) fileData->Get("T1");
+
+  prepareQCDhistos p;
+  p.Init(tree);
   p.Loop();
 
 #endif
