@@ -11,8 +11,9 @@ etaJetAcc               1
 ptJetAcc                1
 jetDeltaPhi		1
 jetInvMass		1
-antiIsolTracker		1
-antiIsolEcal		1
+antiIsolTracker		0
+antiIsolEcal		0
 relSumPtTracks		1
 spikeFraction		1
+met			1
 electronIDType		WP80xWP95          

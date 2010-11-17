@@ -1,6 +1,6 @@
 ptHat		15	30
 etaEleAcc       -2.5    2.5
-ptEleAcc	5       1000
+ptEleAcc	10       1000
 meeWindow      60.0     110.0
 etaJetAcc       -2.5    2.5
 ptJetAcc	30	1000
@@ -9,4 +9,5 @@ jetInvMass	70	10000
 antiIsolTracker  3      10000
 antiIsolEcal     2      10000
 relSumPtTracks   0      0.20
+met		 0	30
 spikeFraction	 -9999	0.95
