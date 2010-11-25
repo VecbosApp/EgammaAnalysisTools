@@ -15,7 +15,7 @@ using namespace std;
 LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   : Egamma(tree) {
 
-  _isData = false;
+  _isData = true;
 
   EgammaCutBasedIDWPs.push_back("WP95");
   EgammaCutBasedIDWPs.push_back("WP90");
@@ -32,26 +32,29 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   EgammaCiCBasedIDWPs.push_back("CiCHyperTight3");
   EgammaCiCBasedIDWPs.push_back("CiCHyperTight4");
 
-
   EgammaLHBasedIDWPs.push_back("LHVeryLoose");
   EgammaLHBasedIDWPs.push_back("LHLoose");
   EgammaLHBasedIDWPs.push_back("LHMedium");
   EgammaLHBasedIDWPs.push_back("LHTight");
   EgammaLHBasedIDWPs.push_back("LHHyperTight");
 
-
+  
   // single electron efficiency
   for (int i=0;i<EgammaCutBasedIDWPs.size();++i)
     {
       CutBasedEleIDSelector aSelector;
-
+      
       char configDir[50];
       sprintf(configDir,"config/%s",EgammaCutBasedIDWPs[i].c_str());
       std::cout << "===== Configuring " <<  EgammaCutBasedIDWPs[i] << " ElectronID ==========" << std::endl;
       aSelector.ConfigureNoClass(configDir);
-  //  aSelector.ConfigureEcalCleaner("config/");
+      //  aSelector.ConfigureEcalCleaner("config/");
       EgammaCutBasedID.push_back(aSelector);
     }  
+
+  // single electron efficiency: configuring for H->WW
+  cout << "=== CONFIGURING WP80 SYMMETRIC ELECTRON ID ===" << endl;
+  EgammaCutBasedIDHWW.ConfigureNoClass("config/WP80");
 
   // single electron efficiency
   for (int i=0;i<EgammaLHBasedIDWPs.size();++i)
@@ -92,6 +95,26 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
 
   LH = new ElectronLikelihood(&(*EBlt15dir), &(*EElt15dir), &(*EBgt15dir), &(*EEgt15dir),
                               defaultSwitches, std::string("class"),std::string("class"),true,true);
+
+
+  // to read good run list
+  if (_isData) {
+    std::string goodRunGiasoneFile = "config/LHPdfsProducer/json/goodRunLS.json";
+    setJsonGoodRunList(goodRunGiasoneFile);
+    fillRunLSMap();
+  }
+
+  HLT=0;
+  WENU=0;
+  WMT=0;
+  ZMASS=0;
+  LEADINGJET=0;
+  LEADINGJETPT=0;
+  TOTALELE=0;
+  ECALDRIVEN=0;
+  ISOL=0;
+  HOE=0;
+  SPIKES=0;
 }
 
 
@@ -179,7 +202,6 @@ void LikelihoodAnalysis::reproduceEgammaCutID() {
 	  bool isEleIDCutBased, isIsolCutBased, isConvRejCutBased;
 	  isEleIDCutBased = isIsolCutBased = isConvRejCutBased = false;
 	  isEleID(&EgammaCutBasedID[icut],iele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
-
 
 	  if( isEleIDCutBased ) iSelected=iele;
 	}
@@ -2125,8 +2147,264 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
   ElectronEffPtEndcap.SetYaxisTitle("Fake rate");
   ElectronEffPtEndcap.SetYaxisMin(0.0);
   ElectronEffPtEndcap.Write();
+}
+
+void LikelihoodAnalysis::estimateFakeRateForHToWW(const char *outname) {
+
+  int nbinsEta = 10;
+  float minEta = -2.5;
+  float maxEta = 2.5;
+  
+  TH1F *FakeableJetsEta = new TH1F( "FakeableJetsEta", "fakeable jets #eta", nbinsEta, minEta, maxEta );
+  TH1F *CutIdWP80Eta    = new TH1F( "CutIdWP80Eta",    "cut ID #eta",        nbinsEta, minEta, maxEta );
+  
+  // int nbinsPt = 7;
+  int nbinsPt = 9;
+  float minPt = 10.;
+  float maxPt = 80.;
+  // float xbins[8] = {10., 15., 20., 25., 30., 35., 40., 80. };
+  
+  // TH1F *FakeableJetsPt = new TH1F( "FakeableJetsPt",  "fakeable jets p_{T} (GeV)", nbinsPt, xbins );
+  // TH1F *CutIdWP80Pt    = new TH1F( "CutIdWP80Pt",     "cut ID p_{T} (GeV)",        nbinsPt, xbins );
+  TH1F *FakeableJetsPt = new TH1F( "FakeableJetsPt",  "fakeable jets p_{T} (GeV)", nbinsPt, minPt, maxPt );
+  TH1F *CutIdWP80Pt    = new TH1F( "CutIdWP80Pt",     "cut ID p_{T} (GeV)",        nbinsPt, minPt, maxPt );
+  
+  // json 
+  unsigned int lastLumi = 0;
+  unsigned int lastRun  = 0;
+
+  // QCD trigger 
+  // requiredTriggers.push_back("HLT_Jet30U");
+  // requiredTriggers.push_back("HLT_Jet30U_v3");
+  requiredTriggers.push_back("HLT_Jet50U");
+  requiredTriggers.push_back("HLT_Jet50U_v3");
+  // requiredTriggers.push_back("HLT_Photon30_L1R");
+
+  Long64_t nbytes = 0, nb = 0;
+  Long64_t nentries = fChain->GetEntries();
+  std::cout << "Number of entries = " << nentries << std::endl;
+  for (Long64_t jentry=0; jentry<nentries;jentry++) {
+    Long64_t ientry = LoadTree(jentry);
+    if (ientry < 0) break;
+
+    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
+
+    // reload trigger mask
+    reloadTriggerMask(true);
+    
+    // good runs selection 
+    if (_isData && !isGoodRunLS()) {
+      if ( lastRun!= runNumber || lastLumi != lumiBlock) {
+        lastRun  = runNumber;
+        lastLumi = lumiBlock;
+	std::cout << "[GoodRunLS]::Run " << lastRun << " LS " << lastLumi << " is rejected" << std::endl;
+      }
+      continue;
+    }
+    if (_isData && ( lastRun!= runNumber || lastLumi != lumiBlock) ) {
+      lastRun = runNumber;
+      lastLumi = lumiBlock;
+      std::cout << "[GoodRunLS]::Run " << lastRun << " LS " << lastLumi << " is OK" << std::endl;
+    }
+
+    Utils anaUtils;
+    bool passedHLT = hasPassedHLT();
+    if ( !passedHLT ) continue;   
+    HLT++;
+
+    // electrons passing the denominator selection to reduce W and Z contamination
+    std::vector<int> denomElectrons;
+    for(int iele=0; iele<nEle; iele++) {
+      
+      bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[iele], bits::isEcalDriven);
+      if(!ecalDriven) continue;
+      
+      TVector3 p3Ele(pxEle[iele], pyEle[iele], pzEle[iele]);
+      float pt = p3Ele.Pt();
+      float combIso = (fabs(etaEle[iele])<1.479) ? (dr03TkSumPtEle[iele] + TMath::Max(0.0,dr03EcalRecHitSumEtEle[iele]-1.0) + dr03HcalTowerSumEtEle[iele]) / pt 
+        : ( dr03TkSumPtEle[iele] + dr03EcalRecHitSumEtEle[iele] + dr03HcalTowerSumEtEle[iele]) / pt; 
+      if(combIso>0.5) continue;
+      
+      if(hOverEEle[iele]>0.15) continue;
+      
+      int sc = superClusterIndexEle[iele];
+      if(sc>-1 && ( (fabs(etaSC[sc])<1.479 && sqrt(covIEtaIEtaSC[sc])>0.014) || (fabs(etaSC[sc])>=1.479 && sqrt(covIEtaIEtaSC[sc])>0.034))) continue;
+      
+      float theE1 = eMaxSC[sc];
+      float theE4SwissCross = e4SwissCrossSC[sc];
+      float theSpikeSC = 1.0 - (theE4SwissCross/theE1);
+      if (theSpikeSC>0.95) continue;
+      
+      denomElectrons.push_back(iele);
+    } 
+
+    // reduce W->enu: MET
+    TVector3 p3Met(pxPFMet[0],pyPFMet[0],0.0);
+    if( p3Met.Pt() > 20 ) continue;       
+    WENU++;
+
+    // reduce W->enu: mT
+    if (denomElectrons.size()>0) {
+      std::pair<int,int> possibleWcand = getBestGoodElePair(denomElectrons);
+      int theWEle1(possibleWcand.first);
+      
+      TLorentzVector tlvWEle1;
+      tlvWEle1.SetXYZT(pxEle[theWEle1],pyEle[theWEle1],pzEle[theWEle1],energyEle[theWEle1]);
+
+      TVector3 tv3Ele1;
+      tv3Ele1.SetXYZ(pxEle[theWEle1],pyEle[theWEle1],0.0);
+
+      float WmT = sqrt(2 * tlvWEle1.Pt() * p3Met.Mag() * (1-cos(tv3Ele1.Angle(p3Met))) );      
+
+      if (WmT > 25. ) continue;
+    }
+    WMT++;
+
+    // reduce Z->ee: invariant mass between two electrons passing the denominator selection
+    if (denomElectrons.size()>1) {
+      std::pair<int,int> possibleZcand = getBestGoodElePair(denomElectrons);
+      int theZEle1(possibleZcand.first);
+      int theZEle2(possibleZcand.second);
+      TLorentzVector tlvZEle1, tlvZEle2;
+      tlvZEle1.SetXYZT(pxEle[theZEle1],pyEle[theZEle1],pzEle[theZEle1],energyEle[theZEle1]);
+      tlvZEle2.SetXYZT(pxEle[theZEle2],pyEle[theZEle2],pzEle[theZEle2],energyEle[theZEle2]);
+      double theInvMass = (tlvZEle1+tlvZEle2).M();
+      
+      if (theInvMass>60. && theInvMass<120.) continue;
+    }
+    ZMASS++;
+
+    // look for the leading jet (not considered as fakeable object to remove trigger bias)
+    float maxEt = -1;
+    int leadingJet = -1;
+    for ( int jet=0; jet<nAK5PFJet; jet++ ) {
+      TVector3 p3Jet(pxAK5PFJet[jet],pyAK5PFJet[jet],pzAK5PFJet[jet]);
+      if ( fabs(p3Jet.Eta()) < maxEta && p3Jet.Pt() > maxEt) {
+        maxEt = p3Jet.Pt();
+        leadingJet = jet;
+      }
+    }
+    if ( leadingJet < 0 ) continue;
+    LEADINGJET++;
+
+    // chiara: per fare come Si
+    TVector3 p3LeadingJetCut(pxAK5PFJet[leadingJet],pyAK5PFJet[leadingJet],pzAK5PFJet[leadingJet]);
+    if (p3LeadingJetCut.Pt()<55) continue;
+    LEADINGJETPT++;
+
+    
+    // consider the reco electrons not matching the leading jet as fakes (denominator)
+    // with the following requirements:
+    // Gsf Electron (Ecal driven)
+    // - relative Iso < 0.5
+    // - H/E < 0.15
+    // - sigma ieta ieta < 0.014 (0.034) 
+    // cleaning for spikes
+
+    TOTALELE = TOTALELE+nEle;
+
+    for(int iele=0; iele<nEle; iele++) {
+      TVector3 p3Ele(pxEle[iele], pyEle[iele], pzEle[iele]);
+      TVector3 p3LeadingJet(pxAK5PFJet[leadingJet],pyAK5PFJet[leadingJet],pzAK5PFJet[leadingJet]);
+      float dr=p3LeadingJet.DeltaR(p3Ele);
+      
+      // denominator selection
+      bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[iele], bits::isEcalDriven);
+      if(!ecalDriven) continue;
+      ECALDRIVEN++;
+
+      float pt = p3Ele.Pt();
+      float combIso = (fabs(etaEle[iele])<1.479) ? (dr03TkSumPtEle[iele] + TMath::Max(0.0,dr03EcalRecHitSumEtEle[iele]-1.0) + dr03HcalTowerSumEtEle[iele]) / pt 
+        : ( dr03TkSumPtEle[iele] + dr03EcalRecHitSumEtEle[iele] + dr03HcalTowerSumEtEle[iele]) / pt; 
+      if(combIso>0.5) continue;
+      ISOL++;
+      
+      if(hOverEEle[iele]>0.15) continue;
+      HOE++;
+
+      int sc = superClusterIndexEle[iele];
+      if(sc>-1 && ( (fabs(etaSC[sc])<1.479 && sqrt(covIEtaIEtaSC[sc])>0.014) || (fabs(etaSC[sc])>=1.479 && sqrt(covIEtaIEtaSC[sc])>0.034))) continue;
+                 
+      // against spikes
+      float theE1 = eMaxSC[sc];
+      float theE4SwissCross = e4SwissCrossSC[sc];
+      float theSpikeSC = 1.0 - (theE4SwissCross/theE1);
+      if (theSpikeSC>0.95) continue;
+      SPIKES++;
+
+      // end denominator selection
+
+      if( dr > 0.3 && fabs(p3Ele.Eta()) < maxEta && p3Ele.Pt() > minPt ) { // exclude the object corresponding to (probably) triggering jet: avoid trigger bias
+        float etaFake = p3Ele.Eta();
+        float etFake  = p3Ele.Pt();
+        
+        FakeableJetsEta -> Fill( etaFake );
+        FakeableJetsPt  -> Fill( etFake );
+	
+        bool isEleIDCutBased, isIsolCutBased, isConvRejCutBased;
+        isEleIDCutBased = isIsolCutBased = isConvRejCutBased = false;
+        isEleID(&EgammaCutBasedIDHWW,iele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
+        
+        if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased ) {
+	  CutIdWP80Eta -> Fill(etaFake);
+          CutIdWP80Pt  -> Fill(etFake);          
+        }
+          
+      } // electron acceptance & pt cut
+      
+    } // loop ele
+
+  } // loop events
+  
+  
+  // counters
+  cout << "-------------------------------" << endl;
+  cout << endl;
+  cout << "-------------------------------" << endl;  
+  cout << "hlt = "          << HLT          << endl;
+  cout << "W: MET= "        << WENU         << endl;
+  cout << "W: MT = "        << WMT          << endl;
+  cout << "Z VETO = "       << ZMASS        << endl;
+  cout << "LEADINGJET = "   << LEADINGJET   << endl;
+  cout << "LEADINGJETPT = " << LEADINGJETPT << endl;
+  cout << "-------------------------------" << endl;
+  cout << "TOTAL #ELE = "   << TOTALELE     << endl;
+  cout << "ECALDRIVEN = "   << ECALDRIVEN   << endl;
+  cout << "ISOL = "         << ISOL         << endl;
+  cout << "HOE = "          << HOE          << endl;
+  cout << "SPIKES = "       << SPIKES       << endl;
+  cout << "-------------------------------" << endl;
+  cout << endl;
+  cout << "-------------------------------" << endl;
+
+  char filename[200];
+  sprintf(filename,"%s-EleMisidEta.root",outname);
+  EfficiencyEvaluator ElectronFakeRateEta(filename);
+  ElectronFakeRateEta.AddNumerator(FakeableJetsEta);
+  ElectronFakeRateEta.AddNumerator(CutIdWP80Eta);
+  ElectronFakeRateEta.SetDenominator(FakeableJetsEta);
+  ElectronFakeRateEta.ComputeEfficiencies();
+  ElectronFakeRateEta.SetTitle("jet fake probability vs #eta");
+  ElectronFakeRateEta.SetXaxisTitle("#eta of closest jet");
+  ElectronFakeRateEta.SetYaxisTitle("jet #rightarrow fake e probability");
+  ElectronFakeRateEta.SetYaxisMin(0.0);
+  ElectronFakeRateEta.Write();
+
+  sprintf(filename,"%s-EleMisidPt.root",outname);
+  EfficiencyEvaluator ElectronFakeRatePt(filename);
+  ElectronFakeRatePt.AddNumerator(FakeableJetsPt);
+  ElectronFakeRatePt.AddNumerator(CutIdWP80Pt);
+  ElectronFakeRatePt.SetDenominator(FakeableJetsPt);
+  ElectronFakeRatePt.ComputeEfficiencies();
+  ElectronFakeRatePt.SetTitle("jet fake probability vs p_{T}");
+  ElectronFakeRatePt.SetXaxisTitle("p_{T} of closest jet [GeV]");
+  ElectronFakeRatePt.SetYaxisTitle("jet #rightarrow fake e probability");
+  ElectronFakeRatePt.SetYaxisMin(0.0);
+  ElectronFakeRatePt.Write();
 
 }
+
 
 
 void LikelihoodAnalysis::isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput) {
@@ -2217,12 +2495,12 @@ void LikelihoodAnalysis::isEleID(CutBasedEleIDSelector *selector, int eleIndex, 
   selector->SetConvDcot( fabs(convDcotEle[eleIndex]) );
 
   // ECAL cleaning variables
-//   selector->m_cleaner->SetE1(e1);
-//   selector->m_cleaner->SetE4SwissCross(e4SwissCross);
-//   selector->m_cleaner->SetFiducialFlag(fidFlagSC);
-//   selector->m_cleaner->SetSeedFlag(seedRecHitFlag);
-//   selector->m_cleaner->SetSeedTime(seedTime);
-//   selector->m_cleaner->SetSeedChi2(seedChi2);
+  //selector->m_cleaner->SetE1(e1);
+  //selector->m_cleaner->SetE4SwissCross(e4SwissCross);
+  //selector->m_cleaner->SetFiducialFlag(fidFlagSC);
+  //selector->m_cleaner->SetSeedFlag(seedRecHitFlag);
+  //selector->m_cleaner->SetSeedTime(seedTime);
+  //selector->m_cleaner->SetSeedChi2(seedChi2);
 
   //  return selector->output(); // class dependent result
   *eleIdOutput = selector->outputNoClassEleId();
@@ -2388,5 +2666,22 @@ float LikelihoodAnalysis::likelihoodRatio(int eleIndex, ElectronLikelihood &lh) 
   measurements.fBrem = fbremEle[eleIndex];
   measurements.nBremClusters = nbremsEle[eleIndex];
   return lh.result(measurements);
+}
+
+// two highest pT electrons - passing the denominator selection  
+std::pair<int,int> LikelihoodAnalysis::getBestGoodElePair(std::vector<int> goodElectrons) {
+  
+  int theEle1=-1;
+  int theEle2=-1;
+  float maxPt1=-1000.;
+  float maxPt2=-1001.;
+  for(int iEle=0;iEle<goodElectrons.size();iEle++) {
+    int eleIndex = goodElectrons[iEle];
+    TVector3 pEle(pxEle[eleIndex],pyEle[eleIndex],pzEle[eleIndex]);
+    float thisPt=pEle.Pt();
+    if (thisPt>maxPt1 && thisPt>maxPt2){ maxPt2 = maxPt1; maxPt1 = thisPt; theEle2 = theEle1; theEle1 = eleIndex; }
+    if (thisPt<maxPt1 && thisPt>maxPt2){ maxPt2 = thisPt; theEle2 = eleIndex; }
+  }
+  return make_pair(theEle1,theEle2);
 }
 

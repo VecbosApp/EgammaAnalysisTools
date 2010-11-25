@@ -1,4 +1,4 @@
-//---------------------------------------
+///---------------------------------------
 // Description:
 // Class to estimate the performances of Likelihood Electron ID
 //---------------------------------------
@@ -13,6 +13,7 @@
 #include "EgammaAnalysisTools/include/CiCBasedEleSelector.hh"
 #include "EgammaAnalysisTools/include/Egamma.h"
 #include "EgammaAnalysisTools/include/ElectronLikelihood.h"
+#include <TLorentzVector.h>
 
 class LikelihoodAnalysis : public Egamma {
 
@@ -33,6 +34,8 @@ public:
   void estimateFakeRate(const char *outname="job0");
   //! produce the mis-ID eta/pT distributions from QCD di-jets
   void estimateFakeRateQCD(const char *outname="job0");
+  //! produce the mis-ID eta/pT distributions for WW studies
+  void estimateFakeRateForHToWW(const char *outname="job0");
 
 private:
 
@@ -46,6 +49,10 @@ private:
   float SigmaiPiP(int electron);
   
   float likelihoodRatio(int eleIndex, ElectronLikelihood &lh);
+
+  std::pair<int,int> getBestGoodElePair(std::vector<int> goodElectrons);
+
+  CutBasedEleIDSelector EgammaCutBasedIDHWW;
 
   std::vector<CutBasedEleIDSelector> EgammaCutBasedID;
   std::vector<CiCBasedEleSelector> EgammaCiCBasedID;
@@ -61,6 +68,12 @@ private:
   std::vector<Selection*> m_EgammaCutIDSelection;
   
   bool _isData;
+
+
+  // counters
+  int HLT, WENU, WMT, LEADINGJET, ECALDRIVEN;
+  int ISOL, HOE, SPIKES, ZMASS;
+  int LEADINGJETPT, TOTALELE;
 
 };
 
