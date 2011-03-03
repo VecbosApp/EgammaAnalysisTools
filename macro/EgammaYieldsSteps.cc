@@ -8,23 +8,23 @@
 
 using namespace std;
 
-int UseWjetsCuts[12];
-string WjetsCuts[12];
-float Wj_Wsel[12];
-float Zj_Wsel[12];
-float ttj_Wsel[12];
-float QCD_em_Wsel[12];
-float QCD_bctoe_Wsel[12];
-float SingleTop_Wsel[12];
-float PhotonJet_Wsel[12];
+int UseWjetsCuts[13];
+string WjetsCuts[13];
+float Wj_Wsel[13];
+float Zj_Wsel[13];
+float ttj_Wsel[13];
+float QCD_em_Wsel[13];
+float QCD_bctoe_Wsel[13];
+float SingleTop_Wsel[13];
+float PhotonJet_Wsel[13];
 
-float Wj_eff_Wsel[12];
-float Zj_eff_Wsel[12];
-float ttj_eff_Wsel[12];
-float QCD_em_eff_Wsel[12];
-float QCD_bctoe_eff_Wsel[12];
-float SingleTop_eff_Wsel[12];
-float PhotonJet_eff_Wsel[12];
+float Wj_eff_Wsel[13];
+float Zj_eff_Wsel[13];
+float ttj_eff_Wsel[13];
+float QCD_em_eff_Wsel[13];
+float QCD_bctoe_eff_Wsel[13];
+float SingleTop_eff_Wsel[13];
+float PhotonJet_eff_Wsel[13];
 
 float Wj_finaleff_Wsel;
 float Zj_finaleff_Wsel;
@@ -99,21 +99,21 @@ void computeYields(float lumi=100.) {
   chains[20]->Add("results/PhotonJet/PhotonJet_Pt300to500/4/*counters.root");
   chains[21]->Add("results/PhotonJet/PhotonJet_Pt500toInf/4/*counters.root");
 
-  float nSelTot[12][22];
-  for(int icut=0; icut<12; icut++) {
+  float nSelTot[13][22];
+  for(int icut=0; icut<13; icut++) {
     for(int isample=0; isample<22; isample++) {
       nSelTot[icut][isample] = 0.0;
     }
   }
 
-  int nCutsAna = 12;
+  int nCutsAna = 13;
 
   for(int isample=0; isample<22; isample++) {
 
     cout << "\tProcessing sample # " << isample << "..." << endl;
 
     Int_t           nCuts;
-    Float_t         nSel[12];   //[nCuts]
+    Float_t         nSel[13];   //[nCuts]
     
     // List of branches
     TBranch        *b_nCuts;   //!
@@ -234,7 +234,7 @@ void computeYields(float lumi=100.) {
 
 void setupCuts() {
   
-  for(int i=0; i<12; i++) {
+  for(int i=0; i<13; i++) {
     UseWjetsCuts[i] = 1;
   }
   
@@ -246,10 +246,11 @@ void setupCuts() {
   WjetsCuts[5]="eletot (nio)";
   WjetsCuts[6]="deltaPhi (nio)";
   WjetsCuts[7]="tag and probe found";
-  WjetsCuts[8]="Z mass veto";
-  WjetsCuts[9]="tracker not isol";
-  WjetsCuts[10]="ecal not isol";
-  WjetsCuts[11]="full selection";
+  WjetsCuts[8]="met";
+  WjetsCuts[9]="Z mass veto";
+  WjetsCuts[10]="tracker not isol";
+  WjetsCuts[11]="ecal not isol";
+  WjetsCuts[12]="full selection";
 }
 
 void printLatex(float lumi) {
@@ -277,7 +278,7 @@ void printLatex(float lumi) {
 	   << "selection & W$(e \\nu)$+jets & Z+jets & $t\\bar{t}$ & single $t$ & QCD (uds) & QCD (bc) & $\\gamma$+jets \t\\\\" << endl
 	   << "\\hline" << endl; 
   
-  for(int icut=0; icut<12; icut++) {
+  for(int icut=0; icut<13; icut++) {
     
     if(!UseWjetsCuts[icut]) continue;
     
