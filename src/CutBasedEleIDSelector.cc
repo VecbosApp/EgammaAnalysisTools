@@ -408,20 +408,20 @@ bool CutBasedEleIDSelector::outputIso()
 
   if(!selection->getSwitch("combIso")) {
     if(selection->getSwitch("ecalIso") && 
-       !selection->passCut("ecalIso", fabs(m_ecalIso))) return false; 
+       !selection->passCut("ecalIso", m_ecalIso)) return false; 
     m_electronCounter.IncrVar("ecalIso");
     
     if(selection->getSwitch("trackerIso") && 
-       !selection->passCut("trackerIso", fabs(m_trackerIso))) return false; 
+       !selection->passCut("trackerIso", m_trackerIso)) return false; 
     m_electronCounter.IncrVar("trackerIso");
     
     if(selection->getSwitch("hcalIso") && 
-       !selection->passCut("hcalIso", fabs(m_hcalIso))) return false; 
+       !selection->passCut("hcalIso", m_hcalIso)) return false; 
     m_electronCounter.IncrVar("hcalIso");
   }    
 
   if(selection->getSwitch("combIso")) {
-    if(!selection->passCut("combIso", fabs(m_combIso))) return false; 
+    if(!selection->passCut("combIso", m_combIso)) return false; 
     m_electronCounter.IncrVar("combIso");
   }
 
@@ -621,20 +621,20 @@ bool CutBasedEleIDSelector::outputNoClassIso()
 
   if(!selection->getSwitch("combIso")) {
     if(selection->getSwitch("ecalIso") && 
-       !selection->passCut("ecalIso", fabs(m_ecalIso))) return false; 
+       !selection->passCut("ecalIso", m_ecalIso)) return false; 
     m_electronCounter.IncrVar("ecalIso");
     
     if(selection->getSwitch("trackerIso") && 
-       !selection->passCut("trackerIso", fabs(m_trackerIso))) return false; 
+       !selection->passCut("trackerIso", m_trackerIso)) return false; 
     m_electronCounter.IncrVar("trackerIso");
     
     if(selection->getSwitch("hcalIso") && 
-       !selection->passCut("hcalIso", fabs(m_hcalIso))) return false; 
+       !selection->passCut("hcalIso", m_hcalIso)) return false; 
     m_electronCounter.IncrVar("hcalIso");
   }
 
   if(selection->getSwitch("combIso")) {
-    if(  ( !selection->passCut("combIso", fabs(m_combIso) ) ) ) return false; 
+    if( !selection->passCut("combIso", m_combIso)) return false; 
     m_electronCounter.IncrVar("combIso");
   }
 
