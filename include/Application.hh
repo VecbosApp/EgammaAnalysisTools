@@ -7,5 +7,6 @@
 //   5 = sPlots 
 //   6 = PF electron seeding efficiency study
 //   7 = PF electron seeding efficiency study (on general tracks)
+//   8 = Z->ee tag and probe
 
-#define Application 5
+#define Application 8
