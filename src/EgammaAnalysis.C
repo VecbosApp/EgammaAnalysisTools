@@ -44,6 +44,9 @@
 #if Application == 6
 #include "EgammaAnalysisTools/MLFit/src/prepareQCDhistos.h"
 #endif
+#if Application == 8
+#include "EgammaAnalysisTools/include/ZeeTagAndProbe.hh"
+#endif
 
 int main(int argc, char* argv[]) {
 
@@ -102,9 +105,10 @@ int main(int argc, char* argv[]) {
   // analysis.reproduceEgammaCutID();
   //  analysis.findEquivalentLHCut( 0.79935 );        // tight eleID
   //  analysis.findEquivalentLHCut( 0.957 );       // loose eleID
-  //analysis.estimateIDEfficiency(outputFileName);
-  analysis.estimateFakeRateQCD(outputFileName);
-  
+  // analysis.estimateIDEfficiency(outputFileName);
+  //analysis.estimateFakeRateQCD(outputFileName);
+  analysis.estimateFakeRate(outputFileName);
+
 #endif
 
 #if Application == 2
@@ -174,7 +178,7 @@ int main(int argc, char* argv[]) {
 
   if(doSignalsPlots) {
     fileData = TFile::Open((std::string("results_data/sPlots/Wenu_tree.root")).c_str());
-    fileMC = TFile::Open((std::string("results/treesW/WJetsMADGRAPH_Wenu.root")).c_str());
+    fileMC = TFile::Open((std::string("wcandleresults/treesW/WjetsMadgraph.root")).c_str());
   } else {
     fileData = TFile::Open((std::string("results_data/sPlots/Wenu_bkgFit_tree.root")).c_str());
     fileMC = TFile::Open((std::string("results/treesW/QCD_Wenu.root")).c_str());    
@@ -192,7 +196,8 @@ int main(int argc, char* argv[]) {
     }
 
   sPlotsPdfsComparison p;
-  p.Init(tree, isMC, isTP, randomizeNotUsedPdf, typeClass);
+  //  p.Init(tree, isMC, isTP, randomizeNotUsedPdf, typeClass);
+  p.Init(tree, isMC, isTP);
   p.doSignalsPlots(doSignalsPlots);
   p.Loop();
 
@@ -213,6 +218,13 @@ int main(int argc, char* argv[]) {
   prepareQCDhistos p;
   p.Init(tree);
   p.Loop();
+
+#endif
+
+#if Application == 8
+
+  ZeeTagAndProbe analysis(theChain);
+  analysis.Loop(outputFileName);
 
 #endif
 
