@@ -12,7 +12,6 @@
 #include "EgammaAnalysisTools/include/CutBasedEleIDSelector.hh"
 #include "EgammaAnalysisTools/include/CiCBasedEleSelector.hh"
 #include "EgammaAnalysisTools/include/Egamma.h"
-#include "EgammaAnalysisTools/include/ElectronLikelihood.h"
 #include <TLorentzVector.h>
 
 class LikelihoodAnalysis : public Egamma {
@@ -48,8 +47,6 @@ private:
   float SigmaiEiE(int electron);
   float SigmaiPiP(int electron);
   
-  float likelihoodRatio(int eleIndex, ElectronLikelihood &lh);
-
   std::pair<int,int> getBestGoodElePair(std::vector<int> goodElectrons);
 
   CutBasedEleIDSelector EgammaCutBasedIDHWW;
