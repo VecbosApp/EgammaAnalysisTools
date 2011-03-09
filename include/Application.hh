@@ -9,4 +9,4 @@
 //   7 = PF electron seeding efficiency study (on general tracks)
 //   8 = Z->ee tag and probe
 
-#define Application 8
+#define Application 1
