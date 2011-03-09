@@ -170,11 +170,11 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
       
       for(int iele=0; iele<2; ++iele) {
         int tag=electrons[0], probe=electrons[1];
-        if(iele=1) {
+        if(iele==1) {
           tag=electrons[1]; 
           probe=electrons[0];
         }
-	
+
         TLorentzVector probeP4(pxEle[probe],pyEle[probe],pzEle[probe],energyEle[probe]);
         TLorentzVector tagP4(pxEle[tag],    pyEle[tag],  pzEle[tag],  energyEle[tag]);
 
@@ -228,12 +228,14 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
 	double EoP          = eSuperClusterOverPEle[probe];
 	double HoE          = hOverEEle[probe];
 	int nbrem           = nbremsEle[probe];
+        float fbrem         = fbremEle[probe];
+        
 	
         /// fill the electron ID pdfs only if:
         /// the tag is loose isolated and identified (ALWAYS)
         /// the probe is loose isolated              (ONLY IF REQUIRED)
-	if( tagIsolated && tagIdentified && probeIsolated && iclass>-1) {   
-          
+        if( tagIsolated && tagIdentified && probeIsolated && iclass>-1) {   
+
           dPhiCaloUnsplitEle      [iecal][iptbin] -> Fill ( dPhiCalo );
           dPhiVtxUnsplitEle       [iecal][iptbin] -> Fill ( dPhiVtx );
           dEtaUnsplitEle          [iecal][iptbin] -> Fill ( dEtaVtx );
@@ -268,10 +270,9 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
           s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
 	  
           // fill the reduced tree
-	  reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,pt,eta,charge);
+	  reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
           reducedTree.fillAttributesSignal(okmass);
           reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
-          reducedTree.fillMore(dr03TkSumPtEle[tag]/tagP4.Pt(), dr03TkSumPtEle[probe]/probeP4.Pt());
           reducedTree.store();
 
         } // fill histograms
@@ -441,10 +442,11 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
       double EoP          = eSuperClusterOverPEle[theClosestEle_mc1];
       double HoE          = hOverEEle[theClosestEle_mc1];
       int nbrem           = nbremsEle[theClosestEle_mc1];
+      float fbrem         = fbremEle[theClosestEle_mc1];
 
       // fill the reduced tree     
       if( isolated1 && iclass>-1 ) {
-	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,pt,eta,charge);
+	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
 	reducedTree.fillAttributesSignal(9999.);
 	reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
 	reducedTree.store();
@@ -500,10 +502,11 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
       double EoP          = eSuperClusterOverPEle[theClosestEle_mc2];
       double HoE          = hOverEEle[theClosestEle_mc2];
       int nbrem           = nbremsEle[theClosestEle_mc2];
+      float fbrem         = fbremEle[theClosestEle_mc2];
 
       // fill the reduced tree     
       if( isolated2 && iclass>-1 ) {
-	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,pt,eta,charge);
+	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
 	reducedTree.fillAttributesSignal(9999.);
 	reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
 	reducedTree.store();
@@ -697,7 +700,8 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
 	double EoP          = eSuperClusterOverPEle[probe];
 	double HoE          = hOverEEle[probe];
 	int nbrem           = nbremsEle[probe];
-	
+        float fbrem         = fbremEle[probe];
+
         /// fill the electron ID pdfs only if:
         /// the tag is loose isolated and identified (ALWAYS)
         /// the probe is loose isolated              (ONLY IF REQUIRED)
@@ -712,7 +716,7 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
 
 	  // only if it matches with MC fill the reduced tree
 	  if (matchMc) { 
-	    reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,pt,eta,charge);
+	    reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
 	    reducedTree.fillAttributesSignal(okmass);
 	    reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
 	    reducedTree.store();
@@ -924,6 +928,7 @@ void LHPdfsProducer::LoopZwithMass(const char *treefilesuffix) {
       double EoP1          = eSuperClusterOverPEle[theClosestEle_mc1];
       double HoE1          = hOverEEle[theClosestEle_mc1];
       int nbrem1           = nbremsEle[theClosestEle_mc1];
+      float fbrem1         = fbremEle[theClosestEle_mc1];
       int sc2 = superClusterIndexEle[theClosestEle_mc2];
       float sigmaIEtaIEta2 = sqrt(fabs(covIEtaIEtaSC[sc2]));
       float sigmaIPhiIPhi2 = sqrt(fabs(covIPhiIPhiSC[sc2]));
@@ -935,16 +940,17 @@ void LHPdfsProducer::LoopZwithMass(const char *treefilesuffix) {
       double EoP2          = eSuperClusterOverPEle[theClosestEle_mc2];
       double HoE2          = hOverEEle[theClosestEle_mc2];
       int nbrem2           = nbremsEle[theClosestEle_mc2];
+      float fbrem2         = fbremEle[theClosestEle_mc2];
 
       float mass = (electron1+electron2).M();
       if( m_selection->passCut("meeWindow",mass) ) {
 
 	// fill the reduced tree     
 	if( isolated1 && isolated2 && iclass1>-1 && iclass2>-1 ) {
-	  reducedTree.fillVariables(EoPout1,EoP1,HoE1,dEtaVtx1,dPhiVtx1,s9s251,s1s91,sigmaIEtaIEta1,sigmaIPhiIPhi1,pt1,eta1,charge1);
+	  reducedTree.fillVariables(EoPout1,EoP1,HoE1,dEtaVtx1,dPhiVtx1,s9s251,sigmaIEtaIEta1,sigmaIPhiIPhi1,fbrem1,nbrem1,pt1,eta1,charge1);
 	  reducedTree.fillAttributesSignal(mass);
 	  reducedTree.fillCategories(iecal1,iptbin1,iclass1,nbrem1);
-	  reducedTree.fillVariables(EoPout2,EoP2,HoE2,dEtaVtx2,dPhiVtx2,s9s252,s1s92,sigmaIEtaIEta2,sigmaIPhiIPhi2,pt2,eta2,charge2);
+	  reducedTree.fillVariables(EoPout2,EoP2,HoE2,dEtaVtx2,dPhiVtx2,s9s252,sigmaIEtaIEta2,sigmaIPhiIPhi2,fbrem2,nbrem2,pt2,eta2,charge2);
 	  reducedTree.fillAttributesSignal(mass);
 	  reducedTree.fillCategories(iecal2,iptbin2,iclass2,nbrem2);
 	  
