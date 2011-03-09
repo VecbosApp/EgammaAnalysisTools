@@ -11,10 +11,10 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myTree->Branch("deta",            &myDeta,            "deta/F");
   myTree->Branch("dphi",            &myDphi,            "dphi/F");
   myTree->Branch("s9s25",           &mys9s25,           "s9s25/F");
-  myTree->Branch("s1s9" ,           &mys1s9,            "s1s9/F");
   myTree->Branch("see",             &mySee,             "see/F");
   myTree->Branch("spp",             &mySpp,             "spp/F");
   myTree->Branch("fbrem",           &myFbrem,           "fbrem/F");
+  myTree->Branch("nbrem",           &myNbrems,          "nbrems/I");
   myTree->Branch("missHits",        &myMissHits,        "missHits/I");
   myTree->Branch("dist",            &myDist,            "dist/F");
   myTree->Branch("dcot",            &myDcot,            "dcot/F");
@@ -30,6 +30,23 @@ RedEleIDTree::~RedEleIDTree() {
 void RedEleIDTree::addAttributesSignal() {
 
   myTree->Branch("zmass",       &myZmass,       "zmass/F");
+}
+
+void RedEleIDTree::addElectronIdBits() {
+
+  myTree->Branch("CutBasedId",         myCutBasedId,         "CutBasedId[4]/I");
+  myTree->Branch("CutBasedIdOlyID",    myCutBasedIdOnlyID,   "CutBasedIdOnlyID[4]/I");
+  myTree->Branch("CutBasedIdOnlyIso",  myCutBasedIdOnlyIso,  "CutBasedIdOnlyIso[4]/I");
+  myTree->Branch("CutBasedIdOnlyConv", myCutBasedIdOnlyConv, "CutBasedIdOnlyConv[4]/I");
+  myTree->Branch("LHBasedId",          myLHBasedId,          "LHBasedId[5]/I");
+  myTree->Branch("LHBasedIdOlyID",     myLHBasedIdOnlyID,    "LHBasedIdOnlyID[5]/I");
+  myTree->Branch("LHBasedIdOnlyIso",   myLHBasedIdOnlyIso,   "LHBasedIdOnlyIso[5]/I");
+  myTree->Branch("LHBasedIdOnlyConv",  myLHBasedIdOnlyConv,  "LHBasedIdOnlyConv[5]/I");
+  myTree->Branch("CiCBasedId",         myCiCBasedId,         "CiCBasedId[9]/I");
+  myTree->Branch("CiCBasedIdOlyID",    myCiCBasedIdOnlyID,   "CiCBasedIdOnlyID[9]/I");
+  myTree->Branch("CiCBasedIdOnlyIso",  myCiCBasedIdOnlyIso,  "CiCBasedIdOnlyIso[9]/I");
+  myTree->Branch("CiCBasedIdOnlyConv", myCiCBasedIdOnlyConv, "CiCBasedIdOnlyConv[9]/I");
+
 }
 
 void RedEleIDTree::addAttributesBackground() {
@@ -48,10 +65,15 @@ void RedEleIDTree::addCategories() {
   myTree->Branch("nbrem",      &mynbrem,      "nbrem/I");
 }
 
+void RedEleIDTree::addIsolations() {
+  myTree->Branch("trkIso",  &myTrkIso,    "trkIso/F");
+  myTree->Branch("ecalIso", &myEcalIso,   "ecalIso/F");
+  myTree->Branch("hcalIso", &myHcalIso,   "hcalIso/F");
+}
+
 void RedEleIDTree::addMore() {
-  
-  myTree->Branch("relIsolTag",   &myRelIsolTag,   "relIsolTag/F");
-  myTree->Branch("relIsolProbe", &myRelIsolProbe, "relIsolProbe/F");
+  myTree->Branch("nVTx",   &myNVtx,   "nVtx/I");
+  myTree->Branch("rho",    &myRho,    "rho/F");
 }
 
 void RedEleIDTree::addGamma() {
@@ -74,17 +96,17 @@ void RedEleIDTree::save() {
   myFile->Close();
 }
 
-void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float Deta, float Dphi, float s9s25, float s1s9, float See, float Spp, float pt, float eta, int charge) {
-
+void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float DEta, float DPhi, float s9s25, float See, float Spp, float fbrem, int nbrems, float pt, float eta, int charge) {
   myEoPout=EoPout;
   myEoP=EoP;
   myHoE=HoE;
-  myDeta=Deta;
-  myDphi=Dphi;
+  myDeta=DEta;
+  myDphi=DPhi;
   mys9s25=s9s25;
-  mys1s9=s1s9;
   mySee=See;
   mySpp=Spp;
+  myFbrem=fbrem;
+  myNbrems=nbrems;
   myPt=pt;
   myEta=eta;
   myCharge=charge;
@@ -110,6 +132,12 @@ void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float Deta,
   myCharge=charge;
 }
 
+void RedEleIDTree::fillIsolations(float trkIso, float ecalIso, float hcalIso) {
+  myTrkIso=trkIso;
+  myEcalIso=ecalIso;
+  myHcalIso=hcalIso;
+}
+
 void RedEleIDTree::fillAttributesSignal(float zmass) {
 
   myZmass=zmass;
@@ -131,10 +159,9 @@ void RedEleIDTree::fillCategories(int iecal, int iptbin, int iclass, int nbr) {
   mynbrem=nbr;
 }
 
-void RedEleIDTree::fillMore(float rit, float rip) {
-
-  myRelIsolTag=rit;
-  myRelIsolProbe=rip;
+void RedEleIDTree::fillMore(int nVtx, float rho) {
+  myNVtx=nVtx;
+  myRho=rho;
 }
 
 void RedEleIDTree::fillGamma(float atg, float aeg, float ahg, int ig) {
@@ -145,3 +172,29 @@ void RedEleIDTree::fillGamma(float atg, float aeg, float ahg, int ig) {
   myIsGamma=ig;
 }
 
+void RedEleIDTree::fillCutBasedIDBits(int CutBasedId[4], int CutBasedIdOnlyID[4], int CutBasedIdOnlyIso[4], int CutBasedIdOnlyConv[4]) {
+  for(int i=0; i<4; i++) {
+    myCutBasedId[i] = CutBasedId[i];
+    myCutBasedIdOnlyID[i] = CutBasedIdOnlyID[i];
+    myCutBasedIdOnlyIso[i] = CutBasedIdOnlyIso[i];
+    myCutBasedIdOnlyConv[i] = CutBasedIdOnlyConv[i];
+  }
+}
+
+void RedEleIDTree::fillLHBasedIDBits(int LHBasedId[4], int LHBasedIdOnlyID[4], int LHBasedIdOnlyIso[4], int LHBasedIdOnlyConv[4]) {
+  for(int i=0; i<5; i++) {
+    myLHBasedId[i] = LHBasedId[i];
+    myLHBasedIdOnlyID[i] = LHBasedIdOnlyID[i];
+    myLHBasedIdOnlyIso[i] = LHBasedIdOnlyIso[i];
+    myLHBasedIdOnlyConv[i] = LHBasedIdOnlyConv[i];
+  }
+}
+
+void RedEleIDTree::fillCiCBasedIDBits(int CiCBasedId[9], int CiCBasedIdOnlyID[9], int CiCBasedIdOnlyIso[9], int CiCBasedIdOnlyConv[9]) {
+  for(int i=0; i<9; i++) {
+    myCiCBasedId[i] = CiCBasedId[i];
+    myCiCBasedIdOnlyID[i] = CiCBasedIdOnlyID[i];
+    myCiCBasedIdOnlyIso[i] = CiCBasedIdOnlyIso[i];
+    myCiCBasedIdOnlyConv[i] = CiCBasedIdOnlyConv[i];
+  }
+}
