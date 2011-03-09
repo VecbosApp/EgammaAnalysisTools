@@ -24,6 +24,7 @@ public :
    Int_t           l1Technical[3];   //[nl1Technical]
    Int_t           nl1Global;
    Int_t           l1Global[5];   //[nl1Global]
+   Float_t         rhoFastjet;
    Int_t           runNumber;
    Int_t           eventNumber;
    Int_t           lumiBlock;
@@ -98,6 +99,8 @@ public :
    Float_t         dr04HcalTowerSumEtEle[100];   //[nEle]
    Float_t         scBasedEcalSum03Ele[100];   //[nEle]
    Float_t         scBasedEcalSum04Ele[100];   //[nEle]
+   Float_t         dr03HcalTowerSumEtFullConeEle[5];   //[nEle]
+   Float_t         dr04HcalTowerSumEtFullConeEle[5];   //[nEle]
    Int_t           eleIdCutsEle[100];   //[nEle]
    Float_t         eleIdLikelihoodEle[100];   //[nEle]
    Float_t         pflowMVAEle[100];   //[nEle]
@@ -149,22 +152,6 @@ public :
    Float_t         phIso03noVetoPFEle[100];   //[nPFEle]
    Float_t         phIso04noVetoPFEle[100];   //[nPFEle]
    Float_t         phIso05noVetoPFEle[100];   //[nPFEle]
-   Int_t           nPFpreId;
-   Float_t         deltaEtaMatchPFpreId[100];   //[nPFpreId]
-   Float_t         deltaPhiMatchPFpreId[100];   //[nPFpreId]
-   Float_t         chiEtaMatchPFpreId[100];   //[nPFpreId]
-   Float_t         chiPhiMatchPFpreId[100];   //[nPFpreId]
-   Float_t         chi2MatchPFpreId[100];   //[nPFpreId]
-   Float_t         eopMatchPFpreId[100];   //[nPFpreId]
-   Float_t         kfChi2PFpreId[100];   //[nPFpreId]
-   Float_t         kfNHitsPFpreId[100];   //[nPFpreId]
-   Float_t         gsfChi2PFpreId[100];   //[nPFpreId]
-   Float_t         chi2RatioPFpreId[100];   //[nPFpreId]
-   Bool_t          ecalMatchingPFpreId[100];   //[nPFpreId]
-   Bool_t          psMatchingPFpreId[100];   //[nPFpreId]
-   Bool_t          trackFilteredPFpreId[100];   //[nPFpreId]
-   Bool_t          preidedPFpreId[100];   //[nPFpreId]
-   Int_t           trackIndexPFpreId[100];   //[nPFpreId]
    Int_t           nSC;
    Int_t           nBCSC[100];   //[nSC]
    Int_t           nCrystalsSC[100];   //[nSC]
@@ -258,99 +245,107 @@ public :
    Float_t         fracClosProblBC[200];   //[nBC]
    Int_t           indexSCBC[200];   //[nBC]
    Int_t           nTrack;
-   Float_t         pxTrack[500];   //[nTrack]
-   Float_t         pyTrack[500];   //[nTrack]
-   Float_t         pzTrack[500];   //[nTrack]
-   Int_t           vtxIndexTrack[500];   //[nTrack]
-   Float_t         vtxWeightTrack[500];   //[nTrack]
-   Float_t         chargeTrack[500];   //[nTrack]
-   Float_t         ptErrorTrack[500];   //[nTrack]
-   Float_t         trackValidHitsTrack[500];   //[nTrack]
-   Float_t         trackLostHitsTrack[500];   //[nTrack]
-   Float_t         trackNormalizedChi2Track[500];   //[nTrack]
-   Int_t           qualityMaskTrack[500];   //[nTrack]
-   Float_t         impactPar3DTrack[500];   //[nTrack]
-   Float_t         impactPar3DErrorTrack[500];   //[nTrack]
-   Float_t         transvImpactParTrack[500];   //[nTrack]
-   Float_t         transvImpactParErrorTrack[500];   //[nTrack]
-   Float_t         trackVxTrack[500];   //[nTrack]
-   Float_t         trackVyTrack[500];   //[nTrack]
-   Float_t         trackVzTrack[500];   //[nTrack]
-   Float_t         pxAtOuterTrack[500];   //[nTrack]
-   Float_t         pyAtOuterTrack[500];   //[nTrack]
-   Float_t         pzAtOuterTrack[500];   //[nTrack]
-   Float_t         xAtOuterTrack[500];   //[nTrack]
-   Float_t         yAtOuterTrack[500];   //[nTrack]
-   Float_t         zAtOuterTrack[500];   //[nTrack]
-   Float_t         pxAtInnerTrack[500];   //[nTrack]
-   Float_t         pyAtInnerTrack[500];   //[nTrack]
-   Float_t         pzAtInnerTrack[500];   //[nTrack]
-   Float_t         xAtInnerTrack[500];   //[nTrack]
-   Float_t         yAtInnerTrack[500];   //[nTrack]
-   Float_t         zAtInnerTrack[500];   //[nTrack]
-   Float_t         recHitsSizeTrack[500];   //[nTrack]
-   Int_t           pixelHitsTrack[500];   //[nTrack]
-   Int_t           expInnerLayersTrack[500];   //[nTrack]
-   Int_t           numberOfValidPixelBarrelHitsTrack[500];   //[nTrack]
-   Int_t           numberOfValidPixelEndcapHitsTrack[500];   //[nTrack]
-   Int_t           numberOfValidStripTIBHitsTrack[500];   //[nTrack]
-   Int_t           numberOfValidStripTIDHitsTrack[500];   //[nTrack]
-   Int_t           numberOfValidStripTOBHitsTrack[500];   //[nTrack]
-   Int_t           numberOfValidStripTECHitsTrack[500];   //[nTrack]
-   Float_t         truncatedDeDxTrack[500];   //[nTrack]
-   Float_t         truncatedDeDxErrorTrack[500];   //[nTrack]
-   Float_t         truncatedDeDxNoMTrack[500];   //[nTrack]
-   Float_t         medianDeDxTrack[500];   //[nTrack]
-   Float_t         medianDeDxErrorTrack[500];   //[nTrack]
-   Float_t         medianDeDxNoMTrack[500];   //[nTrack]
-   Float_t         harmonic2DeDxTrack[500];   //[nTrack]
-   Float_t         harmonic2DeDxErrorTrack[500];   //[nTrack]
-   Float_t         harmonic2DeDxNoMTrack[500];   //[nTrack]
+   Float_t         pxTrack[2000];   //[nTrack]
+   Float_t         pyTrack[2000];   //[nTrack]
+   Float_t         pzTrack[2000];   //[nTrack]
+   Int_t           vtxIndexTrack[2000];   //[nTrack]
+   Float_t         vtxWeightTrack[2000];   //[nTrack]
+   Float_t         chargeTrack[2000];   //[nTrack]
+   Float_t         ptErrorTrack[2000];   //[nTrack]
+   Float_t         trackValidHitsTrack[2000];   //[nTrack]
+   Float_t         trackLostHitsTrack[2000];   //[nTrack]
+   Float_t         trackNormalizedChi2Track[2000];   //[nTrack]
+   Int_t           qualityMaskTrack[2000];   //[nTrack]
+   Float_t         impactPar3DTrack[2000];   //[nTrack]
+   Float_t         impactPar3DErrorTrack[2000];   //[nTrack]
+   Float_t         transvImpactParTrack[2000];   //[nTrack]
+   Float_t         transvImpactParErrorTrack[2000];   //[nTrack]
+   Float_t         impactPar3DBiasedTrack[2000];   //[nTrack]
+   Float_t         impactPar3DBiasedErrorTrack[2000];   //[nTrack]
+   Float_t         transvImpactParBiasedTrack[2000];   //[nTrack]
+   Float_t         transvImpactParBiasedErrorTrack[2000];   //[nTrack]
+   Float_t         trackVxTrack[2000];   //[nTrack]
+   Float_t         trackVyTrack[2000];   //[nTrack]
+   Float_t         trackVzTrack[2000];   //[nTrack]
+   Float_t         pxAtOuterTrack[2000];   //[nTrack]
+   Float_t         pyAtOuterTrack[2000];   //[nTrack]
+   Float_t         pzAtOuterTrack[2000];   //[nTrack]
+   Float_t         xAtOuterTrack[2000];   //[nTrack]
+   Float_t         yAtOuterTrack[2000];   //[nTrack]
+   Float_t         zAtOuterTrack[2000];   //[nTrack]
+   Float_t         pxAtInnerTrack[2000];   //[nTrack]
+   Float_t         pyAtInnerTrack[2000];   //[nTrack]
+   Float_t         pzAtInnerTrack[2000];   //[nTrack]
+   Float_t         xAtInnerTrack[2000];   //[nTrack]
+   Float_t         yAtInnerTrack[2000];   //[nTrack]
+   Float_t         zAtInnerTrack[2000];   //[nTrack]
+   Float_t         recHitsSizeTrack[2000];   //[nTrack]
+   Int_t           pixelHitsTrack[2000];   //[nTrack]
+   Int_t           expInnerLayersTrack[2000];   //[nTrack]
+   Int_t           numberOfValidPixelBarrelHitsTrack[2000];   //[nTrack]
+   Int_t           numberOfValidPixelEndcapHitsTrack[2000];   //[nTrack]
+   Int_t           numberOfValidStripTIBHitsTrack[2000];   //[nTrack]
+   Int_t           numberOfValidStripTIDHitsTrack[2000];   //[nTrack]
+   Int_t           numberOfValidStripTOBHitsTrack[2000];   //[nTrack]
+   Int_t           numberOfValidStripTECHitsTrack[2000];   //[nTrack]
+   Float_t         truncatedDeDxTrack[2000];   //[nTrack]
+   Float_t         truncatedDeDxErrorTrack[2000];   //[nTrack]
+   Float_t         truncatedDeDxNoMTrack[2000];   //[nTrack]
+   Float_t         medianDeDxTrack[2000];   //[nTrack]
+   Float_t         medianDeDxErrorTrack[2000];   //[nTrack]
+   Float_t         medianDeDxNoMTrack[2000];   //[nTrack]
+   Float_t         harmonic2DeDxTrack[2000];   //[nTrack]
+   Float_t         harmonic2DeDxErrorTrack[2000];   //[nTrack]
+   Float_t         harmonic2DeDxNoMTrack[2000];   //[nTrack]
    Int_t           nGsfTrack;
-   Float_t         pxGsfTrack[300];   //[nGsfTrack]
-   Float_t         pyGsfTrack[300];   //[nGsfTrack]
-   Float_t         pzGsfTrack[300];   //[nGsfTrack]
-   Int_t           vtxIndexGsfTrack[300];   //[nGsfTrack]
-   Float_t         vtxWeightGsfTrack[300];   //[nGsfTrack]
-   Float_t         chargeGsfTrack[300];   //[nGsfTrack]
-   Float_t         ptErrorGsfTrack[300];   //[nGsfTrack]
-   Float_t         trackValidHitsGsfTrack[300];   //[nGsfTrack]
-   Float_t         trackLostHitsGsfTrack[300];   //[nGsfTrack]
-   Float_t         trackNormalizedChi2GsfTrack[300];   //[nGsfTrack]
-   Int_t           qualityMaskGsfTrack[300];   //[nGsfTrack]
-   Float_t         impactPar3DGsfTrack[300];   //[nGsfTrack]
-   Float_t         impactPar3DErrorGsfTrack[300];   //[nGsfTrack]
-   Float_t         transvImpactParGsfTrack[300];   //[nGsfTrack]
-   Float_t         transvImpactParErrorGsfTrack[300];   //[nGsfTrack]
-   Float_t         trackVxGsfTrack[300];   //[nGsfTrack]
-   Float_t         trackVyGsfTrack[300];   //[nGsfTrack]
-   Float_t         trackVzGsfTrack[300];   //[nGsfTrack]
-   Float_t         pxAtOuterGsfTrack[300];   //[nGsfTrack]
-   Float_t         pyAtOuterGsfTrack[300];   //[nGsfTrack]
-   Float_t         pzAtOuterGsfTrack[300];   //[nGsfTrack]
-   Float_t         xAtOuterGsfTrack[300];   //[nGsfTrack]
-   Float_t         yAtOuterGsfTrack[300];   //[nGsfTrack]
-   Float_t         zAtOuterGsfTrack[300];   //[nGsfTrack]
-   Float_t         pxAtInnerGsfTrack[300];   //[nGsfTrack]
-   Float_t         pyAtInnerGsfTrack[300];   //[nGsfTrack]
-   Float_t         pzAtInnerGsfTrack[300];   //[nGsfTrack]
-   Float_t         xAtInnerGsfTrack[300];   //[nGsfTrack]
-   Float_t         yAtInnerGsfTrack[300];   //[nGsfTrack]
-   Float_t         zAtInnerGsfTrack[300];   //[nGsfTrack]
-   Float_t         recHitsSizeGsfTrack[300];   //[nGsfTrack]
-   Int_t           pixelHitsGsfTrack[300];   //[nGsfTrack]
-   Int_t           expInnerLayersGsfTrack[300];   //[nGsfTrack]
-   Int_t           numberOfValidPixelBarrelHitsGsfTrack[300];   //[nGsfTrack]
-   Int_t           numberOfValidPixelEndcapHitsGsfTrack[300];   //[nGsfTrack]
-   Int_t           numberOfValidStripTIBHitsGsfTrack[300];   //[nGsfTrack]
-   Int_t           numberOfValidStripTIDHitsGsfTrack[300];   //[nGsfTrack]
-   Int_t           numberOfValidStripTOBHitsGsfTrack[300];   //[nGsfTrack]
-   Int_t           numberOfValidStripTECHitsGsfTrack[300];   //[nGsfTrack]
-   Int_t           chargeModeGsfTrack[300];   //[nGsfTrack]
-   Float_t         pxModeGsfTrack[300];   //[nGsfTrack]
-   Float_t         pyModeGsfTrack[300];   //[nGsfTrack]
-   Float_t         pzModeGsfTrack[300];   //[nGsfTrack]
-   Int_t           recoFlagsGsfTrack[300];   //[nGsfTrack]
+   Float_t         pxGsfTrack[500];   //[nGsfTrack]
+   Float_t         pyGsfTrack[500];   //[nGsfTrack]
+   Float_t         pzGsfTrack[500];   //[nGsfTrack]
+   Int_t           vtxIndexGsfTrack[500];   //[nGsfTrack]
+   Float_t         vtxWeightGsfTrack[500];   //[nGsfTrack]
+   Float_t         chargeGsfTrack[500];   //[nGsfTrack]
+   Float_t         ptErrorGsfTrack[500];   //[nGsfTrack]
+   Float_t         trackValidHitsGsfTrack[500];   //[nGsfTrack]
+   Float_t         trackLostHitsGsfTrack[500];   //[nGsfTrack]
+   Float_t         trackNormalizedChi2GsfTrack[500];   //[nGsfTrack]
+   Int_t           qualityMaskGsfTrack[500];   //[nGsfTrack]
+   Float_t         impactPar3DGsfTrack[500];   //[nGsfTrack]
+   Float_t         impactPar3DErrorGsfTrack[500];   //[nGsfTrack]
+   Float_t         transvImpactParGsfTrack[500];   //[nGsfTrack]
+   Float_t         transvImpactParErrorGsfTrack[500];   //[nGsfTrack]
+   Float_t         impactPar3DBiasedGsfTrack[500];   //[nGsfTrack]
+   Float_t         impactPar3DBiasedErrorGsfTrack[500];   //[nGsfTrack]
+   Float_t         transvImpactParBiasedGsfTrack[500];   //[nGsfTrack]
+   Float_t         transvImpactParBiasedErrorGsfTrack[500];   //[nGsfTrack]
+   Float_t         trackVxGsfTrack[500];   //[nGsfTrack]
+   Float_t         trackVyGsfTrack[500];   //[nGsfTrack]
+   Float_t         trackVzGsfTrack[500];   //[nGsfTrack]
+   Float_t         pxAtOuterGsfTrack[500];   //[nGsfTrack]
+   Float_t         pyAtOuterGsfTrack[500];   //[nGsfTrack]
+   Float_t         pzAtOuterGsfTrack[500];   //[nGsfTrack]
+   Float_t         xAtOuterGsfTrack[500];   //[nGsfTrack]
+   Float_t         yAtOuterGsfTrack[500];   //[nGsfTrack]
+   Float_t         zAtOuterGsfTrack[500];   //[nGsfTrack]
+   Float_t         pxAtInnerGsfTrack[500];   //[nGsfTrack]
+   Float_t         pyAtInnerGsfTrack[500];   //[nGsfTrack]
+   Float_t         pzAtInnerGsfTrack[500];   //[nGsfTrack]
+   Float_t         xAtInnerGsfTrack[500];   //[nGsfTrack]
+   Float_t         yAtInnerGsfTrack[500];   //[nGsfTrack]
+   Float_t         zAtInnerGsfTrack[500];   //[nGsfTrack]
+   Float_t         recHitsSizeGsfTrack[500];   //[nGsfTrack]
+   Int_t           pixelHitsGsfTrack[500];   //[nGsfTrack]
+   Int_t           expInnerLayersGsfTrack[500];   //[nGsfTrack]
+   Int_t           numberOfValidPixelBarrelHitsGsfTrack[500];   //[nGsfTrack]
+   Int_t           numberOfValidPixelEndcapHitsGsfTrack[500];   //[nGsfTrack]
+   Int_t           numberOfValidStripTIBHitsGsfTrack[500];   //[nGsfTrack]
+   Int_t           numberOfValidStripTIDHitsGsfTrack[500];   //[nGsfTrack]
+   Int_t           numberOfValidStripTOBHitsGsfTrack[500];   //[nGsfTrack]
+   Int_t           numberOfValidStripTECHitsGsfTrack[500];   //[nGsfTrack]
+   Int_t           chargeModeGsfTrack[500];   //[nGsfTrack]
+   Float_t         pxModeGsfTrack[500];   //[nGsfTrack]
+   Float_t         pyModeGsfTrack[500];   //[nGsfTrack]
+   Float_t         pzModeGsfTrack[500];   //[nGsfTrack]
+   Int_t           recoFlagsGsfTrack[500];   //[nGsfTrack]
    Int_t           nGlobalMuonTrack;
    Float_t         pxGlobalMuonTrack[100];   //[nGlobalMuonTrack]
    Float_t         pyGlobalMuonTrack[100];   //[nGlobalMuonTrack]
@@ -367,6 +362,10 @@ public :
    Float_t         impactPar3DErrorGlobalMuonTrack[100];   //[nGlobalMuonTrack]
    Float_t         transvImpactParGlobalMuonTrack[100];   //[nGlobalMuonTrack]
    Float_t         transvImpactParErrorGlobalMuonTrack[100];   //[nGlobalMuonTrack]
+   Float_t         impactPar3DBiasedGlobalMuonTrack[100];   //[nGlobalMuonTrack]
+   Float_t         impactPar3DBiasedErrorGlobalMuonTrack[100];   //[nGlobalMuonTrack]
+   Float_t         transvImpactParBiasedGlobalMuonTrack[100];   //[nGlobalMuonTrack]
+   Float_t         transvImpactParBiasedErrorGlobalMuonTrack[100];   //[nGlobalMuonTrack]
    Float_t         trackVxGlobalMuonTrack[100];   //[nGlobalMuonTrack]
    Float_t         trackVyGlobalMuonTrack[100];   //[nGlobalMuonTrack]
    Float_t         trackVzGlobalMuonTrack[100];   //[nGlobalMuonTrack]
@@ -403,10 +402,6 @@ public :
    Float_t         trackLostHitsSTAMuonTrack[100];   //[nSTAMuonTrack]
    Float_t         trackNormalizedChi2STAMuonTrack[100];   //[nSTAMuonTrack]
    Int_t           qualityMaskSTAMuonTrack[100];   //[nSTAMuonTrack]
-   Float_t         impactPar3DSTAMuonTrack[100];   //[nSTAMuonTrack]
-   Float_t         impactPar3DErrorSTAMuonTrack[100];   //[nSTAMuonTrack]
-   Float_t         transvImpactParSTAMuonTrack[100];   //[nSTAMuonTrack]
-   Float_t         transvImpactParErrorSTAMuonTrack[100];   //[nSTAMuonTrack]
    Float_t         trackVxSTAMuonTrack[100];   //[nSTAMuonTrack]
    Float_t         trackVySTAMuonTrack[100];   //[nSTAMuonTrack]
    Float_t         trackVzSTAMuonTrack[100];   //[nSTAMuonTrack]
@@ -683,6 +678,7 @@ public :
    TBranch        *b_l1Technical;   //!
    TBranch        *b_nl1Global;   //!
    TBranch        *b_l1Global;   //!
+   TBranch        *b_rhoFastjet;   //!
    TBranch        *b_runNumber;   //!
    TBranch        *b_eventNumber;   //!
    TBranch        *b_lumiBlock;   //!
@@ -757,6 +753,8 @@ public :
    TBranch        *b_dr04HcalTowerSumEtEle;   //!
    TBranch        *b_scBasedEcalSum03Ele;   //!
    TBranch        *b_scBasedEcalSum04Ele;   //!
+   TBranch        *b_dr03HcalTowerSumEtFullConeEle;   //!
+   TBranch        *b_dr04HcalTowerSumEtFullConeEle;   //!
    TBranch        *b_eleIdCutsEle;   //!
    TBranch        *b_eleIdLikelihoodEle;   //!
    TBranch        *b_pflowMVAEle;   //!
@@ -808,22 +806,6 @@ public :
    TBranch        *b_phIso03noVetoPFEle;   //!
    TBranch        *b_phIso04noVetoPFEle;   //!
    TBranch        *b_phIso05noVetoPFEle;   //!
-   TBranch        *b_nPFpreId;   //!
-   TBranch        *b_deltaEtaMatchPFpreId;   //!
-   TBranch        *b_deltaPhiMatchPFpreId;   //!
-   TBranch        *b_chiEtaMatchPFpreId;   //!
-   TBranch        *b_chiPhiMatchPFpreId;   //!
-   TBranch        *b_chi2MatchPFpreId;   //!
-   TBranch        *b_eopMatchPFpreId;   //!
-   TBranch        *b_kfChi2PFpreId;   //!
-   TBranch        *b_kfNHitsPFpreId;   //!
-   TBranch        *b_gsfChi2PFpreId;   //!
-   TBranch        *b_chi2RatioPFpreId;   //!
-   TBranch        *b_ecalMatchingPFpreId;   //!
-   TBranch        *b_psMatchingPFpreId;   //!
-   TBranch        *b_trackFilteredPFpreId;   //!
-   TBranch        *b_preidedPFpreId;   //!
-   TBranch        *b_trackIndexPFpreId;   //!
    TBranch        *b_nSC;   //!
    TBranch        *b_nBCSC;   //!
    TBranch        *b_nCrystalsSC;   //!
@@ -932,6 +914,10 @@ public :
    TBranch        *b_impactPar3DErrorTrack;   //!
    TBranch        *b_transvImpactParTrack;   //!
    TBranch        *b_transvImpactParErrorTrack;   //!
+   TBranch        *b_impactPar3DBiasedTrack;   //!
+   TBranch        *b_impactPar3DBiasedErrorTrack;   //!
+   TBranch        *b_transvImpactParBiasedTrack;   //!
+   TBranch        *b_transvImpactParBiasedErrorTrack;   //!
    TBranch        *b_trackVxTrack;   //!
    TBranch        *b_trackVyTrack;   //!
    TBranch        *b_trackVzTrack;   //!
@@ -981,6 +967,10 @@ public :
    TBranch        *b_impactPar3DErrorGsfTrack;   //!
    TBranch        *b_transvImpactParGsfTrack;   //!
    TBranch        *b_transvImpactParErrorGsfTrack;   //!
+   TBranch        *b_impactPar3DBiasedGsfTrack;   //!
+   TBranch        *b_impactPar3DBiasedErrorGsfTrack;   //!
+   TBranch        *b_transvImpactParBiasedGsfTrack;   //!
+   TBranch        *b_transvImpactParBiasedErrorGsfTrack;   //!
    TBranch        *b_trackVxGsfTrack;   //!
    TBranch        *b_trackVyGsfTrack;   //!
    TBranch        *b_trackVzGsfTrack;   //!
@@ -1026,6 +1016,10 @@ public :
    TBranch        *b_impactPar3DErrorGlobalMuonTrack;   //!
    TBranch        *b_transvImpactParGlobalMuonTrack;   //!
    TBranch        *b_transvImpactParErrorGlobalMuonTrack;   //!
+   TBranch        *b_impactPar3DBiasedGlobalMuonTrack;   //!
+   TBranch        *b_impactPar3DBiasedErrorGlobalMuonTrack;   //!
+   TBranch        *b_transvImpactParBiasedGlobalMuonTrack;   //!
+   TBranch        *b_transvImpactParBiasedErrorGlobalMuonTrack;   //!
    TBranch        *b_trackVxGlobalMuonTrack;   //!
    TBranch        *b_trackVyGlobalMuonTrack;   //!
    TBranch        *b_trackVzGlobalMuonTrack;   //!
@@ -1062,10 +1056,6 @@ public :
    TBranch        *b_trackLostHitsSTAMuonTrack;   //!
    TBranch        *b_trackNormalizedChi2STAMuonTrack;   //!
    TBranch        *b_qualityMaskSTAMuonTrack;   //!
-   TBranch        *b_impactPar3DSTAMuonTrack;   //!
-   TBranch        *b_impactPar3DErrorSTAMuonTrack;   //!
-   TBranch        *b_transvImpactParSTAMuonTrack;   //!
-   TBranch        *b_transvImpactParErrorSTAMuonTrack;   //!
    TBranch        *b_trackVxSTAMuonTrack;   //!
    TBranch        *b_trackVySTAMuonTrack;   //!
    TBranch        *b_trackVzSTAMuonTrack;   //!
@@ -1415,6 +1405,7 @@ void EgammaBase::Init(TTree *tree)
    fChain->SetBranchAddress("l1Technical", l1Technical, &b_l1Technical);
    fChain->SetBranchAddress("nl1Global", &nl1Global, &b_nl1Global);
    fChain->SetBranchAddress("l1Global", l1Global, &b_l1Global);
+   fChain->SetBranchAddress("rhoFastjet", &rhoFastjet, &b_rhoFastjet);
    fChain->SetBranchAddress("runNumber", &runNumber, &b_runNumber);
    fChain->SetBranchAddress("eventNumber", &eventNumber, &b_eventNumber);
    fChain->SetBranchAddress("lumiBlock", &lumiBlock, &b_lumiBlock);
@@ -1489,6 +1480,8 @@ void EgammaBase::Init(TTree *tree)
    fChain->SetBranchAddress("dr04HcalTowerSumEtEle", dr04HcalTowerSumEtEle, &b_dr04HcalTowerSumEtEle);
    fChain->SetBranchAddress("scBasedEcalSum03Ele", scBasedEcalSum03Ele, &b_scBasedEcalSum03Ele);
    fChain->SetBranchAddress("scBasedEcalSum04Ele", scBasedEcalSum04Ele, &b_scBasedEcalSum04Ele);
+   fChain->SetBranchAddress("dr03HcalTowerSumEtFullConeEle", dr03HcalTowerSumEtFullConeEle, &b_dr03HcalTowerSumEtFullConeEle);
+   fChain->SetBranchAddress("dr04HcalTowerSumEtFullConeEle", dr04HcalTowerSumEtFullConeEle, &b_dr04HcalTowerSumEtFullConeEle);
    fChain->SetBranchAddress("eleIdCutsEle", eleIdCutsEle, &b_eleIdCutsEle);
    fChain->SetBranchAddress("eleIdLikelihoodEle", eleIdLikelihoodEle, &b_eleIdLikelihoodEle);
    fChain->SetBranchAddress("pflowMVAEle", pflowMVAEle, &b_pflowMVAEle);
@@ -1540,22 +1533,6 @@ void EgammaBase::Init(TTree *tree)
    fChain->SetBranchAddress("phIso03noVetoPFEle", phIso03noVetoPFEle, &b_phIso03noVetoPFEle);
    fChain->SetBranchAddress("phIso04noVetoPFEle", phIso04noVetoPFEle, &b_phIso04noVetoPFEle);
    fChain->SetBranchAddress("phIso05noVetoPFEle", phIso05noVetoPFEle, &b_phIso05noVetoPFEle);
-   fChain->SetBranchAddress("nPFpreId", &nPFpreId, &b_nPFpreId);
-   fChain->SetBranchAddress("deltaEtaMatchPFpreId", deltaEtaMatchPFpreId, &b_deltaEtaMatchPFpreId);
-   fChain->SetBranchAddress("deltaPhiMatchPFpreId", deltaPhiMatchPFpreId, &b_deltaPhiMatchPFpreId);
-   fChain->SetBranchAddress("chiEtaMatchPFpreId", chiEtaMatchPFpreId, &b_chiEtaMatchPFpreId);
-   fChain->SetBranchAddress("chiPhiMatchPFpreId", chiPhiMatchPFpreId, &b_chiPhiMatchPFpreId);
-   fChain->SetBranchAddress("chi2MatchPFpreId", chi2MatchPFpreId, &b_chi2MatchPFpreId);
-   fChain->SetBranchAddress("eopMatchPFpreId", eopMatchPFpreId, &b_eopMatchPFpreId);
-   fChain->SetBranchAddress("kfChi2PFpreId", kfChi2PFpreId, &b_kfChi2PFpreId);
-   fChain->SetBranchAddress("kfNHitsPFpreId", kfNHitsPFpreId, &b_kfNHitsPFpreId);
-   fChain->SetBranchAddress("gsfChi2PFpreId", gsfChi2PFpreId, &b_gsfChi2PFpreId);
-   fChain->SetBranchAddress("chi2RatioPFpreId", chi2RatioPFpreId, &b_chi2RatioPFpreId);
-   fChain->SetBranchAddress("ecalMatchingPFpreId", ecalMatchingPFpreId, &b_ecalMatchingPFpreId);
-   fChain->SetBranchAddress("psMatchingPFpreId", psMatchingPFpreId, &b_psMatchingPFpreId);
-   fChain->SetBranchAddress("trackFilteredPFpreId", trackFilteredPFpreId, &b_trackFilteredPFpreId);
-   fChain->SetBranchAddress("preidedPFpreId", preidedPFpreId, &b_preidedPFpreId);
-   fChain->SetBranchAddress("trackIndexPFpreId", trackIndexPFpreId, &b_trackIndexPFpreId);
    fChain->SetBranchAddress("nSC", &nSC, &b_nSC);
    fChain->SetBranchAddress("nBCSC", nBCSC, &b_nBCSC);
    fChain->SetBranchAddress("nCrystalsSC", nCrystalsSC, &b_nCrystalsSC);
@@ -1664,6 +1641,10 @@ void EgammaBase::Init(TTree *tree)
    fChain->SetBranchAddress("impactPar3DErrorTrack", impactPar3DErrorTrack, &b_impactPar3DErrorTrack);
    fChain->SetBranchAddress("transvImpactParTrack", transvImpactParTrack, &b_transvImpactParTrack);
    fChain->SetBranchAddress("transvImpactParErrorTrack", transvImpactParErrorTrack, &b_transvImpactParErrorTrack);
+   fChain->SetBranchAddress("impactPar3DBiasedTrack", impactPar3DBiasedTrack, &b_impactPar3DBiasedTrack);
+   fChain->SetBranchAddress("impactPar3DBiasedErrorTrack", impactPar3DBiasedErrorTrack, &b_impactPar3DBiasedErrorTrack);
+   fChain->SetBranchAddress("transvImpactParBiasedTrack", transvImpactParBiasedTrack, &b_transvImpactParBiasedTrack);
+   fChain->SetBranchAddress("transvImpactParBiasedErrorTrack", transvImpactParBiasedErrorTrack, &b_transvImpactParBiasedErrorTrack);
    fChain->SetBranchAddress("trackVxTrack", trackVxTrack, &b_trackVxTrack);
    fChain->SetBranchAddress("trackVyTrack", trackVyTrack, &b_trackVyTrack);
    fChain->SetBranchAddress("trackVzTrack", trackVzTrack, &b_trackVzTrack);
@@ -1713,6 +1694,10 @@ void EgammaBase::Init(TTree *tree)
    fChain->SetBranchAddress("impactPar3DErrorGsfTrack", impactPar3DErrorGsfTrack, &b_impactPar3DErrorGsfTrack);
    fChain->SetBranchAddress("transvImpactParGsfTrack", transvImpactParGsfTrack, &b_transvImpactParGsfTrack);
    fChain->SetBranchAddress("transvImpactParErrorGsfTrack", transvImpactParErrorGsfTrack, &b_transvImpactParErrorGsfTrack);
+   fChain->SetBranchAddress("impactPar3DBiasedGsfTrack", impactPar3DBiasedGsfTrack, &b_impactPar3DBiasedGsfTrack);
+   fChain->SetBranchAddress("impactPar3DBiasedErrorGsfTrack", impactPar3DBiasedErrorGsfTrack, &b_impactPar3DBiasedErrorGsfTrack);
+   fChain->SetBranchAddress("transvImpactParBiasedGsfTrack", transvImpactParBiasedGsfTrack, &b_transvImpactParBiasedGsfTrack);
+   fChain->SetBranchAddress("transvImpactParBiasedErrorGsfTrack", transvImpactParBiasedErrorGsfTrack, &b_transvImpactParBiasedErrorGsfTrack);
    fChain->SetBranchAddress("trackVxGsfTrack", trackVxGsfTrack, &b_trackVxGsfTrack);
    fChain->SetBranchAddress("trackVyGsfTrack", trackVyGsfTrack, &b_trackVyGsfTrack);
    fChain->SetBranchAddress("trackVzGsfTrack", trackVzGsfTrack, &b_trackVzGsfTrack);
@@ -1758,6 +1743,10 @@ void EgammaBase::Init(TTree *tree)
    fChain->SetBranchAddress("impactPar3DErrorGlobalMuonTrack", impactPar3DErrorGlobalMuonTrack, &b_impactPar3DErrorGlobalMuonTrack);
    fChain->SetBranchAddress("transvImpactParGlobalMuonTrack", transvImpactParGlobalMuonTrack, &b_transvImpactParGlobalMuonTrack);
    fChain->SetBranchAddress("transvImpactParErrorGlobalMuonTrack", transvImpactParErrorGlobalMuonTrack, &b_transvImpactParErrorGlobalMuonTrack);
+   fChain->SetBranchAddress("impactPar3DBiasedGlobalMuonTrack", impactPar3DBiasedGlobalMuonTrack, &b_impactPar3DBiasedGlobalMuonTrack);
+   fChain->SetBranchAddress("impactPar3DBiasedErrorGlobalMuonTrack", impactPar3DBiasedErrorGlobalMuonTrack, &b_impactPar3DBiasedErrorGlobalMuonTrack);
+   fChain->SetBranchAddress("transvImpactParBiasedGlobalMuonTrack", transvImpactParBiasedGlobalMuonTrack, &b_transvImpactParBiasedGlobalMuonTrack);
+   fChain->SetBranchAddress("transvImpactParBiasedErrorGlobalMuonTrack", transvImpactParBiasedErrorGlobalMuonTrack, &b_transvImpactParBiasedErrorGlobalMuonTrack);
    fChain->SetBranchAddress("trackVxGlobalMuonTrack", trackVxGlobalMuonTrack, &b_trackVxGlobalMuonTrack);
    fChain->SetBranchAddress("trackVyGlobalMuonTrack", trackVyGlobalMuonTrack, &b_trackVyGlobalMuonTrack);
    fChain->SetBranchAddress("trackVzGlobalMuonTrack", trackVzGlobalMuonTrack, &b_trackVzGlobalMuonTrack);
@@ -1794,10 +1783,6 @@ void EgammaBase::Init(TTree *tree)
    fChain->SetBranchAddress("trackLostHitsSTAMuonTrack", trackLostHitsSTAMuonTrack, &b_trackLostHitsSTAMuonTrack);
    fChain->SetBranchAddress("trackNormalizedChi2STAMuonTrack", trackNormalizedChi2STAMuonTrack, &b_trackNormalizedChi2STAMuonTrack);
    fChain->SetBranchAddress("qualityMaskSTAMuonTrack", qualityMaskSTAMuonTrack, &b_qualityMaskSTAMuonTrack);
-   fChain->SetBranchAddress("impactPar3DSTAMuonTrack", impactPar3DSTAMuonTrack, &b_impactPar3DSTAMuonTrack);
-   fChain->SetBranchAddress("impactPar3DErrorSTAMuonTrack", impactPar3DErrorSTAMuonTrack, &b_impactPar3DErrorSTAMuonTrack);
-   fChain->SetBranchAddress("transvImpactParSTAMuonTrack", transvImpactParSTAMuonTrack, &b_transvImpactParSTAMuonTrack);
-   fChain->SetBranchAddress("transvImpactParErrorSTAMuonTrack", transvImpactParErrorSTAMuonTrack, &b_transvImpactParErrorSTAMuonTrack);
    fChain->SetBranchAddress("trackVxSTAMuonTrack", trackVxSTAMuonTrack, &b_trackVxSTAMuonTrack);
    fChain->SetBranchAddress("trackVySTAMuonTrack", trackVySTAMuonTrack, &b_trackVySTAMuonTrack);
    fChain->SetBranchAddress("trackVzSTAMuonTrack", trackVzSTAMuonTrack, &b_trackVzSTAMuonTrack);
