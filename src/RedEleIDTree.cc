@@ -3,6 +3,7 @@
 RedEleIDTree::RedEleIDTree(const char *filename) {
 
   myFile = new TFile(filename,"RECREATE");
+  myFile->mkdir("eleIDdir");
   myTree = new TTree("T1","eleID tree");
 
   myTree->Branch("EoPout",          &myEoPout,          "EoPout/F");
@@ -29,23 +30,38 @@ RedEleIDTree::~RedEleIDTree() {
 
 void RedEleIDTree::addAttributesSignal() {
 
-  myTree->Branch("zmass",       &myZmass,       "zmass/F");
+  myTree->Branch("mass",       &myZmass,       "mass/F");
 }
 
 void RedEleIDTree::addElectronIdBits() {
 
-  myTree->Branch("CutBasedId",         myCutBasedId,         "CutBasedId[4]/I");
-  myTree->Branch("CutBasedIdOlyID",    myCutBasedIdOnlyID,   "CutBasedIdOnlyID[4]/I");
-  myTree->Branch("CutBasedIdOnlyIso",  myCutBasedIdOnlyIso,  "CutBasedIdOnlyIso[4]/I");
-  myTree->Branch("CutBasedIdOnlyConv", myCutBasedIdOnlyConv, "CutBasedIdOnlyConv[4]/I");
-  myTree->Branch("LHBasedId",          myLHBasedId,          "LHBasedId[5]/I");
-  myTree->Branch("LHBasedIdOlyID",     myLHBasedIdOnlyID,    "LHBasedIdOnlyID[5]/I");
-  myTree->Branch("LHBasedIdOnlyIso",   myLHBasedIdOnlyIso,   "LHBasedIdOnlyIso[5]/I");
-  myTree->Branch("LHBasedIdOnlyConv",  myLHBasedIdOnlyConv,  "LHBasedIdOnlyConv[5]/I");
-  myTree->Branch("CiCBasedId",         myCiCBasedId,         "CiCBasedId[9]/I");
-  myTree->Branch("CiCBasedIdOlyID",    myCiCBasedIdOnlyID,   "CiCBasedIdOnlyID[9]/I");
-  myTree->Branch("CiCBasedIdOnlyIso",  myCiCBasedIdOnlyIso,  "CiCBasedIdOnlyIso[9]/I");
-  myTree->Branch("CiCBasedIdOnlyConv", myCiCBasedIdOnlyConv, "CiCBasedIdOnlyConv[9]/I");
+  myTree->Branch("WP95",         &myCutBasedId[0],         "WP95/I");
+  myTree->Branch("WP90",         &myCutBasedId[1],         "WP90/I");
+  myTree->Branch("WP80",         &myCutBasedId[2],         "WP80/I");
+  myTree->Branch("WP70",         &myCutBasedId[3],         "WP70/I");
+//   myTree->Branch("CutBasedIdOlyID",    myCutBasedIdOnlyID,   "CutBasedIdOnlyID[4]/I");
+//   myTree->Branch("CutBasedIdOnlyIso",  myCutBasedIdOnlyIso,  "CutBasedIdOnlyIso[4]/I");
+//   myTree->Branch("CutBasedIdOnlyConv", myCutBasedIdOnlyConv, "CutBasedIdOnlyConv[4]/I");
+  myTree->Branch("LHVeryLoose",  &myLHBasedId[0],          "LHVeryLoose/I");
+  myTree->Branch("LHLoose",      &myLHBasedId[1],          "LHLoose/I");
+  myTree->Branch("LHMedium",     &myLHBasedId[2],          "LHMedium/I");
+  myTree->Branch("LHTight",      &myLHBasedId[3],          "LHTight/I");
+  myTree->Branch("LHHyperTight", &myLHBasedId[4],          "LHHyperTight/I");
+//   myTree->Branch("LHBasedIdOlyID",     myLHBasedIdOnlyID,    "LHBasedIdOnlyID[5]/I");
+//   myTree->Branch("LHBasedIdOnlyIso",   myLHBasedIdOnlyIso,   "LHBasedIdOnlyIso[5]/I");
+//   myTree->Branch("LHBasedIdOnlyConv",  myLHBasedIdOnlyConv,  "LHBasedIdOnlyConv[5]/I");
+  myTree->Branch("CiCVeryLoose",       &myCiCBasedId[0],         "CiCVeryLoose/I");
+  myTree->Branch("CiCLoose",           &myCiCBasedId[1],         "CiCLoose/I");
+  myTree->Branch("CiCMedium",          &myCiCBasedId[2],         "CiCMedium/I");
+  myTree->Branch("CiCTight",           &myCiCBasedId[3],         "CiCTight/I");
+  myTree->Branch("CiCSuperTight",      &myCiCBasedId[4],         "CiCSuperTight/I");
+  myTree->Branch("CiCHyperTight",      &myCiCBasedId[5],         "CiCHyperTight/I");
+  myTree->Branch("CiCHyperTight2",     &myCiCBasedId[6],         "CiCHyperTight2/I");
+  myTree->Branch("CiCHyperTight3",     &myCiCBasedId[7],         "CiCHyperTight3/I");
+  myTree->Branch("CiCHyperTight4",     &myCiCBasedId[8],         "CiCHyperTight4/I");
+//   myTree->Branch("CiCBasedIdOlyID",    myCiCBasedIdOnlyID,   "CiCBasedIdOnlyID[9]/I");
+//   myTree->Branch("CiCBasedIdOnlyIso",  myCiCBasedIdOnlyIso,  "CiCBasedIdOnlyIso[9]/I");
+//   myTree->Branch("CiCBasedIdOnlyConv", myCiCBasedIdOnlyConv, "CiCBasedIdOnlyConv[9]/I");
 
 }
 
@@ -72,7 +88,7 @@ void RedEleIDTree::addIsolations() {
 }
 
 void RedEleIDTree::addMore() {
-  myTree->Branch("nVTx",   &myNVtx,   "nVtx/I");
+  myTree->Branch("vertices",   &myNVtx,   "vertices/F");
   myTree->Branch("rho",    &myRho,    "rho/F");
 }
 
@@ -91,7 +107,7 @@ void RedEleIDTree::store() {
 
 void RedEleIDTree::save() {
 
-  myFile->cd();
+  myFile->cd("eleIDdir");
   myTree->Write();
   myFile->Close();
 }
@@ -159,7 +175,7 @@ void RedEleIDTree::fillCategories(int iecal, int iptbin, int iclass, int nbr) {
   mynbrem=nbr;
 }
 
-void RedEleIDTree::fillMore(int nVtx, float rho) {
+void RedEleIDTree::fillMore(float nVtx, float rho) {
   myNVtx=nVtx;
   myRho=rho;
 }
