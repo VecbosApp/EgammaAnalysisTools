@@ -39,7 +39,7 @@ public:
   void fillAttributesBackground(float dphi, float invmass, float met, float pth);
   //! fill the splitting categories of the PDFs
   void fillCategories(int iecal, int iptbin, int iclass, int nbr);
-  void fillMore(int nVtx, float rho);
+  void fillMore(float nVtx, float rho);
   void fillGamma(float atg, float aeg, float ahg, int ig);
 
   void store();
@@ -84,7 +84,7 @@ private:
   float myEcalIso;
   float myHcalIso;
 
-  int myNVtx;
+  float myNVtx;
   float myRho;
 
   float myAbsTrackerIsolGammaCand;
