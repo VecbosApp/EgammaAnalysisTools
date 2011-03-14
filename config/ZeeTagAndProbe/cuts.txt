@@ -1,0 +1,4 @@
+etaEleAcc       -2.5    2.5
+ptEleAcc	10       1000
+meeWindow      60     120
+
