@@ -38,7 +38,7 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
 
   // to read good run list
   if (m_selection->getSwitch("goodRunLS") && m_selection->getSwitch("isData")) {
-    std::string goodRunGiasoneFile = "config/ZeeTagAndProbe/json/goodRunLS.json";
+    std::string goodRunGiasoneFile = "config/json/goodRunLS.json";
     setJsonGoodRunList(goodRunGiasoneFile);
     fillRunLSMap();
   }
