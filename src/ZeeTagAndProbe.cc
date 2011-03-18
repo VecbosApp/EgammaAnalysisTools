@@ -442,7 +442,7 @@ void ZeeTagAndProbe::isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool
   else combinedIso = dr03TkSumPtEle[eleIndex] + dr03EcalRecHitSumEtEle[eleIndex] + dr03HcalTowerSumEtFullConeEle[eleIndex];
   selector->SetCombinedIsolation( (combinedIso - rhoFastjet*TMath::Pi()*0.3*0.3) / pEle.Pt() ); 
 
-  selector->SetMissingHits( expInnerLayersGsfTrack[gsf] );
+  selector->SetMissingHits( trackLostHitsGsfTrack[gsf] );
   selector->SetConvDist( fabs(convDistEle[eleIndex]) );
   selector->SetConvDcot( fabs(convDcotEle[eleIndex]) );
 
@@ -544,7 +544,7 @@ void ZeeTagAndProbe::isEleID(CiCBasedEleSelector *selector, int eleIndex, bool *
   selector->SetEcalIsolation( dr04EcalRecHitSumEtEle[eleIndex] - rhoFastjet*TMath::Pi()*0.4*0.4 );
   selector->SetTrkIsolation( dr03TkSumPtEle[eleIndex] - rhoFastjet*TMath::Pi()*0.3*0.3 );
   selector->SetHcalIsolation( dr04HcalTowerSumEtFullConeEle[eleIndex] - rhoFastjet*TMath::Pi()*0.4*0.4);
-  selector->SetMissingHits( expInnerLayersGsfTrack[gsf] );
+  selector->SetMissingHits( trackLostHitsGsfTrack[gsf] );
   selector->SetConvDist( fabs(convDistEle[eleIndex]) );
   selector->SetConvDcot( fabs(convDcotEle[eleIndex]) );
 
