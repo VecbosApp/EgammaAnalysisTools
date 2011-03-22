@@ -1352,7 +1352,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       
       // conversion rejection variables
       int theMatchedTrack   = trackIndexEle[theProbe];
-      int theExpInnerLayers = trackLostHitsTrack[theMatchedTrack];
+      int theExpInnerLayers = expInnerLayersTrack[theMatchedTrack];
       float convDcot        = convDcotEle[theProbe];
       float convDist        = convDistEle[theProbe];
             
@@ -2095,7 +2095,7 @@ void LHPdfsProducer::isEleID(int eleIndex, bool *eleIdOutput, bool *isolOutput, 
   EgammaCutBasedID.SetCombinedIsolation( (dr03TkSumPtEle[eleIndex] + 
                                           TMath::Max(0.0,dr03EcalRecHitSumEtEle[eleIndex]-1.0) + 
                                           dr03HcalTowerSumEtEle[eleIndex]) / pt );
-  EgammaCutBasedID.SetMissingHits( trackLostHitsGsfTrack[gsf] );
+  EgammaCutBasedID.SetMissingHits( expInnerLayersGsfTrack[gsf] );
   EgammaCutBasedID.SetConvDist( fabs(convDistEle[eleIndex]) );
   EgammaCutBasedID.SetConvDcot( fabs(convDcotEle[eleIndex]) );
 
