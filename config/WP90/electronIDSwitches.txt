@@ -1,11 +1,11 @@
-combIso         0
-trackerIso      1
-ecalIso         1
-hcalIso         1
+combIso         1
+trackerIso      0
+ecalIso         0
+hcalIso         0
 sigmaEtaEta	1
 dphiIn		1
 deta		1
-hOverE		1
+hOverE		0
 distConv        1
 dcotConv        1
 missHits        1

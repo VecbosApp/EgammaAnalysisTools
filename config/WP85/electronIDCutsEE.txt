@@ -1,9 +1,9 @@
-combIso    	     0.0            0.06
+combIso    	 -100    0.042
 trackerIso 	 -100 	 0.05
 ecalIso 	 -100 	 0.05 
 hcalIso 	 -100 	 0.025 
-sigmaEtaEta 	 0.0 	 0.03 
-dphiIn 	 0.0 	 0.04 
+sigmaEtaEta 	 0.0 	 0.031 
+dphiIn 	 0.0 	 0.028 
 deta 	 0.0 	 0.007 
 hOverE 	 0.0 	 0.025 
 missHits 	 0.0 	 1.0 

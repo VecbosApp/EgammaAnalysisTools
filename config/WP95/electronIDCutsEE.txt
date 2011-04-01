@@ -1,10 +1,10 @@
-combIso    	     0.0            0.1
+combIso    	 -100    0.100
 trackerIso 	 -100 	 0.08
 ecalIso 	 -100 	 0.06 
 hcalIso 	 -100 	 0.05 
-sigmaEtaEta 	 0.0 	 0.03 
+sigmaEtaEta 	 0.0 	 0.031 
 dphiIn 	 0.0 	 0.7 
-deta 	 0.0 	 0.01
+deta 	 0.0 	 0.011
 hOverE 	 0.0 	 0.07 
 missHits 	 0.0 	 1.0 
 distConv 	 0.0 100000 
