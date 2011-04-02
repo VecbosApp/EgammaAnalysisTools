@@ -226,3 +226,31 @@ float Egamma::SigmaiPiP(int electron) {
   }
   return spp;
 }
+
+bool Egamma::triggerMatch(float eta, float phi, float Dr){
+
+  bool match=false;
+  for( int i=0; i<m_requiredTriggers.size(); i++ ) {  // loop over require trigger paths
+    
+    int pathIndex=m_requiredTriggers[i];
+    // std::cout << "testing trigger " << pathIndex << " with " << sizePassing[pathIndex] << " passing objects" << std::endl; 
+    
+    if( sizePassing[pathIndex]>  0 ) {  //some object has passed the required trigger 
+      
+      for(int np = 0; np < sizePassing[pathIndex]; np++ ){
+        int iP = indexPassing[ indexPassingPerPath[pathIndex] +np];
+        // std::cout << "passing object eta: " << triggerObsEta[iP] << " phi: " <<  triggerObsPhi[iP] << std::endl; 
+
+        if(DeltaR(eta, phi,triggerObsEta[iP],  triggerObsPhi[iP] ) < Dr){
+          match=true;
+          //std::cout << "MATCH!" <<std::endl;	
+          break;
+        }
+      }
+    }
+    if(match)  //it's enough if one path matches	
+      break;
+  }
+  return match;
+}
+
