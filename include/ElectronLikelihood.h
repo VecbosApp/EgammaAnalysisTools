@@ -29,6 +29,8 @@ class ElectronLikelihood {
 
   //! get the result of the algorithm
   float result (const LikelihoodMeasurements electron) const;
+  //! get the log-expanded result of the algorithm
+  float resultLog (const LikelihoodMeasurements electron) const;
 
  private:
 

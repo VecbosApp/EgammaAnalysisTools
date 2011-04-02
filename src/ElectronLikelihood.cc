@@ -1,7 +1,7 @@
 #include "EgammaAnalysisTools/include/ElectronLikelihood.h"
 #include <stdlib.h>
 #include <iostream>
-
+#include <math.h>
 
 ElectronLikelihood::ElectronLikelihood (TDirectory *EBlt15dir, TDirectory *EElt15dir,
                                         TDirectory *EBgt15dir, TDirectory *EEgt15dir,
@@ -341,3 +341,57 @@ ElectronLikelihood::result (const LikelihoodMeasurements electron) const
   else return -999. ;
 }
 
+float 
+ElectronLikelihood::resultLog (const LikelihoodMeasurements electron) const 
+{
+
+  //=======================================================
+  // used classification:
+  // nbrem clusters = 0         =>  0
+  // nbrem clusters >= 1        =>  1
+  //=======================================================
+
+  std::vector<float> measurements ;
+  if(m_eleIDSwitches.m_useDeltaPhi) measurements.push_back( electron.deltaPhi );
+  if(m_eleIDSwitches.m_useDeltaEta) measurements.push_back( electron.deltaEta );
+  if(m_eleIDSwitches.m_useEoverP) measurements.push_back( electron.eSuperClusterOverP );
+  if(m_eleIDSwitches.m_useHoverE) measurements.push_back( electron.hadronicOverEm );
+  if(m_eleIDSwitches.m_useSigmaEtaEta) measurements.push_back( electron.sigmaIEtaIEta );
+  if(m_eleIDSwitches.m_useSigmaPhiPhi) measurements.push_back( electron.sigmaIPhiIPhi );
+  if(m_eleIDSwitches.m_useFBrem) measurements.push_back( electron.fBrem );
+
+  // Split using only the 1 / >1 cluster
+  int nBremClusters=electron.nBremClusters;
+  int bitVal = (nBremClusters==0) ? 0 : 1 ;
+  
+  char className[20] ;
+  if(m_signalWeightSplitting.compare("class")==0) {
+    sprintf (className,"class%d",bitVal);
+  }
+  else {
+    std::cout << "Only class (non-showering / showering)"
+              << " and fullclass (golden / bigbrem / narrow / showering)" 
+              << " splitting is implemented right now" << std::endl;
+    exit(0);
+  }
+
+  int subdet = electron.subdet;
+  float thisPt =  electron.pt;
+
+  float lh=-999.;
+
+  if (subdet==0 && thisPt<15.)
+    lh = _EBlt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+  else if (subdet==0 && thisPt>=15.)
+    lh = _EBgt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+  else if (subdet==1 && thisPt<15.)
+    lh = _EElt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+  else if (subdet==1 && thisPt>=15.)
+    lh = _EEgt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+  else lh = -999. ;
+
+  if(lh<=0) return -20.;
+  else if(lh==1) return 20.;
+  else return log(lh/(1.0-lh));
+  
+}
