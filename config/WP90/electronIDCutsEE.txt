@@ -3,7 +3,7 @@ trackerIso 	 -100 	 0.05
 ecalIso 	 -100 	 0.06 
 hcalIso 	 -100 	 0.03 
 sigmaEtaEta 	 0.0 	 0.031 
-dphiIn 	 0.0 	 0.47 
+dphiIn 	 0.0 	 0.047 
 deta 	 0.0 	 0.011
 hOverE 	 0.0 	 0.05 
 missHits 	 0.0 	 1.0 
