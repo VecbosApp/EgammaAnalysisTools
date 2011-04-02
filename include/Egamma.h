@@ -41,6 +41,8 @@ public:
   void setRequiredTriggers(const std::vector<std::string>& reqTriggers);
   //check if the event passed HLT. To be called per event
   bool hasPassedHLT();
+  //check for matching HLT object                          
+  bool triggerMatch(float eta, float phi, float Dr);
   //get the value of the requested bits
   std::vector<int> getHLTOutput();
 
@@ -70,6 +72,28 @@ protected:
   /// definitions in http://indico.cern.ch/getFile.py/access?contribId=4&resId=0&materialId=slides&confId=104213
   float mT3(TLorentzVector pl1, TLorentzVector pl2, TVector3 met);
 
+
+  /// some useful template  
+  template <typename T>
+    T DeltaR(T eta1, T phi1, T eta2, T phi2); //< Delta R in between two pairs (eta,phi)
+  
+  template <typename T>
+    T DeltaPhi(T phi1, T phi2); //< Delta phi in radians in between two angles.  
 };
+
+template <typename T>
+T Egamma::DeltaPhi(T phi1, T phi2) {
+  T result = phi1 - phi2;
+  while (result > M_PI) result -= 2*M_PI;
+  while (result <= -M_PI) result += 2*M_PI;
+  return result;
+}
+
+template <typename T>
+T Egamma::DeltaR(T eta1, T phi1, T eta2, T phi2) {
+  T dphi = DeltaPhi(phi1,phi2);
+  T result = sqrt((eta1-eta2)*(eta1-eta2)+dphi*dphi);
+  return result;
+}
 
 #endif
