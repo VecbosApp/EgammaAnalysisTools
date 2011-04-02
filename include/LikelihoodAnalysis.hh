@@ -34,7 +34,8 @@ public:
   //! produce the mis-ID eta/pT distributions from QCD di-jets
   void estimateFakeRateQCD(const char *outname="job0");
   //! produce the mis-ID eta/pT distributions for WW studies
-  void estimateFakeRateForHToWW(const char *outname="job0");
+  void estimateFakeRateForHToWW_QCD(const char *outname="job0");
+  void estimateFakeRateForHToWW_EGAMMA(const char *outname="job0");
 
 private:
 
@@ -48,6 +49,7 @@ private:
   float SigmaiPiP(int electron);
   
   std::pair<int,int> getBestGoodElePair(std::vector<int> goodElectrons);
+  bool isDenomFake_HwwEgamma(int theEle);
 
   CutBasedEleIDSelector EgammaCutBasedIDHWW;
 
@@ -66,12 +68,8 @@ private:
   
   bool _isData;
 
-
   // counters
-  int HLT, WENU, WMT, LEADINGJET, ECALDRIVEN;
-  int ISOL, HOE, SPIKES, ZMASS;
-  int LEADINGJETPT, TOTALELE;
-
+  Counters myCounter;
 };
 
 #endif
