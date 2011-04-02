@@ -186,7 +186,7 @@ float Egamma::likelihoodRatio(int eleIndex, ElectronLikelihood &lh) {
   measurements.sigmaIPhiIPhi = SigmaiPiP(eleIndex);
   measurements.fBrem = fbremEle[eleIndex];
   measurements.nBremClusters = nbremsEle[eleIndex];
-  return lh.result(measurements);
+  return lh.resultLog(measurements);
 }
 
 /// sigma ieta ieta of the seed cluster (ecal-driven/tracker-driven)
