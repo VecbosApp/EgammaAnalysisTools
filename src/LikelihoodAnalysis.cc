@@ -21,6 +21,7 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   
   EgammaCutBasedIDWPs.push_back("WP95");
   EgammaCutBasedIDWPs.push_back("WP90");
+  EgammaCutBasedIDWPs.push_back("WP85");
   EgammaCutBasedIDWPs.push_back("WP80");
   EgammaCutBasedIDWPs.push_back("WP70");
 
