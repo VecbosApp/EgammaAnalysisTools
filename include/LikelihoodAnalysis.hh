@@ -14,6 +14,9 @@
 #include "EgammaAnalysisTools/include/Egamma.h"
 #include <TLorentzVector.h>
 
+#include <TTree.h>
+#include "include/FakeTree.hh"
+
 class LikelihoodAnalysis : public Egamma {
 
 public:
@@ -70,6 +73,9 @@ private:
 
   // counters
   Counters myCounter;
+
+  //! reduced trees                                                                                                                 
+  FakeTree *myOutTree;
 };
 
 #endif
