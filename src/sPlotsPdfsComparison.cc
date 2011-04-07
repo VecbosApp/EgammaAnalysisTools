@@ -39,6 +39,7 @@ void sPlotsPdfsComparison::Loop()
                               defaultSwitches, std::string("class"),std::string("class"),true,true);
 
   Long64_t nentries = fChain->GetEntries();
+  //  Long64_t nentries = 200000;
   
   int firstEvent = 0;
   int lastEvent  = nentries;
@@ -97,10 +98,15 @@ void sPlotsPdfsComparison::Loop()
       }
 
       // populate the unusued PDFs with uniform distribution (including the under/over-flows)
-      float minSPP = sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0)-1.0E-03;
-      float maxSPP = sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetNbinsX()+1)+1.0E-03;
-      float minFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0)-1.0E-03;
-      float maxFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(fBremClassEle [jecal][jptbin][jclass]->GetNbinsX()+1)+1.0E-03;
+//       float minSPP = sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0)-1.0E-03;
+//       float maxSPP = sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetNbinsX()+1)+1.0E-03;
+//       float minFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0)-1.0E-03;
+//       float maxFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(fBremClassEle [jecal][jptbin][jclass]->GetNbinsX()+1)+1.0E-03;
+      //under and over flows are taken into account in bin 0 and nbins+1
+      float minSPP = sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0);
+      float maxSPP = sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetNbinsX()+1);
+      float minFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0);
+      float maxFBrem = fBremClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(fBremClassEle [jecal][jptbin][jclass]->GetNbinsX()+1);
       TRandom3 rnd(jentry);
 
       if(m_isMC) {
@@ -526,13 +532,13 @@ void sPlotsPdfsComparison::bookFullHistos() {
   float HoEMax      =  0.15; // pixelMatchGsfElectron pre-selection: H/E<0.15
   float sigmaIEtaIEtaEBMin = 0.0;
   float sigmaIEtaIEtaEBMax = 0.035;
-  float sigmaIEtaIEtaEEMin = 0.02;
+  float sigmaIEtaIEtaEEMin = 0.01;
   float sigmaIEtaIEtaEEMax = 0.08;
   float sigmaIPhiIPhiEBMin = 0.0;
   float sigmaIPhiIPhiEBMax = 0.03;
   float sigmaIPhiIPhiEEMin = 0.01;
   float sigmaIPhiIPhiEEMax = 0.09;
-  float fBremMin = 0.0;
+  float fBremMin = -0.2;
   float fBremMax = 1.0;
   float lhMin = 0.0;
   float lhMax = 1.0;
@@ -555,13 +561,17 @@ void sPlotsPdfsComparison::bookFullHistos() {
 
       sprintf(histo,"dPhiUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       dPhiUnsplitEle[iecal][iptbin]     = new TH1F(histo, histo, nbins, dPhiMin, dPhiMax);
+      dPhiUnsplitEle[iecal][iptbin]->Sumw2();
       sprintf(histo,"dEtaUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       dEtaUnsplitEle[iecal][iptbin]        = new TH1F(histo, histo, nbins, dEtaMin, dEtaMax);
+      dEtaUnsplitEle[iecal][iptbin]->Sumw2();
       sprintf(histo,"EoPUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       EoPUnsplitEle[iecal][iptbin]      = new TH1F(histo, histo, nbins, EoPMin, EoPMax);
+      EoPUnsplitEle[iecal][iptbin]->Sumw2();
       sprintf(histo,"HoEUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       HoEUnsplitEle[iecal][iptbin]         = new TH1F(histo, histo, nbins, HoEMin, HoEMax);
-      if(iecal==0 || iecal==1) {
+      HoEUnsplitEle[iecal][iptbin]->Sumw2();
+      if(iecal<2) {
         sprintf(histo,"sigmaIEtaIEtaUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
         sigmaIEtaIEtaUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, sigmaIEtaIEtaEBMin, sigmaIEtaIEtaEBMax);
         sprintf(histo,"sigmaIPhiIPhiUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
@@ -572,23 +582,31 @@ void sPlotsPdfsComparison::bookFullHistos() {
         sprintf(histo,"sigmaIPhiIPhiUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
         sigmaIPhiIPhiUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, sigmaIPhiIPhiEEMin, sigmaIPhiIPhiEEMax);
       }
+      sigmaIEtaIEtaUnsplitEle[iecal][iptbin]->Sumw2();
+      sigmaIPhiIPhiUnsplitEle[iecal][iptbin]->Sumw2();
       sprintf(histo,"fBremUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       fBremUnsplitEle[iecal][iptbin] = new TH1F(histo, histo, nbins, fBremMin, fBremMax);
+      fBremUnsplitEle[iecal][iptbin]->Sumw2();
       sprintf(histo,"lhUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       lhUnsplitEle[iecal][iptbin]     = new TH1F(histo, histo, nbins, lhMin, lhMax);
+      lhUnsplitEle[iecal][iptbin]->Sumw2();
 
       // iclass = 0: 0 - brem clusters
       // iclass = 1: >=1 - brem clusters
       for(int iclass=0; iclass<2; iclass++) {
 	sprintf(histo,"dPhiClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
 	dPhiClassEle[iecal][iptbin][iclass]     = new TH1F(histo, histo, nbins, dPhiMin, dPhiMax);
+	dPhiClassEle[iecal][iptbin][iclass]->Sumw2();
 	sprintf(histo,"dEtaClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
 	dEtaClassEle[iecal][iptbin][iclass]        = new TH1F(histo, histo, nbins, dEtaMin, dEtaMax);
+	dEtaClassEle[iecal][iptbin][iclass]->Sumw2();
 	sprintf(histo,"EoPClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
 	EoPClassEle[iecal][iptbin][iclass]      = new TH1F(histo, histo, nbins, EoPMin, EoPMax);
+	EoPClassEle[iecal][iptbin][iclass]->Sumw2();
 	sprintf(histo,"HoEClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
 	HoEClassEle[iecal][iptbin][iclass]         = new TH1F(histo, histo, nbins, HoEMin, HoEMax);
-        if(iecal==0) {
+	HoEClassEle[iecal][iptbin][iclass]->Sumw2();
+        if(iecal<2) {
           sprintf(histo,"sigmaIEtaIEtaClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
           sigmaIEtaIEtaClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, sigmaIEtaIEtaEBMin, sigmaIEtaIEtaEBMax);
           sprintf(histo,"sigmaIPhiIPhiClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
@@ -599,11 +617,14 @@ void sPlotsPdfsComparison::bookFullHistos() {
           sprintf(histo,"sigmaIPhiIPhiClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
           sigmaIPhiIPhiClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, sigmaIPhiIPhiEEMin, sigmaIPhiIPhiEEMax);
         }
+	sigmaIEtaIEtaClassEle[iecal][iptbin][iclass]->Sumw2();
+	sigmaIPhiIPhiClassEle[iecal][iptbin][iclass]->Sumw2();
         sprintf(histo,"fBremClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
         fBremClassEle[iecal][iptbin][iclass] = new TH1F(histo, histo, nbins, fBremMin, fBremMax);
+	fBremClassEle[iecal][iptbin][iclass]->Sumw2();
 	sprintf(histo,"lhClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
 	lhClassEle[iecal][iptbin][iclass]     = new TH1F(histo, histo, nbins, lhMin, lhMax);
-
+	lhClassEle[iecal][iptbin][iclass]->Sumw2();
       }
     }
   }
