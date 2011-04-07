@@ -3,27 +3,27 @@
 #include <iostream>
 #include <math.h>
 
-ElectronLikelihood::ElectronLikelihood (TDirectory *EBLowEtalt15dir, TDirectory *EBHighEtalt15dir, TDirectory *EElt15dir,
-                                        TDirectory *EBLowEtagt15dir, TDirectory *EBHighEtagt15dir, TDirectory *EEgt15dir,
+ElectronLikelihood::ElectronLikelihood (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDirectory *EElt15dir,
+                                        TDirectory *EB0gt15dir, TDirectory *EB1gt15dir, TDirectory *EEgt15dir,
 					LikelihoodSwitches eleIDSwitches,
 					std::string signalWeightSplitting,
 					std::string backgroundWeightSplitting,
 					bool splitSignalPdfs,
 					bool splitBackgroundPdfs) :
-  _EBLowEtalt15lh (new LikelihoodPdfProduct ("electronID_EBLowEta_ptLt15_likelihood",0,0)) ,
-  _EBHighEtalt15lh (new LikelihoodPdfProduct ("electronID_EBHighEta_ptLt15_likelihood",0,0)) ,
-  _EElt15lh (new LikelihoodPdfProduct ("electronID_EE_ptLt15_likelihood",1,0)) ,
-  _EBLowEtagt15lh (new LikelihoodPdfProduct ("electronID_EBLowEta_ptGt15_likelihood",0,1)) ,
-  _EBHighEtagt15lh (new LikelihoodPdfProduct ("electronID_EBHighEta_ptGt15_likelihood",0,1)) ,
-  _EEgt15lh (new LikelihoodPdfProduct ("electronID_EE_ptGt15_likelihood",1,1)) ,
+  _EB0lt15lh (new LikelihoodPdfProduct ("electronID_EB0_ptLt15_likelihood",0,0)) ,
+  _EB1lt15lh (new LikelihoodPdfProduct ("electronID_EB1_ptLt15_likelihood",1,0)) ,
+  _EElt15lh (new LikelihoodPdfProduct ("electronID_EE_ptLt15_likelihood",2,0)) ,
+  _EB0gt15lh (new LikelihoodPdfProduct ("electronID_EB0_ptGt15_likelihood",0,1)) ,
+  _EB1gt15lh (new LikelihoodPdfProduct ("electronID_EB1_ptGt15_likelihood",1,1)) ,
+  _EEgt15lh (new LikelihoodPdfProduct ("electronID_EE_ptGt15_likelihood",2,1)) ,
   m_eleIDSwitches (eleIDSwitches) ,
   m_signalWeightSplitting (signalWeightSplitting), 
   m_backgroundWeightSplitting (backgroundWeightSplitting),
   m_splitSignalPdfs (splitSignalPdfs), 
   m_splitBackgroundPdfs (splitBackgroundPdfs)  
 {
-  Setup (EBLowEtalt15dir, EBHighEtalt15dir, EElt15dir,
-         EBLowEtagt15dir, EBHighEtagt15dir, EEgt15dir,
+  Setup (EB0lt15dir, EB1lt15dir, EElt15dir,
+         EB0gt15dir, EB1gt15dir, EEgt15dir,
 	 signalWeightSplitting, backgroundWeightSplitting,
 	 splitSignalPdfs, splitBackgroundPdfs) ;
 }
@@ -35,11 +35,11 @@ ElectronLikelihood::ElectronLikelihood (TDirectory *EBLowEtalt15dir, TDirectory 
 
 
 ElectronLikelihood::~ElectronLikelihood () {
-  delete _EBLowEtalt15lh ;
-  delete _EBHighEtalt15lh ;
+  delete _EB0lt15lh ;
+  delete _EB1lt15lh ;
   delete _EElt15lh ;
-  delete _EBLowEtagt15lh ;
-  delete _EBHighEtagt15lh ;
+  delete _EB0gt15lh ;
+  delete _EB1gt15lh ;
   delete _EEgt15lh ;
 }
 
@@ -49,87 +49,29 @@ ElectronLikelihood::~ElectronLikelihood () {
 
 
 void 
-ElectronLikelihood::Setup (TDirectory *EBLowEtalt15dir, TDirectory *EBHighEtalt15dir, TDirectory *EElt15dir,
-                           TDirectory *EBLowEtagt15dir, TDirectory *EBHighEtagt15dir, TDirectory *EEgt15dir,
+ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDirectory *EElt15dir,
+                           TDirectory *EB0gt15dir, TDirectory *EB1gt15dir, TDirectory *EEgt15dir,
 			   std::string signalWeightSplitting,
 			   std::string backgroundWeightSplitting,
 			   bool splitSignalPdfs,
 			   bool splitBackgroundPdfs) 
 {
 
-  // ECAL BARREL LIKELIHOOD - Pt < 15 GeV region
-  _EBlt15lh->initFromFile (EBlt15dir) ;
+  // ECAL BARREL0 (|eta|<0.8) LIKELIHOOD - Pt < 15 GeV region
+  _EB0lt15lh->initFromFile (EB0lt15dir) ;
 
-  _EBlt15lh->addSpecies ("electrons", 1.0) ;
-  _EBlt15lh->addSpecies ("hadrons",  1.0) ;
-
-  if(signalWeightSplitting.compare("fullclass")==0) {
-    _EBlt15lh->setSplitFrac ("electrons", "fullclass0", 1.0) ;
-    _EBlt15lh->setSplitFrac ("electrons", "fullclass1", 1.0) ;
-    _EBlt15lh->setSplitFrac ("electrons", "fullclass2", 1.0) ;
-    _EBlt15lh->setSplitFrac ("electrons", "fullclass3", 1.0) ;
-  }
-  else if(signalWeightSplitting.compare("class")==0) {
-    _EBlt15lh->setSplitFrac ("electrons", "class0", 1.0) ;
-    _EBlt15lh->setSplitFrac ("electrons", "class1", 1.0) ;
-  }
-  else {
-    std::cout << "Only class (non-showering / showering)"
-              << " and fullclass (golden / bigbrem / narrow / showering)" 
-              << " splitting is implemented right now" << std::endl;
-    exit(0);
-  }
-
-  if (m_eleIDSwitches.m_useDeltaPhi)     _EBlt15lh->addPdf ("electrons", "dPhi",          splitSignalPdfs) ;   
-  if (m_eleIDSwitches.m_useDeltaEta)     _EBlt15lh->addPdf ("electrons", "dEta",          splitSignalPdfs) ;
-  if (m_eleIDSwitches.m_useEoverP)       _EBlt15lh->addPdf ("electrons", "EoP",           splitSignalPdfs) ;
-  if (m_eleIDSwitches.m_useHoverE)       _EBlt15lh->addPdf ("electrons", "HoE",           splitSignalPdfs) ;
-  if (m_eleIDSwitches.m_useSigmaEtaEta)  _EBlt15lh->addPdf ("electrons", "sigmaIEtaIEta", splitSignalPdfs) ;
-  if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EBlt15lh->addPdf ("electrons", "sigmaIPhiIPhi", splitSignalPdfs) ;
-  if (m_eleIDSwitches.m_useFBrem)        _EBlt15lh->addPdf ("electrons", "fBrem",         splitSignalPdfs) ;
-
-  if(backgroundWeightSplitting.compare("fullclass")==0) {
-    _EBlt15lh->setSplitFrac ("hadrons", "fullclass0", 1.0) ;
-    _EBlt15lh->setSplitFrac ("hadrons", "fullclass1", 1.0) ;
-    _EBlt15lh->setSplitFrac ("hadrons", "fullclass2", 1.0) ;
-    _EBlt15lh->setSplitFrac ("hadrons", "fullclass3", 1.0) ;
-  }
-  else if(backgroundWeightSplitting.compare("class")==0) {
-    _EBlt15lh->setSplitFrac ("hadrons", "class0", 1.0) ;
-    _EBlt15lh->setSplitFrac ("hadrons", "class1", 1.0) ;
-  }
-  else {
-    std::cout << "Only class (non-showering / showering)"
-              << " and fullclass (golden / bigbrem / narrow / showering)" 
-              << " splitting is implemented right now" << std::endl;
-    exit(0);
-  }
-
-  if (m_eleIDSwitches.m_useDeltaPhi)     _EBlt15lh->addPdf ("hadrons", "dPhi",          splitBackgroundPdfs) ;   
-  if (m_eleIDSwitches.m_useDeltaEta)     _EBlt15lh->addPdf ("hadrons", "dEta",          splitBackgroundPdfs) ;
-  if (m_eleIDSwitches.m_useEoverP)       _EBlt15lh->addPdf ("hadrons", "EoP",           splitBackgroundPdfs) ;
-  if (m_eleIDSwitches.m_useHoverE)       _EBlt15lh->addPdf ("hadrons", "HoE",           splitBackgroundPdfs) ;
-  if (m_eleIDSwitches.m_useSigmaEtaEta)  _EBlt15lh->addPdf ("hadrons", "sigmaIEtaIEta", splitBackgroundPdfs) ;
-  if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EBlt15lh->addPdf ("hadrons", "sigmaIPhiIPhi", splitBackgroundPdfs) ;
-  if (m_eleIDSwitches.m_useFBrem)        _EBlt15lh->addPdf ("hadrons", "fBrem",         splitBackgroundPdfs) ;
-
-
-
-  // ECAL BARREL LIKELIHOOD - Pt >= 15 GeV region
-  _EBgt15lh->initFromFile (EBgt15dir) ;
-
-  _EBgt15lh->addSpecies ("electrons", 1.0 ) ;  
-  _EBgt15lh->addSpecies ("hadrons",1.0) ;
+  _EB0lt15lh->addSpecies ("electrons", 1.0) ;
+  _EB0lt15lh->addSpecies ("hadrons",  1.0) ;
 
   if(signalWeightSplitting.compare("fullclass")==0) {
-    _EBgt15lh->setSplitFrac ("electrons", "fullclass0", 1.0) ;
-    _EBgt15lh->setSplitFrac ("electrons", "fullclass1", 1.0) ;
-    _EBgt15lh->setSplitFrac ("electrons", "fullclass2", 1.0) ;
-    _EBgt15lh->setSplitFrac ("electrons", "fullclass3", 1.0) ;
+    _EB0lt15lh->setSplitFrac ("electrons", "fullclass0", 1.0) ;
+    _EB0lt15lh->setSplitFrac ("electrons", "fullclass1", 1.0) ;
+    _EB0lt15lh->setSplitFrac ("electrons", "fullclass2", 1.0) ;
+    _EB0lt15lh->setSplitFrac ("electrons", "fullclass3", 1.0) ;
   }
   else if(signalWeightSplitting.compare("class")==0) {
-    _EBgt15lh->setSplitFrac ("electrons", "class0", 1.0);
-    _EBgt15lh->setSplitFrac ("electrons", "class1", 1.0);
+    _EB0lt15lh->setSplitFrac ("electrons", "class0", 1.0) ;
+    _EB0lt15lh->setSplitFrac ("electrons", "class1", 1.0) ;
   }
   else {
     std::cout << "Only class (non-showering / showering)"
@@ -138,23 +80,23 @@ ElectronLikelihood::Setup (TDirectory *EBLowEtalt15dir, TDirectory *EBHighEtalt1
     exit(0);
   }
 
-  if (m_eleIDSwitches.m_useDeltaPhi)     _EBgt15lh->addPdf ("electrons", "dPhi",          splitSignalPdfs) ;   
-  if (m_eleIDSwitches.m_useDeltaEta)     _EBgt15lh->addPdf ("electrons", "dEta",          splitSignalPdfs) ;
-  if (m_eleIDSwitches.m_useEoverP)       _EBgt15lh->addPdf ("electrons", "EoP",           splitSignalPdfs) ;
-  if (m_eleIDSwitches.m_useHoverE)       _EBgt15lh->addPdf ("electrons", "HoE",           splitSignalPdfs) ;
-  if (m_eleIDSwitches.m_useSigmaEtaEta)  _EBgt15lh->addPdf ("electrons", "sigmaIEtaIEta", splitSignalPdfs) ;
-  if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EBgt15lh->addPdf ("electrons", "sigmaIPhiIPhi", splitSignalPdfs) ;
-  if (m_eleIDSwitches.m_useFBrem)        _EBgt15lh->addPdf ("electrons", "fBrem",         splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useDeltaPhi)     _EB0lt15lh->addPdf ("electrons", "dPhi",          splitSignalPdfs) ;   
+  if (m_eleIDSwitches.m_useDeltaEta)     _EB0lt15lh->addPdf ("electrons", "dEta",          splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useEoverP)       _EB0lt15lh->addPdf ("electrons", "EoP",           splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useHoverE)       _EB0lt15lh->addPdf ("electrons", "HoE",           splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB0lt15lh->addPdf ("electrons", "sigmaIEtaIEta", splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB0lt15lh->addPdf ("electrons", "sigmaIPhiIPhi", splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useFBrem)        _EB0lt15lh->addPdf ("electrons", "fBrem",         splitSignalPdfs) ;
 
   if(backgroundWeightSplitting.compare("fullclass")==0) {
-    _EBgt15lh->setSplitFrac ("hadrons", "fullclass0", 1.0) ;
-    _EBgt15lh->setSplitFrac ("hadrons", "fullclass1", 1.0) ;
-    _EBgt15lh->setSplitFrac ("hadrons", "fullclass2", 1.0) ;
-    _EBgt15lh->setSplitFrac ("hadrons", "fullclass3", 1.0) ;
+    _EB0lt15lh->setSplitFrac ("hadrons", "fullclass0", 1.0) ;
+    _EB0lt15lh->setSplitFrac ("hadrons", "fullclass1", 1.0) ;
+    _EB0lt15lh->setSplitFrac ("hadrons", "fullclass2", 1.0) ;
+    _EB0lt15lh->setSplitFrac ("hadrons", "fullclass3", 1.0) ;
   }
   else if(backgroundWeightSplitting.compare("class")==0) {
-    _EBgt15lh->setSplitFrac ("hadrons", "class0", 1.0);
-    _EBgt15lh->setSplitFrac ("hadrons", "class1", 1.0);
+    _EB0lt15lh->setSplitFrac ("hadrons", "class0", 1.0) ;
+    _EB0lt15lh->setSplitFrac ("hadrons", "class1", 1.0) ;
   }
   else {
     std::cout << "Only class (non-showering / showering)"
@@ -163,13 +105,186 @@ ElectronLikelihood::Setup (TDirectory *EBLowEtalt15dir, TDirectory *EBHighEtalt1
     exit(0);
   }
 
-  if (m_eleIDSwitches.m_useDeltaPhi)     _EBgt15lh->addPdf ("hadrons", "dPhi",          splitBackgroundPdfs) ;   
-  if (m_eleIDSwitches.m_useDeltaEta)     _EBgt15lh->addPdf ("hadrons", "dEta",          splitBackgroundPdfs) ;
-  if (m_eleIDSwitches.m_useEoverP)       _EBgt15lh->addPdf ("hadrons", "EoP",           splitBackgroundPdfs) ;
-  if (m_eleIDSwitches.m_useHoverE)       _EBgt15lh->addPdf ("hadrons", "HoE",           splitBackgroundPdfs) ;
-  if (m_eleIDSwitches.m_useSigmaEtaEta)  _EBgt15lh->addPdf ("hadrons", "sigmaIEtaIEta", splitBackgroundPdfs) ;
-  if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EBgt15lh->addPdf ("hadrons", "sigmaIPhiIPhi", splitBackgroundPdfs) ;
-  if (m_eleIDSwitches.m_useFBrem)        _EBgt15lh->addPdf ("hadrons", "fBrem",         splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useDeltaPhi)     _EB0lt15lh->addPdf ("hadrons", "dPhi",          splitBackgroundPdfs) ;   
+  if (m_eleIDSwitches.m_useDeltaEta)     _EB0lt15lh->addPdf ("hadrons", "dEta",          splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useEoverP)       _EB0lt15lh->addPdf ("hadrons", "EoP",           splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useHoverE)       _EB0lt15lh->addPdf ("hadrons", "HoE",           splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB0lt15lh->addPdf ("hadrons", "sigmaIEtaIEta", splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB0lt15lh->addPdf ("hadrons", "sigmaIPhiIPhi", splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useFBrem)        _EB0lt15lh->addPdf ("hadrons", "fBrem",         splitBackgroundPdfs) ;
+
+
+
+  // ECAL BARREL0 (|eta|<0.8) LIKELIHOOD - Pt >= 15 GeV region
+  _EB0gt15lh->initFromFile (EB0gt15dir) ;
+
+  _EB0gt15lh->addSpecies ("electrons", 1.0 ) ;  
+  _EB0gt15lh->addSpecies ("hadrons",1.0) ;
+
+  if(signalWeightSplitting.compare("fullclass")==0) {
+    _EB0gt15lh->setSplitFrac ("electrons", "fullclass0", 1.0) ;
+    _EB0gt15lh->setSplitFrac ("electrons", "fullclass1", 1.0) ;
+    _EB0gt15lh->setSplitFrac ("electrons", "fullclass2", 1.0) ;
+    _EB0gt15lh->setSplitFrac ("electrons", "fullclass3", 1.0) ;
+  }
+  else if(signalWeightSplitting.compare("class")==0) {
+    _EB0gt15lh->setSplitFrac ("electrons", "class0", 1.0);
+    _EB0gt15lh->setSplitFrac ("electrons", "class1", 1.0);
+  }
+  else {
+    std::cout << "Only class (non-showering / showering)"
+              << " and fullclass (golden / bigbrem / narrow / showering)" 
+              << " splitting is implemented right now" << std::endl;
+    exit(0);
+  }
+
+  if (m_eleIDSwitches.m_useDeltaPhi)     _EB0gt15lh->addPdf ("electrons", "dPhi",          splitSignalPdfs) ;   
+  if (m_eleIDSwitches.m_useDeltaEta)     _EB0gt15lh->addPdf ("electrons", "dEta",          splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useEoverP)       _EB0gt15lh->addPdf ("electrons", "EoP",           splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useHoverE)       _EB0gt15lh->addPdf ("electrons", "HoE",           splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB0gt15lh->addPdf ("electrons", "sigmaIEtaIEta", splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB0gt15lh->addPdf ("electrons", "sigmaIPhiIPhi", splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useFBrem)        _EB0gt15lh->addPdf ("electrons", "fBrem",         splitSignalPdfs) ;
+
+  if(backgroundWeightSplitting.compare("fullclass")==0) {
+    _EB0gt15lh->setSplitFrac ("hadrons", "fullclass0", 1.0) ;
+    _EB0gt15lh->setSplitFrac ("hadrons", "fullclass1", 1.0) ;
+    _EB0gt15lh->setSplitFrac ("hadrons", "fullclass2", 1.0) ;
+    _EB0gt15lh->setSplitFrac ("hadrons", "fullclass3", 1.0) ;
+  }
+  else if(backgroundWeightSplitting.compare("class")==0) {
+    _EB0gt15lh->setSplitFrac ("hadrons", "class0", 1.0);
+    _EB0gt15lh->setSplitFrac ("hadrons", "class1", 1.0);
+  }
+  else {
+    std::cout << "Only class (non-showering / showering)"
+              << " and fullclass (golden / bigbrem / narrow / showering)" 
+              << " splitting is implemented right now" << std::endl;
+    exit(0);
+  }
+
+  if (m_eleIDSwitches.m_useDeltaPhi)     _EB0gt15lh->addPdf ("hadrons", "dPhi",          splitBackgroundPdfs) ;   
+  if (m_eleIDSwitches.m_useDeltaEta)     _EB0gt15lh->addPdf ("hadrons", "dEta",          splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useEoverP)       _EB0gt15lh->addPdf ("hadrons", "EoP",           splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useHoverE)       _EB0gt15lh->addPdf ("hadrons", "HoE",           splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB0gt15lh->addPdf ("hadrons", "sigmaIEtaIEta", splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB0gt15lh->addPdf ("hadrons", "sigmaIPhiIPhi", splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useFBrem)        _EB0gt15lh->addPdf ("hadrons", "fBrem",         splitBackgroundPdfs) ;
+
+
+  // ECAL BARREL1 (|eta|>0.8) LIKELIHOOD - Pt < 15 GeV region
+  _EB1lt15lh->initFromFile (EB1lt15dir) ;
+
+  _EB1lt15lh->addSpecies ("electrons", 1.0) ;
+  _EB1lt15lh->addSpecies ("hadrons",  1.0) ;
+
+  if(signalWeightSplitting.compare("fullclass")==0) {
+    _EB1lt15lh->setSplitFrac ("electrons", "fullclass0", 1.0) ;
+    _EB1lt15lh->setSplitFrac ("electrons", "fullclass1", 1.0) ;
+    _EB1lt15lh->setSplitFrac ("electrons", "fullclass2", 1.0) ;
+    _EB1lt15lh->setSplitFrac ("electrons", "fullclass3", 1.0) ;
+  }
+  else if(signalWeightSplitting.compare("class")==0) {
+    _EB1lt15lh->setSplitFrac ("electrons", "class0", 1.0) ;
+    _EB1lt15lh->setSplitFrac ("electrons", "class1", 1.0) ;
+  }
+  else {
+    std::cout << "Only class (non-showering / showering)"
+              << " and fullclass (golden / bigbrem / narrow / showering)" 
+              << " splitting is implemented right now" << std::endl;
+    exit(0);
+  }
+
+  if (m_eleIDSwitches.m_useDeltaPhi)     _EB1lt15lh->addPdf ("electrons", "dPhi",          splitSignalPdfs) ;   
+  if (m_eleIDSwitches.m_useDeltaEta)     _EB1lt15lh->addPdf ("electrons", "dEta",          splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useEoverP)       _EB1lt15lh->addPdf ("electrons", "EoP",           splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useHoverE)       _EB1lt15lh->addPdf ("electrons", "HoE",           splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB1lt15lh->addPdf ("electrons", "sigmaIEtaIEta", splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB1lt15lh->addPdf ("electrons", "sigmaIPhiIPhi", splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useFBrem)        _EB1lt15lh->addPdf ("electrons", "fBrem",         splitSignalPdfs) ;
+
+  if(backgroundWeightSplitting.compare("fullclass")==0) {
+    _EB1lt15lh->setSplitFrac ("hadrons", "fullclass0", 1.0) ;
+    _EB1lt15lh->setSplitFrac ("hadrons", "fullclass1", 1.0) ;
+    _EB1lt15lh->setSplitFrac ("hadrons", "fullclass2", 1.0) ;
+    _EB1lt15lh->setSplitFrac ("hadrons", "fullclass3", 1.0) ;
+  }
+  else if(backgroundWeightSplitting.compare("class")==0) {
+    _EB1lt15lh->setSplitFrac ("hadrons", "class0", 1.0) ;
+    _EB1lt15lh->setSplitFrac ("hadrons", "class1", 1.0) ;
+  }
+  else {
+    std::cout << "Only class (non-showering / showering)"
+              << " and fullclass (golden / bigbrem / narrow / showering)" 
+              << " splitting is implemented right now" << std::endl;
+    exit(0);
+  }
+
+  if (m_eleIDSwitches.m_useDeltaPhi)     _EB1lt15lh->addPdf ("hadrons", "dPhi",          splitBackgroundPdfs) ;   
+  if (m_eleIDSwitches.m_useDeltaEta)     _EB1lt15lh->addPdf ("hadrons", "dEta",          splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useEoverP)       _EB1lt15lh->addPdf ("hadrons", "EoP",           splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useHoverE)       _EB1lt15lh->addPdf ("hadrons", "HoE",           splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB1lt15lh->addPdf ("hadrons", "sigmaIEtaIEta", splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB1lt15lh->addPdf ("hadrons", "sigmaIPhiIPhi", splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useFBrem)        _EB1lt15lh->addPdf ("hadrons", "fBrem",         splitBackgroundPdfs) ;
+
+
+
+  // ECAL BARREL1 (|eta|>0.8) LIKELIHOOD - Pt >= 15 GeV region
+  _EB1gt15lh->initFromFile (EB1gt15dir) ;
+
+  _EB1gt15lh->addSpecies ("electrons", 1.0 ) ;  
+  _EB1gt15lh->addSpecies ("hadrons",1.0) ;
+
+  if(signalWeightSplitting.compare("fullclass")==0) {
+    _EB1gt15lh->setSplitFrac ("electrons", "fullclass0", 1.0) ;
+    _EB1gt15lh->setSplitFrac ("electrons", "fullclass1", 1.0) ;
+    _EB1gt15lh->setSplitFrac ("electrons", "fullclass2", 1.0) ;
+    _EB1gt15lh->setSplitFrac ("electrons", "fullclass3", 1.0) ;
+  }
+  else if(signalWeightSplitting.compare("class")==0) {
+    _EB1gt15lh->setSplitFrac ("electrons", "class0", 1.0);
+    _EB1gt15lh->setSplitFrac ("electrons", "class1", 1.0);
+  }
+  else {
+    std::cout << "Only class (non-showering / showering)"
+              << " and fullclass (golden / bigbrem / narrow / showering)" 
+              << " splitting is implemented right now" << std::endl;
+    exit(0);
+  }
+
+  if (m_eleIDSwitches.m_useDeltaPhi)     _EB1gt15lh->addPdf ("electrons", "dPhi",          splitSignalPdfs) ;   
+  if (m_eleIDSwitches.m_useDeltaEta)     _EB1gt15lh->addPdf ("electrons", "dEta",          splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useEoverP)       _EB1gt15lh->addPdf ("electrons", "EoP",           splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useHoverE)       _EB1gt15lh->addPdf ("electrons", "HoE",           splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB1gt15lh->addPdf ("electrons", "sigmaIEtaIEta", splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB1gt15lh->addPdf ("electrons", "sigmaIPhiIPhi", splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useFBrem)        _EB1gt15lh->addPdf ("electrons", "fBrem",         splitSignalPdfs) ;
+
+  if(backgroundWeightSplitting.compare("fullclass")==0) {
+    _EB1gt15lh->setSplitFrac ("hadrons", "fullclass0", 1.0) ;
+    _EB1gt15lh->setSplitFrac ("hadrons", "fullclass1", 1.0) ;
+    _EB1gt15lh->setSplitFrac ("hadrons", "fullclass2", 1.0) ;
+    _EB1gt15lh->setSplitFrac ("hadrons", "fullclass3", 1.0) ;
+  }
+  else if(backgroundWeightSplitting.compare("class")==0) {
+    _EB1gt15lh->setSplitFrac ("hadrons", "class0", 1.0);
+    _EB1gt15lh->setSplitFrac ("hadrons", "class1", 1.0);
+  }
+  else {
+    std::cout << "Only class (non-showering / showering)"
+              << " and fullclass (golden / bigbrem / narrow / showering)" 
+              << " splitting is implemented right now" << std::endl;
+    exit(0);
+  }
+
+  if (m_eleIDSwitches.m_useDeltaPhi)     _EB1gt15lh->addPdf ("hadrons", "dPhi",          splitBackgroundPdfs) ;   
+  if (m_eleIDSwitches.m_useDeltaEta)     _EB1gt15lh->addPdf ("hadrons", "dEta",          splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useEoverP)       _EB1gt15lh->addPdf ("hadrons", "EoP",           splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useHoverE)       _EB1gt15lh->addPdf ("hadrons", "HoE",           splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB1gt15lh->addPdf ("hadrons", "sigmaIEtaIEta", splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB1gt15lh->addPdf ("hadrons", "sigmaIPhiIPhi", splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useFBrem)        _EB1gt15lh->addPdf ("hadrons", "fBrem",         splitBackgroundPdfs) ;
 
 
   // ECAL ENDCAP LIKELIHOOD - Pt < 15 GeV
@@ -335,12 +450,16 @@ ElectronLikelihood::result (const LikelihoodMeasurements electron) const
   float thisPt =  electron.pt;
 
   if (subdet==0 && thisPt<15.)
-    return _EBlt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+    return _EB0lt15lh->getRatio ("electrons",measurements,std::string (className)) ;
   else if (subdet==0 && thisPt>=15.)
-    return _EBgt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+    return _EB0gt15lh->getRatio ("electrons",measurements,std::string (className)) ;
   else if (subdet==1 && thisPt<15.)
-    return _EElt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+    return _EB1lt15lh->getRatio ("electrons",measurements,std::string (className)) ;
   else if (subdet==1 && thisPt>=15.)
+    return _EB1gt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+  else if (subdet==2 && thisPt<15.)
+    return _EElt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+  else if (subdet==2 && thisPt>=15.)
     return _EEgt15lh->getRatio ("electrons",measurements,std::string (className)) ;
   else return -999. ;
 }
@@ -385,12 +504,16 @@ ElectronLikelihood::resultLog (const LikelihoodMeasurements electron) const
   float lh=-999.;
 
   if (subdet==0 && thisPt<15.)
-    lh = _EBlt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+    lh = _EB0lt15lh->getRatio ("electrons",measurements,std::string (className)) ;
   else if (subdet==0 && thisPt>=15.)
-    lh = _EBgt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+    lh = _EB0gt15lh->getRatio ("electrons",measurements,std::string (className)) ;
   else if (subdet==1 && thisPt<15.)
-    lh = _EElt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+    lh = _EB1lt15lh->getRatio ("electrons",measurements,std::string (className)) ;
   else if (subdet==1 && thisPt>=15.)
+    lh = _EB1gt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+  else if (subdet==2 && thisPt<15.)
+    lh = _EElt15lh->getRatio ("electrons",measurements,std::string (className)) ;
+  else if (subdet==2 && thisPt>=15.)
     lh = _EEgt15lh->getRatio ("electrons",measurements,std::string (className)) ;
   else lh = -999. ;
 
