@@ -94,6 +94,8 @@ $(OUTLIBCOMMON)TriggerMask.o: $(INCLUDEDIRCOMMON)/CommonTools/src/TriggerMask.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)TriggerMask.o $<
 $(OUTLIB)RedEleIDTree.o: $(INCLUDEDIR)/src/RedEleIDTree.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RedEleIDTree.o $<
+$(OUTLIB)FakeTree.o: $(INCLUDEDIR)/src/FakeTree.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FakeTree.o $<
 $(OUTLIB)LikelihoodAnalysis.o: $(INCLUDEDIR)/src/LikelihoodAnalysis.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LikelihoodAnalysis.o $<
 $(OUTLIB)ZeeTagAndProbe.o: $(INCLUDEDIR)/src/ZeeTagAndProbe.cc
@@ -139,6 +141,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIBCOMMON)TriggerMask.o \
 	$(OUTLIBCOMMON)Utils.o \
 	$(OUTLIB)RedEleIDTree.o \
+	$(OUTLIB)FakeTree.o \
 	$(OUTLIB)sPlotsPdfsComparison.o \
 	$(OUTLIB)LHPdfsProducer.o \
 	$(OUTLIB)IsolationPdfsProducer.o \
