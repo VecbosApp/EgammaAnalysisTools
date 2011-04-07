@@ -3,16 +3,18 @@
 #include <iostream>
 #include <math.h>
 
-ElectronLikelihood::ElectronLikelihood (TDirectory *EBlt15dir, TDirectory *EElt15dir,
-                                        TDirectory *EBgt15dir, TDirectory *EEgt15dir,
+ElectronLikelihood::ElectronLikelihood (TDirectory *EBLowEtalt15dir, TDirectory *EBHighEtalt15dir, TDirectory *EElt15dir,
+                                        TDirectory *EBLowEtagt15dir, TDirectory *EBHighEtagt15dir, TDirectory *EEgt15dir,
 					LikelihoodSwitches eleIDSwitches,
 					std::string signalWeightSplitting,
 					std::string backgroundWeightSplitting,
 					bool splitSignalPdfs,
 					bool splitBackgroundPdfs) :
-  _EBlt15lh (new LikelihoodPdfProduct ("electronID_EB_ptLt15_likelihood",0,0)) ,
+  _EBLowEtalt15lh (new LikelihoodPdfProduct ("electronID_EBLowEta_ptLt15_likelihood",0,0)) ,
+  _EBHighEtalt15lh (new LikelihoodPdfProduct ("electronID_EBHighEta_ptLt15_likelihood",0,0)) ,
   _EElt15lh (new LikelihoodPdfProduct ("electronID_EE_ptLt15_likelihood",1,0)) ,
-  _EBgt15lh (new LikelihoodPdfProduct ("electronID_EB_ptGt15_likelihood",0,1)) ,
+  _EBLowEtagt15lh (new LikelihoodPdfProduct ("electronID_EBLowEta_ptGt15_likelihood",0,1)) ,
+  _EBHighEtagt15lh (new LikelihoodPdfProduct ("electronID_EBHighEta_ptGt15_likelihood",0,1)) ,
   _EEgt15lh (new LikelihoodPdfProduct ("electronID_EE_ptGt15_likelihood",1,1)) ,
   m_eleIDSwitches (eleIDSwitches) ,
   m_signalWeightSplitting (signalWeightSplitting), 
@@ -20,8 +22,8 @@ ElectronLikelihood::ElectronLikelihood (TDirectory *EBlt15dir, TDirectory *EElt1
   m_splitSignalPdfs (splitSignalPdfs), 
   m_splitBackgroundPdfs (splitBackgroundPdfs)  
 {
-  Setup (EBlt15dir, EElt15dir,
-         EBgt15dir, EEgt15dir,
+  Setup (EBLowEtalt15dir, EBHighEtalt15dir, EElt15dir,
+         EBLowEtagt15dir, EBHighEtagt15dir, EEgt15dir,
 	 signalWeightSplitting, backgroundWeightSplitting,
 	 splitSignalPdfs, splitBackgroundPdfs) ;
 }
@@ -33,9 +35,11 @@ ElectronLikelihood::ElectronLikelihood (TDirectory *EBlt15dir, TDirectory *EElt1
 
 
 ElectronLikelihood::~ElectronLikelihood () {
-  delete _EBlt15lh ;
+  delete _EBLowEtalt15lh ;
+  delete _EBHighEtalt15lh ;
   delete _EElt15lh ;
-  delete _EBgt15lh ;
+  delete _EBLowEtagt15lh ;
+  delete _EBHighEtagt15lh ;
   delete _EEgt15lh ;
 }
 
@@ -45,8 +49,8 @@ ElectronLikelihood::~ElectronLikelihood () {
 
 
 void 
-ElectronLikelihood::Setup (TDirectory *EBlt15dir, TDirectory *EElt15dir,
-                           TDirectory *EBgt15dir, TDirectory *EEgt15dir,
+ElectronLikelihood::Setup (TDirectory *EBLowEtalt15dir, TDirectory *EBHighEtalt15dir, TDirectory *EElt15dir,
+                           TDirectory *EBLowEtagt15dir, TDirectory *EBHighEtagt15dir, TDirectory *EEgt15dir,
 			   std::string signalWeightSplitting,
 			   std::string backgroundWeightSplitting,
 			   bool splitSignalPdfs,
