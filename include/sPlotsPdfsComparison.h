@@ -77,6 +77,7 @@ public :
    Double_t        isWP90;
    Double_t        isWP95;
 
+   Int_t         f_nPU;
    Float_t       f_trackerIso;
    Float_t       f_ecalJIso;
    Float_t       f_ecalGTIso;
@@ -153,6 +154,7 @@ public :
    Double_t      ztap_weight;
 
    // List of branches
+   TBranch        *b_nPU;
    TBranch        *b_N_sig_sw;   //!
    TBranch        *b_L_N_sig;   //!
    TBranch        *b_N_qcd_sw;   //!
@@ -248,39 +250,39 @@ public :
    bool m_isDataZTaP;
 
    TH1F *etaEle;   
-   TH1F *dPhiEle[2];
-   TH1F *dEtaEle[2];
-   TH1F *EoPEle[2];
-   TH1F *HoEEle[2];
-   TH1F *sigmaIEtaIEtaEle[2];
-   TH1F *fbremEle[2];
-   TH1F *phiEle[2];
-   TH1F *chargeEle[2];
-   TH1F *lhEle[2];
+   TH1F *dPhiEle[3];
+   TH1F *dEtaEle[3];
+   TH1F *EoPEle[3];
+   TH1F *HoEEle[3];
+   TH1F *sigmaIEtaIEtaEle[3];
+   TH1F *fbremEle[3];
+   TH1F *phiEle[3];
+   TH1F *chargeEle[3];
+   TH1F *lhEle[3];
 
   // ---------- monitoring histograms ------------
 
   /// Electrons: not splitted
   /// histo[ecalsubdet][ptbin]
-  TH1F *dPhiUnsplitEle[2][2];
-  TH1F *dEtaUnsplitEle[2][2];
-  TH1F *EoPUnsplitEle[2][2];
-  TH1F *HoEUnsplitEle[2][2];  
-  TH1F *sigmaIEtaIEtaUnsplitEle[2][2];
-  TH1F *sigmaIPhiIPhiUnsplitEle[2][2];
-  TH1F *fBremUnsplitEle[2][2];
-  TH1F *lhUnsplitEle[2][2];
+  TH1F *dPhiUnsplitEle[3][2];
+  TH1F *dEtaUnsplitEle[3][2];
+  TH1F *EoPUnsplitEle[3][2];
+  TH1F *HoEUnsplitEle[3][2];  
+  TH1F *sigmaIEtaIEtaUnsplitEle[3][2];
+  TH1F *sigmaIPhiIPhiUnsplitEle[3][2];
+  TH1F *fBremUnsplitEle[3][2];
+  TH1F *lhUnsplitEle[3][2];
   
   /// Electrons class-splitted
   /// histo[ecalsubdet][ptbin][class]
-  TH1F *dPhiClassEle[2][2][2];
-  TH1F *dEtaClassEle[2][2][2];
-  TH1F *EoPClassEle[2][2][2];
-  TH1F *HoEClassEle[2][2][2];
-  TH1F *sigmaIEtaIEtaClassEle[2][2][2];
-  TH1F *sigmaIPhiIPhiClassEle[2][2][2];
-  TH1F *fBremClassEle[2][2][2];
-  TH1F *lhClassEle[2][2][2];
+  TH1F *dPhiClassEle[3][2][2];
+  TH1F *dEtaClassEle[3][2][2];
+  TH1F *EoPClassEle[3][2][2];
+  TH1F *HoEClassEle[3][2][2];
+  TH1F *sigmaIEtaIEtaClassEle[3][2][2];
+  TH1F *sigmaIPhiIPhiClassEle[3][2][2];
+  TH1F *fBremClassEle[3][2][2];
+  TH1F *lhClassEle[3][2][2];
 
   // the likelihood algorithm
   ElectronLikelihood *LH;
@@ -338,6 +340,7 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC, int data_ZTaP)
    if(isMC) {
      std::cout << "Setting branches for MC tree" << std::endl;
      m_isMC = 1;
+     fChain->SetBranchAddress("nPU", &f_nPU, &b_nPU);
      fChain->SetBranchAddress("trackerIso", &f_trackerIso, &b_trackerIso);
      fChain->SetBranchAddress("ecalJIso", &f_ecalJIso, &b_ecalJIso);
      fChain->SetBranchAddress("ecalGTIso", &f_ecalGTIso, &b_ecalGTIso);
@@ -358,9 +361,9 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC, int data_ZTaP)
      fChain->SetBranchAddress("mt", &f_mt, &b_mt);
      fChain->SetBranchAddress("tcmt", &f_tcmt, &b_tcmt);
      fChain->SetBranchAddress("pfmt", &f_pfmt, &b_pfmt);
-     fChain->SetBranchAddress("pt", &f_pt, &b_pt);
-     fChain->SetBranchAddress("eta", &f_eta, &b_eta);
-     fChain->SetBranchAddress("phi", &f_phi, &b_phi);
+     fChain->SetBranchAddress("pt1", &f_pt, &b_pt);
+     fChain->SetBranchAddress("eta1", &f_eta, &b_eta);
+     fChain->SetBranchAddress("phi1", &f_phi, &b_phi);
      fChain->SetBranchAddress("charge", &f_charge, &b_charge);
      fChain->SetBranchAddress("weight", &f_weight, &b_weight);
      fChain->SetBranchAddress("event", &f_event, &b_event);
