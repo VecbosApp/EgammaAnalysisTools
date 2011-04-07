@@ -38,7 +38,7 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
 
   // to read good run list
   if (m_selection->getSwitch("goodRunLS") && m_selection->getSwitch("isData")) {
-    std::string goodRunGiasoneFile = "config/json/goodRunLS.json";
+    std::string goodRunGiasoneFile = "config/json/myGolden.json";
     setJsonGoodRunList(goodRunGiasoneFile);
     fillRunLSMap();
   }
@@ -46,6 +46,7 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
   // single electron efficiency
   EgammaCutBasedIDWPs.push_back("WP95");
   EgammaCutBasedIDWPs.push_back("WP90");
+  EgammaCutBasedIDWPs.push_back("WP85");
   EgammaCutBasedIDWPs.push_back("WP80");
   EgammaCutBasedIDWPs.push_back("WP70");
 
@@ -104,20 +105,21 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
 
   // configuring electron likelihood
   TFile *fileLH = TFile::Open("pdfs_MC.root");
-  TDirectory *EBlt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB0lt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB1lt15dir = fileLH->GetDirectory("/");
   TDirectory *EElt15dir = fileLH->GetDirectory("/");
-  TDirectory *EBgt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB0gt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB1gt15dir = fileLH->GetDirectory("/");
   TDirectory *EEgt15dir = fileLH->GetDirectory("/");
   LikelihoodSwitches defaultSwitches;
 
   defaultSwitches.m_useFBrem = true;
   defaultSwitches.m_useEoverP = false;
   defaultSwitches.m_useSigmaPhiPhi = true;
-  defaultSwitches.m_useHoverE = false;
+  defaultSwitches.m_useHoverE = false;        
 
-  LH = new ElectronLikelihood(&(*EBlt15dir), &(*EElt15dir), &(*EBgt15dir), &(*EEgt15dir),
+  LH = new ElectronLikelihood(&(*EB0lt15dir), &(*EB1lt15dir), &(*EElt15dir), &(*EB0gt15dir), &(*EB1gt15dir), &(*EEgt15dir),
                               defaultSwitches, std::string("class"),std::string("class"),true,true);
-
 
 }
 
@@ -135,7 +137,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
   if(fChain == 0) return;
   
   char treename[200];
-  sprintf(treename,"%s",treefilesuffix);
+  sprintf(treename,"%s.root",treefilesuffix);
   RedEleIDTree reducedTree(treename);
   reducedTree.addAttributesSignal();
   reducedTree.addElectronIdBits();
@@ -255,7 +257,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
         if (tagIdentified && tagIsolated && tagConvRej) {
 
           // look at the probe
-          int CutBasedId[4], CutBasedIdOnlyID[4], CutBasedIdOnlyIso[4], CutBasedIdOnlyConv[4];
+          int CutBasedId[5], CutBasedIdOnlyID[5], CutBasedIdOnlyIso[5], CutBasedIdOnlyConv[5];
           int CiCBasedId[9], CiCBasedIdOnlyID[9], CiCBasedIdOnlyIso[9], CiCBasedIdOnlyConv[9];
           int LHBasedId[5], LHBasedIdOnlyID[5], LHBasedIdOnlyIso[5], LHBasedIdOnlyConv[5];
           
@@ -330,7 +332,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           reducedTree.fillIsolations(dr03TkSumPtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                      dr03EcalRecHitSumEtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                      dr03HcalTowerSumEtFullConeEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3);
-          reducedTree.fillMore(nPV,rhoFastjet);
+          reducedTree.fillMore(nPV,rhoFastjet,runNumber);
           reducedTree.fillCutBasedIDBits(CutBasedId,CutBasedIdOnlyID,CutBasedIdOnlyIso,CutBasedIdOnlyConv);
           reducedTree.fillLHBasedIDBits(LHBasedId,LHBasedIdOnlyID,LHBasedIdOnlyIso,LHBasedIdOnlyConv);
           reducedTree.fillCiCBasedIDBits(CiCBasedId,CiCBasedIdOnlyID,CiCBasedIdOnlyIso,CiCBasedIdOnlyConv);

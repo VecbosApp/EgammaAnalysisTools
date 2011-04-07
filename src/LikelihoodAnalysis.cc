@@ -80,12 +80,13 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
       EgammaCiCBasedID.push_back(aSelector);
     }  
 
-
   // configuring electron likelihood
   TFile *fileLH = TFile::Open("pdfs_MC.root");
-  TDirectory *EBlt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB0lt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB1lt15dir = fileLH->GetDirectory("/");
   TDirectory *EElt15dir = fileLH->GetDirectory("/");
-  TDirectory *EBgt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB0gt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB1gt15dir = fileLH->GetDirectory("/");
   TDirectory *EEgt15dir = fileLH->GetDirectory("/");
   LikelihoodSwitches defaultSwitches;
 
@@ -94,9 +95,8 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   defaultSwitches.m_useSigmaPhiPhi = true;
   defaultSwitches.m_useHoverE = false;        
 
-  LH = new ElectronLikelihood(&(*EBlt15dir), &(*EElt15dir), &(*EBgt15dir), &(*EEgt15dir),
+  LH = new ElectronLikelihood(&(*EB0lt15dir), &(*EB1lt15dir), &(*EElt15dir), &(*EB0gt15dir), &(*EB1gt15dir), &(*EEgt15dir),
                               defaultSwitches, std::string("class"),std::string("class"),true,true);
-
 
   // to read good run list
   if (_isData) {

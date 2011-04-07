@@ -35,7 +35,7 @@ void sPlotsPdfsComparison::Loop()
   defaultSwitches.m_useEoverP = false;
   defaultSwitches.m_useSigmaPhiPhi = true;
   defaultSwitches.m_useHoverE = false;
-  LH = new ElectronLikelihood(&(*LHdir), &(*LHdir), &(*LHdir), &(*LHdir),
+  LH = new ElectronLikelihood(&(*LHdir), &(*LHdir), &(*LHdir), &(*LHdir), &(*LHdir), &(*LHdir),
                               defaultSwitches, std::string("class"),std::string("class"),true,true);
 
   Long64_t nentries = fChain->GetEntries();
