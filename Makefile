@@ -200,6 +200,10 @@ ComparesPlotsClassesPdfs: $(INCLUDEDIR)/src/ComparesPlotsClassesPdfs.C
 CompareSignalIsolation: $(INCLUDEDIR)/src/CompareSignalIsolation.C
 	$(CXX) $(CXXFLAGS) -o CompareSignalIsolation $(GLIBS) $ $<
 
+MakeROC: $(INCLUDEDIR)/src/MakeROC.C
+	$(CXX) $(CXXFLAGS) -o MakeROC $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
+
+
 EgammaAnalysis.clean:
 	rm -f EgammaAnalysis
 
