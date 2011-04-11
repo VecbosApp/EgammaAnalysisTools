@@ -176,7 +176,7 @@ float Egamma::mT3(TLorentzVector pl1, TLorentzVector pl2, TVector3 met) {
 float Egamma::likelihoodRatio(int eleIndex, ElectronLikelihood &lh) {
   LikelihoodMeasurements measurements;
   measurements.pt = GetPt(pxEle[eleIndex],pyEle[eleIndex]);
-  if(fabs(etaEle[eleIndex])<0.8) measurements.subdet = 0;
+  if(fabs(etaEle[eleIndex])<1.0) measurements.subdet = 0;
   else if (fabs(etaEle[eleIndex])<1.479) measurements.subdet = 1;
   else measurements.subdet = 2;
   measurements.deltaPhi = deltaPhiAtVtxEle[eleIndex];
