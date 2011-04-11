@@ -145,7 +145,9 @@ void drawEta(const char* filename,TString type) {
   ElectronEfficiencyEta.ComputeEfficiencies();
   
   vector<TH1F*> efficiency = ElectronEfficiencyEta.GetCumulativeEfficiencies();
-  vector<float> effAverage = ElectronEfficiencyEta.GetCumulativeEfficiencyAverages();
+  vector<float> effAverageEB = ElectronEfficiencyEta.GetCumulativeEfficiencyAverages(13,47);
+  vector<float> effAverageEEm = ElectronEfficiencyEta.GetCumulativeEfficiencyAverages(1,12);
+  vector<float> effAverageEEp = ElectronEfficiencyEta.GetCumulativeEfficiencyAverages(48,60);
 
   for (int tightness=0;tightness<CutIdEta.size();tightness++)
     { 
@@ -158,16 +160,22 @@ void drawEta(const char* filename,TString type) {
 //       efficiency[CutIdEta.size()+LHIdEta.size()+tightness]->SetMarkerColor(4);
       //  efficiency[6]->SetLineColor(8);
 
-      char effCutId[50];
-      sprintf(effCutId," (#epsilon = %.2f) ", effAverage[0+tightness]);
-      char effLHId[50];
-      sprintf(effLHId," (#epsilon = %.2f) ", effAverage[CutIdEta.size()+tightness]);
+      char effCutIdEB[50];
+      sprintf(effCutIdEB," (#epsilon EB = %.2f) ", effAverageEB[0+tightness]);
+      char effCutIdEE[50];
+      sprintf(effCutIdEE," (#epsilon EE = %.2f) ", (effAverageEEm[0+tightness]+effAverageEEp[0+tightness])/2.);
+      char effLHIdEB[50];
+      sprintf(effLHIdEB," (#epsilon EB = %.2f) ", effAverageEB[CutIdEta.size()+tightness]);
+      char effLHIdEE[50];
+      sprintf(effLHIdEE," (#epsilon EE = %.2f) ", (effAverageEEm[CutIdEta.size()+tightness]+effAverageEEp[CutIdEta.size()+tightness])/2.);
       
       TLegend* leg = new TLegend(0.35,0.25,0.60,0.50);
       leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
       leg->SetFillColor(0);
-      leg->AddEntry(efficiency[0+tightness],(EgammaCutBasedIDWPs[0+tightness]+TString(effCutId)).Data());
-      leg->AddEntry(efficiency[CutIdEta.size()+tightness],(EgammaLHBasedIDWPs[0+tightness]+TString(effLHId)).Data());
+      leg->AddEntry(efficiency[0+tightness],(EgammaCutBasedIDWPs[0+tightness]+TString(effCutIdEB)).Data());
+      leg->AddEntry(efficiency[0+tightness],(EgammaCutBasedIDWPs[0+tightness]+TString(effCutIdEE)).Data());
+      leg->AddEntry(efficiency[CutIdEta.size()+tightness],(EgammaLHBasedIDWPs[0+tightness]+TString(effLHIdEB)).Data());
+      leg->AddEntry(efficiency[CutIdEta.size()+tightness],(EgammaLHBasedIDWPs[0+tightness]+TString(effLHIdEE)).Data());
       //  leg->AddEntry(efficiency[3],"Tight CIC Cuts");
       //  leg->AddEntry(efficiency[CutIdEta.size()+LHIdEta.size()+tightness],EgammaCiCBasedIDWPs[0+tightness].Data());
       
