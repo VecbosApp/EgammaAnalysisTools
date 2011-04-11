@@ -28,7 +28,7 @@ void sPlotsPdfsComparison::Loop()
   bookFullHistos();  
 
   // configuring electron likelihood
-  TFile *fileLH = TFile::Open("pdfs_MC.root");
+  TFile *fileLH = TFile::Open("pdfs_new.root");
   TDirectory *LHdir = fileLH->GetDirectory("/");
   LikelihoodSwitches defaultSwitches;
   defaultSwitches.m_useFBrem = true;
@@ -63,7 +63,7 @@ void sPlotsPdfsComparison::Loop()
     if(!m_isDataZTaP) { // W->enu sample
       if(m_isMC) {
         if(wgt>500) continue;
-        if(fabs(f_eta)<0.8) jecal = 0;
+        if(fabs(f_eta)<1.0) jecal = 0;
         else if (fabs(f_eta)<1.479) jecal = 1;
         else jecal = 2;
         if(f_pt>=10 && f_pt<=20) jptbin = 0;
@@ -79,7 +79,7 @@ void sPlotsPdfsComparison::Loop()
 //         }
       } else {
         if(see<1e-4) continue; // remove residual spikes (if the cleaning is not done)
-        if(fabs(f_eta)<0.8) jecal = 0;
+        if(fabs(f_eta)<1.0) jecal = 0;
         else if (fabs(f_eta)<1.479) jecal = 1;
         else jecal = 2;
         if(pt>=10 && pt<=20) jptbin = 0;
@@ -92,7 +92,7 @@ void sPlotsPdfsComparison::Loop()
         }
       }
       if(m_isDataZTaP) {
-        if(fabs(ztap_eta)<0.8) jecal = 0;
+        if(fabs(ztap_eta)<1.0) jecal = 0;
         else if (fabs(ztap_eta)<1.479) jecal = 1;
         else jecal = 2;
       }
@@ -140,8 +140,14 @@ void sPlotsPdfsComparison::Loop()
           sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( f_spp, wgt ); 
           fBremClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minFBrem,maxFBrem) );
         } else {
-          sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minSPP,maxSPP) );
-          fBremClassEle [jecal][jptbin][jclass] -> Fill ( f_fbrem, wgt );
+	  //  	  if (jecal!=0)
+	  sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minSPP,maxSPP) );
+	  //  	  else
+	  // 	    sigmaIPhiIPhiClassEle [jecal][jptbin][jclass] -> Fill ( f_spp, wgt ); 
+	  if (jecal!=0)
+	    fBremClassEle [jecal][jptbin][jclass] -> Fill ( f_fbrem, wgt );
+	  else
+	    fBremClassEle [jecal][jptbin][jclass] -> Fill ( rnd.Uniform(minFBrem,maxFBrem) );
         }
       } else {
         dPhiEle          [jecal] -> Fill ( dphi, wgt );
@@ -182,7 +188,7 @@ void sPlotsPdfsComparison::Loop()
       lhUnsplitEle [jecal][jptbin] -> Fill ( f_lh, wgt );
       lhClassEle [jecal][jptbin][jclass] -> Fill ( f_lh, wgt );
     } else {
-      if(fabs(ztap_eta)<0.8) jecal = 0;
+      if(fabs(ztap_eta)<1.0) jecal = 0;
       else if (fabs(ztap_eta)<1.479) jecal = 1;
       else jecal = 2;
       dPhiEle          [jecal] -> Fill ( ztap_dphi, wgt );
@@ -340,7 +346,7 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
   etaEle->Sumw2();
 
   if(m_doSignal) {
-    // EB histograms |eta|<0.8
+    // EB histograms |eta|<1.0
     sprintf(histo,"dPhiClass_electrons_%d",0);
     dPhiEle[0] = new TH1F(histo, histo, 50, -0.05, 0.05);
     dPhiEle[0]->Sumw2();
@@ -369,7 +375,7 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     lhEle[0] = new TH1F(histo, histo, 50, 0., 1.);
     lhEle[0]->Sumw2();
 
-    // EB histograms |eta|>0.8
+    // EB histograms |eta|>1.0
     sprintf(histo,"dPhiClass_electrons_%d",1);
     dPhiEle[1] = new TH1F(histo, histo, 50, -0.05, 0.05);
     dPhiEle[1]->Sumw2();
@@ -428,7 +434,7 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     lhEle[2] = new TH1F(histo, histo, 50, 0., 1.);
     lhEle[2]->Sumw2();
   } else {
-    // EB histograms |eta|<0.8
+    // EB histograms |eta|<1.0
     sprintf(histo,"dPhiClass_electrons_%d",0);
     dPhiEle[0] = new TH1F(histo, histo, 50, -0.15, 0.15);
     dPhiEle[0]->Sumw2();
@@ -457,7 +463,7 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     lhEle[0] = new TH1F(histo, histo, 50, 0., 1.);
     lhEle[0]->Sumw2();
 
-    // EB histograms |eta|>=0.8
+    // EB histograms |eta|>=1.0
     sprintf(histo,"dPhiClass_electrons_%d",0);
     dPhiEle[1] = new TH1F(histo, histo, 50, -0.15, 0.15);
     dPhiEle[1]->Sumw2();
@@ -548,8 +554,8 @@ void sPlotsPdfsComparison::bookFullHistos() {
   else sprintf(hypothesis,"hadrons");
   
   // booking histos eleID
-  // iecal = 0 --> barrel |eta|< 0.8
-  // iecal = 1 --> barrel |eta|>= 0.8
+  // iecal = 0 --> barrel |eta|< 1.0
+  // iecal = 1 --> barrel |eta|>= 1.0
   // iecal = 2 --> endcap
   for (int iecal=0; iecal<3; iecal++) {
 
@@ -634,7 +640,9 @@ float sPlotsPdfsComparison::likelihoodRatio(int isMc, ElectronLikelihood &lh) {
   LikelihoodMeasurements measurements;
   if(isMc) {
     measurements.pt = f_pt;
-    measurements.subdet = (fabs(f_eta)<1.479) ? 0 : 1;
+    if(fabs(f_eta)<1.0) measurements.subdet = 0;
+    else if (fabs(f_eta)<1.479) measurements.subdet = 1;
+    else measurements.subdet = 2;    
     measurements.deltaPhi = f_dphi;
     measurements.deltaEta = f_deta;
     measurements.eSeedClusterOverPout = -1;
@@ -646,7 +654,9 @@ float sPlotsPdfsComparison::likelihoodRatio(int isMc, ElectronLikelihood &lh) {
     measurements.nBremClusters = f_nbrem;
   } else {
     measurements.pt = pt;
-    measurements.subdet = (fabs(eta)<1.479) ? 0 : 1;
+    if(fabs(eta)<1.0) measurements.subdet = 0;
+    else if (fabs(eta)<1.479) measurements.subdet = 1;
+    else measurements.subdet = 2;    
     measurements.deltaPhi = dphi;
     measurements.deltaEta = deta;
     measurements.eSeedClusterOverPout = -1;
