@@ -3730,7 +3730,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_QCD(const char *outname) {
       	: ( dr03TkSumPtEle[iele] + dr03EcalRecHitSumEtEle[iele] + dr03HcalTowerSumEtFullConeEle[iele]);
       float combIso = (myCombIso - rhoFastjet*TMath::Pi()*0.3*0.3) / pt;
 
-      if(combIso>0.1) continue;    
+      if(combIso>0.15) continue;    
       
       // H/E
       if(hOverEEle[iele]>0.15) continue;

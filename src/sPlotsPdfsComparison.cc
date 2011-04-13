@@ -33,6 +33,7 @@ void sPlotsPdfsComparison::Loop()
   LikelihoodSwitches defaultSwitches;
   defaultSwitches.m_useFBrem = true;
   defaultSwitches.m_useEoverP = false;
+  defaultSwitches.m_useOneOverEMinusOneOverP = false;
   defaultSwitches.m_useSigmaPhiPhi = true;
   defaultSwitches.m_useHoverE = false;
   LH = new ElectronLikelihood(&(*LHdir), &(*LHdir), &(*LHdir), &(*LHdir), &(*LHdir), &(*LHdir),
@@ -64,8 +65,9 @@ void sPlotsPdfsComparison::Loop()
       if(m_isMC) {
         if(wgt>500) continue;
         if(fabs(f_eta)<1.0) jecal = 0;
-        else if (fabs(f_eta)<1.479) jecal = 1;
-        else jecal = 2;
+        else if (fabs(f_eta)<1.442) jecal = 1;
+        else if (fabs(f_eta)>1.56) jecal = 2;
+	else jecal = -1;
         if(f_pt>=10 && f_pt<=20) jptbin = 0;
         else if(f_pt>20) jptbin = 1;
         else continue;
@@ -80,8 +82,9 @@ void sPlotsPdfsComparison::Loop()
       } else {
         if(see<1e-4) continue; // remove residual spikes (if the cleaning is not done)
         if(fabs(f_eta)<1.0) jecal = 0;
-        else if (fabs(f_eta)<1.479) jecal = 1;
-        else jecal = 2;
+        else if (fabs(f_eta)<1.442) jecal = 1;
+        else if (fabs(f_eta)>1.56) jecal = 2;
+        else jecal = -1;
         if(pt>=10 && pt<=20) jptbin = 0;
         else if(pt>20) jptbin = 1;
         else continue;
@@ -93,10 +96,13 @@ void sPlotsPdfsComparison::Loop()
       }
       if(m_isDataZTaP) {
         if(fabs(ztap_eta)<1.0) jecal = 0;
-        else if (fabs(ztap_eta)<1.479) jecal = 1;
-        else jecal = 2;
+        else if (fabs(ztap_eta)<1.442) jecal = 1;
+        else if (fabs(ztap_eta)>1.56) jecal = 2;
+        else jecal = -1;
       }
 
+      if (jecal == -1)
+	continue;
       // populate the unusued PDFs with uniform distribution (including the under/over-flows)
 //       float minSPP = sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinLowEdge(0)-1.0E-03;
 //       float maxSPP = sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetXaxis()->GetBinUpEdge(sigmaIPhiIPhiClassEle [jecal][jptbin][jclass]->GetNbinsX()+1)+1.0E-03;
@@ -113,6 +119,7 @@ void sPlotsPdfsComparison::Loop()
         dPhiEle          [jecal] -> Fill ( f_dphi, wgt );
         dEtaEle          [jecal] -> Fill ( f_deta, wgt );
         EoPEle           [jecal] -> Fill ( f_eop, wgt );
+        OneOverEMinusOneOverPEle[jecal] -> Fill ( 1./(f_eop*f_pin) - 1./f_pin, wgt );
         HoEEle           [jecal] -> Fill ( f_hoe, wgt );
         sigmaIEtaIEtaEle [jecal] -> Fill ( f_see, wgt );
         fbremEle         [jecal] -> Fill ( f_fbrem, wgt );
@@ -124,7 +131,8 @@ void sPlotsPdfsComparison::Loop()
         dPhiUnsplitEle [jecal][jptbin] -> Fill ( f_dphi, wgt );
         dEtaUnsplitEle [jecal][jptbin] -> Fill ( f_deta, wgt );
         EoPUnsplitEle [jecal][jptbin] -> Fill ( f_eop, wgt );
-        HoEUnsplitEle  [jecal][jptbin] -> Fill ( f_hoe, wgt );
+	OneOverEMinusOneOverPUnsplitEle [jecal][jptbin] -> Fill ( 1./(f_eop*f_pin) - 1./f_pin , wgt );
+	HoEUnsplitEle  [jecal][jptbin] -> Fill ( f_hoe, wgt );
         sigmaIEtaIEtaUnsplitEle [jecal][jptbin] -> Fill ( f_see, wgt );
         sigmaIPhiIPhiUnsplitEle [jecal][jptbin] -> Fill ( f_spp, wgt ); 
         fBremUnsplitEle [jecal][jptbin] -> Fill ( f_fbrem, wgt );
@@ -133,6 +141,9 @@ void sPlotsPdfsComparison::Loop()
         dPhiClassEle [jecal][jptbin][jclass] -> Fill ( f_dphi, wgt );
         dEtaClassEle [jecal][jptbin][jclass] -> Fill ( f_deta, wgt );
         EoPClassEle [jecal][jptbin][jclass] -> Fill ( f_eop, wgt );
+	
+        OneOverEMinusOneOverPClassEle [jecal][jptbin][jclass] -> Fill ( 1./(f_eop*f_pin) - 1./f_pin , wgt );
+
         HoEClassEle  [jecal][jptbin][jclass] -> Fill ( f_hoe, wgt );
         sigmaIEtaIEtaClassEle [jecal][jptbin][jclass] -> Fill ( f_see, wgt );
         
@@ -153,6 +164,7 @@ void sPlotsPdfsComparison::Loop()
         dPhiEle          [jecal] -> Fill ( dphi, wgt );
         dEtaEle          [jecal] -> Fill ( deta, wgt );
         EoPEle           [jecal] -> Fill ( eop, wgt );
+	OneOverEMinusOneOverPEle[jecal] -> Fill ( 1./(eop*pin) - 1./pin, wgt );
         HoEEle           [jecal] -> Fill ( hoe, wgt );
         sigmaIEtaIEtaEle [jecal] -> Fill ( see, wgt );
         fbremEle         [jecal] -> Fill ( fbrem, wgt );
@@ -164,6 +176,7 @@ void sPlotsPdfsComparison::Loop()
         dPhiUnsplitEle [jecal][jptbin] -> Fill ( dphi, wgt );
         dEtaUnsplitEle [jecal][jptbin] -> Fill ( deta, wgt );
         EoPUnsplitEle [jecal][jptbin] -> Fill ( eop, wgt );
+	OneOverEMinusOneOverPUnsplitEle [jecal][jptbin] -> Fill ( 1./(eop*pin) - 1./pin , wgt );
         HoEUnsplitEle  [jecal][jptbin] -> Fill ( hoe, wgt );
         sigmaIEtaIEtaUnsplitEle [jecal][jptbin] -> Fill ( see, wgt );
         sigmaIPhiIPhiUnsplitEle [jecal][jptbin] -> Fill ( spp, wgt );
@@ -172,6 +185,7 @@ void sPlotsPdfsComparison::Loop()
         dPhiClassEle [jecal][jptbin][jclass] -> Fill ( dphi, wgt );
         dEtaClassEle [jecal][jptbin][jclass] -> Fill ( deta, wgt );
         EoPClassEle [jecal][jptbin][jclass] -> Fill ( eop, wgt );
+        OneOverEMinusOneOverPClassEle [jecal][jptbin][jclass] -> Fill ( 1./(eop*pin) - 1./pin , wgt );
         HoEClassEle  [jecal][jptbin][jclass] -> Fill ( hoe, wgt );
         sigmaIEtaIEtaClassEle [jecal][jptbin][jclass] -> Fill ( see, wgt );
         if(jclass==0) {
@@ -189,11 +203,12 @@ void sPlotsPdfsComparison::Loop()
       lhClassEle [jecal][jptbin][jclass] -> Fill ( f_lh, wgt );
     } else {
       if(fabs(ztap_eta)<1.0) jecal = 0;
-      else if (fabs(ztap_eta)<1.479) jecal = 1;
+      else if (fabs(ztap_eta)<1.442) jecal = 1;
       else jecal = 2;
       dPhiEle          [jecal] -> Fill ( ztap_dphi, wgt );
       dEtaEle          [jecal] -> Fill ( ztap_deta, wgt );
       EoPEle           [jecal] -> Fill ( ztap_eop, wgt );
+      OneOverEMinusOneOverPEle[jecal] -> Fill ( 1./(ztap_eop*ztap_pin) - 1./ztap_pin, wgt );
       HoEEle           [jecal] -> Fill ( ztap_hoe, wgt );
       sigmaIEtaIEtaEle [jecal] -> Fill ( ztap_see, wgt );
       fbremEle         [jecal] -> Fill ( ztap_fbrem, wgt );
@@ -230,6 +245,7 @@ void sPlotsPdfsComparison::Loop()
     dPhiEle[jecal]->Write();
     dEtaEle[jecal]->Write();
     EoPEle[jecal]->Write();           
+    OneOverEMinusOneOverPEle[jecal]->Write();           
     HoEEle[jecal]->Write();
     sigmaIEtaIEtaEle[jecal]->Write();
     fbremEle[jecal]->Write();
@@ -251,6 +267,7 @@ void sPlotsPdfsComparison::Loop()
       dPhiUnsplitEle[iecal][iptbin]->Write();
       dEtaUnsplitEle[iecal][iptbin]->Write();
       EoPUnsplitEle[iecal][iptbin]->Write();
+      OneOverEMinusOneOverPUnsplitEle[iecal][iptbin]->Write();
       HoEUnsplitEle[iecal][iptbin]->Write();
       sigmaIEtaIEtaUnsplitEle[iecal][iptbin]->Write();
       sigmaIPhiIPhiUnsplitEle[iecal][iptbin]->Write();
@@ -262,6 +279,7 @@ void sPlotsPdfsComparison::Loop()
 	dPhiClassEle[iecal][iptbin][iclass]->Write();
 	dEtaClassEle[iecal][iptbin][iclass]->Write();
 	EoPClassEle[iecal][iptbin][iclass]->Write();
+	OneOverEMinusOneOverPClassEle[iecal][iptbin][iclass]->Write();
 	HoEClassEle[iecal][iptbin][iclass]->Write();
 	sigmaIEtaIEtaClassEle[iecal][iptbin][iclass]->Write();
 	sigmaIPhiIPhiClassEle[iecal][iptbin][iclass]->Write();
@@ -286,6 +304,9 @@ void sPlotsPdfsComparison::bookHistosVariableBinning() {
 
   float EoPBinsEB[12] = {0, 0.5, 0.75, 0.875, 1, 1.125, 1.25, 1.5, 2, 4.0, 7., 10.};
   float EoPBinsEE[12] = {0, 0.5, 0.75, 0.875, 1, 1.125, 1.25, 1.5, 2, 4.0, 7., 10.};
+
+  float OneOverEMinusOneOverPBinsEB[12] = {-1., -0.8, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3};
+  float OneOverEMinusOneOverPBinsEE[12] = {-1., -0.8, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3};
 
   float seeBinsEB[14] = {0., 0.005 , 0.0055 , 0.006 , 0.0065 , 0.007 , 0.0075 , 0.008 , 0.0085 , 0.009 , 0.0095, 0.01,
                          0.015, 0.020 };
@@ -314,18 +335,24 @@ void sPlotsPdfsComparison::bookHistosVariableBinning() {
   int iecal = 0;
   sprintf(histo,"EoPClass_electrons_%d",iecal);
   EoPEle[iecal] = new TH1F(histo, histo, 11, EoPBinsEB);
+  sprintf(histo,"OneOverEMinusOneOverPClass_electrons_%d",iecal);
+  OneOverEMinusOneOverPEle[iecal] = new TH1F(histo, histo, 11, OneOverEMinusOneOverPBinsEB);
   sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",iecal);
   sigmaIEtaIEtaEle[iecal] = new TH1F(histo, histo, 13, seeBinsEB);
 
   iecal = 1;
   sprintf(histo,"EoPClass_electrons_%d",iecal);
   EoPEle[iecal] = new TH1F(histo, histo, 11, EoPBinsEB);
+  sprintf(histo,"OneOverEMinusOneOverPClass_electrons_%d",iecal);
+  OneOverEMinusOneOverPEle[iecal] = new TH1F(histo, histo, 11, OneOverEMinusOneOverPBinsEB);
   sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",iecal);
   sigmaIEtaIEtaEle[iecal] = new TH1F(histo, histo, 13, seeBinsEB);
 
   iecal = 2;
   sprintf(histo,"EoPClass_electrons_%d",iecal);
   EoPEle[iecal] = new TH1F(histo, histo, 11, EoPBinsEE);
+  sprintf(histo,"OneOverEMinusOneOverPClass_electrons_%d",iecal);
+  OneOverEMinusOneOverPEle[iecal] = new TH1F(histo, histo, 11, OneOverEMinusOneOverPBinsEE);
   sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",iecal);
   sigmaIEtaIEtaEle[iecal] = new TH1F(histo, histo, 13, seeBinsEE);
 
@@ -359,6 +386,9 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     sprintf(histo,"EoPClass_electrons_%d",0);
     EoPEle[0] = new TH1F(histo, histo, 50, 0., 3.);
     EoPEle[0]->Sumw2();
+    sprintf(histo,"OneOverEMinusOneOverPClass_electrons_%d",0);
+    OneOverEMinusOneOverPEle[0] = new TH1F(histo, histo, 50, -0.2, 0.1);
+    OneOverEMinusOneOverPEle[0]->Sumw2();
     sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",0);
     sigmaIEtaIEtaEle[0] = new TH1F(histo, histo, 50, 0., 0.03);
     sigmaIEtaIEtaEle[0]->Sumw2();
@@ -388,6 +418,9 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     sprintf(histo,"EoPClass_electrons_%d",1);
     EoPEle[1] = new TH1F(histo, histo, 50, 0., 3.);
     EoPEle[1]->Sumw2();
+    sprintf(histo,"OneOverEMinusOneOverPClass_electrons_%d",1);
+    OneOverEMinusOneOverPEle[1] = new TH1F(histo, histo, 50, -0.2, 0.1);
+    OneOverEMinusOneOverPEle[1]->Sumw2();
     sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",1);
     sigmaIEtaIEtaEle[1] = new TH1F(histo, histo, 50, 0., 0.03);
     sigmaIEtaIEtaEle[1]->Sumw2();
@@ -405,6 +438,7 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     lhEle[1]->Sumw2();
 
 
+
     // EE histograms
     sprintf(histo,"dPhiClass_electrons_%d",1);
     dPhiEle[2] = new TH1F(histo, histo, 50, -0.1, 0.1);
@@ -418,6 +452,9 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     sprintf(histo,"EoPClass_electrons_%d",1);
     EoPEle[2] = new TH1F(histo, histo, 50, 0., 5.);
     EoPEle[2]->Sumw2();
+    sprintf(histo,"OneOverEMinusOneOverPClass_electrons_%d",1);
+    OneOverEMinusOneOverPEle[2] = new TH1F(histo, histo, 50, -0.2, 0.1);
+    OneOverEMinusOneOverPEle[2]->Sumw2();
     sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",1);
     sigmaIEtaIEtaEle[2] = new TH1F(histo, histo, 50, 0.01, 0.05);
     sigmaIEtaIEtaEle[2]->Sumw2();
@@ -447,6 +484,9 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     sprintf(histo,"EoPClass_electrons_%d",0);
     EoPEle[0] = new TH1F(histo, histo, 50, 0., 10.);
     EoPEle[0]->Sumw2();
+    sprintf(histo,"OneOverEMinusOneOverPClass_electrons_%d",0);
+    OneOverEMinusOneOverPEle[0] = new TH1F(histo, histo, 50, -0.2, 0.1);
+    OneOverEMinusOneOverPEle[0]->Sumw2();
     sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",0);
     sigmaIEtaIEtaEle[0] = new TH1F(histo, histo, 50, 0., 0.03);
     sigmaIEtaIEtaEle[0]->Sumw2();
@@ -476,6 +516,9 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     sprintf(histo,"EoPClass_electrons_%d",0);
     EoPEle[1] = new TH1F(histo, histo, 50, 0., 10.);
     EoPEle[1]->Sumw2();
+    sprintf(histo,"OneOverEMinusOneOverPClass_electrons_%d",0);
+    OneOverEMinusOneOverPEle[1] = new TH1F(histo, histo, 50, -0.2, 0.1);
+    OneOverEMinusOneOverPEle[1]->Sumw2();
     sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",0);
     sigmaIEtaIEtaEle[1] = new TH1F(histo, histo, 50, 0., 0.03);
     sigmaIEtaIEtaEle[1]->Sumw2();
@@ -505,6 +548,9 @@ void sPlotsPdfsComparison::bookHistosFixedBinning() {
     sprintf(histo,"EoPClass_electrons_%d",1);
     EoPEle[2] = new TH1F(histo, histo, 50, 0., 10.);
     EoPEle[2]->Sumw2();
+    sprintf(histo,"OneOverEMinusOneOverPClass_electrons_%d",1);
+    OneOverEMinusOneOverPEle[2] = new TH1F(histo, histo, 50, -0.2, 0.1);
+    OneOverEMinusOneOverPEle[2]->Sumw2();
     sprintf(histo,"sigmaIEtaIEtaClass_electrons_%d",1);
     sigmaIEtaIEtaEle[2] = new TH1F(histo, histo, 50, 0.01, 0.08);
     sigmaIEtaIEtaEle[2]->Sumw2();
@@ -534,6 +580,8 @@ void sPlotsPdfsComparison::bookFullHistos() {
   float dEtaMax     =  0.015;
   float EoPMin   =  0.0;
   float EoPMax   =  10.0;
+  float OneOverEMinusOneOverPMin   =  -0.1;
+  float OneOverEMinusOneOverPMax   =  0.05;
   float HoEMin      =  0.0; // zero-suppression in HCAL
   float HoEMax      =  0.15; // pixelMatchGsfElectron pre-selection: H/E<0.15
   float sigmaIEtaIEtaEBMin = 0.0;
@@ -574,6 +622,9 @@ void sPlotsPdfsComparison::bookFullHistos() {
       sprintf(histo,"EoPUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       EoPUnsplitEle[iecal][iptbin]      = new TH1F(histo, histo, nbins, EoPMin, EoPMax);
       EoPUnsplitEle[iecal][iptbin]->Sumw2();
+      sprintf(histo,"OneOverEMinusOneOverPUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
+      OneOverEMinusOneOverPUnsplitEle[iecal][iptbin]      = new TH1F(histo, histo, nbins, OneOverEMinusOneOverPMin, OneOverEMinusOneOverPMax);
+      OneOverEMinusOneOverPUnsplitEle[iecal][iptbin]->Sumw2();
       sprintf(histo,"HoEUnsplit_%s_subdet%d_ptbin%d",hypothesis,iecal,iptbin);
       HoEUnsplitEle[iecal][iptbin]         = new TH1F(histo, histo, nbins, HoEMin, HoEMax);
       HoEUnsplitEle[iecal][iptbin]->Sumw2();
@@ -609,6 +660,9 @@ void sPlotsPdfsComparison::bookFullHistos() {
 	sprintf(histo,"EoPClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
 	EoPClassEle[iecal][iptbin][iclass]      = new TH1F(histo, histo, nbins, EoPMin, EoPMax);
 	EoPClassEle[iecal][iptbin][iclass]->Sumw2();
+	sprintf(histo,"OneOverEMinusOneOverPClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
+	OneOverEMinusOneOverPClassEle[iecal][iptbin][iclass]      = new TH1F(histo, histo, nbins, OneOverEMinusOneOverPMin, OneOverEMinusOneOverPMax);
+	OneOverEMinusOneOverPClassEle[iecal][iptbin][iclass]->Sumw2();
 	sprintf(histo,"HoEClass_%s_subdet%d_ptbin%d_class%d",hypothesis,iecal,iptbin,iclass);
 	HoEClassEle[iecal][iptbin][iclass]         = new TH1F(histo, histo, nbins, HoEMin, HoEMax);
 	HoEClassEle[iecal][iptbin][iclass]->Sumw2();

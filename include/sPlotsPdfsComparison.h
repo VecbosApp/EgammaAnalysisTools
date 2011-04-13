@@ -40,6 +40,9 @@ public :
    Double_t        see;
    Double_t        spp;
    Double_t        eop;
+   Double_t        esc;
+   Double_t        pin;
+   Double_t        rho;
    Double_t        fbrem;
    Double_t        nbrem;
    Double_t        met;
@@ -90,6 +93,9 @@ public :
    Float_t       f_see;
    Float_t       f_spp;
    Float_t       f_eop;
+   Float_t       f_esc;
+   Float_t       f_pin;
+   Float_t       f_rho;
    Float_t       f_fbrem;
    Int_t         f_nbrem;
    Float_t       f_met;
@@ -134,6 +140,8 @@ public :
    Double_t      ztap_L_N_bkg;
    Double_t      ztap_eopout;
    Double_t      ztap_eop;
+   Double_t      ztap_esc;
+   Double_t      ztap_pin;
    Double_t      ztap_hoe;
    Double_t      ztap_deta;
    Double_t      ztap_dphi;
@@ -171,6 +179,9 @@ public :
    TBranch        *b_see;   //!
    TBranch        *b_spp;   //!
    TBranch        *b_eop;   //!
+   TBranch        *b_esc;   //!
+   TBranch        *b_pin;   //!
+   TBranch        *b_rho;   //!
    TBranch        *b_fbrem;   //!
    TBranch        *b_nbrem;   //!
    TBranch        *b_met;   //!
@@ -213,6 +224,8 @@ public :
    TBranch        *b_L_N_bkg;   //!
    TBranch        *b_EoPout;   //!
    TBranch        *b_EoP;   //!
+   TBranch        *b_Esc;   //!
+   TBranch        *b_Pin;   //!
    TBranch        *b_HoE;   //!
    TBranch        *b_deltaEtaCorr;   //!
    TBranch        *b_deltaPhiCorr;   //!
@@ -253,6 +266,7 @@ public :
    TH1F *dPhiEle[3];
    TH1F *dEtaEle[3];
    TH1F *EoPEle[3];
+   TH1F *OneOverEMinusOneOverPEle[3];
    TH1F *HoEEle[3];
    TH1F *sigmaIEtaIEtaEle[3];
    TH1F *fbremEle[3];
@@ -267,6 +281,7 @@ public :
   TH1F *dPhiUnsplitEle[3][2];
   TH1F *dEtaUnsplitEle[3][2];
   TH1F *EoPUnsplitEle[3][2];
+  TH1F *OneOverEMinusOneOverPUnsplitEle[3][2];
   TH1F *HoEUnsplitEle[3][2];  
   TH1F *sigmaIEtaIEtaUnsplitEle[3][2];
   TH1F *sigmaIPhiIPhiUnsplitEle[3][2];
@@ -278,6 +293,7 @@ public :
   TH1F *dPhiClassEle[3][2][2];
   TH1F *dEtaClassEle[3][2][2];
   TH1F *EoPClassEle[3][2][2];
+  TH1F *OneOverEMinusOneOverPClassEle[3][2][2];
   TH1F *HoEClassEle[3][2][2];
   TH1F *sigmaIEtaIEtaClassEle[3][2][2];
   TH1F *sigmaIPhiIPhiClassEle[3][2][2];
@@ -353,6 +369,8 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC, int data_ZTaP)
      fChain->SetBranchAddress("see", &f_see, &b_see);
      fChain->SetBranchAddress("spp", &f_spp, &b_spp);
      fChain->SetBranchAddress("eop", &f_eop, &b_eop);
+     fChain->SetBranchAddress("esc", &f_esc, &b_esc);
+     fChain->SetBranchAddress("pin", &f_pin, &b_pin);
      fChain->SetBranchAddress("fbrem", &f_fbrem, &b_fbrem);
      fChain->SetBranchAddress("nbrem", &f_nbrem, &b_nbrem);
      fChain->SetBranchAddress("met", &f_met, &b_met);
@@ -407,6 +425,8 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC, int data_ZTaP)
      fChain->SetBranchAddress("see", &see, &b_see);
      fChain->SetBranchAddress("spp", &spp, &b_spp);
      fChain->SetBranchAddress("eop", &eop, &b_eop);
+     fChain->SetBranchAddress("esc", &esc, &b_esc);
+     fChain->SetBranchAddress("pin", &pin, &b_pin);
      fChain->SetBranchAddress("fbrem", &fbrem, &b_fbrem);
      fChain->SetBranchAddress("nbrem", &nbrem, &b_nbrem);
      fChain->SetBranchAddress("met", &met, &b_met);
@@ -453,6 +473,8 @@ void sPlotsPdfsComparison::Init(TTree *tree, int isMC, int data_ZTaP)
      fChain->SetBranchAddress("L_N_bkg", &ztap_L_N_bkg, &b_L_N_bkg);
      fChain->SetBranchAddress("EoPout", &ztap_eopout, &b_EoPout);
      fChain->SetBranchAddress("EoP", &ztap_eop, &b_EoP);
+     fChain->SetBranchAddress("esc", &ztap_esc, &b_Esc);
+     fChain->SetBranchAddress("pin", &ztap_pin, &b_Pin);
      fChain->SetBranchAddress("HoE", &ztap_hoe, &b_HoE);
      fChain->SetBranchAddress("deltaEtaCorr", &ztap_deta, &b_deltaEtaCorr);
      fChain->SetBranchAddress("deltaPhiCorr", &ztap_dphi, &b_deltaPhiCorr);

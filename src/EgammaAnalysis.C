@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
 
 #if Application == 5
 
-  int doSignalsPlots = 1;
+  int doSignalsPlots = 0;
   int isMC = 1;
   int typeClass = 2;
   int isTP = 0;
@@ -177,11 +177,11 @@ int main(int argc, char* argv[]) {
   TFile *fileData, *fileMC;
 
   if(doSignalsPlots) {
-    fileData = TFile::Open((std::string("results_data/sPlots/Wenu_tree.root")).c_str());
-    fileMC = TFile::Open((std::string("wcandleresults/treesW/WjetsMadgraph.root")).c_str());
+    //    fileData = TFile::Open((std::string("results_data/sPlots/Wenu_tree.root")).c_str());
+    fileMC = TFile::Open((std::string("results/treesW/WJetsMADGRAPH_Wenu.root")).c_str());
   } else {
-    fileData = TFile::Open((std::string("results_data/sPlots/Wenu_bkgFit_tree.root")).c_str());
-    fileMC = TFile::Open((std::string("results/treesW/QCD_Wenu.root")).c_str());    
+    //    fileData = TFile::Open((std::string("results_data/sPlots/Wenu_bkgFit_tree.root")).c_str());
+    fileMC = TFile::Open((std::string("results/treesW/fakes_Wenu.root")).c_str());    
   }
 
   TTree *tree = 0;

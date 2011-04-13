@@ -87,6 +87,7 @@ ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDire
   if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB0lt15lh->addPdf ("electrons", "sigmaIEtaIEta", splitSignalPdfs) ;
   if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB0lt15lh->addPdf ("electrons", "sigmaIPhiIPhi", splitSignalPdfs) ;
   if (m_eleIDSwitches.m_useFBrem)        _EB0lt15lh->addPdf ("electrons", "fBrem",         splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useOneOverEMinusOneOverP)        _EB0lt15lh->addPdf ("electrons", "OneOverEMinusOneOverP",         splitSignalPdfs) ;
 
   if(backgroundWeightSplitting.compare("fullclass")==0) {
     _EB0lt15lh->setSplitFrac ("hadrons", "fullclass0", 1.0) ;
@@ -112,6 +113,7 @@ ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDire
   if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB0lt15lh->addPdf ("hadrons", "sigmaIEtaIEta", splitBackgroundPdfs) ;
   if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB0lt15lh->addPdf ("hadrons", "sigmaIPhiIPhi", splitBackgroundPdfs) ;
   if (m_eleIDSwitches.m_useFBrem)        _EB0lt15lh->addPdf ("hadrons", "fBrem",         splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useOneOverEMinusOneOverP)        _EB0lt15lh->addPdf ("hadrons", "OneOverEMinusOneOverP",         splitBackgroundPdfs) ;
 
 
 
@@ -145,6 +147,7 @@ ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDire
   if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB0gt15lh->addPdf ("electrons", "sigmaIEtaIEta", splitSignalPdfs) ;
   if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB0gt15lh->addPdf ("electrons", "sigmaIPhiIPhi", splitSignalPdfs) ;
   if (m_eleIDSwitches.m_useFBrem)        _EB0gt15lh->addPdf ("electrons", "fBrem",         splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useOneOverEMinusOneOverP)        _EB0gt15lh->addPdf ("electrons", "OneOverEMinusOneOverP",         splitSignalPdfs) ;
 
   if(backgroundWeightSplitting.compare("fullclass")==0) {
     _EB0gt15lh->setSplitFrac ("hadrons", "fullclass0", 1.0) ;
@@ -170,6 +173,7 @@ ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDire
   if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB0gt15lh->addPdf ("hadrons", "sigmaIEtaIEta", splitBackgroundPdfs) ;
   if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB0gt15lh->addPdf ("hadrons", "sigmaIPhiIPhi", splitBackgroundPdfs) ;
   if (m_eleIDSwitches.m_useFBrem)        _EB0gt15lh->addPdf ("hadrons", "fBrem",         splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useOneOverEMinusOneOverP)        _EB0gt15lh->addPdf ("hadrons", "OneOverEMinusOneOverP",         splitBackgroundPdfs) ;
 
 
   // ECAL BARREL1 (|eta|>0.8) LIKELIHOOD - Pt < 15 GeV region
@@ -202,6 +206,7 @@ ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDire
   if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB1lt15lh->addPdf ("electrons", "sigmaIEtaIEta", splitSignalPdfs) ;
   if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB1lt15lh->addPdf ("electrons", "sigmaIPhiIPhi", splitSignalPdfs) ;
   if (m_eleIDSwitches.m_useFBrem)        _EB1lt15lh->addPdf ("electrons", "fBrem",         splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useOneOverEMinusOneOverP)        _EB1lt15lh->addPdf ("electrons", "OneOverEMinusOneOverP",         splitSignalPdfs) ;
 
   if(backgroundWeightSplitting.compare("fullclass")==0) {
     _EB1lt15lh->setSplitFrac ("hadrons", "fullclass0", 1.0) ;
@@ -227,6 +232,7 @@ ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDire
   if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB1lt15lh->addPdf ("hadrons", "sigmaIEtaIEta", splitBackgroundPdfs) ;
   if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB1lt15lh->addPdf ("hadrons", "sigmaIPhiIPhi", splitBackgroundPdfs) ;
   if (m_eleIDSwitches.m_useFBrem)        _EB1lt15lh->addPdf ("hadrons", "fBrem",         splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useOneOverEMinusOneOverP)        _EB1lt15lh->addPdf ("hadrons", "OneOverEMinusOneOverP",         splitBackgroundPdfs) ;
 
 
 
@@ -260,6 +266,7 @@ ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDire
   if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB1gt15lh->addPdf ("electrons", "sigmaIEtaIEta", splitSignalPdfs) ;
   if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB1gt15lh->addPdf ("electrons", "sigmaIPhiIPhi", splitSignalPdfs) ;
   if (m_eleIDSwitches.m_useFBrem)        _EB1gt15lh->addPdf ("electrons", "fBrem",         splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useOneOverEMinusOneOverP)        _EB1gt15lh->addPdf ("electrons", "OneOverEMinusOneOverP",         splitSignalPdfs) ;
 
   if(backgroundWeightSplitting.compare("fullclass")==0) {
     _EB1gt15lh->setSplitFrac ("hadrons", "fullclass0", 1.0) ;
@@ -285,6 +292,7 @@ ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDire
   if (m_eleIDSwitches.m_useSigmaEtaEta)  _EB1gt15lh->addPdf ("hadrons", "sigmaIEtaIEta", splitBackgroundPdfs) ;
   if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EB1gt15lh->addPdf ("hadrons", "sigmaIPhiIPhi", splitBackgroundPdfs) ;
   if (m_eleIDSwitches.m_useFBrem)        _EB1gt15lh->addPdf ("hadrons", "fBrem",         splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useOneOverEMinusOneOverP)        _EB1gt15lh->addPdf ("hadrons", "OneOverEMinusOneOverP",         splitBackgroundPdfs) ;
 
 
   // ECAL ENDCAP LIKELIHOOD - Pt < 15 GeV
@@ -317,6 +325,7 @@ ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDire
   if (m_eleIDSwitches.m_useSigmaEtaEta)  _EElt15lh->addPdf ("electrons", "sigmaIEtaIEta", splitSignalPdfs) ;
   if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EElt15lh->addPdf ("electrons", "sigmaIPhiIPhi", splitSignalPdfs) ;
   if (m_eleIDSwitches.m_useFBrem)        _EElt15lh->addPdf ("electrons", "fBrem",         splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useOneOverEMinusOneOverP)        _EElt15lh->addPdf ("electrons", "OneOverEMinusOneOverP",         splitSignalPdfs) ;
 
   if(backgroundWeightSplitting.compare("fullclass")==0) {
     _EElt15lh->setSplitFrac ("hadrons", "fullclass0", 1.0) ;
@@ -342,6 +351,7 @@ ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDire
   if (m_eleIDSwitches.m_useSigmaEtaEta)  _EElt15lh->addPdf ("hadrons", "sigmaIEtaIEta", splitBackgroundPdfs) ;
   if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EElt15lh->addPdf ("hadrons", "sigmaIPhiIPhi", splitBackgroundPdfs) ;
   if (m_eleIDSwitches.m_useFBrem)        _EElt15lh->addPdf ("hadrons", "fBrem",         splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useOneOverEMinusOneOverP)        _EElt15lh->addPdf ("hadrons", "OneOverEMinusOneOverP",         splitBackgroundPdfs) ;
 
   // ECAL ENDCAP LIKELIHOOD - Pt >= 15 GeV
   _EEgt15lh->initFromFile (EEgt15dir) ;
@@ -373,6 +383,7 @@ ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDire
   if (m_eleIDSwitches.m_useSigmaEtaEta)  _EEgt15lh->addPdf ("electrons", "sigmaIEtaIEta", splitSignalPdfs) ;
   if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EEgt15lh->addPdf ("electrons", "sigmaIPhiIPhi", splitSignalPdfs) ;
   if (m_eleIDSwitches.m_useFBrem)        _EEgt15lh->addPdf ("electrons", "fBrem",         splitSignalPdfs) ;
+  if (m_eleIDSwitches.m_useOneOverEMinusOneOverP)        _EEgt15lh->addPdf ("electrons", "OneOverEMinusOneOverP",         splitSignalPdfs) ;
 
   if(backgroundWeightSplitting.compare("fullclass")==0) {
     _EEgt15lh->setSplitFrac ("hadrons", "fullclass0", 1.0) ;
@@ -398,6 +409,7 @@ ElectronLikelihood::Setup (TDirectory *EB0lt15dir, TDirectory *EB1lt15dir, TDire
   if (m_eleIDSwitches.m_useSigmaEtaEta)  _EEgt15lh->addPdf ("hadrons", "sigmaIEtaIEta", splitBackgroundPdfs) ;
   if (m_eleIDSwitches.m_useSigmaPhiPhi)  _EEgt15lh->addPdf ("hadrons", "sigmaIPhiIPhi", splitBackgroundPdfs) ;
   if (m_eleIDSwitches.m_useFBrem)        _EEgt15lh->addPdf ("hadrons", "fBrem",         splitBackgroundPdfs) ;
+  if (m_eleIDSwitches.m_useOneOverEMinusOneOverP)        _EEgt15lh->addPdf ("hadrons", "OneOverEMinusOneOverP",         splitBackgroundPdfs) ;
 
 }
 
@@ -430,6 +442,7 @@ ElectronLikelihood::result (const LikelihoodMeasurements electron) const
   if(m_eleIDSwitches.m_useSigmaEtaEta) measurements.push_back( electron.sigmaIEtaIEta );
   if(m_eleIDSwitches.m_useSigmaPhiPhi) measurements.push_back( electron.sigmaIPhiIPhi );
   if(m_eleIDSwitches.m_useFBrem) measurements.push_back( electron.fBrem );
+  if(m_eleIDSwitches.m_useOneOverEMinusOneOverP) measurements.push_back( electron.OneOverEMinusOneOverP );
 
   // Split using only the 1 / >1 cluster
   int nBremClusters=electron.nBremClusters;
@@ -482,6 +495,7 @@ ElectronLikelihood::resultLog (const LikelihoodMeasurements electron) const
   if(m_eleIDSwitches.m_useSigmaEtaEta) measurements.push_back( electron.sigmaIEtaIEta );
   if(m_eleIDSwitches.m_useSigmaPhiPhi) measurements.push_back( electron.sigmaIPhiIPhi );
   if(m_eleIDSwitches.m_useFBrem) measurements.push_back( electron.fBrem );
+  if(m_eleIDSwitches.m_useOneOverEMinusOneOverP) measurements.push_back( electron.OneOverEMinusOneOverP );
 
   // Split using only the 1 / >1 cluster
   int nBremClusters=electron.nBremClusters;
