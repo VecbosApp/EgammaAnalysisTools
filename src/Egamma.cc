@@ -190,6 +190,9 @@ float Egamma::likelihoodRatio(int eleIndex, ElectronLikelihood &lh) {
   measurements.sigmaIPhiIPhi = SigmaiPiP(eleIndex);
   measurements.fBrem = fbremEle[eleIndex];
   measurements.nBremClusters = nbremsEle[eleIndex];
+  int gsftrack = gsfTrackIndexEle[eleIndex];
+  TVector3 pIn(pxGsfTrack[gsftrack],pyGsfTrack[gsftrack],pzGsfTrack[gsftrack]);
+  measurements.OneOverEMinusOneOverP = 1./(eSuperClusterOverPEle[eleIndex]*pIn.Mag()) - 1./pIn.Mag();
   return lh.resultLog(measurements);
 }
 
