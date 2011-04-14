@@ -16,5 +16,5 @@ dphiOut         0.0             999.
 invEminusInvP   0.0             1000
 bremFraction    0.0             999.
 sigmaPhiPhi     0.0             999.
-likelihood0     -1.825          100.
-likelihood1     -0.096          100.
+likelihood0     -2.571          100.
+likelihood1     -0.657          100.
