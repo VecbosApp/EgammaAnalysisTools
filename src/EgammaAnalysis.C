@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
   // analysis.reproduceEgammaCutID();
   //  analysis.findEquivalentLHCut( 0.79935 );        // tight eleID
   //  analysis.findEquivalentLHCut( 0.957 );       // loose eleID
-  // analysis.estimateIDEfficiency(outputFileName);
+  //  analysis.estimateIDEfficiency(outputFileName);
   //analysis.estimateFakeRateQCD(outputFileName);
   analysis.estimateFakeRate(outputFileName);
 

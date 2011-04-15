@@ -16,6 +16,8 @@
 // Offline analysis includes
 #include "CommonTools/include/EfficiencyEvaluator.hh"
 #include <string>
+#include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -146,6 +148,52 @@ void drawEta(const char* filename, TString type) {
   vector<float> effAverageEB = ElectronEfficiencyEta.GetCumulativeEfficiencyAverages(4,12);
   vector<float> effAverageEEm = ElectronEfficiencyEta.GetCumulativeEfficiencyAverages(1,3);
   vector<float> effAverageEEp = ElectronEfficiencyEta.GetCumulativeEfficiencyAverages(13,15);
+
+  std::ostringstream effCutEB;
+  std::ostringstream effCutEE;
+  std::ostringstream effLHEB;
+  std::ostringstream effLHEE;
+
+  effCutEB << "float fr_EB_CutId_" << type << "[" << CutIdEta.size() << "] = { ";
+  effCutEE << "float fr_EE_CutId_" << type << "[" << CutIdEta.size() << "] = { ";
+
+  effLHEB << "float fr_EB_LHId_" << type << "[" << CutIdEta.size() << "] = { ";
+  effLHEE << "float fr_EE_LHId_" << type << "[" << CutIdEta.size() << "] = { ";
+
+  for (int tightness=0;tightness<CutIdEta.size();++tightness)
+    { 
+      effCutEB << effAverageEB[0+tightness] ;
+      effCutEE << (effAverageEEm[0+tightness]+effAverageEEp[0+tightness])/2 ;
+      effLHEB << effAverageEB[CutIdEta.size()+tightness] ;
+      effLHEE << (effAverageEEm[CutIdEta.size()+tightness]+effAverageEEp[CutIdEta.size()+tightness])/2. ;
+      if (tightness==CutIdEta.size()-1)
+	{
+	  effCutEB << " };"  ;
+	  effCutEE << " };"  ;
+	  effLHEB << " };"  ;
+	  effLHEE << " };"  ;
+	}
+      else
+	{
+	  effCutEB << " , " ;
+	  effCutEE << " , " ;
+	  effLHEB << " , " ;
+	  effLHEE << " , " ;
+	}
+    }
+
+  std::ostringstream fileName;
+  fileName << "elefakes-" << type << ".txt";
+
+  std::ofstream out;
+  out.open(fileName.str().c_str());
+  out << "//************* EB " << type << " fakes *************" << std::endl;
+  out << effCutEB.str() << std::endl;
+  out << effLHEB.str() << std::endl;
+
+  out << "//************* EE " << type << " fakes *************" << std::endl;
+  out << effCutEE.str() << std::endl;
+  out << effLHEE.str() << std::endl;
 
   for (int tightness=0;tightness<CutIdEta.size();++tightness)
     { 

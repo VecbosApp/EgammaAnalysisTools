@@ -92,6 +92,7 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
 
   defaultSwitches.m_useFBrem = true;
   defaultSwitches.m_useEoverP = false;
+  defaultSwitches.m_useOneOverEMinusOneOverP = true;
   defaultSwitches.m_useSigmaPhiPhi = true;
   defaultSwitches.m_useHoverE = false;        
 

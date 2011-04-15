@@ -17,6 +17,8 @@
 #include "CommonTools/include/EfficiencyEvaluator.hh"
 
 #include <string>
+#include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -149,6 +151,53 @@ void drawEta(const char* filename,TString type) {
   vector<float> effAverageEEm = ElectronEfficiencyEta.GetCumulativeEfficiencyAverages(1,12);
   vector<float> effAverageEEp = ElectronEfficiencyEta.GetCumulativeEfficiencyAverages(48,60);
 
+  std::ostringstream effCutEB;
+  std::ostringstream effCutEE;
+  std::ostringstream effLHEB;
+  std::ostringstream effLHEE;
+
+  effCutEB << "float eff_EB_CutId_" << type << "[" << CutIdEta.size() << "] = { ";
+  effCutEE << "float eff_EE_CutId_" << type << "[" << CutIdEta.size() << "] = { ";
+
+  effLHEB << "float eff_EB_LHId_" << type << "[" << CutIdEta.size() << "] = { ";
+  effLHEE << "float eff_EE_LHId_" << type << "[" << CutIdEta.size() << "] = { ";
+
+  for (int tightness=0;tightness<CutIdEta.size();++tightness)
+    { 
+      effCutEB << effAverageEB[0+tightness] ;
+      effCutEE << (effAverageEEm[0+tightness]+effAverageEEp[0+tightness])/2 ;
+      effLHEB << effAverageEB[CutIdEta.size()+tightness] ;
+      effLHEE << (effAverageEEm[CutIdEta.size()+tightness]+effAverageEEp[CutIdEta.size()+tightness])/2. ;
+      if (tightness==CutIdEta.size()-1)
+	{
+	  effCutEB << " };"  ;
+	  effCutEE << " };"  ;
+	  effLHEB << " };"  ;
+	  effLHEE << " };"  ;
+	}
+      else
+	{
+	  effCutEB << " , " ;
+	  effCutEE << " , " ;
+	  effLHEB << " , " ;
+	  effLHEE << " , " ;
+	}
+    }
+
+  std::ostringstream fileName;
+  fileName << "efficiencies-" << type << ".txt";
+
+  std::ofstream out;
+  out.open(fileName.str().c_str());
+  out << "//************* EB " << type << " efficiencies *************" << std::endl;
+  out << effCutEB.str() << std::endl;
+  out << effLHEB.str() << std::endl;
+
+  out << "//************* EE " << type << " efficiencies *************" << std::endl;
+  out << effCutEE.str() << std::endl;
+  out << effLHEE.str() << std::endl;
+  
+
   for (int tightness=0;tightness<CutIdEta.size();tightness++)
     { 
       TCanvas c1;
@@ -247,7 +296,7 @@ void drawPt(const char* filename, TString type) {
   
   vector<TH1F*> efficiency = ElectronEfficiencyPt.GetCumulativeEfficiencies();
   vector<float> effAverage = ElectronEfficiencyPt.GetCumulativeEfficiencyAverages();
-
+      
   for (int tightness=0;tightness<CutIdPt.size();++tightness)
     { 
       TCanvas c1;
