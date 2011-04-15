@@ -21,70 +21,134 @@ int main(int argc, char* argv[]) {
   gROOT->SetStyle("Plain");
   gStyle->SetOptStat(0);
 
-  // MC efficiencies on W+jets Spring 11
-  float eff_CutId_HighPt[5] = { 0.95, 0.88, 0.81, 0.76, 0.70 };
-  float eff_LHId_HighPt[5] = { 0.94, 0.91, 0.83, 0.74, 0.67 };
+  // MC efficiencies on W+jets Spring 11 (EB)
+  float eff_EB_CutId_HighPt[5] = { 0.97, 0.91, 0.85, 0.82, 0.77 };
+  float eff_EB_LHId_HighPt[5] = { 0.96, 0.93, 0.87, 0.80, 0.73 };
 
-  float eff_CutId_LowPt[5] = { 0.81, 0.68, 0.59, 0.54, 0.48 };
-  float eff_LHId_LowPt[5] = { 0.84, 0.77, 0.65, 0.52, 0.44 };
+  float eff_EB_CutId_LowPt[5] = { 0.87, 0.74, 0.65, 0.61, 0.55 };
+  float eff_EB_LHId_LowPt[5] = { 0.90, 0.83, 0.73, 0.62, 0.50 };
 
-  // MC fake rates on W+jets Spring 11
-  float fr_CutId_HighPt[5] = { 0.128, 0.090, 0.061, 0.050, 0.043 };
-  float fr_LHId_HighPt[5] = { 0.106, 0.087, 0.062, 0.045, 0.039 };
+  // MC efficiencies on W+jets Spring 11 (EE)
+  float eff_EE_CutId_HighPt[5] = { 0.94, 0.83, 0.75, 0.68, 0.60 };
+  float eff_EE_LHId_HighPt[5] = { 0.95, 0.90, 0.78, 0.68, 0.54 };
 
-  float fr_CutId_LowPt[5] = { 0.093, 0.060, 0.041, 0.032, 0.028 };
-  float fr_LHId_LowPt[5] = { 0.094, 0.070, 0.047, 0.030, 0.023 };
+  float eff_EE_CutId_LowPt[5] = { 0.72, 0.59, 0.47, 0.39, 0.34 };
+  float eff_EE_LHId_LowPt[5] = { 0.84, 0.73, 0.54, 0.37, 0.21 };
 
-  TGraph *ROC_CutId_HighPt = new TGraph(5, eff_CutId_HighPt, fr_CutId_HighPt);
-  TGraph *ROC_LHId_HighPt = new TGraph(5, eff_LHId_HighPt, fr_LHId_HighPt);
+  // MC fake rates on W+jets Spring 11 (EB)
+  float fr_EB_CutId_HighPt[5] = { 0.112, 0.084, 0.057, 0.050, 0.044 };
+  float fr_EB_LHId_HighPt[5] = { 0.102, 0.075, 0.056, 0.046, 0.039 };
 
-  TGraph *ROC_CutId_LowPt = new TGraph(5, eff_CutId_HighPt, fr_CutId_LowPt);
-  TGraph *ROC_LHId_LowPt = new TGraph(5, eff_LHId_HighPt, fr_LHId_LowPt);
+  float fr_EB_CutId_LowPt[5] = { 0.074, 0.046, 0.035, 0.030, 0.027 };
+  float fr_EB_LHId_LowPt[5] = { 0.088, 0.055, 0.040, 0.030, 0.022 };
 
-  // high pT ROC
-  TCanvas *highPt = new TCanvas("highPt","highPt",600,400);
-  ROC_CutId_HighPt->GetXaxis()->SetTitle("Signal efficiency");
-  ROC_CutId_HighPt->GetYaxis()->SetTitle("Background efficiency");
-  ROC_CutId_HighPt->SetMarkerStyle(20);
-  ROC_CutId_HighPt->SetMarkerSize(1.05);
-  ROC_LHId_HighPt->SetMarkerStyle(21);
-  ROC_LHId_HighPt->SetMarkerSize(1.05);
-  ROC_CutId_HighPt->SetLineColor(1);
-  ROC_CutId_HighPt->SetMarkerColor(1);
-  ROC_LHId_HighPt->SetLineColor(2);
-  ROC_LHId_HighPt->SetMarkerColor(2);
+  // MC fake rates on W+jets Spring 11 (EE)
+  float fr_EE_CutId_HighPt[5] = { 0.156, 0.096, 0.066, 0.046, 0.038 };
+  float fr_EE_LHId_HighPt[5] = { 0.163, 0.119, 0.075, 0.047, 0.031 };
+
+  float fr_EE_CutId_LowPt[5] = { 0.119, 0.078, 0.049, 0.033, 0.026 };
+  float fr_EE_LHId_LowPt[5] = { 0.171, 0.109, 0.062, 0.033, 0.015 };
+
+  
+
+  TGraph *ROC_EB_CutId_HighPt = new TGraph(5, eff_EB_CutId_HighPt, fr_EB_CutId_HighPt);
+  TGraph *ROC_EB_LHId_HighPt = new TGraph(5, eff_EB_LHId_HighPt, fr_EB_LHId_HighPt);
+
+  TGraph *ROC_EE_CutId_HighPt = new TGraph(5, eff_EE_CutId_HighPt, fr_EE_CutId_HighPt);
+  TGraph *ROC_EE_LHId_HighPt = new TGraph(5, eff_EE_LHId_HighPt, fr_EE_LHId_HighPt);
+
+  TGraph *ROC_EB_CutId_LowPt = new TGraph(5, eff_EB_CutId_LowPt, fr_EB_CutId_LowPt);
+  TGraph *ROC_EB_LHId_LowPt = new TGraph(5, eff_EB_LHId_LowPt, fr_EB_LHId_LowPt);
+
+  TGraph *ROC_EE_CutId_LowPt = new TGraph(5, eff_EE_CutId_LowPt, fr_EE_CutId_LowPt);
+  TGraph *ROC_EE_LHId_LowPt = new TGraph(5, eff_EE_LHId_LowPt, fr_EE_LHId_LowPt);
+
+
+  // high pT ROC EB
+  TCanvas *highPtEB = new TCanvas("highPtEB","highPtEB",600,400);
+  ROC_EB_CutId_HighPt->GetXaxis()->SetTitle("Signal efficiency");
+  ROC_EB_CutId_HighPt->GetYaxis()->SetTitle("Background efficiency");
+  ROC_EB_CutId_HighPt->SetMarkerStyle(20);
+  ROC_EB_CutId_HighPt->SetMarkerSize(1.05);
+  ROC_EB_LHId_HighPt->SetMarkerStyle(21);
+  ROC_EB_LHId_HighPt->SetMarkerSize(1.05);
+  ROC_EB_CutId_HighPt->SetLineColor(1);
+  ROC_EB_CutId_HighPt->SetMarkerColor(1);
+  ROC_EB_LHId_HighPt->SetLineColor(2);
+  ROC_EB_LHId_HighPt->SetMarkerColor(2);
 
   TLegend* leg = new TLegend(0.35,0.25,0.60,0.50);
   leg->SetFillStyle(0); leg->SetBorderSize(0); leg->SetTextSize(0.03);
   leg->SetFillColor(0);
-  leg->AddEntry(ROC_CutId_HighPt, "Cut Id","pl"); 
-  leg->AddEntry(ROC_LHId_HighPt, "LH Id","pl"); 
+  leg->AddEntry(ROC_EB_CutId_HighPt, "Cut Id","pl"); 
+  leg->AddEntry(ROC_EB_LHId_HighPt, "LH Id","pl"); 
 
-  ROC_CutId_HighPt->Draw("apl");
-  ROC_LHId_HighPt->Draw("pl");
+  ROC_EB_CutId_HighPt->Draw("apl");
+  ROC_EB_LHId_HighPt->Draw("pl");
   leg->Draw();
-  highPt->SaveAs("roc_HighPt.eps");
-  highPt->SaveAs("roc_HighPt.root");
-  highPt->SaveAs("roc_HighPt.png");
+  highPtEB->SaveAs("roc_EB_HighPt.eps");
+  highPtEB->SaveAs("roc_EB_HighPt.root");
+  highPtEB->SaveAs("roc_EB_HighPt.png");
 
-  // low pT ROC
-  TCanvas *lowPt = new TCanvas("lowPt","lowPt",600,400);
-  ROC_CutId_LowPt->GetXaxis()->SetTitle("Signal efficiency");
-  ROC_CutId_LowPt->GetYaxis()->SetTitle("Background efficiency");
-  ROC_CutId_LowPt->SetMarkerStyle(20);
-  ROC_CutId_LowPt->SetMarkerSize(1.05);
-  ROC_LHId_LowPt->SetMarkerStyle(21);
-  ROC_LHId_LowPt->SetMarkerSize(1.05);
-  ROC_CutId_LowPt->SetLineColor(1);
-  ROC_CutId_LowPt->SetMarkerColor(1);
-  ROC_LHId_LowPt->SetLineColor(2);
-  ROC_LHId_LowPt->SetMarkerColor(2);
+  // high pT ROC EE
+  TCanvas *highPtEE = new TCanvas("highPtEE","highPtEE",600,400);
+  ROC_EE_CutId_HighPt->GetXaxis()->SetTitle("Signal efficiency");
+  ROC_EE_CutId_HighPt->GetYaxis()->SetTitle("Background efficiency");
+  ROC_EE_CutId_HighPt->SetMarkerStyle(20);
+  ROC_EE_CutId_HighPt->SetMarkerSize(1.05);
+  ROC_EE_LHId_HighPt->SetMarkerStyle(21);
+  ROC_EE_LHId_HighPt->SetMarkerSize(1.05);
+  ROC_EE_CutId_HighPt->SetLineColor(1);
+  ROC_EE_CutId_HighPt->SetMarkerColor(1);
+  ROC_EE_LHId_HighPt->SetLineColor(2);
+  ROC_EE_LHId_HighPt->SetMarkerColor(2);
 
-  ROC_CutId_LowPt->Draw("apl");
-  ROC_LHId_LowPt->Draw("pl");
+  ROC_EE_CutId_HighPt->Draw("apl");
+  ROC_EE_LHId_HighPt->Draw("pl");
   leg->Draw();
-  lowPt->SaveAs("roc_LowPt.eps");
-  lowPt->SaveAs("roc_LowPt.root");
-  lowPt->SaveAs("roc_LowPt.png");
+  highPtEE->SaveAs("roc_EE_HighPt.eps");
+  highPtEE->SaveAs("roc_EE_HighPt.root");
+  highPtEE->SaveAs("roc_EE_HighPt.png");
+
+  // low pT ROC EB
+  TCanvas *lowPtEB = new TCanvas("lowPtEB","lowPtEB",600,400);
+  ROC_EB_CutId_LowPt->GetXaxis()->SetTitle("Signal efficiency");
+  ROC_EB_CutId_LowPt->GetYaxis()->SetTitle("Background efficiency");
+  ROC_EB_CutId_LowPt->SetMarkerStyle(20);
+  ROC_EB_CutId_LowPt->SetMarkerSize(1.05);
+  ROC_EB_LHId_LowPt->SetMarkerStyle(21);
+  ROC_EB_LHId_LowPt->SetMarkerSize(1.05);
+  ROC_EB_CutId_LowPt->SetLineColor(1);
+  ROC_EB_CutId_LowPt->SetMarkerColor(1);
+  ROC_EB_LHId_LowPt->SetLineColor(2);
+  ROC_EB_LHId_LowPt->SetMarkerColor(2);
+
+  ROC_EB_CutId_LowPt->Draw("apl");
+  ROC_EB_LHId_LowPt->Draw("pl");
+  leg->Draw();
+  lowPtEB->SaveAs("roc_EB_LowPt.eps");
+  lowPtEB->SaveAs("roc_EB_LowPt.root");
+  lowPtEB->SaveAs("roc_EB_LowPt.png");
+
+  // low pT ROC EE
+  TCanvas *lowPtEE = new TCanvas("lowPtEE","lowPtEE",600,400);
+  ROC_EE_CutId_LowPt->GetXaxis()->SetTitle("Signal efficiency");
+  ROC_EE_CutId_LowPt->GetYaxis()->SetTitle("Background efficiency");
+  ROC_EE_CutId_LowPt->SetMarkerStyle(20);
+  ROC_EE_CutId_LowPt->SetMarkerSize(1.05);
+  ROC_EE_LHId_LowPt->SetMarkerStyle(21);
+  ROC_EE_LHId_LowPt->SetMarkerSize(1.05);
+  ROC_EE_CutId_LowPt->SetLineColor(1);
+  ROC_EE_CutId_LowPt->SetMarkerColor(1);
+  ROC_EE_LHId_LowPt->SetLineColor(2);
+  ROC_EE_LHId_LowPt->SetMarkerColor(2);
+
+  ROC_EE_CutId_LowPt->Draw("apl");
+  ROC_EE_LHId_LowPt->Draw("pl");
+  leg->Draw();
+  lowPtEE->SaveAs("roc_EE_LowPt.eps");
+  lowPtEE->SaveAs("roc_EE_LowPt.root");
+  lowPtEE->SaveAs("roc_EE_LowPt.png");
+
 
 }
