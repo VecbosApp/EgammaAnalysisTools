@@ -17,7 +17,7 @@ using namespace std;
 LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   : Egamma(tree) {
 
-  _isData = true;
+  _isData = false;
   
   EgammaCutBasedIDWPs.push_back("WP95");
   EgammaCutBasedIDWPs.push_back("WP90");
