@@ -332,7 +332,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           reducedTree.fillIsolations(dr03TkSumPtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                      dr03EcalRecHitSumEtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                      dr03HcalTowerSumEtFullConeEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3);
-          reducedTree.fillMore(nPV,rhoFastjet,runNumber);
+          reducedTree.fillMore(nPV,rhoFastjet);
           reducedTree.fillCutBasedIDBits(CutBasedId,CutBasedIdOnlyID,CutBasedIdOnlyIso,CutBasedIdOnlyConv);
           reducedTree.fillLHBasedIDBits(LHBasedId,LHBasedIdOnlyID,LHBasedIdOnlyIso,LHBasedIdOnlyConv);
           reducedTree.fillCiCBasedIDBits(CiCBasedId,CiCBasedIdOnlyID,CiCBasedIdOnlyIso,CiCBasedIdOnlyConv);
