@@ -5,32 +5,84 @@
 #include "TROOT.h"
 #include "TAxis.h"
 #include "TString.h"
+#include <vector>
+#include <sstream>
+#include <fstream>
 
 void compare(const char* file1, const char* file2, const char* variable="vertices", const char* effPoint="80", bool writeEBEE=false);
+float eff_Cut[2], eff_LH[2];
 
-void doAll() {
+int doEff() {
+
+  // for ROC curve
+  std::ostringstream effCutEB;
+  std::ostringstream effCutEE;
+  std::ostringstream effLHEB;
+  std::ostringstream effLHEE;
+
+  std::vector<TString> CutFile, LHFile, WP;
+  CutFile.push_back("WP95"); LHFile.push_back("LHVeryLoose"); WP.push_back("95");
+  CutFile.push_back("WP90"); LHFile.push_back("LHLoose"); WP.push_back("90");
+  CutFile.push_back("WP85"); LHFile.push_back("LHMedium"); WP.push_back("85");
+  CutFile.push_back("WP80"); LHFile.push_back("LHTight"); WP.push_back("80");
+  CutFile.push_back("WP70"); LHFile.push_back("LHHyperTight"); WP.push_back("70");
+
+  effCutEB << "float eff_EB_CutId_" << "[ " << WP.size() << " ] = { ";
+  effCutEE << "float eff_EE_CutId_" << "[ " << WP.size() << " ] = { ";
+
+  effLHEB << "float eff_EB_LHId_" << "[ " << WP.size() << " ] = { ";
+  effLHEE << "float eff_EE_LHId_" << "[ " << WP.size() << " ] = { ";
 
   // eta
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Eta_WP95.root","NewCatOpt_1oEm1oP/LowPt/effData_Eta_LHVeryLoose.root","eta","95",true);
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Eta_WP90.root","NewCatOpt_1oEm1oP/LowPt/effData_Eta_LHLoose.root","eta","90",true);
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Eta_WP85.root","NewCatOpt_1oEm1oP/LowPt/effData_Eta_LHMedium.root","eta","85",true);
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Eta_WP80.root","NewCatOpt_1oEm1oP/LowPt/effData_Eta_LHTight.root","eta","80",true);
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Eta_WP70.root","NewCatOpt_1oEm1oP/LowPt/effData_Eta_LHHyperTight.root","eta","70",true);
+  for(int i=0; i<(int)WP.size(); i++) {
+    TString CutFilePath = TString("NewCatOpt_1oEm1oP/HighPt/effData_Eta_")+CutFile[i]+TString(".root");
+    TString LHFilePath = TString("NewCatOpt_1oEm1oP/HighPt/effData_Eta_")+LHFile[i]+TString(".root");
+    compare(CutFilePath.Data(),LHFilePath.Data(),"eta",WP[i].Data(),true);
+    effCutEB << eff_Cut[0] ;
+      effCutEE << eff_Cut[1] ;
+      effLHEB << eff_LH[0];
+      effLHEE << eff_LH[1] ;
+    if(i==(int)WP.size()-1) {
+      effCutEB << " };"  ;
+      effCutEE << " };"  ;
+      effLHEB << " };"  ;
+      effLHEE << " };"  ;
+    } else {
+      effCutEB << " , " ;
+      effCutEE << " , " ;
+      effLHEB << " , " ;
+      effLHEE << " , " ;
+    }
+  }
+
+  std::ostringstream fileName;
+  fileName << "efficiencies.txt";
+
+  std::ofstream out;
+  out.open(fileName.str().c_str());
+  out << "//************* EB efficiencies *************" << std::endl;
+  out << effCutEB.str() << std::endl;
+  out << effLHEB.str() << std::endl;
+
+  out << "//************* EE efficiencies *************" << std::endl;
+  out << effCutEE.str() << std::endl;
+  out << effLHEE.str() << std::endl;
+  
 
   // pT
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Pt_WP95.root","NewCatOpt_1oEm1oP/LowPt/effData_Pt_LHVeryLoose.root","pt","95");
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Pt_WP90.root","NewCatOpt_1oEm1oP/LowPt/effData_Pt_LHLoose.root","pt","90");
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Pt_WP85.root","NewCatOpt_1oEm1oP/LowPt/effData_Pt_LHMedium.root","pt","85");
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Pt_WP80.root","NewCatOpt_1oEm1oP/LowPt/effData_Pt_LHTight.root","pt","80");
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Pt_WP70.root","NewCatOpt_1oEm1oP/LowPt/effData_Pt_LHHyperTight.root","pt","70");
-
+  for(int i=0; i<(int)WP.size(); i++) {
+    TString CutFilePath = TString("NewCatOpt_1oEm1oP/HighPt/effData_Pt_")+CutFile[i]+TString(".root");
+    TString LHFilePath = TString("NewCatOpt_1oEm1oP/HighPt/effData_Pt_")+LHFile[i]+TString(".root");
+    compare(CutFilePath.Data(),LHFilePath.Data(),"pt",WP[i].Data());
+  }
   // vertices
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Vertices_WP95.root","NewCatOpt_1oEm1oP/LowPt/effData_Vertices_LHVeryLoose.root","vertices","95");
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Vertices_WP90.root","NewCatOpt_1oEm1oP/LowPt/effData_Vertices_LHLoose.root","vertices","90");
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Vertices_WP85.root","NewCatOpt_1oEm1oP/LowPt/effData_Vertices_LHMedium.root","vertices","85");
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Vertices_WP80.root","NewCatOpt_1oEm1oP/LowPt/effData_Vertices_LHTight.root","vertices","80");
-  compare("NewCatOpt_1oEm1oP/LowPt/effData_Vertices_WP70.root","NewCatOpt_1oEm1oP/LowPt/effData_Vertices_LHHyperTight.root","vertices","70");
+  for(int i=0; i<(int)WP.size(); i++) {
+    TString CutFilePath = TString("NewCatOpt_1oEm1oP/HighPt/effData_Vertices_")+CutFile[i]+TString(".root");
+    TString LHFilePath = TString("NewCatOpt_1oEm1oP/HighPt/effData_Vertices_")+LHFile[i]+TString(".root");
+    compare(CutFilePath.Data(),LHFilePath.Data(),"vertices",WP[i].Data());
+  }
 
+  return 0;
 }
 
 void compare(const char* file1, const char* file2, const char* variable, const char* effPoint, bool writeEBEE) {
@@ -100,8 +152,8 @@ void compare(const char* file1, const char* file2, const char* variable, const c
       }
     }
   }
-  std::cout << "EFFICIENCY FOR " << effPoint << " (WP) = " << num1/denom1 
-	    << " (LH) = " << num2/denom2 << std::endl;
+  // std::cout << "EFFICIENCY FOR " << effPoint << " (WP) = " << num1/denom1 
+  // 	    << " (LH) = " << num2/denom2 << std::endl;
 
   char CutIdEff[50], LHIdEff[50];
   char CutIdEff_EB[50], LHIdEff_EB[50], CutIdEff_EE[50], LHIdEff_EE[50];
@@ -131,10 +183,18 @@ void compare(const char* file1, const char* file2, const char* variable, const c
   }
   leg->Draw();
 
-  TString fileOut = TString("eff_vs_")+TString(variable)+TString("_")+TString(effPoint)+TString("_lowPt.png");
+  TString fileOut = TString("eff_vs_")+TString(variable)+TString("_")+TString(effPoint)+TString("_HighPt.png");
   c3->SaveAs(fileOut.Data());
 
-  fileOut = TString("eff_vs_")+TString(variable)+TString("_")+TString(effPoint)+TString("_lowPt.eps");
+  fileOut = TString("eff_vs_")+TString(variable)+TString("_")+TString(effPoint)+TString("_HighPt.eps");
   c3->SaveAs(fileOut.Data());
 
+  if(writeEBEE) {
+    for(int iecal=0;iecal<2;iecal++) {
+      eff_Cut[iecal] = num1_eta[iecal]/denom1_eta[iecal];
+      eff_LH[iecal] = num2_eta[iecal]/denom2_eta[iecal];
+    }
+  }
+
+  return;
 }
