@@ -6,7 +6,7 @@ sigmaEtaEta 	 0.0 	 0.01
 dphiIn 	 0.0 	 0.039 
 deta 	 0.0 	 0.005 
 hOverE 	 0.0 	 0.04 
-missHits 	 0.0 	 1.0 
+missHits 	 0.0 	 0.0 
 distConv 	 0.02 100000 
 dcotConv 	 0.02 100000 
 eOverPin        0.0             999.
