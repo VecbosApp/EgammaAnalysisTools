@@ -526,7 +526,7 @@ bool CutBasedEleIDSelector::outputNoClassEleId() {
 
   bool eleInGap = anaUtils.fiducialFlagECAL(m_fiducialflag, isEBEEGap);
 
-  if ( eleInGap ) return false;
+  //  if ( eleInGap ) return false;
 
   int offset=0;
   bool eeElectron = anaUtils.fiducialFlagECAL(m_fiducialflag, isEE);
