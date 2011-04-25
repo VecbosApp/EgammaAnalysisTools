@@ -7,8 +7,8 @@ dphiIn 	 0.0 	 0.8
 deta 	 0.0 	 0.007 
 hOverE 	 0.0 	 0.5 
 missHits 	 0.0 	 0.0 
-distConv 	 0.0 100000 
-dcotConv 	 0.0 100000 
+distConv 	 0.02 100000 
+dcotConv 	 0.02 100000 
 eOverPin        0.0             999.
 s9s25           0.0             1.0
 eOverPout       0.0             1000
