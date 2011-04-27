@@ -6,8 +6,8 @@ sigmaEtaEta	0
 dphiIn		0
 deta		0
 hOverE		0
-distConv        0
-dcotConv        0
+distConv        1
+dcotConv        1
 missHits        1
 eOverPin	0
 s9s25		0
