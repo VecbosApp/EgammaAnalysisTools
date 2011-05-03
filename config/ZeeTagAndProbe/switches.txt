@@ -1,6 +1,0 @@
-isData			1
-goodRunLS		1
-meeWindow               1
-etaEleAcc               1
-ptEleAcc                1
-
