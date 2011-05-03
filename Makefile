@@ -169,6 +169,10 @@ CompareMisId: $(INCLUDEDIR)/src/CompareMisId.C \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o
 	$(CXX) $(CXXFLAGS) -o CompareMisId $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
+CompareMisId_analysisPlots: $(INCLUDEDIR)/src/CompareMisId_analysisPlots.C \
+	$(OUTLIBCOMMON)EfficiencyEvaluator.o
+	$(CXX) $(CXXFLAGS) -o CompareMisId_analysisPlots $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
+
 CompareClasses: $(INCLUDEDIR)/src/CompareClasses.C \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o
 	$(CXX) $(CXXFLAGS) -o CompareClasses $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
