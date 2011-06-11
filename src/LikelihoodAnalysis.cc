@@ -19,11 +19,13 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
 
   _isData = false;
   
-  EgammaCutBasedIDWPs.push_back("WP95");
-  EgammaCutBasedIDWPs.push_back("WP90");
-  EgammaCutBasedIDWPs.push_back("WP85");
-  EgammaCutBasedIDWPs.push_back("WP80");
-  EgammaCutBasedIDWPs.push_back("WP70");
+  EgammaCutBasedIDWPs.push_back("WP95"); // [0]
+  EgammaCutBasedIDWPs.push_back("WP90"); // [1]
+  EgammaCutBasedIDWPs.push_back("WP85"); // [2]
+  EgammaCutBasedIDWPs.push_back("WP80"); // [3]
+  EgammaCutBasedIDWPs.push_back("WP70"); // [4]
+  EgammaCutBasedIDWPs.push_back("WP80Smurf"); // [5]
+  EgammaCutBasedIDWPs.push_back("WP70Smurf"); // [6]
 
   EgammaCiCBasedIDWPs.push_back("CiCVeryLoose");
   EgammaCiCBasedIDWPs.push_back("CiCLoose");
@@ -92,9 +94,9 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
 
   defaultSwitches.m_useFBrem = true;
   defaultSwitches.m_useEoverP = false;
-  defaultSwitches.m_useOneOverEMinusOneOverP = true;
   defaultSwitches.m_useSigmaPhiPhi = true;
   defaultSwitches.m_useHoverE = false;        
+  defaultSwitches.m_useOneOverEMinusOneOverP = true;
 
   LH = new ElectronLikelihood(&(*EB0lt15dir), &(*EB1lt15dir), &(*EElt15dir), &(*EB0gt15dir), &(*EB1gt15dir), &(*EEgt15dir),
                               defaultSwitches, std::string("class"),std::string("class"),true,true);
@@ -791,6 +793,13 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  bool isEleIDCutBased, isIsolCutBased, isConvRejCutBased;
 	  isEleIDCutBased = isIsolCutBased = isConvRejCutBased = false;
 	  isEleID(&EgammaCutBasedID[icut],matchedRecoEle,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
+
+          // for the smurf selection, add further cut for pT<15 GeV. --> move to WP70
+          if(TString(EgammaCutBasedIDWPs[icut].c_str()).Contains("Smurf") && eleP3.Perp()<15.) {
+            // apply the VBTF70 smurfs
+            isEleID(&EgammaCutBasedID[6],matchedRecoEle,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
+            isEleIDCutBased = isEleIDCutBased && (fbremEle[matchedRecoEle]>0.15 || (fabs(etaEle[matchedRecoEle])<1.0 && eSuperClusterOverPEle[matchedRecoEle]>0.95));
+          }
 
 	  if ( isEleIDCutBased ) {
 	    CutIdOnlyIDEta[icut]->Fill(mcEta);
@@ -1960,7 +1969,14 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
               bool isEleIDCutBased, isIsolCutBased, isConvRejCutBased;
               isEleIDCutBased = isIsolCutBased = isConvRejCutBased = false;
               isEleID(&EgammaCutBasedID[icut],ele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
-              
+
+              // for the smurf selection, add further cut for pT<15 GeV. --> move to WP70
+              if(TString(EgammaCutBasedIDWPs[icut].c_str()).Contains("Smurf") && etFake<15.) {
+                // apply the VBTF70 smurfs
+                isEleID(&EgammaCutBasedID[6],ele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
+                isEleIDCutBased = isEleIDCutBased && (fbremEle[ele]>0.15 || (fabs(etaEle[ele])<1.0 && eSuperClusterOverPEle[ele]>0.95));
+              }
+
               if ( isEleIDCutBased ) {
                 CutIdOnlyIDEta[icut]->Fill(etaFake);
                 CutIdOnlyIDPt[icut]->Fill(etFake);
@@ -2982,6 +2998,13 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
 	  isEleIDCutBased = isIsolCutBased = isConvRejCutBased = false;
 	  isEleID(&EgammaCutBasedID[icut],ele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
 
+          // for the smurf selection, add further cut for pT<15 GeV. --> move to WP70
+          if(TString(EgammaCutBasedIDWPs[icut].c_str()).Contains("Smurf") && etFake<15.) {
+            // apply the VBTF70 smurfs
+            isEleID(&EgammaCutBasedID[6],ele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
+            isEleIDCutBased = isEleIDCutBased && (fbremEle[ele]>0.15 || (fabs(etaEle[ele])<1.0 && eSuperClusterOverPEle[ele]>0.95));
+          }
+
 	  if ( isEleIDCutBased ) {
 	    CutIdOnlyIDEta[icut]->Fill(etaFake);
 	    CutIdOnlyIDPt[icut]->Fill(etFake);
@@ -3889,6 +3912,13 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_QCD(const char *outname) {
         isEleIDCutBased = isIsolCutBased = isConvRejCutBased = false;
         isEleID(&EgammaCutBasedID[icut],iele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
 	
+        // for the smurf selection, add further cut for pT<15 GeV. --> move to WP70
+        if(TString(EgammaCutBasedIDWPs[icut].c_str()).Contains("Smurf") && etFake<15.) {
+          // apply the VBTF70 smurfs
+          isEleID(&EgammaCutBasedID[6],iele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
+          isEleIDCutBased = isEleIDCutBased && (fbremEle[iele]>0.15 || (fabs(etaEle[iele])<1.0 && eSuperClusterOverPEle[iele]>0.95));
+        }
+
         if ( isEleIDCutBased ) {
           CutIdOnlyIDEta[icut]->Fill(etaFake);
           CutIdOnlyIDPt[icut] ->Fill(etFake);
@@ -4815,6 +4845,13 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
       isEleIDCutBased = isIsolCutBased = isConvRejCutBased = false;
       isEleID(&EgammaCutBasedID[icut],theDenom1,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
       
+      // for the smurf selection, add further cut for pT<15 GeV. --> move to WP70
+      if(TString(EgammaCutBasedIDWPs[icut].c_str()).Contains("Smurf") && etFake<15.) {
+        // apply the VBTF70 smurfs
+        isEleID(&EgammaCutBasedID[6],theDenom1,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
+        isEleIDCutBased = isEleIDCutBased && (fbremEle[theDenom1]>0.15 || (fabs(etaEle[theDenom1])<1.0 && eSuperClusterOverPEle[theDenom1]>0.95));
+      }
+
       if ( isEleIDCutBased ) {
 	CutIdOnlyIDEta[icut]-> Fill(etaFake);
 	CutIdOnlyIDPt[icut] -> Fill(etFake);
