@@ -42,9 +42,11 @@ public:
   void SetTrkIsolation(float trackerIso) { m_trackerIso = trackerIso; m_useTrkIso = true; }
   void SetHcalIsolation(float hcalIso) { m_hcalIso = hcalIso; m_useHcalIso = true; }
   void SetCombinedIsolation(float combIso) { m_combIso = combIso; m_useCombIso = true; }
+  void SetCombinedPFIsolation(float combPFIso) { m_combPFIso = combPFIso; m_useCombPFIso = true; }
   void SetMissingHits(int missingHits) { m_missingHits = missingHits; m_useMissingHits = true; }
   void SetConvDist(float dist) { m_distConv = dist; m_useDistConv = true; }
   void SetConvDcot(float dcot) { m_dcotConv = dcot; m_useDcotConv = true; }
+  void SetHasMatchedConversion(bool matchedConv) { m_matchedConv = matchedConv; m_useMatchedConv = true; }
   //! set event by event output of egamma cut-based electron ID
   void SetEgammaCutBasedID(bool egammaCutBased) { m_egammaCutBased = egammaCutBased; m_egammaCutBasedInitialised = true; }
 
@@ -92,9 +94,11 @@ private:
   bool m_useTrkIso;
   bool m_useHcalIso;
   bool m_useCombIso;
+  bool m_useCombPFIso;
   bool m_useMissingHits;
   bool m_useDistConv;
   bool m_useDcotConv;
+  bool m_useMatchedConv;
   bool m_electronClassInitialised;
   bool m_egammaCutBasedInitialised;
 
@@ -117,8 +121,10 @@ private:
   float m_trackerIso;
   float m_hcalIso;
   float m_combIso;
+  float m_combPFIso;
   float m_distConv;
   float m_dcotConv;
+  bool m_matchedConv;
   int m_missingHits;
   int m_electronClass;
   int m_fiducialflag;

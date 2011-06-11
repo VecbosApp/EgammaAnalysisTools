@@ -25,8 +25,10 @@ CutBasedEleIDSelector::CutBasedEleIDSelector() {
   m_useTrkIso = false;
   m_useHcalIso = false;
   m_useCombIso = false;
+  m_useCombPFIso = false;
   m_useDistConv = false;
   m_useDcotConv = false;
+  m_useMatchedConv = false;
   m_useMissingHits = false;
   m_useLikelihood = false;
   m_electronClassInitialised = false;
@@ -102,9 +104,11 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
     eleSelection->addCut("trackerIso");
     eleSelection->addCut("hcalIso");
     eleSelection->addCut("combIso");
+    eleSelection->addCut("combPFIso");
     eleSelection->addCut("missHits");
     eleSelection->addCut("distConv");
     eleSelection->addCut("dcotConv");
+    eleSelection->addSwitch("matchedConv");
     eleSelection->addCut("likelihood");
     eleSelection->summary();
   }
@@ -131,8 +135,10 @@ void CutBasedEleIDSelector::Configure(const char *configDir) {
   m_electronCounter.AddVar("trackerIso");
   m_electronCounter.AddVar("hcalIso");
   m_electronCounter.AddVar("combIso");
+  m_electronCounter.AddVar("combPFIso");
   m_electronCounter.AddVar("missHits");
   m_electronCounter.AddVar("vetoConv");
+  m_electronCounter.AddVar("matchedConv");
   m_electronCounter.AddVar("finalCustomEleIDOnlyID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyIso");
   m_electronCounter.AddVar("finalCustomEleIDOnlyConv");
@@ -176,9 +182,11 @@ void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir)
     eleSelection->addCut("trackerIso");
     eleSelection->addCut("hcalIso");
     eleSelection->addCut("combIso");
+    eleSelection->addCut("combPFIso");
     eleSelection->addCut("missHits");
     eleSelection->addCut("distConv");
     eleSelection->addCut("dcotConv");
+    eleSelection->addSwitch("matchedConv");
     eleSelection->addCut("likelihood0");
     eleSelection->addCut("likelihood1");
     eleSelection->summary();
@@ -207,8 +215,10 @@ void CutBasedEleIDSelector::ConfigureNoClass(const char *configDir)
   m_electronCounter.AddVar("trackerIso");
   m_electronCounter.AddVar("hcalIso");
   m_electronCounter.AddVar("combIso");
+  m_electronCounter.AddVar("combPFIso");
   m_electronCounter.AddVar("missHits");
   m_electronCounter.AddVar("vetoConv");
+  m_electronCounter.AddVar("matchedConv");
   m_electronCounter.AddVar("likelihood");
   m_electronCounter.AddVar("finalCustomEleID");
   m_electronCounter.AddVar("finalCustomEleIDOnlyID");
@@ -406,7 +416,7 @@ bool CutBasedEleIDSelector::outputIso()
 
   m_electronCounter.IncrVar("electronsOnlyIso");
 
-  if(!selection->getSwitch("combIso")) {
+  if(!selection->getSwitch("combIso") && !selection->getSwitch("combPFIso")) {
     if(selection->getSwitch("ecalIso") && 
        !selection->passCut("ecalIso", m_ecalIso)) return false; 
     m_electronCounter.IncrVar("ecalIso");
@@ -423,6 +433,11 @@ bool CutBasedEleIDSelector::outputIso()
   if(selection->getSwitch("combIso")) {
     if(!selection->passCut("combIso", m_combIso)) return false; 
     m_electronCounter.IncrVar("combIso");
+  }
+
+  if(selection->getSwitch("combPFIso")) {
+    if(!selection->passCut("combPFIso", m_combPFIso)) return false; 
+    m_electronCounter.IncrVar("combPFIso");
   }
 
   m_electronCounter.IncrVar("finalCustomEleIDOnlyIso");
@@ -470,6 +485,10 @@ bool CutBasedEleIDSelector::outputConv()
   if(selection->getSwitch("distConv") && selection->getSwitch("dcotConv") &&
      (!selection->passCut("distConv", m_distConv) && !selection->passCut("dcotConv", m_dcotConv)) ) return false; 
   m_electronCounter.IncrVar("vetoConv");
+
+  if(selection->getSwitch("matchedConv") && 
+     m_matchedConv) return false; 
+  m_electronCounter.IncrVar("matchedConv");
 
   m_electronCounter.IncrVar("finalCustomEleIDOnlyConv");
 
@@ -619,7 +638,7 @@ bool CutBasedEleIDSelector::outputNoClassIso()
 
   m_electronCounter.IncrVar("electronsOnlyIso");
 
-  if(!selection->getSwitch("combIso")) {
+  if(!selection->getSwitch("combIso") && !selection->getSwitch("combPFIso")) {
     if(selection->getSwitch("ecalIso") && 
        !selection->passCut("ecalIso", m_ecalIso)) return false; 
     m_electronCounter.IncrVar("ecalIso");
@@ -636,6 +655,11 @@ bool CutBasedEleIDSelector::outputNoClassIso()
   if(selection->getSwitch("combIso")) {
     if( !selection->passCut("combIso", m_combIso)) return false; 
     m_electronCounter.IncrVar("combIso");
+  }
+
+  if(selection->getSwitch("combPFIso")) {
+    if( !selection->passCut("combPFIso", m_combPFIso)) return false; 
+    m_electronCounter.IncrVar("combPFIso");
   }
 
   m_electronCounter.IncrVar("finalCustomEleIDOnlyIso");
@@ -672,6 +696,10 @@ bool CutBasedEleIDSelector::outputNoClassConv()
      (!selection->passCut("distConv", m_distConv) && !selection->passCut("dcotConv", m_dcotConv)) ) return false; 
   m_electronCounter.IncrVar("vetoConv");
 
+  if(selection->getSwitch("matchedConv") && 
+     m_matchedConv) return false; 
+  m_electronCounter.IncrVar("matchedConv");
+  
   m_electronCounter.IncrVar("finalCustomEleIDOnlyConv");
 
   return true;
@@ -704,12 +732,14 @@ void CutBasedEleIDSelector::displayEfficiencies() {
   m_electronCounter.Draw("trackerIso", "ecalIso");
   m_electronCounter.Draw("hcalIso", "trackerIso");
   m_electronCounter.Draw("combIso", "electronsOnlyIso");
+  m_electronCounter.Draw("combPFIso", "combIso");
 
   std::cout << "++++++ CONV REJ PART +++++++" << std::endl;
   m_electronCounter.Draw("finalCustomEleIDOnlyConv","electronsOnlyConv");
   std::cout << "====== CUTS EFFICIENCY ======" << std::endl;
   m_electronCounter.Draw("missHits", "electronsOnlyConv");
   m_electronCounter.Draw("vetoConv", "missHits");
+  m_electronCounter.Draw("matchedConv", "vetoConv");
 
   std::cout << "++++++ FINAL EFFICIENCY +++++++" << std::endl;
   m_electronCounter.Draw("finalCustomEleID","electrons");
