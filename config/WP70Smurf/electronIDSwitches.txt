@@ -5,7 +5,7 @@ hcalIso         0
 sigmaEtaEta	1
 dphiIn		1
 deta		1
-hOverE		0
+hOverE		1
 distConv        1
 dcotConv        1
 missHits        1

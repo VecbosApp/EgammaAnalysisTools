@@ -5,7 +5,7 @@ hcalIso 	 -100 	 0.02
 sigmaEtaEta 	 0.0 	 0.030
 dphiIn 	 0.0 	 0.020
 deta 	 0.0 	 0.005 
-hOverE 	 0.0 	 0.01 
+hOverE 	 0.0 	 0.10 
 missHits 	 0.0 	 0.0 
 distConv 	 0.02 100000 
 dcotConv 	 0.02 100000 
