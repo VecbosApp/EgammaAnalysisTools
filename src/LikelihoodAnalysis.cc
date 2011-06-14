@@ -17,7 +17,7 @@ using namespace std;
 LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   : Egamma(tree) {
 
-  _isData = false;
+  _isData = false;    
   
   EgammaCutBasedIDWPs.push_back("WP95"); // [0]
   EgammaCutBasedIDWPs.push_back("WP90"); // [1]
@@ -103,7 +103,7 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
 
   // to read good run list
   if (_isData) {
-    std::string goodRunGiasoneFile = "config/LHPdfsProducer/json/Cert_136033-149442_7TeV_Dec22ReReco_Collisions10_JSON_v4.txt";  
+    std::string goodRunGiasoneFile = "config/LHPdfsProducer/json/Cert_136033-149442_7TeV_Dec22ReReco_Collisions10_JSON_v4.txt";     
     setJsonGoodRunList(goodRunGiasoneFile);
     fillRunLSMap();
   }
@@ -237,9 +237,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   TH1F *RecoEta  = new TH1F( "RecoEta", "reconstructed #eta", nbinsEta, minEta, maxEta );
   TH1F *RecoEtaHighPt  = new TH1F( "RecoEtaHighPt", "reconstructed #eta", nbinsEta, minEta, maxEta );
   TH1F *RecoEtaLowPt  = new TH1F( "RecoEtaLowPt", "reconstructed #eta", nbinsEta, minEta, maxEta );
-//   TH1F *GoldenEta = new TH1F( "GoldenEta", "golden@reconstruction #eta", nbinsEta, minEta, maxEta );
-//   TH1F *GoldenEta = new TH1F( "GoldenEta", "golden@reconstruction #eta", nbinsEta, minEta, maxEta );
-//   TH1F *ShoweringEta = new TH1F( "ShoweringEta", "narrow@reconstruction #eta", nbinsEta, minEta, maxEta );
 
   std::vector<TH1F*> CutIdEta;
   std::vector<TH1F*> CutIdOnlyIDEta;
@@ -400,9 +397,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   TH1F *RecoPt  = new TH1F( "RecoPt", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
   TH1F *RecoPtBarrel  = new TH1F( "RecoPtBarrel", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
   TH1F *RecoPtEndcap  = new TH1F( "RecoPtEndcap", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
-//   TH1F *GoldenPt = new TH1F( "GoldenPt", "golden@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
-//   TH1F *ShoweringPt = new TH1F( "ShoweringPt", "narrow@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
-
 
   std::vector<TH1F*> CutIdPt;
   std::vector<TH1F*> CutIdOnlyIDPt;
@@ -779,14 +773,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
       }
       if (isInEB) RecoPtBarrel->Fill(mcPt);
       if (isInEE) RecoPtEndcap->Fill(mcPt);
-      // Golden means 0 brem clusters, showering otherwise
-//       if ( nbremsEle[matchedRecoEle] == 0 ) {
-//         GoldenEta->Fill(mcEta);
-//         GoldenPt->Fill(mcPt);
-//       } else {
-//         ShoweringEta->Fill(mcEta);
-//         ShoweringPt->Fill(mcPt);
-//       }
 
       for (int icut=0;icut<EgammaCutBasedIDWPs.size();++icut)
 	{
@@ -1041,8 +1027,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   EfficiencyEvaluator ElectronEffEta(filename);
   //  ElectronEffEta.AddNumerator(GenEta);
   ElectronEffEta.AddNumerator(RecoEta);
-//   ElectronEffEta.AddNumerator(GoldenEta);
-//   ElectronEffEta.AddNumerator(ShoweringEta);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffEta.AddNumerator(CutIdEta[icut]);
@@ -1076,8 +1060,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   EfficiencyEvaluator ElectronEffEtaHighPt(filename);
   //  ElectronEffEtaHighPt.AddNumerator(GenEtaHighPt);
   ElectronEffEtaHighPt.AddNumerator(RecoEtaHighPt);
-//   ElectronEffEtaHighPt.AddNumerator(GoldenEtaHighPt);
-//   ElectronEffEtaHighPt.AddNumerator(ShoweringEtaHighPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffEtaHighPt.AddNumerator(CutIdEtaHighPt[icut]);
@@ -1111,8 +1093,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   EfficiencyEvaluator ElectronEffEtaLowPt(filename);
   //  ElectronEffEtaLowPt.AddNumerator(GenEtaLowPt);
   ElectronEffEtaLowPt.AddNumerator(RecoEtaLowPt);
-//   ElectronEffEtaLowPt.AddNumerator(GoldenEtaLowPt);
-//   ElectronEffEtaLowPt.AddNumerator(ShoweringEtaLowPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffEtaLowPt.AddNumerator(CutIdEtaLowPt[icut]);
@@ -1146,8 +1126,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   EfficiencyEvaluator ElectronEffPt(filename);
   //  ElectronEffPt.AddNumerator(GenPt);
   ElectronEffPt.AddNumerator(RecoPt);
-//   ElectronEffPt.AddNumerator(GoldenPt);
-//   ElectronEffPt.AddNumerator(ShoweringPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPt.AddNumerator(CutIdPt[icut]);
@@ -1182,8 +1160,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   EfficiencyEvaluator ElectronEffPtBarrel(filename);
   //  ElectronEffPtBarrel.AddNumerator(GenPtBarrel);
   ElectronEffPtBarrel.AddNumerator(RecoPtBarrel);
-//   ElectronEffPtBarrel.AddNumerator(GoldenPtBarrel);
-//   ElectronEffPtBarrel.AddNumerator(ShoweringPtBarrel);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPtBarrel.AddNumerator(CutIdPtBarrel[icut]);
@@ -1218,8 +1194,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   EfficiencyEvaluator ElectronEffPtEndcap(filename);
   //  ElectronEffPtEndcap.AddNumerator(GenPtEndcap);
   ElectronEffPtEndcap.AddNumerator(RecoPtEndcap);
-//   ElectronEffPtEndcap.AddNumerator(GoldenPtEndcap);
-//   ElectronEffPtEndcap.AddNumerator(ShoweringPtEndcap);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPtEndcap.AddNumerator(CutIdPtEndcap[icut]);
@@ -1255,8 +1229,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   EfficiencyEvaluator ElectronEffPU(filename);
   //  ElectronEffPU.AddNumerator(GenPU);
   ElectronEffPU.AddNumerator(RecoPU);
-//   ElectronEffPU.AddNumerator(GoldenPU);
-//   ElectronEffPU.AddNumerator(ShoweringPU);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPU.AddNumerator(CutIdPU[icut]);
@@ -1290,8 +1262,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   EfficiencyEvaluator ElectronEffPUHighPt(filename);
   //  ElectronEffPUHighPt.AddNumerator(GenPUHighPt);
   ElectronEffPUHighPt.AddNumerator(RecoPUHighPt);
-//   ElectronEffPUHighPt.AddNumerator(GoldenPUHighPt);
-//   ElectronEffPUHighPt.AddNumerator(ShoweringPUHighPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPUHighPt.AddNumerator(CutIdPUHighPt[icut]);
@@ -1325,8 +1295,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   EfficiencyEvaluator ElectronEffPULowPt(filename);
   //  ElectronEffPULowPt.AddNumerator(GenPULowPt);
   ElectronEffPULowPt.AddNumerator(RecoPULowPt);
-//   ElectronEffPULowPt.AddNumerator(GoldenPULowPt);
-//   ElectronEffPULowPt.AddNumerator(ShoweringPULowPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPULowPt.AddNumerator(CutIdPULowPt[icut]);
@@ -1360,6 +1328,7 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 
 
 
+// this is for W+jets
 void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
   // hardcoded cuts
@@ -1374,8 +1343,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   TH1F *RecoEta  = new TH1F( "RecoEta", "reconstructed #eta", nbinsEta, minEta, maxEta );
   TH1F *RecoEtaHighPt  = new TH1F( "RecoEtaHighPt", "reconstructed #eta", nbinsEta, minEta, maxEta );
   TH1F *RecoEtaLowPt  = new TH1F( "RecoEtaLowPt", "reconstructed #eta", nbinsEta, minEta, maxEta );
-//   TH1F *GoldenEta = new TH1F( "GoldenEta", "golden@reconstruction #eta", nbinsEta, minEta, maxEta );
-//   TH1F *ShoweringEta = new TH1F( "ShoweringEta", "narrow@reconstruction #eta", nbinsEta, minEta, maxEta );
   std::vector<TH1F*> CutIdEta;
   std::vector<TH1F*> CutIdOnlyIDEta;
   std::vector<TH1F*> CutIdOnlyIsoEta;
@@ -1534,8 +1501,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   TH1F *RecoPt  = new TH1F( "RecoPt", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
   TH1F *RecoPtBarrel  = new TH1F( "RecoPtBarrel", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
   TH1F *RecoPtEndcap  = new TH1F( "RecoPtEndcap", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
-//   TH1F *GoldenPt = new TH1F( "GoldenPt", "golden@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
-//   TH1F *ShoweringPt = new TH1F( "ShoweringPt", "narrow@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
   std::vector<TH1F*> CutIdPt;
   std::vector<TH1F*> CutIdOnlyIDPt;
   std::vector<TH1F*> CutIdOnlyIsoPt;
@@ -1956,14 +1921,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 	  if (isInEB) RecoPtBarrel->Fill(etFake);
 	  if (isInEE) RecoPtEndcap->Fill(etFake);
 
-//           if ( nbremsEle[ele] == 0 ) {
-//             GoldenEta->Fill(etaFake);
-//             GoldenPt->Fill(etFake);
-//           } else {
-//             ShoweringEta->Fill(etaFake);
-//             ShoweringPt->Fill(etFake);
-//           }
-
           for (int icut=0;icut<EgammaCutBasedIDWPs.size();++icut)
             {
               bool isEleIDCutBased, isIsolCutBased, isConvRejCutBased;
@@ -2226,8 +2183,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   EfficiencyEvaluator ElectronEffEta(filename);
   //  ElectronEffEta.AddNumerator(GenEta);
   ElectronEffEta.AddNumerator(RecoEta);
-//   ElectronEffEta.AddNumerator(GoldenEta);
-//   ElectronEffEta.AddNumerator(ShoweringEta);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffEta.AddNumerator(CutIdEta[icut]);
@@ -2261,8 +2216,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   EfficiencyEvaluator ElectronEffEtaHighPt(filename);
   //  ElectronEffEtaHighPt.AddNumerator(GenEtaHighPt);
   ElectronEffEtaHighPt.AddNumerator(RecoEtaHighPt);
-//   ElectronEffEtaHighPt.AddNumerator(GoldenEtaHighPt);
-//   ElectronEffEtaHighPt.AddNumerator(ShoweringEtaHighPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffEtaHighPt.AddNumerator(CutIdEtaHighPt[icut]);
@@ -2296,8 +2249,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   EfficiencyEvaluator ElectronEffEtaLowPt(filename);
   //  ElectronEffEtaLowPt.AddNumerator(GenEtaLowPt);
   ElectronEffEtaLowPt.AddNumerator(RecoEtaLowPt);
-//   ElectronEffEtaLowPt.AddNumerator(GoldenEtaLowPt);
-//   ElectronEffEtaLowPt.AddNumerator(ShoweringEtaLowPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffEtaLowPt.AddNumerator(CutIdEtaLowPt[icut]);
@@ -2331,8 +2282,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   EfficiencyEvaluator ElectronEffPt(filename);
   //  ElectronEffPt.AddNumerator(GenPt);
   ElectronEffPt.AddNumerator(RecoPt);
-//   ElectronEffPt.AddNumerator(GoldenPt);
-//   ElectronEffPt.AddNumerator(ShoweringPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPt.AddNumerator(CutIdPt[icut]);
@@ -2367,8 +2316,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   EfficiencyEvaluator ElectronEffPtBarrel(filename);
   //  ElectronEffPtBarrel.AddNumerator(GenPtBarrel);
   ElectronEffPtBarrel.AddNumerator(RecoPtBarrel);
-//   ElectronEffPtBarrel.AddNumerator(GoldenPtBarrel);
-//   ElectronEffPtBarrel.AddNumerator(ShoweringPtBarrel);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPtBarrel.AddNumerator(CutIdPtBarrel[icut]);
@@ -2403,8 +2350,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   EfficiencyEvaluator ElectronEffPtEndcap(filename);
   //  ElectronEffPtEndcap.AddNumerator(GenPtEndcap);
   ElectronEffPtEndcap.AddNumerator(RecoPtEndcap);
-//   ElectronEffPtEndcap.AddNumerator(GoldenPtEndcap);
-//   ElectronEffPtEndcap.AddNumerator(ShoweringPtEndcap);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPtEndcap.AddNumerator(CutIdPtEndcap[icut]);
@@ -2440,8 +2385,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   EfficiencyEvaluator ElectronEffPU(filename);
   //  ElectronEffPU.AddNumerator(GenPU);
   ElectronEffPU.AddNumerator(RecoPU);
-//   ElectronEffPU.AddNumerator(GoldenPU);
-//   ElectronEffPU.AddNumerator(ShoweringPU);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPU.AddNumerator(CutIdPU[icut]);
@@ -2475,8 +2418,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   EfficiencyEvaluator ElectronEffPUHighPt(filename);
   //  ElectronEffPUHighPt.AddNumerator(GenPUHighPt);
   ElectronEffPUHighPt.AddNumerator(RecoPUHighPt);
-//   ElectronEffPUHighPt.AddNumerator(GoldenPUHighPt);
-//   ElectronEffPUHighPt.AddNumerator(ShoweringPUHighPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPUHighPt.AddNumerator(CutIdPUHighPt[icut]);
@@ -2510,8 +2451,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   EfficiencyEvaluator ElectronEffPULowPt(filename);
   //  ElectronEffPULowPt.AddNumerator(GenPULowPt);
   ElectronEffPULowPt.AddNumerator(RecoPULowPt);
-//   ElectronEffPULowPt.AddNumerator(GoldenPULowPt);
-//   ElectronEffPULowPt.AddNumerator(ShoweringPULowPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPULowPt.AddNumerator(CutIdPULowPt[icut]);
@@ -2558,9 +2497,6 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
   TH1F *RecoEta  = new TH1F( "RecoEta", "reconstructed #eta", nbinsEta, minEta, maxEta );
   TH1F *RecoEtaHighPt  = new TH1F( "RecoEtaHighPt", "reconstructed #eta", nbinsEta, minEta, maxEta );
   TH1F *RecoEtaLowPt  = new TH1F( "RecoEtaLowPt", "reconstructed #eta", nbinsEta, minEta, maxEta );
-//   TH1F *GoldenEta = new TH1F( "GoldenEta", "golden@reconstruction #eta", nbinsEta, minEta, maxEta );
-//   TH1F *GoldenEta = new TH1F( "GoldenEta", "golden@reconstruction #eta", nbinsEta, minEta, maxEta );
-//   TH1F *ShoweringEta = new TH1F( "ShoweringEta", "narrow@reconstruction #eta", nbinsEta, minEta, maxEta );
 
   std::vector<TH1F*> CutIdEta;
   std::vector<TH1F*> CutIdOnlyIDEta;
@@ -2720,9 +2656,6 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
   TH1F *RecoPt  = new TH1F( "RecoPt", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
   TH1F *RecoPtBarrel  = new TH1F( "RecoPtBarrel", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
   TH1F *RecoPtEndcap  = new TH1F( "RecoPtEndcap", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
-//   TH1F *GoldenPt = new TH1F( "GoldenPt", "golden@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
-//   TH1F *ShoweringPt = new TH1F( "ShoweringPt", "narrow@reconstruction vs p_{T}", nbinsPt, minPt, maxPt );
-
 
   std::vector<TH1F*> CutIdPt;
   std::vector<TH1F*> CutIdOnlyIDPt;
@@ -2983,14 +2916,6 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
 	  if (lowPt) RecoEtaLowPt->Fill(etaFake);
 	  if (isInEB) RecoPtBarrel->Fill(etFake);
 	  if (isInEE) RecoPtEndcap->Fill(etFake);
-      // Golden means 0 brem clusters, showering otherwise
-//       if ( nbremsEle[ele] == 0 ) {
-//         GoldenEta->Fill(etaFake);
-//         GoldenPt->Fill(etFake);
-//       } else {
-//         ShoweringEta->Fill(etaFake);
-//         ShoweringPt->Fill(etFake);
-//       }
 
       for (int icut=0;icut<EgammaCutBasedIDWPs.size();++icut)
 	{
@@ -3187,8 +3112,6 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
   EfficiencyEvaluator ElectronEffEta(filename);
   //  ElectronEffEta.AddNumerator(GenEta);
   ElectronEffEta.AddNumerator(RecoEta);
-//   ElectronEffEta.AddNumerator(GoldenEta);
-//   ElectronEffEta.AddNumerator(ShoweringEta);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffEta.AddNumerator(CutIdEta[icut]);
@@ -3222,8 +3145,6 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
   EfficiencyEvaluator ElectronEffEtaHighPt(filename);
   //  ElectronEffEtaHighPt.AddNumerator(GenEtaHighPt);
   ElectronEffEtaHighPt.AddNumerator(RecoEtaHighPt);
-//   ElectronEffEtaHighPt.AddNumerator(GoldenEtaHighPt);
-//   ElectronEffEtaHighPt.AddNumerator(ShoweringEtaHighPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffEtaHighPt.AddNumerator(CutIdEtaHighPt[icut]);
@@ -3257,8 +3178,6 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
   EfficiencyEvaluator ElectronEffEtaLowPt(filename);
   //  ElectronEffEtaLowPt.AddNumerator(GenEtaLowPt);
   ElectronEffEtaLowPt.AddNumerator(RecoEtaLowPt);
-//   ElectronEffEtaLowPt.AddNumerator(GoldenEtaLowPt);
-//   ElectronEffEtaLowPt.AddNumerator(ShoweringEtaLowPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffEtaLowPt.AddNumerator(CutIdEtaLowPt[icut]);
@@ -3292,8 +3211,6 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
   EfficiencyEvaluator ElectronEffPt(filename);
   //  ElectronEffPt.AddNumerator(GenPt);
   ElectronEffPt.AddNumerator(RecoPt);
-//   ElectronEffPt.AddNumerator(GoldenPt);
-//   ElectronEffPt.AddNumerator(ShoweringPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPt.AddNumerator(CutIdPt[icut]);
@@ -3328,8 +3245,6 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
   EfficiencyEvaluator ElectronEffPtBarrel(filename);
   //  ElectronEffPtBarrel.AddNumerator(GenPtBarrel);
   ElectronEffPtBarrel.AddNumerator(RecoPtBarrel);
-//   ElectronEffPtBarrel.AddNumerator(GoldenPtBarrel);
-//   ElectronEffPtBarrel.AddNumerator(ShoweringPtBarrel);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPtBarrel.AddNumerator(CutIdPtBarrel[icut]);
@@ -3364,8 +3279,6 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
   EfficiencyEvaluator ElectronEffPtEndcap(filename);
   //  ElectronEffPtEndcap.AddNumerator(GenPtEndcap);
   ElectronEffPtEndcap.AddNumerator(RecoPtEndcap);
-//   ElectronEffPtEndcap.AddNumerator(GoldenPtEndcap);
-//   ElectronEffPtEndcap.AddNumerator(ShoweringPtEndcap);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       ElectronEffPtEndcap.AddNumerator(CutIdPtEndcap[icut]);
