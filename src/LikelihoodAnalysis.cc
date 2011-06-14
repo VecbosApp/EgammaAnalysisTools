@@ -17,7 +17,7 @@ using namespace std;
 LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   : Egamma(tree) {
 
-  _isData = false;    
+  _isData = false;       
   
   EgammaCutBasedIDWPs.push_back("WP95"); // [0]
   EgammaCutBasedIDWPs.push_back("WP90"); // [1]
@@ -103,8 +103,8 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
 
   // to read good run list
   if (_isData) {
-    std::string goodRunGiasoneFile = "config/LHPdfsProducer/json/Cert_136033-149442_7TeV_Dec22ReReco_Collisions10_JSON_v4.txt";     
-    setJsonGoodRunList(goodRunGiasoneFile);
+    std::string goodRunGiasoneFile = "config/LHPdfsProducer/json/Cert_136033-149442_7TeV_Dec22ReReco_Collisions10_JSON_v4.txt";       //  json
+    setJsonGoodRunList(goodRunGiasoneFile); 
     fillRunLSMap();
   }
 
@@ -1338,8 +1338,11 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   int nbinsEta = 60;
   float minEta = -2.5;
   float maxEta = 2.5;
+
+  // to study which ET cut we want to apply on the jet (for Wjets HWW studies)
+  TH1F *FakeJetForThresholdPT = new TH1F("FakeJetForThresholdPT", "fakeable jets p_{T}", 20, 0., 100.);
     
-  TH1F *FakeableJetsEta   = new TH1F( "FakeableJetsEta",  "fakeable jets #eta",     nbinsEta, minEta, maxEta );
+  TH1F *FakeableJetsEta   = new TH1F( "FakeableJetsEta",  "fakeable jets #eta",nbinsEta, minEta, maxEta );
   TH1F *RecoEta  = new TH1F( "RecoEta", "reconstructed #eta", nbinsEta, minEta, maxEta );
   TH1F *RecoEtaHighPt  = new TH1F( "RecoEtaHighPt", "reconstructed #eta", nbinsEta, minEta, maxEta );
   TH1F *RecoEtaLowPt  = new TH1F( "RecoEtaLowPt", "reconstructed #eta", nbinsEta, minEta, maxEta );
@@ -1853,8 +1856,8 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 //     int nJetsReco=0;
 //     int nEleReco=0;
 
-    for ( int jet=0; jet<nAK5PFJet; jet++ ) {
-      TVector3 p3Jet(pxAK5PFJet[jet],pyAK5PFJet[jet],pzAK5PFJet[jet]);
+    for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
+      TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
       if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 10.0 ) {
         float deltaR = 1000;
         if(mceleindex>-1) deltaR = p3Jet.DeltaR(mcEle);
@@ -1878,8 +1881,8 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
         float dREleJet_min = 1000;
         int closestJet=-1;
 
-        for ( int jet=0; jet<nAK5PFJet; jet++ ) {
-          TVector3 p3Jet(pxAK5PFJet[jet],pyAK5PFJet[jet],pzAK5PFJet[jet]);
+        for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
+          TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
           if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 10.0 ) {          
             float dREleJet = p3Jet.DeltaR(p3Ele);
             if(dREleJet<dREleJet_min) {
@@ -1893,7 +1896,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
         if(closestJet > -1) {
 
-          TVector3 p3ClosestJet(pxAK5PFJet[closestJet],pyAK5PFJet[closestJet],pzAK5PFJet[closestJet]);
+          TVector3 p3ClosestJet(pxAK5PFPUcorrJet[closestJet],pyAK5PFPUcorrJet[closestJet],pzAK5PFPUcorrJet[closestJet]);
 
 	  //!!//
 //           float etFake=p3ClosestJet.Pt();
@@ -1901,6 +1904,9 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
           float etFake=p3Ele.Pt();
           float etaFake=etaEle[ele];
+
+	  // to study the dependence on the jet threshold for Wjets in HWW
+          if ( etFake > 10.0 ) FakeJetForThresholdPT ->Fill( p3ClosestJet.Pt() ); // hardcoded
 
           Utils anaUtils;
 	  bool isInEB = anaUtils.fiducialFlagECAL(fiducialFlagsEle[ele], isEB);
@@ -2480,6 +2486,10 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   ElectronEffPULowPt.SetYaxisMin(0.0);
   ElectronEffPULowPt.Write();
 
+
+  TFile fileThreshold("EleMisidPt-Threshold.root","RECREATE");
+  fileThreshold.cd();
+  FakeJetForThresholdPT->Write();
 }
 
 void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
@@ -2858,8 +2868,8 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
     // look for the leading jet (not considered as fakeable object to remove trigger bias)
     float maxEt = -1;
     int leadingJet = -1;
-    for ( int jet=0; jet<nAK5PFJet; jet++ ) {
-      TVector3 p3Jet(pxAK5PFJet[jet],pyAK5PFJet[jet],pzAK5PFJet[jet]);
+    for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
+      TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
       if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 25.0 && p3Jet.Pt() > maxEt) {
         maxEt = p3Jet.Pt();
         leadingJet = jet;
@@ -2867,8 +2877,8 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
     }
 
     // consider the other as fakes (denominator)
-    for ( int jet=0; jet<nAK5PFJet; jet++ ) {
-      TVector3 p3Jet(pxAK5PFJet[jet],pyAK5PFJet[jet],pzAK5PFJet[jet]);
+    for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
+      TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
       if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 10.0 && jet!=leadingJet ) {
         FakeableJetsEta->Fill( p3Jet.Eta() );
         FakeableJetsPt->Fill( p3Jet.Pt() );
@@ -2883,8 +2893,8 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
         float dREleJet_min = 0.7;
         int closestJet=-1;
 
-        for ( int jet=0; jet<nAK5PFJet; jet++ ) {
-          TVector3 p3Jet(pxAK5PFJet[jet],pyAK5PFJet[jet],pzAK5PFJet[jet]);
+        for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
+          TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
           if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 10.0 && jet!=leadingJet ) {          
             float dREleJet = p3Jet.DeltaR(p3Ele);
             if(dREleJet<dREleJet_min) {
@@ -2898,7 +2908,7 @@ void LikelihoodAnalysis::estimateFakeRateQCD(const char *outname) {
 
         if(closestJet > -1) {
 
-          TVector3 p3ClosestJet(pxAK5PFJet[closestJet],pyAK5PFJet[closestJet],pzAK5PFJet[closestJet]);
+          TVector3 p3ClosestJet(pxAK5PFPUcorrJet[closestJet],pyAK5PFPUcorrJet[closestJet],pzAK5PFPUcorrJet[closestJet]);
 
 //           float etFake=p3ClosestJet.Pt();
 //           float etaFake=p3ClosestJet.Eta();
@@ -3725,8 +3735,8 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_QCD(const char *outname) {
     // (not considered as fakeable object to remove trigger bias)
     float maxEt = -1.;
     int leading = -1;
-    for ( int jet=0; jet<nAK5PFJet; jet++ ) {
-      TVector3 p3Jet(pxAK5PFJet[jet],pyAK5PFJet[jet],pzAK5PFJet[jet]);
+    for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
+      TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
       if ( fabs(p3Jet.Eta()) < maxEta && p3Jet.Pt() > maxEt) {  
 	maxEt   = p3Jet.Pt();
 	leading = jet;
@@ -3738,7 +3748,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_QCD(const char *outname) {
     myCounter.IncrVar("leadingExist",1);    
 
     // minimal cut on leading jet ET
-    TVector3 p3LeadingCut(pxAK5PFJet[leading],pyAK5PFJet[leading],pzAK5PFJet[leading]);
+    TVector3 p3LeadingCut(pxAK5PFPUcorrJet[leading],pyAK5PFPUcorrJet[leading],pzAK5PFPUcorrJet[leading]);
     if (p3LeadingCut.Pt()<55) continue;
 
     myCounter.IncrVar("leadingPT",1);    
@@ -3759,7 +3769,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_QCD(const char *outname) {
 
       // not matching the leading object
       float dr;
-      TVector3 p3LeadingJet(pxAK5PFJet[leading],pyAK5PFJet[leading],pzAK5PFJet[leading]);
+      TVector3 p3LeadingJet(pxAK5PFPUcorrJet[leading],pyAK5PFPUcorrJet[leading],pzAK5PFPUcorrJet[leading]);
       dr=p3LeadingJet.DeltaR(p3Ele);
       
       // denominator selection
@@ -4149,7 +4159,6 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_QCD(const char *outname) {
 
 void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   
-
   // study vs eta
   int nbinsEta = 60;
   float minEta = -2.5;
@@ -4594,22 +4603,21 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   char filename[200];
   sprintf(filename,"%sKineTree.root",outname);
   myOutTree = new FakeTree(filename);
+  sprintf(filename,"%sKineTreePassed.root",outname);
+  myOutTreePassed = new FakeTree(filename);
 
-  // trigger: electrons 
+  // trigger: electrons
   cout << "using electrons triggers" << endl;
-  requiredTriggers.push_back("HLT_Ele8_v1");  
-  requiredTriggers.push_back("HLT_Ele8_v2");  
   requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v1");
   requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v2");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v3");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v1");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v2");
-  requiredTriggers.push_back("HLT_Photon30_CaloIdVL_v1");
-  requiredTriggers.push_back("HLT_Photon30_CaloIdVL_v2");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v3");
   // 
   // for mc Winter10 and for spring11
   // requiredTriggers.push_back("HLT_Ele10_SW_L1R_v2");
   // requiredTriggers.push_back("HLT_Ele17_SW_L1R_v2");
-  // requiredTriggers.push_back("HLT_Photon30_Cleaned_L1R");
 
   // loop on events
   unsigned int lastLumi = 0;
@@ -4677,11 +4685,11 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     // look for the leading jet not matching the HLT object - to further reduce the W contribution
     float maxEt    = -1.;
     int leadingJet = -1;
-    for ( int jet=0; jet<nAK5PFJet; jet++ ) {
-      TVector3 p3Jet(pxAK5PFJet[jet],pyAK5PFJet[jet],pzAK5PFJet[jet]);
+    for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
+      TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
       bool HLTmatch = triggerMatch(p3Jet.Eta(),p3Jet.Phi(),0.2);
       if (HLTmatch) continue;
-      if ( fabs(p3Jet.Eta()) < maxEta && p3Jet.Pt() > maxEt) {  
+      if ( fabs(p3Jet.Eta()) < maxEta && p3Jet.Pt() > maxEt) {    
 	maxEt   = p3Jet.Pt();
 	leadingJet = jet;
       }
@@ -4689,7 +4697,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     
     // variables used in the selection
     TVector3 p3Met(pxPFMet[0],pyPFMet[0],0.0);
-    TVector3 p3LeadingCut(pxAK5PFJet[leadingJet],pyAK5PFJet[leadingJet],pzAK5PFJet[leadingJet]);
+    TVector3 p3LeadingCut(pxAK5PFPUcorrJet[leadingJet],pyAK5PFPUcorrJet[leadingJet],pzAK5PFPUcorrJet[leadingJet]);
     float WmT        = sqrt(2*tlvDenom1.Pt()*p3Met.Pt()*(1-cos(tv3Denom1.Angle(p3Met))) );      
     float theInvMass = -10.;
     if (theDenom1>-1 && theDenom2>-1) theInvMass = (tlvDenom1+tlvDenom2).M();
@@ -4709,6 +4717,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
 
     // event selection: invariant mass between two electrons passing the denominator selection to reduce Z->ee
     if (theInvMass>60. && theInvMass<120.) continue;
+    if (theInvMass>0.1 && theInvMass<12.)  continue;  
     myCounter.IncrVar("Zmass",1);    
     
     // need at least one reco jet
@@ -4716,9 +4725,16 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     myCounter.IncrVar("leadingExist",1);    
 
     // minimal cut on leading jet or photon ET
-    if (p3LeadingCut.Pt()<30) continue;   
+    // if (p3LeadingCut.Pt()<15) continue;   
+    if (p3LeadingCut.Pt()<30) continue;        
+    // if (p3LeadingCut.Pt()<35) continue;   
+    // if (p3LeadingCut.Pt()<50) continue;   
     myCounter.IncrVar("leadingPT",1);    
     
+    // fill the kine tree - after full selection  
+    myOutTreePassed -> fill( p3Met.Pt(), WmT, theInvMass, maxEt, tv3Denom1.Pt(), deltaPhi);
+    myOutTreePassed -> store();
+
     // consider as denominator all the reco electrons matching the HLT candidate 
     // passing some requirements on the following variables:
     // Gsf Electron (Ecal driven)
@@ -4751,6 +4767,15 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     if (isInEB) RecoPtBarrel ->Fill(etFake);
     if (isInEE) RecoPtEndcap ->Fill(etFake);
       
+    // does this denominator pass the IP cut as for H->WW ?  
+    bool isDenomIP = true;
+    int gsfTrack = gsfTrackIndexEle[theDenom1];
+    float dxyEle = impactPar3DGsfTrack[gsfTrack];
+    if ( fabs(dxyEle)>0.03 ) isDenomIP = false;
+    // does this denominator pass the IP cut as for H->WW ?  
+
+
+
     // fill the numerator: simple cut based
     for (int icut=0;icut<EgammaCutBasedIDWPs.size();++icut) {
 	
@@ -4813,7 +4838,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
 	if (isInEE) CutIdOnlyConvPtEndcap[icut] ->Fill(etFake);
       }
       
-      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased ) {
+      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {  
 	CutIdEta[icut]->Fill(etaFake);
 	CutIdPt[icut] ->Fill(etFake);
 	CutIdPU[icut] -> Fill(nPV);
@@ -4886,7 +4911,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
 	if (isInEE) LHIdOnlyConvPtEndcap[icut] -> Fill(etFake);
       }
       
-      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased ) {
+      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {
 	LHIdEta[icut]->Fill(etaFake);
 	LHIdPt[icut] ->Fill(etFake);
 	LHIdPU[icut] ->Fill(nPV);
@@ -4959,7 +4984,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
 	if (isInEE) CiCIdOnlyConvPtEndcap[icut]  -> Fill(etFake);
       }
       
-      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased ) {
+      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {  
 	CiCIdEta[icut]->Fill(etaFake);
 	CiCIdPt[icut] ->Fill(etFake);
 	CiCIdPU[icut]->Fill(nPV);
@@ -4984,7 +5009,8 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   myCounter.Save(filename,"recreate");
 
   // saving the output tree
-  myOutTree -> save();
+  myOutTree       -> save();
+  myOutTreePassed -> save();
 
 
   // saving efficiency histos
