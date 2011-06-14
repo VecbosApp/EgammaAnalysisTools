@@ -1,4 +1,5 @@
 combIso    	 -100    0.033
+combPFIso	 -100    0.09
 trackerIso 	 -100 	 0.04
 ecalIso 	 -100 	 0.05 
 hcalIso 	 -100 	 0.025 
