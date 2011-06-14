@@ -104,6 +104,8 @@ public :
    Int_t           eleIdCutsEle[100];   //[nEle]
    Float_t         eleIdLikelihoodEle[100];   //[nEle]
    Float_t         pflowMVAEle[100];   //[nEle]
+   Float_t         pfCombinedIsoEle[100];   //[nEle]
+   Bool_t          hasMatchedConversionEle[100];   //[nEle]
    Int_t           nPFEle;
    Int_t           chargePFEle[100];   //[nPFEle]
    Float_t         energyPFEle[100];   //[nPFEle]
@@ -758,6 +760,8 @@ public :
    TBranch        *b_eleIdCutsEle;   //!
    TBranch        *b_eleIdLikelihoodEle;   //!
    TBranch        *b_pflowMVAEle;   //!
+   TBranch        *b_pfCombinedIsoEle;   //!
+   TBranch        *b_hasMatchedConversionEle;   //!
    TBranch        *b_nPFEle;   //!
    TBranch        *b_chargePFEle;   //!
    TBranch        *b_energyPFEle;   //!
@@ -1485,6 +1489,8 @@ void EgammaBase::Init(TTree *tree)
    fChain->SetBranchAddress("eleIdCutsEle", eleIdCutsEle, &b_eleIdCutsEle);
    fChain->SetBranchAddress("eleIdLikelihoodEle", eleIdLikelihoodEle, &b_eleIdLikelihoodEle);
    fChain->SetBranchAddress("pflowMVAEle", pflowMVAEle, &b_pflowMVAEle);
+   fChain->SetBranchAddress("pfCombinedIsoEle", pfCombinedIsoEle, &b_pfCombinedIsoEle);
+   fChain->SetBranchAddress("hasMatchedConversionEle", hasMatchedConversionEle, &b_hasMatchedConversionEle);
    fChain->SetBranchAddress("nPFEle", &nPFEle, &b_nPFEle);
    fChain->SetBranchAddress("chargePFEle", chargePFEle, &b_chargePFEle);
    fChain->SetBranchAddress("energyPFEle", energyPFEle, &b_energyPFEle);
