@@ -47,6 +47,9 @@
 #if Application == 8
 #include "EgammaAnalysisTools/include/ZeeTagAndProbe.hh"
 #endif
+#if Application == 9
+#include "EgammaAnalysisTools/include/TestTurnOnCurve.hh"
+#endif
 
 int main(int argc, char* argv[]) {
 
@@ -55,13 +58,13 @@ int main(int argc, char* argv[]) {
 
 #if Application != 5
   if ( argc < 4 ){
-    std::cout << "missing argument: insert at least inputFile with list of root files" << std::endl; 
+    std::cout << "missing argument: insert at least the inputFile with list of root files"    << std::endl; 
     std::cout << "EgammaAnalysis inputFile outputFile 0" << std::endl;
     return 1;
   }
-  strcpy(inputFileName,argv[1]);
+  strcpy(inputFileName, argv[1]);
   strcpy(outputFileName,argv[2]);
-  int signal = atoi(argv[3]);
+  int signal   = atoi(argv[3]);
 
   // -------------------------
   // loading file:
@@ -85,8 +88,8 @@ int main(int argc, char* argv[]) {
     if (!strstr(Buffer,"#") && !(strspn(Buffer," ") == strlen(Buffer)))
       {
 	sscanf(Buffer,"%s",MyRootFile);
-	theChain->Add("rfio:"+TString(MyRootFile));
-	// theChain->Add(TString(MyRootFile));
+	// theChain->Add("rfio:"+TString(MyRootFile));
+	theChain->Add(TString(MyRootFile));
 	std::cout << "chaining " << MyRootFile << std::endl;
 	// if ( nfiles==1 ) {
 	//  TFile *firstfile = TFile::Open(MyRootFile);
@@ -103,12 +106,12 @@ int main(int argc, char* argv[]) {
 
   LikelihoodAnalysis analysis(theChain);
   // analysis.reproduceEgammaCutID();
-  //  analysis.findEquivalentLHCut( 0.79935 );        // tight eleID
-  //  analysis.findEquivalentLHCut( 0.957 );       // loose eleID
-  //  analysis.estimateIDEfficiency(outputFileName);
-  //analysis.estimateFakeRateQCD(outputFileName);
-  analysis.estimateFakeRate(outputFileName);
-
+  // analysis.findEquivalentLHCut( 0.79935 );        // tight eleID
+  // analysis.findEquivalentLHCut( 0.957 );          // loose eleID
+  // analysis.estimateIDEfficiency(outputFileName);
+  // analysis.estimateFakeRate(outputFileName);
+  analysis.estimateFakeRateForHToWW_EGAMMA(outputFileName);
+  
 #endif
 
 #if Application == 2
@@ -168,7 +171,7 @@ int main(int argc, char* argv[]) {
 
 #if Application == 5
 
-  int doSignalsPlots = 0;
+  int doSignalsPlots = 1;
   int isMC = 1;
   int typeClass = 2;
   int isTP = 0;
@@ -177,11 +180,11 @@ int main(int argc, char* argv[]) {
   TFile *fileData, *fileMC;
 
   if(doSignalsPlots) {
-    //    fileData = TFile::Open((std::string("results_data/sPlots/Wenu_tree.root")).c_str());
-    fileMC = TFile::Open((std::string("results/treesW/WJetsMADGRAPH_Wenu.root")).c_str());
+    fileData = TFile::Open((std::string("results_data/sPlots/Wenu_tree.root")).c_str());
+    fileMC = TFile::Open((std::string("wcandleresults/treesW/WjetsMadgraph.root")).c_str());
   } else {
-    //    fileData = TFile::Open((std::string("results_data/sPlots/Wenu_bkgFit_tree.root")).c_str());
-    fileMC = TFile::Open((std::string("results/treesW/fakes_Wenu.root")).c_str());    
+    fileData = TFile::Open((std::string("results_data/sPlots/Wenu_bkgFit_tree.root")).c_str());
+    fileMC = TFile::Open((std::string("results/treesW/QCD_Wenu.root")).c_str());    
   }
 
   TTree *tree = 0;
@@ -226,6 +229,13 @@ int main(int argc, char* argv[]) {
   ZeeTagAndProbe analysis(theChain);
   analysis.Loop(outputFileName);
 
+#endif
+
+#if Application == 9
+
+  TestTurnOnCurve analysis(theChain);
+  analysis.measureTurnOn(outputFileName);
+  
 #endif
 
   return 0;
