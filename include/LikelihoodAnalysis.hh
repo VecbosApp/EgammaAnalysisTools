@@ -76,6 +76,7 @@ private:
 
   //! reduced trees                                                                                                                 
   FakeTree *myOutTree;
+  FakeTree *myOutTreePassed;
 };
 
 #endif
