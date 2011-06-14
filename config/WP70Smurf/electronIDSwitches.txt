@@ -1,4 +1,5 @@
-combIso         1
+combIso         0
+combPFIso       1
 trackerIso      0
 ecalIso         0
 hcalIso         0
@@ -6,8 +7,9 @@ sigmaEtaEta	1
 dphiIn		1
 deta		1
 hOverE		1
-distConv        1
-dcotConv        1
+distConv        0
+dcotConv        0
+matchedConv     1
 missHits        1
 eOverPin	0
 s9s25		0
