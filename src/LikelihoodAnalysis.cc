@@ -17,7 +17,7 @@ using namespace std;
 LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   : Egamma(tree) {
 
-  _isData = true;    // to be modified harcoded
+  _isData = true;       // chiara
   
   EgammaCutBasedIDWPs.push_back("WP95"); // [0]
   EgammaCutBasedIDWPs.push_back("WP90"); // [1]
@@ -103,9 +103,16 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   LH = new ElectronLikelihood(&(*EB0lt15dir), &(*EB1lt15dir), &(*EElt15dir), &(*EB0gt15dir), &(*EB1gt15dir), &(*EEgt15dir),
                               defaultSwitches, std::string("class"),std::string("class"),true,true);
 
+  // chiara
   // to read good run list
   if (_isData) {
-    std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/goodCollisions2011.json";  
+    // std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/goodCollisions2011.json";  
+    // std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/goodCollisions2011_preapproval_184pb.json";
+    // std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/goodCollisions2011_V7.json";
+    // std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/goodCollisions2011_815pb.json";
+    //// std::string goodRunGiasoneFile    = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/Cert_EPSFINAL_May10ReReco_v2_PromptReco_160404_167913_JSON.txt";
+    std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/HWW.conservativeCertificationLP11.json";
+
     setJsonGoodRunList(goodRunGiasoneFile); 
     fillRunLSMap();
   }
@@ -1343,7 +1350,8 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   float maxEta = 2.5;
 
   // to study which ET cut we want to apply on the jet (for Wjets HWW studies)
-  TH1F *FakeJetForThresholdPT = new TH1F("FakeJetForThresholdPT", "fakeable jets p_{T}", 20, 0., 100.);
+  // TH1F *FakeJetForThresholdPT = new TH1F("FakeJetForThresholdPT", "fakeable jets p_{T}", 20, 0., 100.);
+  TH1F *FakeJetForThresholdPT = new TH1F("FakeJetForThresholdPT", "fakeable jets p_{T}", 50, 0., 100.);
     
   TH1F *FakeableJetsEta   = new TH1F( "FakeableJetsEta",  "fakeable jets #eta",nbinsEta, minEta, maxEta );
   TH1F *RecoEta  = new TH1F( "RecoEta", "reconstructed #eta", nbinsEta, minEta, maxEta );
@@ -4159,16 +4167,16 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_QCD(const char *outname) {
   ElectronEffPtEndcap.Write();
 }
 
-
 void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
 
   // to study which ET cut we want to apply on the jet (for Wjets HWW studies)
-  TH1F *FakeJetForThresholdPT = new TH1F("FakeJetForThresholdPT", "fakeable jets p_{T}", 20, 0., 100.);
+  // TH1F *FakeJetForThresholdPT = new TH1F("FakeJetForThresholdPT", "fakeable jets p_{T}", 20, 0., 100.);
+  TH1F *FakeJetForThresholdPT = new TH1F("FakeJetForThresholdPT", "fakeable jets p_{T}", 50, 0., 100.);
   
   // study vs eta
   int nbinsEta = 60;
   float minEta = -2.5;
-  float maxEta = 2.5;
+  float maxEta =  2.5;
   TH1F *FakeableJetsEta = new TH1F( "FakeableJetsEta", "fakeable jets #eta", nbinsEta, minEta, maxEta );
   TH1F *RecoEta         = new TH1F( "RecoEta",         "reconstructed #eta", nbinsEta, minEta, maxEta );
   TH1F *RecoEtaHighPt   = new TH1F( "RecoEtaHighPt",   "reconstructed #eta", nbinsEta, minEta, maxEta );
@@ -4230,7 +4238,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     CutIdOnlyIDEtaHighPt.push_back(aHisto);
     aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoEtaHighPt", "cut ID #eta",  nbinsEta, minEta, maxEta );
     CutIdOnlyIsoEtaHighPt.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvEtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvEtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta);
     CutIdOnlyConvEtaHighPt.push_back(aHisto);
   }
 
@@ -4611,26 +4619,28 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   sprintf(filename,"%sKineTreePassed.root",outname);
   myOutTreePassed = new FakeTree(filename);
   
-  // trigger: electrons
+  // trigger: electrons - chiara
   cout << "using electrons triggers" << endl;
   requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v1");
   requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v2");
-  // requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v3");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v3");
   requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v4");
   requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v5");
   requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v6");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v7");
   // 
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v1");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v2");
-  // requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v3");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v3");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v4");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v5");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v6");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v7");
   // 
   // for mc Winter10 and for spring11
   // requiredTriggers.push_back("HLT_Ele10_SW_L1R_v2");
   // requiredTriggers.push_back("HLT_Ele17_SW_L1R_v2");
-  
+
   // loop on events
   unsigned int lastLumi = 0;
   unsigned int lastRun  = 0;
@@ -4743,7 +4753,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     // minimal cut on leading jet or photon ET
     // if (p3LeadingCut.Pt()<15) continue;   
     // if (p3LeadingCut.Pt()<20) continue;   
-    if (p3LeadingCut.Pt()<30) continue;        
+    if (p3LeadingCut.Pt()<30) continue;        // chiara
     // if (p3LeadingCut.Pt()<35) continue;   
     // if (p3LeadingCut.Pt()<50) continue;   
     myCounter.IncrVar("leadingPT",1);    
@@ -4761,6 +4771,57 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     // cleaning for spikes
     // conversion rejection ?? 
 
+
+    // weight to the events to reweight for jet pT
+    float theWeight = 1.;
+
+    /*
+    // chiara: only to reweight => start
+    float dREleJet_minA = 1000;
+    int closestJetA=-1;
+    for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
+      TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
+      if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 10.0 ) {          
+	float dREleJet = p3Jet.DeltaR(tv3Denom1);
+	if(dREleJet<dREleJet_minA) {
+	  closestJetA=jet;
+	  dREleJet_minA=dREleJet;
+	}}}
+
+    if(closestJetA > -1) {
+      TVector3 p3ClosestJetA(pxAK5PFPUcorrJet[closestJetA],pyAK5PFPUcorrJet[closestJetA],pzAK5PFPUcorrJet[closestJetA]);
+      int binAverage[50];
+      float contentQCD[50], contentWjets[50]; 
+      TFile fileFromQCD  ("fileFromQCD_data.root");
+      TFile fileFromWjets("fileFromWjets_mc.root");
+      TH1F *histoFromQCD   = (TH1F*)fileFromQCD  .Get("FakeJetForThresholdPT");
+      TH1F *histoFromWjets = (TH1F*)fileFromWjets.Get("FakeJetForThresholdPT");
+      if (histoFromQCD->GetNbinsX() != histoFromWjets->GetNbinsX() ) cout << "major bug" << endl;
+      if (histoFromQCD->GetNbinsX() != 50 ) cout << "major bug" << endl;  // hardcoded
+      histoFromQCD->Scale(1./histoFromQCD->Integral());
+      histoFromWjets->Scale(1./histoFromWjets->Integral());
+      for (int iBin=0; iBin<(histoFromQCD->GetNbinsX()); iBin++) {
+	int theBin = iBin + 1;
+	contentQCD[iBin]   = histoFromQCD  ->GetBinContent(theBin);
+	contentWjets[iBin] = histoFromWjets->GetBinContent(theBin);
+	binAverage[iBin]   = iBin*2 + 1;    // hardcoded
+	// cout << iBin << " " << contentQCD[iBin] << " " << contentWjets[iBin] << " " << binAverage[iBin] << endl;
+      }
+
+      cout << "closest jet pT = " << p3ClosestJetA.Pt() << endl;
+      for (int iBin=0; iBin<(histoFromQCD->GetNbinsX()); iBin++) {
+	int binUp   = binAverage[iBin]+1;
+	int binDown = binAverage[iBin]-1;
+	if ( (p3ClosestJetA.Pt()<=binUp) && (p3ClosestJetA.Pt()>binDown) ) {
+	  if (contentQCD[iBin]>0)  theWeight = contentWjets[iBin]/contentQCD[iBin];
+	  if (contentQCD[iBin]==0) theWeight = contentWjets[iBin]/0.001;
+	  // cout << "scelgo: " << binUp << " " << binDown << " " << contentWjets[iBin] << " " << contentQCD[iBin] << " " << theWeight << endl;
+	}
+      }
+    }
+    // chiara: only to reweight => end
+    */
+
     // fill the denominator: take only the highest pT one
     float etaFake = tv3Denom1.Eta();
     float etFake  = tv3Denom1.Pt();
@@ -4768,22 +4829,22 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     bool isInEE   = anaUtils.fiducialFlagECAL(fiducialFlagsEle[theDenom1], isEE);
     bool highPt   = (etFake>20.);
     bool lowPt    = (etFake<=20.);
-    RecoEta         -> Fill(etaFake);
-    RecoPt          -> Fill(etFake);
-    RecoPU          -> Fill(nPV);
-    FakeableJetsEta -> Fill( etaFake );
-    FakeableJetsPt  -> Fill( etFake );
-    FakeableJetsPU  -> Fill( nPV );
+    RecoEta         -> Fill(etaFake, theWeight);
+    RecoPt          -> Fill(etFake, theWeight);
+    RecoPU          -> Fill(nPV, theWeight);
+    FakeableJetsEta -> Fill(etaFake, theWeight);
+    FakeableJetsPt  -> Fill(etFake, theWeight);
+    FakeableJetsPU  -> Fill(nPV, theWeight);
     if (highPt) { 
-      RecoEtaHighPt->Fill(etaFake);
-      RecoPUHighPt->Fill(nPV);
+      RecoEtaHighPt->Fill(etaFake, theWeight);
+      RecoPUHighPt->Fill(nPV, theWeight);
     }
     if (lowPt)  { 
-      RecoEtaLowPt ->Fill(etaFake);
-      RecoPULowPt->Fill(nPV);
+      RecoEtaLowPt ->Fill(etaFake, theWeight);
+      RecoPULowPt->Fill(nPV, theWeight);
     }
-    if (isInEB) RecoPtBarrel ->Fill(etFake);
-    if (isInEE) RecoPtEndcap ->Fill(etFake);
+    if (isInEB) RecoPtBarrel ->Fill(etFake, theWeight);
+    if (isInEE) RecoPtEndcap ->Fill(etFake, theWeight);
       
 
     // for the systematics of HWW - init
@@ -4799,7 +4860,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
 	}}}
     if(closestJet > -1) {
       TVector3 p3ClosestJet(pxAK5PFPUcorrJet[closestJet],pyAK5PFPUcorrJet[closestJet],pzAK5PFPUcorrJet[closestJet]);
-      if ( etFake > 10.0 ) FakeJetForThresholdPT ->Fill( p3ClosestJet.Pt() ); // hardcoded 
+      if ( etFake > 10.0 ) FakeJetForThresholdPT ->Fill(p3ClosestJet.Pt(), theWeight);
     }
     // for the systematics of HWW - init
 
@@ -4807,14 +4868,12 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     // does this denominator pass the IP cut as for H->WW ?  // tutto hardcoded. Se resta -> sistemalo
     bool isDenomIP = true;
     int gsfTrack = gsfTrackIndexEle[theDenom1];
-    // float dxyEle = impactPar3DGsfTrack[gsfTrack];
-    // if ( fabs(dxyEle)>0.03 ) isDenomIP = false;
     float dxyEle = transvImpactParGsfTrack[gsfTrack];
     float dzEle  = PVzPV[0] - trackVzGsfTrack[gsfTrack];   
     if ( fabs(dxyEle)>0.02 ) isDenomIP = false;
     if ( fabs(dzEle)>0.10 )  isDenomIP = false;
     // does this denominator pass the IP cut as for H->WW ?  
-
+    
 
     // fill the numerator: simple cut based
     for (int icut=0;icut<EgammaCutBasedIDWPs.size();++icut) {
@@ -4831,67 +4890,67 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
       }
 
       if ( isEleIDCutBased ) {
-	CutIdOnlyIDEta[icut]-> Fill(etaFake);
-	CutIdOnlyIDPt[icut] -> Fill(etFake);
-	CutIdOnlyIDPU[icut] -> Fill(nPV);
+	CutIdOnlyIDEta[icut]-> Fill(etaFake, theWeight);
+	CutIdOnlyIDPt[icut] -> Fill(etFake, theWeight);
+	CutIdOnlyIDPU[icut] -> Fill(nPV, theWeight);
 	if (highPt) { 
-	  CutIdOnlyIDEtaHighPt[icut]-> Fill(etaFake);
-	  CutIdOnlyIDPUHighPt[icut] -> Fill(nPV);
+	  CutIdOnlyIDEtaHighPt[icut]-> Fill(etaFake, theWeight);
+	  CutIdOnlyIDPUHighPt[icut] -> Fill(nPV, theWeight);
 	}
 	if (lowPt)  { 
-	  CutIdOnlyIDEtaLowPt[icut] -> Fill(etaFake);
-	  CutIdOnlyIDPULowPt[icut]  -> Fill(nPV);
+	  CutIdOnlyIDEtaLowPt[icut] -> Fill(etaFake, theWeight);
+	  CutIdOnlyIDPULowPt[icut]  -> Fill(nPV, theWeight);
 	}
-	if (isInEB) CutIdOnlyIDPtBarrel[icut] -> Fill(etFake);
-	if (isInEE) CutIdOnlyIDPtEndcap[icut] -> Fill(etFake);
+	if (isInEB) CutIdOnlyIDPtBarrel[icut] -> Fill(etFake, theWeight);
+	if (isInEE) CutIdOnlyIDPtEndcap[icut] -> Fill(etFake, theWeight);
       }
       
       if ( isIsolCutBased ) {
-	CutIdOnlyIsoEta[icut]-> Fill(etaFake);
-	CutIdOnlyIsoPt[icut] -> Fill(etFake);
-	CutIdOnlyIsoPU[icut] -> Fill(nPV);
+	CutIdOnlyIsoEta[icut]-> Fill(etaFake, theWeight);
+	CutIdOnlyIsoPt[icut] -> Fill(etFake, theWeight);
+	CutIdOnlyIsoPU[icut] -> Fill(nPV, theWeight);
 	if (highPt) { 
-	  CutIdOnlyIsoEtaHighPt[icut] -> Fill(etaFake);
-	  CutIdOnlyIsoPUHighPt[icut]  -> Fill(nPV);
+	  CutIdOnlyIsoEtaHighPt[icut] -> Fill(etaFake, theWeight);
+	  CutIdOnlyIsoPUHighPt[icut]  -> Fill(nPV, theWeight);
 	}
 	if (lowPt)  { 
-	  CutIdOnlyIsoEtaLowPt[icut] -> Fill(etaFake);
-	  CutIdOnlyIsoPULowPt[icut]  -> Fill(nPV);
+	  CutIdOnlyIsoEtaLowPt[icut] -> Fill(etaFake, theWeight);
+	  CutIdOnlyIsoPULowPt[icut]  -> Fill(nPV, theWeight);
 	}
-	if (isInEB) CutIdOnlyIsoPtBarrel[icut] ->Fill(etFake);
-	if (isInEE) CutIdOnlyIsoPtEndcap[icut] ->Fill(etFake);
+	if (isInEB) CutIdOnlyIsoPtBarrel[icut] ->Fill(etFake, theWeight);
+	if (isInEE) CutIdOnlyIsoPtEndcap[icut] ->Fill(etFake, theWeight);
       }
       
       if ( isConvRejCutBased ) {
-	CutIdOnlyConvEta[icut]-> Fill(etaFake);
-	CutIdOnlyConvPt[icut] -> Fill(etFake);
-	CutIdOnlyConvPU[icut] -> Fill(nPV);
+	CutIdOnlyConvEta[icut]-> Fill(etaFake, theWeight);
+	CutIdOnlyConvPt[icut] -> Fill(etFake, theWeight);
+	CutIdOnlyConvPU[icut] -> Fill(nPV, theWeight);
 	if (highPt) { 
-	  CutIdOnlyConvEtaHighPt[icut] -> Fill(etaFake);
-	  CutIdOnlyConvPUHighPt[icut]  -> Fill(nPV);
+	  CutIdOnlyConvEtaHighPt[icut] -> Fill(etaFake, theWeight);
+	  CutIdOnlyConvPUHighPt[icut]  -> Fill(nPV, theWeight);
 	}
 	if (lowPt)  { 
-	  CutIdOnlyConvEtaLowPt[icut] -> Fill(etaFake);
-	  CutIdOnlyConvPULowPt[icut]  -> Fill(nPV);
+	  CutIdOnlyConvEtaLowPt[icut] -> Fill(etaFake, theWeight);
+	  CutIdOnlyConvPULowPt[icut]  -> Fill(nPV, theWeight);
 	}
-	if (isInEB) CutIdOnlyConvPtBarrel[icut] ->Fill(etFake);
-	if (isInEE) CutIdOnlyConvPtEndcap[icut] ->Fill(etFake);
+	if (isInEB) CutIdOnlyConvPtBarrel[icut] ->Fill(etFake, theWeight);
+	if (isInEE) CutIdOnlyConvPtEndcap[icut] ->Fill(etFake, theWeight);
       }
       
-      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {  // IP cut added
-	CutIdEta[icut]->Fill(etaFake);
-	CutIdPt[icut] ->Fill(etFake);
-	CutIdPU[icut] -> Fill(nPV);
+      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {  // chiara: IP cut added
+	CutIdEta[icut]->Fill(etaFake, theWeight);
+	CutIdPt[icut] ->Fill(etFake, theWeight);
+	CutIdPU[icut] -> Fill(nPV, theWeight);
 	if (highPt) { 
-	  CutIdEtaHighPt[icut]-> Fill(etaFake);
-	  CutIdPUHighPt[icut] -> Fill(nPV);
+	  CutIdEtaHighPt[icut]-> Fill(etaFake, theWeight);
+	  CutIdPUHighPt[icut] -> Fill(nPV, theWeight);
 	}
 	if (lowPt)  { 
-	  CutIdEtaLowPt[icut] -> Fill(etaFake);
-	  CutIdPULowPt[icut]  -> Fill(nPV);
+	  CutIdEtaLowPt[icut] -> Fill(etaFake, theWeight);
+	  CutIdPULowPt[icut]  -> Fill(nPV, theWeight);
 	}
-	if (isInEB) CutIdPtBarrel[icut] ->Fill(etFake);
-	if (isInEE) CutIdPtEndcap[icut] ->Fill(etFake);
+	if (isInEB) CutIdPtBarrel[icut] ->Fill(etFake, theWeight);
+	if (isInEE) CutIdPtEndcap[icut] ->Fill(etFake, theWeight);
       }
     }
     
@@ -4908,67 +4967,67 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
         isEleID(&EgammaLHBasedID[6],theDenom1,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
 
       if ( isEleIDCutBased ) {
-	LHIdOnlyIDEta[icut]->Fill(etaFake);
-	LHIdOnlyIDPt[icut] ->Fill(etFake);
-	LHIdOnlyIDPU[icut] ->Fill(nPV);
+	LHIdOnlyIDEta[icut]->Fill(etaFake, theWeight);
+	LHIdOnlyIDPt[icut] ->Fill(etFake, theWeight);
+	LHIdOnlyIDPU[icut] ->Fill(nPV, theWeight);
 	if (highPt) { 
-	  LHIdOnlyIDEtaHighPt[icut]-> Fill(etaFake);
-	  LHIdOnlyIDPUHighPt[icut] -> Fill(nPV);
+	  LHIdOnlyIDEtaHighPt[icut]-> Fill(etaFake, theWeight);
+	  LHIdOnlyIDPUHighPt[icut] -> Fill(nPV, theWeight);
 	}
 	if (lowPt)  { 
-	  LHIdOnlyIDEtaLowPt[icut] -> Fill(etaFake);
-	  LHIdOnlyIDPULowPt[icut]  -> Fill(nPV);
+	  LHIdOnlyIDEtaLowPt[icut] -> Fill(etaFake, theWeight);
+	  LHIdOnlyIDPULowPt[icut]  -> Fill(nPV, theWeight);
 	}
-	if (isInEB) LHIdOnlyIDPtBarrel[icut] -> Fill(etFake);
-	if (isInEE) LHIdOnlyIDPtEndcap[icut] -> Fill(etFake);
+	if (isInEB) LHIdOnlyIDPtBarrel[icut] -> Fill(etFake, theWeight);
+	if (isInEE) LHIdOnlyIDPtEndcap[icut] -> Fill(etFake, theWeight);
       }
       
       if ( isIsolCutBased ) {
-	LHIdOnlyIsoEta[icut]-> Fill(etaFake);
-	LHIdOnlyIsoPt[icut] -> Fill(etFake);
-	LHIdOnlyIsoPU[icut] -> Fill(nPV);
+	LHIdOnlyIsoEta[icut]-> Fill(etaFake, theWeight);
+	LHIdOnlyIsoPt[icut] -> Fill(etFake, theWeight);
+	LHIdOnlyIsoPU[icut] -> Fill(nPV, theWeight);
 	if (highPt) { 
-	  LHIdOnlyIsoEtaHighPt[icut]-> Fill(etaFake);
-	  LHIdOnlyIsoPUHighPt[icut] -> Fill(nPV);
+	  LHIdOnlyIsoEtaHighPt[icut]-> Fill(etaFake, theWeight);
+	  LHIdOnlyIsoPUHighPt[icut] -> Fill(nPV, theWeight);
 	}
 	if (lowPt)  { 
-	  LHIdOnlyIsoEtaLowPt[icut] -> Fill(etaFake);
-	  LHIdOnlyIsoPULowPt[icut]  -> Fill(nPV);
+	  LHIdOnlyIsoEtaLowPt[icut] -> Fill(etaFake, theWeight);
+	  LHIdOnlyIsoPULowPt[icut]  -> Fill(nPV, theWeight);
 	}
-	if (isInEB) LHIdOnlyIsoPtBarrel[icut] -> Fill(etFake);
-	if (isInEE) LHIdOnlyIsoPtEndcap[icut] -> Fill(etFake);
+	if (isInEB) LHIdOnlyIsoPtBarrel[icut] -> Fill(etFake, theWeight);
+	if (isInEE) LHIdOnlyIsoPtEndcap[icut] -> Fill(etFake, theWeight);
       }
       
       if ( isConvRejCutBased ) {
-	LHIdOnlyConvEta[icut]->Fill(etaFake);
-	LHIdOnlyConvPt[icut] ->Fill(etFake);
-	LHIdOnlyConvPU[icut] ->Fill(nPV);
+	LHIdOnlyConvEta[icut]->Fill(etaFake, theWeight);
+	LHIdOnlyConvPt[icut] ->Fill(etFake, theWeight);
+	LHIdOnlyConvPU[icut] ->Fill(nPV, theWeight);
 	if (highPt) { 
-	  LHIdOnlyConvEtaHighPt[icut]-> Fill(etaFake);
-	  LHIdOnlyConvPUHighPt[icut] -> Fill(nPV);
+	  LHIdOnlyConvEtaHighPt[icut]-> Fill(etaFake, theWeight);
+	  LHIdOnlyConvPUHighPt[icut] -> Fill(nPV, theWeight);
 	}
 	if (lowPt)  { 
-	  LHIdOnlyConvEtaLowPt[icut] -> Fill(etaFake);
-	  LHIdOnlyConvPULowPt[icut]  -> Fill(nPV);
+	  LHIdOnlyConvEtaLowPt[icut] -> Fill(etaFake, theWeight);
+	  LHIdOnlyConvPULowPt[icut]  -> Fill(nPV, theWeight);
 	}
-	if (isInEB) LHIdOnlyConvPtBarrel[icut] -> Fill(etFake);
-	if (isInEE) LHIdOnlyConvPtEndcap[icut] -> Fill(etFake);
+	if (isInEB) LHIdOnlyConvPtBarrel[icut] -> Fill(etFake, theWeight);
+	if (isInEE) LHIdOnlyConvPtEndcap[icut] -> Fill(etFake, theWeight);
       }
       
-      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {  // IP added
-	LHIdEta[icut]->Fill(etaFake);
-	LHIdPt[icut] ->Fill(etFake);
-	LHIdPU[icut] ->Fill(nPV);
+      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {  // chiara: IP added
+	LHIdEta[icut]->Fill(etaFake, theWeight);
+	LHIdPt[icut] ->Fill(etFake, theWeight);
+	LHIdPU[icut] ->Fill(nPV, theWeight);
 	if (highPt) { 
-	  LHIdEtaHighPt[icut]->Fill(etaFake);
-	  LHIdPUHighPt[icut] ->Fill(nPV);
+	  LHIdEtaHighPt[icut]->Fill(etaFake, theWeight);
+	  LHIdPUHighPt[icut] ->Fill(nPV, theWeight);
 	}
 	if (lowPt)  { 
-	  LHIdEtaLowPt[icut] -> Fill(etaFake);
-	  LHIdPULowPt[icut]  -> Fill(nPV);
+	  LHIdEtaLowPt[icut] -> Fill(etaFake, theWeight);
+	  LHIdPULowPt[icut]  -> Fill(nPV, theWeight);
 	}
-	if (isInEB) LHIdPtBarrel[icut] ->Fill(etFake);
-	if (isInEE) LHIdPtEndcap[icut] ->Fill(etFake);
+	if (isInEB) LHIdPtBarrel[icut] ->Fill(etFake, theWeight);
+	if (isInEE) LHIdPtEndcap[icut] ->Fill(etFake, theWeight);
       }
     }
     
@@ -4981,67 +5040,67 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
       isEleID(&EgammaCiCBasedID[icut],theDenom1,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
 
       if ( isEleIDCutBased ) {
-	CiCIdOnlyIDEta[icut]->Fill(etaFake);
-	CiCIdOnlyIDPt[icut] ->Fill(etFake);
-	CiCIdOnlyIDPU[icut] ->Fill(nPV);
+	CiCIdOnlyIDEta[icut]->Fill(etaFake, theWeight);
+	CiCIdOnlyIDPt[icut] ->Fill(etFake, theWeight);
+	CiCIdOnlyIDPU[icut] ->Fill(nPV, theWeight);
 	if (highPt) { 
-	  CiCIdOnlyIDEtaHighPt[icut]-> Fill(etaFake);
-	  CiCIdOnlyIDPUHighPt[icut] -> Fill(nPV);
+	  CiCIdOnlyIDEtaHighPt[icut]-> Fill(etaFake, theWeight);
+	  CiCIdOnlyIDPUHighPt[icut] -> Fill(nPV, theWeight);
 	}
 	if (lowPt)  { 
-	  CiCIdOnlyIDEtaLowPt[icut] -> Fill(etaFake);
-	  CiCIdOnlyIDPULowPt[icut]  -> Fill(nPV);
+	  CiCIdOnlyIDEtaLowPt[icut] -> Fill(etaFake, theWeight);
+	  CiCIdOnlyIDPULowPt[icut]  -> Fill(nPV, theWeight);
 	}
-	if (isInEB) CiCIdOnlyIDPtBarrel[icut] -> Fill(etFake);
-	if (isInEE) CiCIdOnlyIDPtEndcap[icut] -> Fill(etFake);
+	if (isInEB) CiCIdOnlyIDPtBarrel[icut] -> Fill(etFake, theWeight);
+	if (isInEE) CiCIdOnlyIDPtEndcap[icut] -> Fill(etFake, theWeight);
       }
       
       if ( isIsolCutBased ) {
-	CiCIdOnlyIsoEta[icut]->Fill(etaFake);
-	CiCIdOnlyIsoPt[icut] ->Fill(etFake);
-	CiCIdOnlyIsoPU[icut] ->Fill(nPV);
+	CiCIdOnlyIsoEta[icut]->Fill(etaFake, theWeight);
+	CiCIdOnlyIsoPt[icut] ->Fill(etFake, theWeight);
+	CiCIdOnlyIsoPU[icut] ->Fill(nPV, theWeight);
 	if (highPt) { 
-	  CiCIdOnlyIsoEtaHighPt[icut]->Fill(etaFake);
-	  CiCIdOnlyIsoPUHighPt[icut] ->Fill(nPV);
+	  CiCIdOnlyIsoEtaHighPt[icut]->Fill(etaFake, theWeight);
+	  CiCIdOnlyIsoPUHighPt[icut] ->Fill(nPV, theWeight);
 	}
 	if (lowPt)  { 
-	  CiCIdOnlyIsoEtaLowPt[icut] -> Fill(etaFake);
-	  CiCIdOnlyIsoPULowPt[icut]  -> Fill(nPV);
+	  CiCIdOnlyIsoEtaLowPt[icut] -> Fill(etaFake, theWeight);
+	  CiCIdOnlyIsoPULowPt[icut]  -> Fill(nPV, theWeight);
 	}
-	if (isInEB) CiCIdOnlyIsoPtBarrel[icut] -> Fill(etFake);
-	if (isInEE) CiCIdOnlyIsoPtEndcap[icut] -> Fill(etFake);
+	if (isInEB) CiCIdOnlyIsoPtBarrel[icut] -> Fill(etFake, theWeight);
+	if (isInEE) CiCIdOnlyIsoPtEndcap[icut] -> Fill(etFake, theWeight);
       }
       
       if ( isConvRejCutBased ) {
-	CiCIdOnlyConvEta[icut]-> Fill(etaFake);
-	CiCIdOnlyConvPt[icut] -> Fill(etFake);
-	CiCIdOnlyConvPU[icut] -> Fill(nPV);
+	CiCIdOnlyConvEta[icut]-> Fill(etaFake, theWeight);
+	CiCIdOnlyConvPt[icut] -> Fill(etFake, theWeight);
+	CiCIdOnlyConvPU[icut] -> Fill(nPV, theWeight);
 	if (highPt) { 
-	  CiCIdOnlyConvEtaHighPt[icut] -> Fill(etaFake);
-	  CiCIdOnlyConvPUHighPt[icut]  -> Fill(nPV);
+	  CiCIdOnlyConvEtaHighPt[icut] -> Fill(etaFake, theWeight);
+	  CiCIdOnlyConvPUHighPt[icut]  -> Fill(nPV, theWeight);
 	}
 	if (lowPt)  { 
-	  CiCIdOnlyConvEtaLowPt[icut]  -> Fill(etaFake);
-	  CiCIdOnlyConvPULowPt[icut]   -> Fill(nPV);
+	  CiCIdOnlyConvEtaLowPt[icut]  -> Fill(etaFake, theWeight);
+	  CiCIdOnlyConvPULowPt[icut]   -> Fill(nPV, theWeight);
 	}
-	if (isInEB) CiCIdOnlyConvPtBarrel[icut]  -> Fill(etFake);
-	if (isInEE) CiCIdOnlyConvPtEndcap[icut]  -> Fill(etFake);
+	if (isInEB) CiCIdOnlyConvPtBarrel[icut]  -> Fill(etFake, theWeight);
+	if (isInEE) CiCIdOnlyConvPtEndcap[icut]  -> Fill(etFake, theWeight);
       }
       
-      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {  // IP added
-	CiCIdEta[icut]->Fill(etaFake);
-	CiCIdPt[icut] ->Fill(etFake);
-	CiCIdPU[icut]->Fill(nPV);
+      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {  // chiara: IP added
+	CiCIdEta[icut]->Fill(etaFake, theWeight);
+	CiCIdPt[icut] ->Fill(etFake, theWeight);
+	CiCIdPU[icut]->Fill(nPV, theWeight);
 	if (highPt) { 
-	  CiCIdEtaHighPt[icut] -> Fill(etaFake);
-	  CiCIdPUHighPt[icut]  -> Fill(nPV);
+	  CiCIdEtaHighPt[icut] -> Fill(etaFake, theWeight);
+	  CiCIdPUHighPt[icut]  -> Fill(nPV, theWeight);
 	}
 	if (lowPt)  { 
-	  CiCIdEtaLowPt[icut] -> Fill(etaFake);
-	  CiCIdPULowPt[icut]  -> Fill(nPV);
+	  CiCIdEtaLowPt[icut] -> Fill(etaFake, theWeight);
+	  CiCIdPULowPt[icut]  -> Fill(nPV, theWeight);
 	}
-	if (isInEB) CiCIdPtBarrel[icut] -> Fill(etFake);
-	if (isInEE) CiCIdPtEndcap[icut] -> Fill(etFake);
+	if (isInEB) CiCIdPtBarrel[icut] -> Fill(etFake, theWeight);
+	if (isInEE) CiCIdPtEndcap[icut] -> Fill(etFake, theWeight);
       }
     }
 
@@ -5605,31 +5664,29 @@ bool LikelihoodAnalysis::isDenomFake_HwwEgamma(int theEle) {
   // isolation 
   float ecalIsol    = (dr03EcalRecHitSumEtEle[theEle])/p3Ele.Pt();
   float hcalIsol    = (dr03HcalTowerSumEtEle[theEle])/p3Ele.Pt();
-  float trackerIsol = (dr03TkSumPtEle[theEle])/p3Ele.Pt();                 // this is new
+  float trackerIsol = (dr03TkSumPtEle[theEle])/p3Ele.Pt();                
   if(ecalIsol>0.2)    isGoodDenom = false;
   if(hcalIsol>0.2)    isGoodDenom = false;
-  if(trackerIsol>0.2) isGoodDenom = false;                                      // this is new
-  // full iso
-  // float combinedIso;
-  // if (isEleEB)  combinedIso = dr03TkSumPtEle[theEle] + TMath::Max(0.0,dr03EcalRecHitSumEtEle[theEle]-1.0) + dr03HcalTowerSumEtFullConeEle[theEle];
-  // if (!isEleEB) combinedIso = dr03TkSumPtEle[theEle] + dr03EcalRecHitSumEtEle[theEle] + dr03HcalTowerSumEtFullConeEle[theEle];
-  // float corrCombinedIso = (combinedIso - rhoFastjet*TMath::Pi()*0.3*0.3) / p3Ele.Pt();       
-  // if ( corrCombinedIso>0.15 ) isGoodDenom = false;
-  // 
-  // float combPFiso = pfCombinedIsoEle[theEle]/p3Ele.Pt();    
-  // if ( isEleEB && combPFiso>0.13 ) isGoodDenom = false; 
-  // if (!isEleEB && combPFiso>0.09 ) isGoodDenom = false; 
+  if(trackerIsol>0.2) isGoodDenom = false;                                
 
   // H/E
-  if ( isEleEB && hOverEEle[theEle]>0.15) isGoodDenom = false;
+  if ( isEleEB && hOverEEle[theEle]>0.12) isGoodDenom = false;   
   if (!isEleEB && hOverEEle[theEle]>0.10) isGoodDenom = false;
   
   // sigmaIetaIeta
   bool isBarrelSc;
   if ( fabs(etaSC[sc]) <  1.479 ) isBarrelSc = true;
   if ( fabs(etaSC[sc]) >= 1.479 ) isBarrelSc = false;
-  if ( isBarrelSc && sqrt(covIEtaIEtaSC[sc])>0.013 ) isGoodDenom = false;
-  if (!isBarrelSc && sqrt(covIEtaIEtaSC[sc])>0.034 ) isGoodDenom = false;
+  if ( isBarrelSc && sqrt(covIEtaIEtaSC[sc])>0.01 ) isGoodDenom = false;  
+  if (!isBarrelSc && sqrt(covIEtaIEtaSC[sc])>0.03 ) isGoodDenom = false;  
+
+  // deltaEta
+  if ( isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.007) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.009) ) isGoodDenom = false;
+
+  // deltaPhi
+  if ( isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.15) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.10) ) isGoodDenom = false;
       
   // spikes 
   float theE1 = eMaxSC[sc];
