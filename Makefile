@@ -173,6 +173,10 @@ CompareMisId_analysisPlots: $(INCLUDEDIR)/src/CompareMisId_analysisPlots.C \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o
 	$(CXX) $(CXXFLAGS) -o CompareMisId_analysisPlots $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
+produceMCSubtractedFake: $(INCLUDEDIR)/src/produceMCSubtractedFake.cxx \
+        $(OUTLIBCOMMON)EfficiencyEvaluator.o
+        $(CXX) $(CXXFLAGS) -o produceMCSubtractedFake $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
+
 CompareClasses: $(INCLUDEDIR)/src/CompareClasses.C \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o
 	$(CXX) $(CXXFLAGS) -o CompareClasses $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
@@ -217,6 +221,7 @@ clean:
 	rm -f CompareEff
 	rm -f CompareMisId
 	rm -f CompareClasses
+	rm -f produceMCSubtractedFake
 	rm -f MakeNotePdfPlots
 	rm -f MakeNoteBkgPdfPlots
 	rm -f CompareSignalPdfs
@@ -231,6 +236,7 @@ all:  EgammaAnalysis \
 	CompareEff \
 	CompareMisId \
 	CompareClasses \
+	produceMCSubtractedFake \
 	MakeNotePdfPlots \
 	MakeNoteBkgPdfPlots \
 	CompareSignalPdfs \
