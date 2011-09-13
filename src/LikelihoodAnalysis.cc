@@ -42,8 +42,8 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   EgammaLHBasedIDWPs.push_back("LHMedium");     // [2] 
   EgammaLHBasedIDWPs.push_back("LHTight");      // [3]
   EgammaLHBasedIDWPs.push_back("LHHyperTight"); // [4]
-  EgammaLHBasedIDWPs.push_back("LHLoosePFIso"); // [5]
-  EgammaLHBasedIDWPs.push_back("LHTightPFIso"); // [6]
+  EgammaLHBasedIDWPs.push_back("LHTightPFIso"); // [5]
+  EgammaLHBasedIDWPs.push_back("LHHyperTightPFIso"); // [6]
 
   
   // single electron efficiency, simple cuts 
@@ -111,7 +111,7 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
     // std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/goodCollisions2011_V7.json";
     // std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/goodCollisions2011_815pb.json";
     //// std::string goodRunGiasoneFile    = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/Cert_EPSFINAL_May10ReReco_v2_PromptReco_160404_167913_JSON.txt";
-    std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/HWW.conservativeCertificationLP11.json";
+    std::string goodRunGiasoneFile = "config/json/goodCollisions2011.json";
 
     setJsonGoodRunList(goodRunGiasoneFile); 
     fillRunLSMap();
@@ -5394,8 +5394,6 @@ void LikelihoodAnalysis::isEleID(CutBasedEleIDSelector *selector, int eleIndex, 
 
   Utils anaUtils;
   int gsf = gsfTrackIndexEle[eleIndex];
-  TVector3 pTrkAtOuter(pxAtOuterGsfTrack[gsf],pyAtOuterGsfTrack[gsf],pzAtOuterGsfTrack[gsf]);
-
   TVector3 pEle(pxEle[eleIndex],pyEle[eleIndex],pzEle[eleIndex]);
 
   // if is ECAL driven, take the electron ID variables from the standard electron
@@ -5487,8 +5485,6 @@ void LikelihoodAnalysis::isEleID(CiCBasedEleSelector *selector, int eleIndex, bo
 
   Utils anaUtils;
   int gsf = gsfTrackIndexEle[eleIndex];
-  TVector3 pTrkAtOuter(pxAtOuterGsfTrack[gsf],pyAtOuterGsfTrack[gsf],pzAtOuterGsfTrack[gsf]);
-
   TVector3 pEle(pxEle[eleIndex],pyEle[eleIndex],pzEle[eleIndex]);
 
   // if is ECAL driven, take the electron ID variables from the standard electron
