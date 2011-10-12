@@ -53,6 +53,7 @@ private:
   
   std::pair<int,int> getBestGoodElePair(std::vector<int> goodElectrons);
   bool isDenomFake_HwwEgamma(int theEle);
+  bool isDenomFake_smurfs(int theEle);
 
   CutBasedEleIDSelector EgammaCutBasedIDHWW;
 
