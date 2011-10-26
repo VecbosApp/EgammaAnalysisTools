@@ -50,6 +50,8 @@ private:
   
   float SigmaiEiE(int electron);
   float SigmaiPiP(int electron);
+
+  double eleDzPV(int iele, int iPV);
   
   std::pair<int,int> getBestGoodElePair(std::vector<int> goodElectrons);
   bool isDenomFake_HwwEgamma(int theEle);

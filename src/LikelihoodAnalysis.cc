@@ -37,52 +37,42 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   EgammaCiCBasedIDWPs.push_back("CiCHyperTight3");
   EgammaCiCBasedIDWPs.push_back("CiCHyperTight4");
 
-  EgammaLHBasedIDWPs.push_back("LHVeryLoose");  // [0]
-  EgammaLHBasedIDWPs.push_back("LHLoose");      // [1] 
-  EgammaLHBasedIDWPs.push_back("LHMedium");     // [2] 
-  EgammaLHBasedIDWPs.push_back("LHTight");      // [3]
-  EgammaLHBasedIDWPs.push_back("LHHyperTight"); // [4]
-  EgammaLHBasedIDWPs.push_back("LHTightPFIso"); // [5]
-  EgammaLHBasedIDWPs.push_back("LHHyperTightPFIso"); // [6]
-
+  EgammaLHBasedIDWPs.push_back("LHVeryLoose");     // [0]
+  EgammaLHBasedIDWPs.push_back("LHLoose");         // [1] 
+  EgammaLHBasedIDWPs.push_back("LHMedium");        // [2] 
+  EgammaLHBasedIDWPs.push_back("LHTight");         // [3]
+  EgammaLHBasedIDWPs.push_back("LHTightPFIso");    // [4]
+  EgammaLHBasedIDWPs.push_back("LHHyperTightPFIso");      // [5]
+  EgammaLHBasedIDWPs.push_back("LHHyperTightPFIsoLowPt"); // [6]
   
   // single electron efficiency, simple cuts 
-  for (int i=0;i<EgammaCutBasedIDWPs.size();++i)
-    {
-      CutBasedEleIDSelector aSelector;
-      
-      char configDir[50];
-      sprintf(configDir,"config/%s",EgammaCutBasedIDWPs[i].c_str());
-      std::cout << "===== Configuring " <<  EgammaCutBasedIDWPs[i] << " ElectronID ==========" << std::endl;
-      aSelector.ConfigureNoClass(configDir);
-      //  aSelector.ConfigureEcalCleaner("config/");
-      EgammaCutBasedID.push_back(aSelector);
-    }  
+  for (int i=0;i<EgammaCutBasedIDWPs.size();++i) {
+    CutBasedEleIDSelector aSelector;
+    char configDir[50];
+    sprintf(configDir,"config/%s",EgammaCutBasedIDWPs[i].c_str());
+    std::cout << "===== Configuring " <<  EgammaCutBasedIDWPs[i] << " ElectronID ==========" << std::endl;
+    aSelector.ConfigureNoClass(configDir);
+    EgammaCutBasedID.push_back(aSelector);
+  }  
 
   // single electron efficiency, likelihood
-  for (int i=0;i<EgammaLHBasedIDWPs.size();++i)
-    {
-      CutBasedEleIDSelector aSelector;
-
-      char configDir[50];
-      sprintf(configDir,"config/%s",EgammaLHBasedIDWPs[i].c_str());
-      std::cout << "===== Configuring " <<  EgammaLHBasedIDWPs[i] << " ElectronID ==========" << std::endl;
-      aSelector.ConfigureNoClass(configDir);
-      //  aSelector.ConfigureEcalCleaner("config/");
-      EgammaLHBasedID.push_back(aSelector);
-    }  
+  for (int i=0;i<EgammaLHBasedIDWPs.size();++i) {
+    CutBasedEleIDSelector aSelector;
+    char configDir[50];
+    sprintf(configDir,"config/%s",EgammaLHBasedIDWPs[i].c_str());
+    std::cout << "===== Configuring " <<  EgammaLHBasedIDWPs[i] << " ElectronID ==========" << std::endl;
+    aSelector.ConfigureNoClass(configDir);
+    EgammaLHBasedID.push_back(aSelector);
+  }  
 
   // single electron efficiency, cics
-  for (int i=0;i<EgammaCiCBasedIDWPs.size();++i)
-    {
-      CiCBasedEleSelector aSelector;
-
-      char configDir[50];
-      std::cout << "===== Configuring " <<  EgammaCiCBasedIDWPs[i] << " ElectronID ==========" << std::endl;
-      aSelector.Configure(EgammaCiCBasedIDWPs[i],1,1,2);
-      //  aSelector.ConfigureEcalCleaner("config/");
-      EgammaCiCBasedID.push_back(aSelector);
-    }  
+  for (int i=0;i<EgammaCiCBasedIDWPs.size();++i) {
+    CiCBasedEleSelector aSelector;
+    char configDir[50];
+    std::cout << "===== Configuring " <<  EgammaCiCBasedIDWPs[i] << " ElectronID ==========" << std::endl;
+    aSelector.Configure(EgammaCiCBasedIDWPs[i],1,1,2);
+    EgammaCiCBasedID.push_back(aSelector);
+  }  
 
   // configuring electron likelihood
   TFile *fileLH = TFile::Open("pdfs_MC.root");
@@ -107,12 +97,9 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   // to read good run list
   if (_isData) {
     // std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/goodCollisions2011.json";  
-    // std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/goodCollisions2011_preapproval_184pb.json";
-    // std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/goodCollisions2011_V7.json";
-    // std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/goodCollisions2011_815pb.json";
     //// std::string goodRunGiasoneFile    = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/Cert_EPSFINAL_May10ReReco_v2_PromptReco_160404_167913_JSON.txt";
-    std::string goodRunGiasoneFile = "config/json/goodCollisions2011.json";
     // std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/HWW.conservativeCertificationLP11.json";
+    std::string goodRunGiasoneFile = "/afs/cern.ch/user/c/crovelli/scratch0/Vecbos2010/HiggsAnalysisTools/config/json/2011a.json";
 
     setJsonGoodRunList(goodRunGiasoneFile); 
     fillRunLSMap();
@@ -131,18 +118,12 @@ LikelihoodAnalysis::LikelihoodAnalysis(TTree *tree)
   myCounter.AddVar("leadingPT");
 }
 
-
-
-LikelihoodAnalysis::~LikelihoodAnalysis() {
-}
-
-
+LikelihoodAnalysis::~LikelihoodAnalysis() { }
 
 float LikelihoodAnalysis::findEquivalentLHCut(float wantEfficiency) {
 
   int nbins = 500;
   TH1F *LHBinnedHisto = new TH1F("LHBinnedHisto", "LHBinnedHisto", nbins, 0.0, 1.0);
-
 
   Long64_t nbytes = 0, nb = 0;
   Long64_t nentries = fChain->GetEntries();
@@ -158,17 +139,15 @@ float LikelihoodAnalysis::findEquivalentLHCut(float wantEfficiency) {
       TVector3 pEle(pxEle[iele],pyEle[iele],pzEle[iele]);
       if(pEle.Pt()>15.0) LHBinnedHisto->Fill(likelihoodRatio(iele,*LH));
     }
-
   }
-
 
   // scan the likelihood to find the cut
   float nEntries = LHBinnedHisto->GetEntries();
   float efficiency = 0.0;
   int bin = nbins+1;
-
+  
   while (efficiency < wantEfficiency) {
-
+    
     float integral = LHBinnedHisto->Integral(bin,nbins+1);
     efficiency = integral / nEntries;
     std::cout << "integral = " << integral 
@@ -176,23 +155,19 @@ float LikelihoodAnalysis::findEquivalentLHCut(float wantEfficiency) {
 	      << "bin = " << bin << std::endl;
     
     bin--;
-
+    
   }
-
+  
   float equivalentLHCut = LHBinnedHisto->GetBinLowEdge(bin);
 
   std::cout << "Equivalent cut on LH is LH > " << equivalentLHCut << std::endl
 	    << "efficiency is: " << efficiency << std::endl
 	    << "while wanted is: " << wantEfficiency << std::endl;
-
+  
   TFile *outfile = TFile::Open("likHisto.root","recreate");
   LHBinnedHisto->Write();
   outfile->Close();
-
 }
-
-
-
 
 void LikelihoodAnalysis::reproduceEgammaCutID() {
 
@@ -220,19 +195,14 @@ void LikelihoodAnalysis::reproduceEgammaCutID() {
 	  if( isEleIDCutBased ) iSelected=iele;
 	}
     }
-
     nEvtGoodElectron++;
-    
   }
   
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
       EgammaCutBasedID[icut].displayEfficiencies();
     }
-    
 }
-
-
 
 void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 
@@ -393,11 +363,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
       CiCIdOnlyConvEtaLowPt.push_back(aHisto);
     }
 
-//   TH1F *CutIdTightCICEta = new TH1F( "CutIdTightCICEta", "cut ID #eta",       nbinsEta, minEta, maxEta );
-//   TH1F *CutIdSuperTightCICEta = new TH1F( "CutIdSuperTightCICEta", "cut ID #eta",       nbinsEta, minEta, maxEta );
-//   TH1F *LHIdLooseEta  = new TH1F( "LHIdLooseEta",  "LH Loose ID #eta",        nbinsEta, minEta, maxEta );
-//   TH1F *LHIdTightEta  = new TH1F( "LHIdTightEta",  "LH Tight ID #eta",        nbinsEta, minEta, maxEta );
-
   int nbinsPt = 18;
   float minPt = 10.0;
   float maxPt = 100.;
@@ -552,12 +517,6 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
       aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyConvPtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
       CiCIdOnlyConvPtEndcap.push_back(aHisto);
     }
-
-//   TH1F *CutIdTightCICPt = new TH1F( "CutIdTightCICPt", "cut ID p_{T} (GeV)",       nbinsPt, minPt, maxPt );
-//   TH1F *CutIdSuperTightCICPt = new TH1F( "CutIdSuperTightCICPt", "cut ID p_{T} (GeV)",       nbinsPt, minPt, maxPt );
-//   TH1F *LHIdLoosePt  = new TH1F( "LHIdLoosePt",  "LH Loose ID p_{T} (GeV)",        nbinsPt, minPt, maxPt );
-//   TH1F *LHIdTightPt  = new TH1F( "LHIdTightPt",  "LH Tight ID p_{T} (GeV)",        nbinsPt, minPt, maxPt );
-
 
   int nbinsPU = 26;
   float minPU = 0;
@@ -715,8 +674,7 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 
   Long64_t nbytes = 0, nb = 0;
   Long64_t nentries = fChain->GetEntries();
-  //  Long64_t nentries = 10000;
-  std::cout << "Number of entries = " << nentries << std::endl;
+   std::cout << "Number of entries = " << nentries << std::endl;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
@@ -1334,338 +1292,349 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
   ElectronEffPULowPt.SetYaxisTitle("efficiency");
   ElectronEffPULowPt.SetYaxisMin(0.0);
   ElectronEffPULowPt.Write();
-
 }
 
-
-
-// this is for W+jets
+// this is for W+jets (eg for closure test or for W and Z contamination)
 void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
-
-  // hardcoded cuts
-  float minLikelihoodTight = 0.75;
-  float minLikelihoodLoose = 0.056;
-
-  int nbinsEta = 60;
-  float minEta = -2.5;
-  float maxEta = 2.5;
 
   // to study which ET cut we want to apply on the jet (for Wjets HWW studies)
   TH1F *FakeJetForThresholdPT = new TH1F("FakeJetForThresholdPT", "fakeable jets p_{T}", 20, 0., 100.);
-    
-  TH1F *FakeableJetsEta   = new TH1F( "FakeableJetsEta",  "fakeable jets #eta",nbinsEta, minEta, maxEta );
-  TH1F *RecoEta  = new TH1F( "RecoEta", "reconstructed #eta", nbinsEta, minEta, maxEta );
-  TH1F *RecoEtaHighPt  = new TH1F( "RecoEtaHighPt", "reconstructed #eta", nbinsEta, minEta, maxEta );
-  TH1F *RecoEtaLowPt  = new TH1F( "RecoEtaLowPt", "reconstructed #eta", nbinsEta, minEta, maxEta );
+
+  // study vs eta
+  int nbinsEta = 60;
+  float minEta = -2.5;
+  float maxEta =  2.5;
+  
+  Float_t LowerEta[5];
+  LowerEta[0]=0.0;
+  LowerEta[1]=1.0;
+  LowerEta[2]=1.479;
+  LowerEta[3]=2.0;
+  LowerEta[4]=2.5;
+
+  TH1F *FakeableJetsEta = new TH1F( "FakeableJetsEta",  "fakeable jets #eta", 4, LowerEta);
+  TH1F *RecoEta         = new TH1F( "RecoEta",          "reconstructed #eta", 4, LowerEta);
+  TH1F *RecoEtaHighPt   = new TH1F( "RecoEtaHighPt",    "reconstructed #eta", 4, LowerEta);
+  TH1F *RecoEtaLowPt    = new TH1F( "RecoEtaLowPt",     "reconstructed #eta", 4, LowerEta);
+  
   std::vector<TH1F*> CutIdEta;
   std::vector<TH1F*> CutIdOnlyIDEta;
   std::vector<TH1F*> CutIdOnlyIsoEta;
   std::vector<TH1F*> CutIdOnlyConvEta;
-  for (int i=0;i<EgammaCutBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"Eta", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CutIdEta.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDEta", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CutIdOnlyIDEta.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoEta", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CutIdOnlyIsoEta.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvEta", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CutIdOnlyConvEta.push_back(aHisto);
-    }
-
+  for (int i=0;i<EgammaCutBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"Eta", "cut ID #eta", 4, LowerEta);
+    CutIdEta.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDEta", "cut ID #eta", 4, LowerEta);
+    CutIdOnlyIDEta.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoEta", "cut ID #eta", 4, LowerEta);
+    CutIdOnlyIsoEta.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvEta", "cut ID #eta", 4, LowerEta);
+    CutIdOnlyConvEta.push_back(aHisto);
+  }
+  
   std::vector<TH1F*> LHIdEta;
   std::vector<TH1F*> LHIdOnlyIDEta;
   std::vector<TH1F*> LHIdOnlyIsoEta;
   std::vector<TH1F*> LHIdOnlyConvEta;
-  for (int i=0;i<EgammaLHBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"Eta", "cut ID #eta", nbinsEta, minEta, maxEta );
-      LHIdEta.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDEta", "cut ID #eta", nbinsEta, minEta, maxEta );
-      LHIdOnlyIDEta.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoEta", "cut ID #eta", nbinsEta, minEta, maxEta );
-      LHIdOnlyIsoEta.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvEta", "cut ID #eta", nbinsEta, minEta, maxEta );
-      LHIdOnlyConvEta.push_back(aHisto);
-    }
-
-  std::vector<TH1F*> CiCIdEta;
-  std::vector<TH1F*> CiCIdOnlyIDEta;
-  std::vector<TH1F*> CiCIdOnlyIsoEta;
-  std::vector<TH1F*> CiCIdOnlyConvEta;
-  for (int i=0;i<EgammaCiCBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"Eta", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CiCIdEta.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIDEta", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CiCIdOnlyIDEta.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIsoEta", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CiCIdOnlyIsoEta.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyConvEta", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CiCIdOnlyConvEta.push_back(aHisto);
-    }
-
+  for (int i=0;i<EgammaLHBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"Eta", "cut ID #eta", 4, LowerEta);
+    LHIdEta.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDEta", "cut ID #eta", 4, LowerEta);
+    LHIdOnlyIDEta.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoEta", "cut ID #eta", 4, LowerEta);
+    LHIdOnlyIsoEta.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvEta", "cut ID #eta", 4, LowerEta);
+    LHIdOnlyConvEta.push_back(aHisto);
+  }
+  
   std::vector<TH1F*> CutIdEtaHighPt;
   std::vector<TH1F*> CutIdOnlyIDEtaHighPt;
   std::vector<TH1F*> CutIdOnlyIsoEtaHighPt;
   std::vector<TH1F*> CutIdOnlyConvEtaHighPt;
-  for (int i=0;i<EgammaCutBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"EtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CutIdEtaHighPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDEtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CutIdOnlyIDEtaHighPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoEtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CutIdOnlyIsoEtaHighPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvEtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CutIdOnlyConvEtaHighPt.push_back(aHisto);
-    }
+  for (int i=0;i<EgammaCutBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"EtaHighPt", "cut ID #eta", 4, LowerEta);
+    CutIdEtaHighPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDEtaHighPt", "cut ID #eta", 4, LowerEta);
+    CutIdOnlyIDEtaHighPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoEtaHighPt", "cut ID #eta", 4, LowerEta);
+    CutIdOnlyIsoEtaHighPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvEtaHighPt", "cut ID #eta", 4, LowerEta);
+    CutIdOnlyConvEtaHighPt.push_back(aHisto);
+  }
 
   std::vector<TH1F*> LHIdEtaHighPt;
   std::vector<TH1F*> LHIdOnlyIDEtaHighPt;
   std::vector<TH1F*> LHIdOnlyIsoEtaHighPt;
   std::vector<TH1F*> LHIdOnlyConvEtaHighPt;
-  for (int i=0;i<EgammaLHBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"EtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      LHIdEtaHighPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDEtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      LHIdOnlyIDEtaHighPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoEtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      LHIdOnlyIsoEtaHighPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvEtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      LHIdOnlyConvEtaHighPt.push_back(aHisto);
-    }
-
-  std::vector<TH1F*> CiCIdEtaHighPt;
-  std::vector<TH1F*> CiCIdOnlyIDEtaHighPt;
-  std::vector<TH1F*> CiCIdOnlyIsoEtaHighPt;
-  std::vector<TH1F*> CiCIdOnlyConvEtaHighPt;
-  for (int i=0;i<EgammaCiCBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"EtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CiCIdEtaHighPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIDEtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CiCIdOnlyIDEtaHighPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIsoEtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CiCIdOnlyIsoEtaHighPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyConvEtaHighPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CiCIdOnlyConvEtaHighPt.push_back(aHisto);
-    }
+  for (int i=0;i<EgammaLHBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"EtaHighPt", "cut ID #eta", 4, LowerEta);
+    LHIdEtaHighPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDEtaHighPt", "cut ID #eta", 4, LowerEta);
+    LHIdOnlyIDEtaHighPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoEtaHighPt", "cut ID #eta", 4, LowerEta);
+    LHIdOnlyIsoEtaHighPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvEtaHighPt", "cut ID #eta", 4, LowerEta);
+    LHIdOnlyConvEtaHighPt.push_back(aHisto);
+  }
 
   std::vector<TH1F*> CutIdEtaLowPt;
   std::vector<TH1F*> CutIdOnlyIDEtaLowPt;
   std::vector<TH1F*> CutIdOnlyIsoEtaLowPt;
   std::vector<TH1F*> CutIdOnlyConvEtaLowPt;
-  for (int i=0;i<EgammaCutBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"EtaLowPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CutIdEtaLowPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDEtaLowPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CutIdOnlyIDEtaLowPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoEtaLowPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CutIdOnlyIsoEtaLowPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvEtaLowPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CutIdOnlyConvEtaLowPt.push_back(aHisto);
-    }
-
+  for (int i=0;i<EgammaCutBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"EtaLowPt", "cut ID #eta", 4, LowerEta);
+    CutIdEtaLowPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDEtaLowPt", "cut ID #eta", 4, LowerEta);
+    CutIdOnlyIDEtaLowPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoEtaLowPt", "cut ID #eta", 4, LowerEta);
+    CutIdOnlyIsoEtaLowPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvEtaLowPt", "cut ID #eta", 4, LowerEta);
+    CutIdOnlyConvEtaLowPt.push_back(aHisto);
+  }
+  
   std::vector<TH1F*> LHIdEtaLowPt;
   std::vector<TH1F*> LHIdOnlyIDEtaLowPt;
   std::vector<TH1F*> LHIdOnlyIsoEtaLowPt;
   std::vector<TH1F*> LHIdOnlyConvEtaLowPt;
-  for (int i=0;i<EgammaLHBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"EtaLowPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      LHIdEtaLowPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDEtaLowPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      LHIdOnlyIDEtaLowPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoEtaLowPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      LHIdOnlyIsoEtaLowPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvEtaLowPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      LHIdOnlyConvEtaLowPt.push_back(aHisto);
-    }
-
-  std::vector<TH1F*> CiCIdEtaLowPt;
-  std::vector<TH1F*> CiCIdOnlyIDEtaLowPt;
-  std::vector<TH1F*> CiCIdOnlyIsoEtaLowPt;
-  std::vector<TH1F*> CiCIdOnlyConvEtaLowPt;
-  for (int i=0;i<EgammaCiCBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"EtaLowPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CiCIdEtaLowPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIDEtaLowPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CiCIdOnlyIDEtaLowPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIsoEtaLowPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CiCIdOnlyIsoEtaLowPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyConvEtaLowPt", "cut ID #eta", nbinsEta, minEta, maxEta );
-      CiCIdOnlyConvEtaLowPt.push_back(aHisto);
-    }
-
-//   TH1F *CutIdWP80Eta = new TH1F( "CutIdWP80Eta", "cut ID #eta",       nbinsEta, minEta, maxEta );
-//   TH1F *CutIdTightCICEta = new TH1F( "CutIdTightCICEta", "cut ID #eta",       nbinsEta, minEta, maxEta );
-//   TH1F *CutIdSuperTightCICEta = new TH1F( "CutIdSuperTightCICEta", "cut ID #eta",       nbinsEta, minEta, maxEta );
-//   TH1F *LHIdTightEta  = new TH1F( "LHIdTightEta",  "LH ID tight #eta",        nbinsEta, minEta, maxEta );
-//   TH1F *LHIdLooseEta  = new TH1F( "LHIdLooseEta",  "LH ID loose #eta",        nbinsEta, minEta, maxEta );
-
-  int nbinsPt = 18;
-  float minPt = 10.0;
-  float maxPt = 100.;
+  for (int i=0;i<EgammaLHBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"EtaLowPt", "cut ID #eta", 4, LowerEta);
+    LHIdEtaLowPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDEtaLowPt", "cut ID #eta", 4, LowerEta);
+    LHIdOnlyIDEtaLowPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoEtaLowPt", "cut ID #eta", 4, LowerEta);
+    LHIdOnlyIsoEtaLowPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvEtaLowPt", "cut ID #eta", 4, LowerEta);
+    LHIdOnlyConvEtaLowPt.push_back(aHisto);
+  }
   
-  TH1F *FakeableJetsPt   = new TH1F( "FakeableJetsPt",  "fakeable jets p_{T} (GeV)",     nbinsPt, minPt, maxPt );
-  TH1F *RecoPt  = new TH1F( "RecoPt", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
-  TH1F *RecoPtBarrel  = new TH1F( "RecoPtBarrel", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
-  TH1F *RecoPtEndcap  = new TH1F( "RecoPtEndcap", "reconstructed p_{T} (GeV)", nbinsPt, minPt, maxPt );
+  // study vs pT
+  Float_t LowerPt[9];
+  LowerPt[0]=10;
+  LowerPt[1]=15;
+  LowerPt[2]=20;
+  LowerPt[3]=25;
+  LowerPt[4]=30;
+  LowerPt[5]=35;
+  LowerPt[6]=40;
+  LowerPt[7]=45;
+  LowerPt[8]=50;
+  TH1F *FakeableJetsPt = new TH1F( "FakeableJetsPt",  "fakeable jets p_{T} (GeV)", 8, LowerPt);
+  TH1F *RecoPt         = new TH1F( "RecoPt",          "reconstructed p_{T} (GeV)", 8, LowerPt);
+  TH1F *RecoPtBarrel   = new TH1F( "RecoPtBarrel",    "reconstructed p_{T} (GeV)", 8, LowerPt);
+  TH1F *RecoPtBarrel1  = new TH1F( "RecoPtBarrel1",   "reconstructed p_{T} (GeV)", 8, LowerPt);    // this is done to subsplit barrel and endcap in 2
+  TH1F *RecoPtBarrel2  = new TH1F( "RecoPtBarrel2",   "reconstructed p_{T} (GeV)", 8, LowerPt);
+  TH1F *RecoPtEndcap   = new TH1F( "RecoPtEndcap",    "reconstructed p_{T} (GeV)", 8, LowerPt);
+  TH1F *RecoPtEndcap1  = new TH1F( "RecoPtEndcap1",   "reconstructed p_{T} (GeV)", 8, LowerPt);
+  TH1F *RecoPtEndcap2  = new TH1F( "RecoPtEndcap2",   "reconstructed p_{T} (GeV)", 8, LowerPt);
+
   std::vector<TH1F*> CutIdPt;
   std::vector<TH1F*> CutIdOnlyIDPt;
   std::vector<TH1F*> CutIdOnlyIsoPt;
   std::vector<TH1F*> CutIdOnlyConvPt;
-  for (int i=0;i<EgammaCutBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"Pt", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CutIdPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPt", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CutIdOnlyIDPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPt", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CutIdOnlyIsoPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPt", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CutIdOnlyConvPt.push_back(aHisto);
-    }
-
+  for (int i=0;i<EgammaCutBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"Pt", "cut ID #eta", 8, LowerPt );
+    CutIdPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPt", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyIDPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPt", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyIsoPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPt", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyConvPt.push_back(aHisto);
+  }
+  
   std::vector<TH1F*> LHIdPt;
   std::vector<TH1F*> LHIdOnlyIDPt;
   std::vector<TH1F*> LHIdOnlyIsoPt;
   std::vector<TH1F*> LHIdOnlyConvPt;
-  for (int i=0;i<EgammaLHBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"Pt", "cut ID #eta", nbinsPt, minPt, maxPt );
-      LHIdPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPt", "cut ID #eta", nbinsPt, minPt, maxPt );
-      LHIdOnlyIDPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPt", "cut ID #eta", nbinsPt, minPt, maxPt );
-      LHIdOnlyIsoPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPt", "cut ID #eta", nbinsPt, minPt, maxPt );
-      LHIdOnlyConvPt.push_back(aHisto);
-    }
-
-  std::vector<TH1F*> CiCIdPt;
-  std::vector<TH1F*> CiCIdOnlyIDPt;
-  std::vector<TH1F*> CiCIdOnlyIsoPt;
-  std::vector<TH1F*> CiCIdOnlyConvPt;
-  for (int i=0;i<EgammaCiCBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"Pt", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CiCIdPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIDPt", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CiCIdOnlyIDPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIsoPt", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CiCIdOnlyIsoPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyConvPt", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CiCIdOnlyConvPt.push_back(aHisto);
-    }
-
+  for (int i=0;i<EgammaLHBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"Pt", "cut ID #eta", 8, LowerPt );
+    LHIdPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPt", "cut ID #eta", 8, LowerPt );
+    LHIdOnlyIDPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPt", "cut ID #eta", 8, LowerPt );
+    LHIdOnlyIsoPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPt", "cut ID #eta", 8, LowerPt );
+    LHIdOnlyConvPt.push_back(aHisto);
+  }
+  
+  // to have the full picture  
   std::vector<TH1F*> CutIdPtBarrel;
   std::vector<TH1F*> CutIdOnlyIDPtBarrel;
   std::vector<TH1F*> CutIdOnlyIsoPtBarrel;
   std::vector<TH1F*> CutIdOnlyConvPtBarrel;
-  for (int i=0;i<EgammaCutBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtBarrel", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CutIdPtBarrel.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtBarrel", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CutIdOnlyIDPtBarrel.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtBarrel", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CutIdOnlyIsoPtBarrel.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtBarrel", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CutIdOnlyConvPtBarrel.push_back(aHisto);
-    }
-
+  for (int i=0;i<EgammaCutBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtBarrel", "cut ID #eta", 8, LowerPt );
+    CutIdPtBarrel.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtBarrel", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyIDPtBarrel.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtBarrel", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyIsoPtBarrel.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtBarrel", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyConvPtBarrel.push_back(aHisto);
+  }
+  
+  // to have the full picture  
   std::vector<TH1F*> LHIdPtBarrel;
   std::vector<TH1F*> LHIdOnlyIDPtBarrel;
   std::vector<TH1F*> LHIdOnlyIsoPtBarrel;
   std::vector<TH1F*> LHIdOnlyConvPtBarrel;
-  for (int i=0;i<EgammaLHBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtBarrel", "cut ID #eta", nbinsPt, minPt, maxPt );
-      LHIdPtBarrel.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtBarrel", "cut ID #eta", nbinsPt, minPt, maxPt );
-      LHIdOnlyIDPtBarrel.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtBarrel", "cut ID #eta", nbinsPt, minPt, maxPt );
-      LHIdOnlyIsoPtBarrel.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtBarrel", "cut ID #eta", nbinsPt, minPt, maxPt );
-      LHIdOnlyConvPtBarrel.push_back(aHisto);
-    }
+  for (int i=0;i<EgammaLHBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtBarrel", "cut ID #eta", 8, LowerPt );
+    LHIdPtBarrel.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtBarrel", "cut ID #eta", 8, LowerPt );
+    LHIdOnlyIDPtBarrel.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtBarrel", "cut ID #eta", 8, LowerPt );
+    LHIdOnlyIsoPtBarrel.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtBarrel", "cut ID #eta", 8, LowerPt );
+    LHIdOnlyConvPtBarrel.push_back(aHisto);
+  }
+  
+  // to compute the FR in 4 eta bins                                  
+  std::vector<TH1F*> CutIdPtBarrel1;
+  std::vector<TH1F*> CutIdPtBarrel2;
+  std::vector<TH1F*> CutIdOnlyIDPtBarrel1;
+  std::vector<TH1F*> CutIdOnlyIDPtBarrel2;
+  std::vector<TH1F*> CutIdOnlyIsoPtBarrel1;
+  std::vector<TH1F*> CutIdOnlyIsoPtBarrel2;
+  std::vector<TH1F*> CutIdOnlyConvPtBarrel1;
+  std::vector<TH1F*> CutIdOnlyConvPtBarrel2;
 
-  std::vector<TH1F*> CiCIdPtBarrel;
-  std::vector<TH1F*> CiCIdOnlyIDPtBarrel;
-  std::vector<TH1F*> CiCIdOnlyIsoPtBarrel;
-  std::vector<TH1F*> CiCIdOnlyConvPtBarrel;
-  for (int i=0;i<EgammaCiCBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"PtBarrel", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CiCIdPtBarrel.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIDPtBarrel", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CiCIdOnlyIDPtBarrel.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIsoPtBarrel", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CiCIdOnlyIsoPtBarrel.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyConvPtBarrel", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CiCIdOnlyConvPtBarrel.push_back(aHisto);
-    }
+  for (int i=0;i<EgammaCutBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtBarrel1", "cut ID #eta",   8, LowerPt );
+    CutIdPtBarrel1.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtBarrel1", "cut ID #eta",   8, LowerPt );
+    CutIdOnlyIDPtBarrel1.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtBarrel1", "cut ID #eta",  8, LowerPt );
+    CutIdOnlyIsoPtBarrel1.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtBarrel1", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyConvPtBarrel1.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtBarrel2", "cut ID #eta",   8, LowerPt );
+    CutIdPtBarrel2.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtBarrel2", "cut ID #eta",   8, LowerPt );
+    CutIdOnlyIDPtBarrel2.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtBarrel2", "cut ID #eta",  8, LowerPt );
+    CutIdOnlyIsoPtBarrel2.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtBarrel2", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyConvPtBarrel2.push_back(aHisto);
+  }
 
+  // to compute the FR in 4 eta bins                         
+  std::vector<TH1F*> LHIdPtBarrel1;
+  std::vector<TH1F*> LHIdOnlyIDPtBarrel1;
+  std::vector<TH1F*> LHIdOnlyIsoPtBarrel1;
+  std::vector<TH1F*> LHIdOnlyConvPtBarrel1;
+  std::vector<TH1F*> LHIdPtBarrel2;
+  std::vector<TH1F*> LHIdOnlyIDPtBarrel2;
+  std::vector<TH1F*> LHIdOnlyIsoPtBarrel2;
+  std::vector<TH1F*> LHIdOnlyConvPtBarrel2;
+  for (int i=0;i<EgammaLHBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtBarrel1", "like ID #eta",   8, LowerPt );
+    LHIdPtBarrel1.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtBarrel1", "like ID #eta",   8, LowerPt );
+    LHIdOnlyIDPtBarrel1.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtBarrel1", "like ID #eta",  8, LowerPt );
+    LHIdOnlyIsoPtBarrel1.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtBarrel1", "like ID #eta", 8, LowerPt );
+    LHIdOnlyConvPtBarrel1.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtBarrel2", "like ID #eta",   8, LowerPt );
+    LHIdPtBarrel2.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtBarrel2", "like ID #eta",   8, LowerPt );
+    LHIdOnlyIDPtBarrel2.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtBarrel2", "like ID #eta",  8, LowerPt );
+    LHIdOnlyIsoPtBarrel2.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtBarrel2", "like ID #eta", 8, LowerPt );
+    LHIdOnlyConvPtBarrel2.push_back(aHisto);
+  }
+
+  // to have the full picture
   std::vector<TH1F*> CutIdPtEndcap;
   std::vector<TH1F*> CutIdOnlyIDPtEndcap;
   std::vector<TH1F*> CutIdOnlyIsoPtEndcap;
   std::vector<TH1F*> CutIdOnlyConvPtEndcap;
-  for (int i=0;i<EgammaCutBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CutIdPtEndcap.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CutIdOnlyIDPtEndcap.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CutIdOnlyIsoPtEndcap.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CutIdOnlyConvPtEndcap.push_back(aHisto);
-    }
-
+  for (int i=0;i<EgammaCutBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtEndcap", "cut ID #eta", 8, LowerPt );
+    CutIdPtEndcap.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtEndcap", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyIDPtEndcap.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtEndcap", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyIsoPtEndcap.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtEndcap", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyConvPtEndcap.push_back(aHisto);
+  }
+  
+  // to have the full picture
   std::vector<TH1F*> LHIdPtEndcap;
   std::vector<TH1F*> LHIdOnlyIDPtEndcap;
   std::vector<TH1F*> LHIdOnlyIsoPtEndcap;
   std::vector<TH1F*> LHIdOnlyConvPtEndcap;
-  for (int i=0;i<EgammaLHBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
-      LHIdPtEndcap.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
-      LHIdOnlyIDPtEndcap.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
-      LHIdOnlyIsoPtEndcap.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
-      LHIdOnlyConvPtEndcap.push_back(aHisto);
-    }
+  for (int i=0;i<EgammaLHBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtEndcap", "cut ID #eta", 8, LowerPt );
+    LHIdPtEndcap.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtEndcap", "cut ID #eta", 8, LowerPt );
+    LHIdOnlyIDPtEndcap.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtEndcap", "cut ID #eta", 8, LowerPt );
+    LHIdOnlyIsoPtEndcap.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtEndcap", "cut ID #eta", 8, LowerPt );
+    LHIdOnlyConvPtEndcap.push_back(aHisto);
+  }
+  
+  // to compute the FR in 4 eta bins 
+  std::vector<TH1F*> CutIdPtEndcap1;
+  std::vector<TH1F*> CutIdPtEndcap2;
+  std::vector<TH1F*> CutIdOnlyIDPtEndcap1;
+  std::vector<TH1F*> CutIdOnlyIDPtEndcap2;
+  std::vector<TH1F*> CutIdOnlyIsoPtEndcap1;
+  std::vector<TH1F*> CutIdOnlyIsoPtEndcap2;
+  std::vector<TH1F*> CutIdOnlyConvPtEndcap1;
+  std::vector<TH1F*> CutIdOnlyConvPtEndcap2;
+  for (int i=0;i<EgammaCutBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtEndcap1", "cut ID #eta",   8, LowerPt );
+    CutIdPtEndcap1.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtEndcap1", "cut ID #eta",   8, LowerPt );
+    CutIdOnlyIDPtEndcap1.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtEndcap1", "cut ID #eta",  8, LowerPt );
+    CutIdOnlyIsoPtEndcap1.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtEndcap1", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyConvPtEndcap1.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtEndcap2", "cut ID #eta",   8, LowerPt );
+    CutIdPtEndcap2.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtEndcap2", "cut ID #eta",   8, LowerPt );
+    CutIdOnlyIDPtEndcap2.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtEndcap2", "cut ID #eta",  8, LowerPt );
+    CutIdOnlyIsoPtEndcap2.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtEndcap2", "cut ID #eta", 8, LowerPt );
+    CutIdOnlyConvPtEndcap2.push_back(aHisto);
+  }
 
-  std::vector<TH1F*> CiCIdPtEndcap;
-  std::vector<TH1F*> CiCIdOnlyIDPtEndcap;
-  std::vector<TH1F*> CiCIdOnlyIsoPtEndcap;
-  std::vector<TH1F*> CiCIdOnlyConvPtEndcap;
-  for (int i=0;i<EgammaCiCBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"PtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CiCIdPtEndcap.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIDPtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CiCIdOnlyIDPtEndcap.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIsoPtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CiCIdOnlyIsoPtEndcap.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyConvPtEndcap", "cut ID #eta", nbinsPt, minPt, maxPt );
-      CiCIdOnlyConvPtEndcap.push_back(aHisto);
-    }
+  // to compute the FR in 4 eta bins 
+  std::vector<TH1F*> LHIdPtEndcap1;
+  std::vector<TH1F*> LHIdPtEndcap2;
+  std::vector<TH1F*> LHIdOnlyIDPtEndcap1;
+  std::vector<TH1F*> LHIdOnlyIDPtEndcap2;
+  std::vector<TH1F*> LHIdOnlyIsoPtEndcap1;
+  std::vector<TH1F*> LHIdOnlyIsoPtEndcap2;
+  std::vector<TH1F*> LHIdOnlyConvPtEndcap1;
+  std::vector<TH1F*> LHIdOnlyConvPtEndcap2;
+  for (int i=0;i<EgammaLHBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtEndcap1", "like ID #eta",   8, LowerPt);
+    LHIdPtEndcap1.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtEndcap1", "like ID #eta",   8, LowerPt);
+    LHIdOnlyIDPtEndcap1.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtEndcap1", "like ID #eta",  8, LowerPt);
+    LHIdOnlyIsoPtEndcap1.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtEndcap1", "like ID #eta", 8, LowerPt);
+    LHIdOnlyConvPtEndcap1.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtEndcap2", "like ID #eta",   8, LowerPt);
+    LHIdPtEndcap2.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtEndcap2", "like ID #eta",   8, LowerPt);
+    LHIdOnlyIDPtEndcap2.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtEndcap2", "like ID #eta",  8, LowerPt);
+    LHIdOnlyIsoPtEndcap2.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtEndcap2", "like ID #eta", 8, LowerPt);
+    LHIdOnlyConvPtEndcap2.push_back(aHisto);
+  }
 
-//   TH1F *CutIdWP80Pt = new TH1F( "CutIdWP80Pt", "cut ID p_{T} (GeV)",       nbinsPt, minPt, maxPt );
-//   TH1F *CutIdTightCICPt = new TH1F( "CutIdTightCICPt", "cut ID p_{T} (GeV)",       nbinsPt, minPt, maxPt );
-//   TH1F *CutIdSuperTightCICPt = new TH1F( "CutIdSuperTightCICPt", "cut ID p_{T} (GeV)",       nbinsPt, minPt, maxPt );
-//   TH1F *LHIdTightPt  = new TH1F( "LHIdTightPt",  "LH ID tight p_{T} (GeV)",        nbinsPt, minPt, maxPt );
-//   TH1F *LHIdLoosePt  = new TH1F( "LHIdLoosePt",  "LH ID loose p_{T} (GeV)",        nbinsPt, minPt, maxPt );
-
-
+  // study vs pu
   int nbinsPU = 26;
   float minPU = 0;
   float maxPU = 25;
@@ -1679,220 +1648,149 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   std::vector<TH1F*> CutIdOnlyIDPU;
   std::vector<TH1F*> CutIdOnlyIsoPU;
   std::vector<TH1F*> CutIdOnlyConvPU;
-  for (int i=0;i<EgammaCutBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PU", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CutIdPU.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPU", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CutIdOnlyIDPU.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPU", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CutIdOnlyIsoPU.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPU", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CutIdOnlyConvPU.push_back(aHisto);
-    }
-
+  for (int i=0;i<EgammaCutBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PU", "cut ID nPU", nbinsPU, minPU, maxPU );
+    CutIdPU.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPU", "cut ID nPU", nbinsPU, minPU, maxPU );
+    CutIdOnlyIDPU.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPU", "cut ID nPU", nbinsPU, minPU, maxPU );
+    CutIdOnlyIsoPU.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPU", "cut ID nPU", nbinsPU, minPU, maxPU );
+    CutIdOnlyConvPU.push_back(aHisto);
+  }
+  
   std::vector<TH1F*> LHIdPU;
   std::vector<TH1F*> LHIdOnlyIDPU;
   std::vector<TH1F*> LHIdOnlyIsoPU;
   std::vector<TH1F*> LHIdOnlyConvPU;
-  for (int i=0;i<EgammaLHBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PU", "cut ID nPU", nbinsPU, minPU, maxPU );
-      LHIdPU.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPU", "cut ID nPU", nbinsPU, minPU, maxPU );
-      LHIdOnlyIDPU.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPU", "cut ID nPU", nbinsPU, minPU, maxPU );
-      LHIdOnlyIsoPU.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPU", "cut ID nPU", nbinsPU, minPU, maxPU );
-      LHIdOnlyConvPU.push_back(aHisto);
-    }
-
-  std::vector<TH1F*> CiCIdPU;
-  std::vector<TH1F*> CiCIdOnlyIDPU;
-  std::vector<TH1F*> CiCIdOnlyIsoPU;
-  std::vector<TH1F*> CiCIdOnlyConvPU;
-  for (int i=0;i<EgammaCiCBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"PU", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CiCIdPU.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIDPU", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CiCIdOnlyIDPU.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIsoPU", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CiCIdOnlyIsoPU.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyConvPU", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CiCIdOnlyConvPU.push_back(aHisto);
-    }
+  for (int i=0;i<EgammaLHBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PU", "cut ID nPU", nbinsPU, minPU, maxPU );
+    LHIdPU.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPU", "cut ID nPU", nbinsPU, minPU, maxPU );
+    LHIdOnlyIDPU.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPU", "cut ID nPU", nbinsPU, minPU, maxPU );
+    LHIdOnlyIsoPU.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPU", "cut ID nPU", nbinsPU, minPU, maxPU );
+    LHIdOnlyConvPU.push_back(aHisto);
+  }
 
   std::vector<TH1F*> CutIdPUHighPt;
   std::vector<TH1F*> CutIdOnlyIDPUHighPt;
   std::vector<TH1F*> CutIdOnlyIsoPUHighPt;
   std::vector<TH1F*> CutIdOnlyConvPUHighPt;
-  for (int i=0;i<EgammaCutBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CutIdPUHighPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CutIdOnlyIDPUHighPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CutIdOnlyIsoPUHighPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CutIdOnlyConvPUHighPt.push_back(aHisto);
-    }
-
+  for (int i=0;i<EgammaCutBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    CutIdPUHighPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    CutIdOnlyIDPUHighPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    CutIdOnlyIsoPUHighPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    CutIdOnlyConvPUHighPt.push_back(aHisto);
+  }
+  
   std::vector<TH1F*> LHIdPUHighPt;
   std::vector<TH1F*> LHIdOnlyIDPUHighPt;
   std::vector<TH1F*> LHIdOnlyIsoPUHighPt;
   std::vector<TH1F*> LHIdOnlyConvPUHighPt;
-  for (int i=0;i<EgammaLHBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      LHIdPUHighPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      LHIdOnlyIDPUHighPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      LHIdOnlyIsoPUHighPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      LHIdOnlyConvPUHighPt.push_back(aHisto);
-    }
-
-  std::vector<TH1F*> CiCIdPUHighPt;
-  std::vector<TH1F*> CiCIdOnlyIDPUHighPt;
-  std::vector<TH1F*> CiCIdOnlyIsoPUHighPt;
-  std::vector<TH1F*> CiCIdOnlyConvPUHighPt;
-  for (int i=0;i<EgammaCiCBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"PUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CiCIdPUHighPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIDPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CiCIdOnlyIDPUHighPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIsoPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CiCIdOnlyIsoPUHighPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyConvPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CiCIdOnlyConvPUHighPt.push_back(aHisto);
-    }
-
+  for (int i=0;i<EgammaLHBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    LHIdPUHighPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    LHIdOnlyIDPUHighPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    LHIdOnlyIsoPUHighPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPUHighPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    LHIdOnlyConvPUHighPt.push_back(aHisto);
+  }
+  
   std::vector<TH1F*> CutIdPULowPt;
   std::vector<TH1F*> CutIdOnlyIDPULowPt;
   std::vector<TH1F*> CutIdOnlyIsoPULowPt;
   std::vector<TH1F*> CutIdOnlyConvPULowPt;
-  for (int i=0;i<EgammaCutBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CutIdPULowPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CutIdOnlyIDPULowPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CutIdOnlyIsoPULowPt.push_back(aHisto);
-      aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CutIdOnlyConvPULowPt.push_back(aHisto);
-    }
-
+  for (int i=0;i<EgammaCutBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    CutIdPULowPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    CutIdOnlyIDPULowPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    CutIdOnlyIsoPULowPt.push_back(aHisto);
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    CutIdOnlyConvPULowPt.push_back(aHisto);
+  }
+  
   std::vector<TH1F*> LHIdPULowPt;
   std::vector<TH1F*> LHIdOnlyIDPULowPt;
   std::vector<TH1F*> LHIdOnlyIsoPULowPt;
   std::vector<TH1F*> LHIdOnlyConvPULowPt;
-  for (int i=0;i<EgammaLHBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      LHIdPULowPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      LHIdOnlyIDPULowPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      LHIdOnlyIsoPULowPt.push_back(aHisto);
-      aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      LHIdOnlyConvPULowPt.push_back(aHisto);
-    }
-
-  std::vector<TH1F*> CiCIdPULowPt;
-  std::vector<TH1F*> CiCIdOnlyIDPULowPt;
-  std::vector<TH1F*> CiCIdOnlyIsoPULowPt;
-  std::vector<TH1F*> CiCIdOnlyConvPULowPt;
-  for (int i=0;i<EgammaCiCBasedID.size();++i)
-    {
-      TH1F* aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"PULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CiCIdPULowPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIDPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CiCIdOnlyIDPULowPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyIsoPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CiCIdOnlyIsoPULowPt.push_back(aHisto);
-      aHisto = new TH1F( "CiCId"+TString(EgammaCiCBasedIDWPs[i])+"OnlyConvPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
-      CiCIdOnlyConvPULowPt.push_back(aHisto);
-    }
-
+  for (int i=0;i<EgammaLHBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    LHIdPULowPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    LHIdOnlyIDPULowPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    LHIdOnlyIsoPULowPt.push_back(aHisto);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPULowPt", "cut ID nPU", nbinsPU, minPU, maxPU );
+    LHIdOnlyConvPULowPt.push_back(aHisto);
+  }
+  
+  // analysis
   Long64_t nbytes = 0, nb = 0;
   Long64_t nentries = fChain->GetEntries();
   std::cout << "Number of entries = " << nentries << std::endl;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
-
+    
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
-
-    // PU interactions cut
-    //    if(nPU>0) continue;
-
-    bool tauPresence=false;
-
+    
+    // real mc electron from W
     int mceleindex = -1;
     for(int imc=0; imc<50; imc++) {
-      // not only ele from W->enu: there is enu emission (V_ud?) in madgraph
       if ( (fabs(idMc[imc])==11) ) {
         mceleindex=imc;
         break;
       }
-      // since the stable particle list is truncated, if there is a tau 
-      // not possible to say what happens...
+    }
+    TVector3 mcEle(0,0,0);
+    if(mceleindex>-1) mcEle = TVector3(pMc[mceleindex]*cos(phiMc[mceleindex])*sin(thetaMc[mceleindex]), pMc[mceleindex]*sin(phiMc[mceleindex])*sin(thetaMc[mceleindex]), pMc[mceleindex]*cos(thetaMc[mceleindex]));
+
+    // since the stable particle list is truncated, if there is a tau not possible to say what happens...
+    bool tauPresence=false;
+    for(int imc=0; imc<50; imc++) {
       if ( (fabs(idMc[imc])==15) ) {
-        tauPresence=true;
-        break;
+	tauPresence=true;
+	break;
       }
     }
+    if (tauPresence) continue;
 
-    if(tauPresence) continue;
-
-    //debug
-//     if(mceleindex==-1) {
-//       for(int imc=0; imc<20; imc++) {
-//         cout << "imc = " << imc << "\tidMc = " << idMc[imc] << "\tmothMc = " << mothMc[imc] << endl;
-//       }
-//     }
-    //enddebug
-
-    TVector3 mcEle(0,0,0);
-    if(mceleindex>-1) mcEle = TVector3(pMc[mceleindex]*cos(phiMc[mceleindex])*sin(thetaMc[mceleindex]), 
-                                       pMc[mceleindex]*sin(phiMc[mceleindex])*sin(thetaMc[mceleindex]),
-                                       pMc[mceleindex]*cos(thetaMc[mceleindex]));
-    
-//     int nJetsReco=0;
-//     int nEleReco=0;
-
+    // consider jets and remove from denominator the electron reconstructed as jet
     for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
       TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
       if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 10.0 ) {
         float deltaR = 1000;
         if(mceleindex>-1) deltaR = p3Jet.DeltaR(mcEle);
-        // remove from denominator the electron reconstructed as jet
         if( deltaR>0.5 ) { 
           FakeableJetsEta->Fill( p3Jet.Eta() );
           FakeableJetsPt->Fill( p3Jet.Pt() );
-          //          nJetsReco++;
         }
       }
     }
 
-    //  consider the electrons (numerator) 
+    // consider the reconstructed electrons (numerator) 
     for ( int ele=0; ele<nEle; ele++ ) {
       TVector3 p3Ele(pxEle[ele], pyEle[ele], pzEle[ele]);
       if ( fabs(etaEle[ele]) < 2.5 && p3Ele.Pt() > 10.0 ) {
         float deltaR = 1000;
         if(mceleindex>-1) deltaR = p3Ele.DeltaR(mcEle);
-        if(deltaR<0.3) continue;   
+        if(deltaR<0.3) continue;                          // here we remove the real electron because we're interested in fakes
 
+	// considering only electrons which are close to jets
         float dREleJet_min = 1000;
         int closestJet=-1;
-
-        for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
+	for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
           TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
           if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 10.0 ) {          
             float dREleJet = p3Jet.DeltaR(p3Ele);
@@ -1902,28 +1800,28 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
             }
           }
         }
-
-        //        nEleReco++;
-
         if(closestJet > -1) {
 
-          TVector3 p3ClosestJet(pxAK5PFPUcorrJet[closestJet],pyAK5PFPUcorrJet[closestJet],pzAK5PFPUcorrJet[closestJet]);
-
-	  //!!//
-//           float etFake=p3ClosestJet.Pt();
-//           float etaFake=p3ClosestJet.Eta();
-
-          float etFake=p3Ele.Pt();
+          float etFake =p3Ele.Pt();
           float etaFake=etaEle[ele];
-
+	  
 	  // to study the dependence on the jet threshold for Wjets in HWW
-          if ( etFake > 10.0 ) FakeJetForThresholdPT ->Fill( p3ClosestJet.Pt() ); // hardcoded 
+          TVector3 p3ClosestJet(pxAK5PFPUcorrJet[closestJet],pyAK5PFPUcorrJet[closestJet],pzAK5PFPUcorrJet[closestJet]);
+          if ( etFake > 10.0 ) FakeJetForThresholdPT ->Fill( p3ClosestJet.Pt() ); 
 	  
           Utils anaUtils;
 	  bool isInEB = anaUtils.fiducialFlagECAL(fiducialFlagsEle[ele], isEB);
 	  bool isInEE = anaUtils.fiducialFlagECAL(fiducialFlagsEle[ele], isEE);
 	  bool highPt= (etFake>20.);
-	  bool lowPt= (etFake<=20.);
+	  bool lowPt = (etFake<=20.);
+	  // to split in 4 eta regions  
+	  int etaRegion = -1;
+	  if (fabs(etaFake)>=0. && fabs(etaFake)<1.)    etaRegion = 1;
+	  if (fabs(etaFake)>=1. && fabs(etaFake)<1.479) etaRegion = 2;
+	  if (fabs(etaFake)>=1.479 && fabs(etaFake)<2.) etaRegion = 3;
+	  if (fabs(etaFake)>=2. && fabs(etaFake)<2.5)   etaRegion = 4;
+
+	  // filling
 	  RecoEta->Fill(etaFake);
 	  RecoPt->Fill(etFake);
           RecoPU->Fill(nPU);
@@ -1937,18 +1835,37 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
           }
 	  if (isInEB) RecoPtBarrel->Fill(etFake);
 	  if (isInEE) RecoPtEndcap->Fill(etFake);
+	  if (etaRegion==1) RecoPtBarrel1 -> Fill(etFake);
+	  if (etaRegion==2) RecoPtBarrel2 -> Fill(etFake);
+	  if (etaRegion==3) RecoPtEndcap1 -> Fill(etFake);
+	  if (etaRegion==4) RecoPtEndcap2 -> Fill(etFake);
 
+	  // does this denominator pass the IP cut as for H->WW ?  // chiara, hardcoded
+	  bool isDenomIP = true;
+	  int gsfTrack = gsfTrackIndexEle[ele];
+	  float dxyEle = transvImpactParGsfTrack[gsfTrack];
+	  float dzEle  = eleDzPV(ele,0);
+	  if ( fabs(dxyEle)>0.02 ) isDenomIP = false;
+	  if ( fabs(dzEle)>0.10 )  isDenomIP = false;
+	  // does this denominator pass the IP cut as for H->WW ? 
+
+	  // filling the numerator: cut based
           for (int icut=0;icut<EgammaCutBasedIDWPs.size();++icut)
             {
               bool isEleIDCutBased, isIsolCutBased, isConvRejCutBased;
               isEleIDCutBased = isIsolCutBased = isConvRejCutBased = false;
               isEleID(&EgammaCutBasedID[icut],ele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
-
+	      
               // for the smurf selection, add further cut for pT<20 GeV. --> move to WP70
               if(TString(EgammaCutBasedIDWPs[icut].c_str()).Contains("Smurf") && etFake<20.) {
-                // apply the VBTF70 smurfs
                 isEleID(&EgammaCutBasedID[6],ele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
-                isEleIDCutBased = isEleIDCutBased && (fbremEle[ele]>0.15 || (fabs(etaEle[ele])<1.0 && eSuperClusterOverPEle[ele]>0.95));
+		Utils anaUtils;
+		int smurfsc;
+		bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[ele], bits::isEcalDriven);
+		float scEta = -1.;
+		if ( ecalDriven) { smurfsc = superClusterIndexEle[ele];   scEta = etaSC[smurfsc]; }
+		if (!ecalDriven) { smurfsc = PFsuperClusterIndexEle[ele]; scEta = etaPFSC[smurfsc]; }
+		isEleIDCutBased = isEleIDCutBased && (fbremEle[ele]>0.15 || (fabs(scEta)<1.0 && eSuperClusterOverPEle[ele]>0.95));
               }
 
               if ( isEleIDCutBased ) {
@@ -1965,6 +1882,10 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
                 }
                 if (isInEB) CutIdOnlyIDPtBarrel[icut]->Fill(etFake);
                 if (isInEE) CutIdOnlyIDPtEndcap[icut]->Fill(etFake);
+		if (etaRegion==1) CutIdOnlyIDPtBarrel1[icut] -> Fill(etFake);
+		if (etaRegion==2) CutIdOnlyIDPtBarrel2[icut] -> Fill(etFake);
+		if (etaRegion==3) CutIdOnlyIDPtEndcap1[icut] -> Fill(etFake);
+		if (etaRegion==4) CutIdOnlyIDPtEndcap2[icut] -> Fill(etFake);
               }
               if ( isIsolCutBased ) {
                 CutIdOnlyIsoEta[icut]->Fill(etaFake);
@@ -1980,6 +1901,10 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
                 }
                 if (isInEB) CutIdOnlyIsoPtBarrel[icut]->Fill(etFake);
                 if (isInEE) CutIdOnlyIsoPtEndcap[icut]->Fill(etFake);
+		if (etaRegion==1) CutIdOnlyIsoPtBarrel1[icut] -> Fill(etFake);
+		if (etaRegion==2) CutIdOnlyIsoPtBarrel2[icut] -> Fill(etFake);
+		if (etaRegion==3) CutIdOnlyIsoPtEndcap1[icut] -> Fill(etFake);
+		if (etaRegion==4) CutIdOnlyIsoPtEndcap2[icut] -> Fill(etFake);
               }
               if ( isConvRejCutBased ) {
                 CutIdOnlyConvEta[icut]->Fill(etaFake);
@@ -1995,8 +1920,12 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
                 }
                 if (isInEB) CutIdOnlyConvPtBarrel[icut]->Fill(etFake);
                 if (isInEE) CutIdOnlyConvPtEndcap[icut]->Fill(etFake);
+		if (etaRegion==1) CutIdOnlyConvPtBarrel1[icut] -> Fill(etFake);
+		if (etaRegion==2) CutIdOnlyConvPtBarrel2[icut] -> Fill(etFake);
+		if (etaRegion==3) CutIdOnlyConvPtEndcap1[icut] -> Fill(etFake);
+		if (etaRegion==4) CutIdOnlyConvPtEndcap2[icut] -> Fill(etFake);
               }
-              if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased ) {
+              if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {
                 CutIdEta[icut]->Fill(etaFake);
                 CutIdPt[icut]->Fill(etFake);
                 CutIdPU[icut]->Fill(nPU);
@@ -2010,195 +1939,107 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
                 }
                 if (isInEB) CutIdPtBarrel[icut]->Fill(etFake);
                 if (isInEE) CutIdPtEndcap[icut]->Fill(etFake);
+		if (etaRegion==1) CutIdPtBarrel1[icut] -> Fill(etFake);
+		if (etaRegion==2) CutIdPtBarrel2[icut] -> Fill(etFake);
+		if (etaRegion==3) CutIdPtEndcap1[icut] -> Fill(etFake);
+		if (etaRegion==4) CutIdPtEndcap2[icut] -> Fill(etFake);
               }
             }
-
-      for (int icut=0;icut<EgammaLHBasedIDWPs.size();++icut)
-	{
-	  bool isEleIDCutBased, isIsolCutBased, isConvRejCutBased;
-	  isEleIDCutBased = isIsolCutBased = isConvRejCutBased = false;
-	  isEleID(&EgammaLHBasedID[icut],ele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
-
-	  if ( isEleIDCutBased ) {
-	    LHIdOnlyIDEta[icut]->Fill(etaFake);
-	    LHIdOnlyIDPt[icut]->Fill(etFake);
-            LHIdOnlyIDPU[icut]->Fill(nPU);
-	    if (highPt) {
-              LHIdOnlyIDEtaHighPt[icut]->Fill(etaFake);
-              LHIdOnlyIDPUHighPt[icut]->Fill(nPU);
-            }
-	    if (lowPt) {
-              LHIdOnlyIDEtaLowPt[icut]->Fill(etaFake);
-              LHIdOnlyIDPULowPt[icut]->Fill(nPU);
-            }
-	    if (isInEB) LHIdOnlyIDPtBarrel[icut]->Fill(etFake);
-	    if (isInEE) LHIdOnlyIDPtEndcap[icut]->Fill(etFake);
-	  }
-	  if ( isIsolCutBased ) {
-	    LHIdOnlyIsoEta[icut]->Fill(etaFake);
-	    LHIdOnlyIsoPt[icut]->Fill(etFake);
-            LHIdOnlyIsoPU[icut]->Fill(nPU);
-	    if (highPt) {
-              LHIdOnlyIsoEtaHighPt[icut]->Fill(etaFake);
-              LHIdOnlyIsoPUHighPt[icut]->Fill(nPU);
-            }
-	    if (lowPt) {
-              LHIdOnlyIsoEtaLowPt[icut]->Fill(etaFake);
-              LHIdOnlyIsoPULowPt[icut]->Fill(nPU);
-            }
-	    if (isInEB) LHIdOnlyIsoPtBarrel[icut]->Fill(etFake);
-	    if (isInEE) LHIdOnlyIsoPtEndcap[icut]->Fill(etFake);
-	  }
-	  if ( isConvRejCutBased ) {
-	    LHIdOnlyConvEta[icut]->Fill(etaFake);
-	    LHIdOnlyConvPt[icut]->Fill(etFake);
-            LHIdOnlyConvPU[icut]->Fill(nPU);
-	    if (highPt) {
-              LHIdOnlyConvEtaHighPt[icut]->Fill(etaFake);
-              LHIdOnlyConvPUHighPt[icut]->Fill(nPU);
-            }
-            if (lowPt) {
-              LHIdOnlyConvEtaLowPt[icut]->Fill(etaFake);
-              LHIdOnlyConvPULowPt[icut]->Fill(nPU);
-            }
-	    if (isInEB) LHIdOnlyConvPtBarrel[icut]->Fill(etFake);
-	    if (isInEE) LHIdOnlyConvPtEndcap[icut]->Fill(etFake);
-	  }
-	  if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased ) {
-	    LHIdEta[icut]->Fill(etaFake);
-	    LHIdPt[icut]->Fill(etFake);
-            LHIdPU[icut]->Fill(nPU);
-	    if (highPt) {
-              LHIdEtaHighPt[icut]->Fill(etaFake);
-              LHIdPUHighPt[icut]->Fill(nPU);
-            }
-	    if (lowPt) {
-              LHIdEtaLowPt[icut]->Fill(etaFake);
-              LHIdPULowPt[icut]->Fill(nPU);
-            }
-	    if (isInEB) LHIdPtBarrel[icut]->Fill(etFake);
-	    if (isInEE) LHIdPtEndcap[icut]->Fill(etFake);
-	  }	  
-
-	}
-
-      for (int icut=0;icut<EgammaCiCBasedIDWPs.size();++icut)
-	{
-	  bool isEleIDCutBased, isIsolCutBased, isConvRejCutBased;
-	  isEleIDCutBased = isIsolCutBased = isConvRejCutBased = false;
-	  isEleID(&EgammaCiCBasedID[icut],ele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
-
-	  if ( isEleIDCutBased ) {
-	    CiCIdOnlyIDEta[icut]->Fill(etaFake);
-	    CiCIdOnlyIDPt[icut]->Fill(etFake);
-            CiCIdOnlyIDPU[icut]->Fill(nPU);
-	    if (highPt) {
-              CiCIdOnlyIDEtaHighPt[icut]->Fill(etaFake);
-              CiCIdOnlyIDPUHighPt[icut]->Fill(nPU);
-            }
-	    if (lowPt) {
-              CiCIdOnlyIDEtaLowPt[icut]->Fill(etaFake);
-              CiCIdOnlyIDPULowPt[icut]->Fill(nPU);
-            }
-	    if (isInEB) CiCIdOnlyIDPtBarrel[icut]->Fill(etFake);
-	    if (isInEE) CiCIdOnlyIDPtEndcap[icut]->Fill(etFake);
-	  }
-	  if ( isIsolCutBased ) {
-	    CiCIdOnlyIsoEta[icut]->Fill(etaFake);
-	    CiCIdOnlyIsoPt[icut]->Fill(etFake);
-            CiCIdOnlyIsoPU[icut]->Fill(nPU);
-	    if (highPt) {
-              CiCIdOnlyIsoEtaHighPt[icut]->Fill(etaFake);
-              CiCIdOnlyIsoPUHighPt[icut]->Fill(nPU);
-            }
-	    if (lowPt) {
-              CiCIdOnlyIsoEtaLowPt[icut]->Fill(etaFake);
-              CiCIdOnlyIsoPULowPt[icut]->Fill(nPU);
-            }
-	    if (isInEB) CiCIdOnlyIsoPtBarrel[icut]->Fill(etFake);
-	    if (isInEE) CiCIdOnlyIsoPtEndcap[icut]->Fill(etFake);
-	  }
-	  if ( isConvRejCutBased ) {
-	    CiCIdOnlyConvEta[icut]->Fill(etaFake);
-	    CiCIdOnlyConvPt[icut]->Fill(etFake);
-            CiCIdOnlyConvPU[icut]->Fill(nPU);
-	    if (highPt) {
-              CiCIdOnlyConvEtaHighPt[icut]->Fill(etaFake);
-              CiCIdOnlyConvPUHighPt[icut]->Fill(nPU);
-            }
-	    if (lowPt) {
-              CiCIdOnlyConvEtaLowPt[icut]->Fill(etaFake);
-              CiCIdOnlyConvPULowPt[icut]->Fill(nPU);
-            }
-	    if (isInEB) CiCIdOnlyConvPtBarrel[icut]->Fill(etFake);
-	    if (isInEE) CiCIdOnlyConvPtEndcap[icut]->Fill(etFake);
-	  }
-	  if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased ) {
-	    CiCIdEta[icut]->Fill(etaFake);
-	    CiCIdPt[icut]->Fill(etFake);
-            CiCIdPU[icut]->Fill(nPU);
-	    if (highPt) {
-              CiCIdEtaHighPt[icut]->Fill(etaFake);
-              CiCIdPUHighPt[icut]->Fill(nPU);
-            }
-	    if (lowPt) {
-              CiCIdEtaLowPt[icut]->Fill(etaFake);
-              CiCIdPULowPt[icut]->Fill(nPU);
-            }
-	    if (isInEB) CiCIdPtBarrel[icut]->Fill(etFake);
-	    if (isInEE) CiCIdPtEndcap[icut]->Fill(etFake);
-	  }	  	  
-
-	}
 	
-          
-//           Utils anaUtils;
-          
-//           if ( anaUtils.electronIdVal(eleIdCutsEle[ele], eleIdTightCIC) ) {
-            
-//             CutIdTightCICEta->Fill(etaFake);
-//             CutIdTightCICPt->Fill(etFake);
-            
-//           }
-
-//           if ( anaUtils.electronIdVal(eleIdCutsEle[ele], eleIdSuperTightCIC) ) {
-            
-//             CutIdSuperTightCICEta->Fill(etaFake);
-//             CutIdSuperTightCICPt->Fill(etFake);
-            
-//           }
-
-//           float lik = 
-//           bool eleInGap = anaUtils.fiducialFlagECAL(fiducialFlagsEle[ele], isEBEEGap);
-
-//           if ( lik > minLikelihoodLoose && !eleInGap) {
-
-//             LHIdLooseEta->Fill(etaFake);
-//             LHIdLoosePt->Fill(etFake);
-
-//           }
-
-//           if ( lik > minLikelihoodTight && !eleInGap) {
-
-//             LHIdTightEta->Fill(etaFake);
-//             LHIdTightPt->Fill(etFake);
-	  
-// 	}
-	
+	  // filling the numerator: likelihood based
+	  for (int icut=0;icut<EgammaLHBasedIDWPs.size();++icut)
+	    {
+	      bool isEleIDCutBased, isIsolCutBased, isConvRejCutBased;
+	      isEleIDCutBased = isIsolCutBased = isConvRejCutBased = false;
+	      isEleID(&EgammaLHBasedID[icut],ele,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
+	      
+	      if ( isEleIDCutBased ) {
+		LHIdOnlyIDEta[icut]->Fill(etaFake);
+		LHIdOnlyIDPt[icut]->Fill(etFake);
+		LHIdOnlyIDPU[icut]->Fill(nPU);
+		if (highPt) {
+		  LHIdOnlyIDEtaHighPt[icut]->Fill(etaFake);
+		  LHIdOnlyIDPUHighPt[icut]->Fill(nPU);
+		}
+		if (lowPt) {
+		  LHIdOnlyIDEtaLowPt[icut]->Fill(etaFake);
+		  LHIdOnlyIDPULowPt[icut]->Fill(nPU);
+		}
+		if (isInEB) LHIdOnlyIDPtBarrel[icut]->Fill(etFake);
+		if (isInEE) LHIdOnlyIDPtEndcap[icut]->Fill(etFake);
+		if (etaRegion==1) LHIdOnlyIDPtBarrel1[icut] -> Fill(etFake);
+		if (etaRegion==2) LHIdOnlyIDPtBarrel2[icut] -> Fill(etFake);
+		if (etaRegion==3) LHIdOnlyIDPtEndcap1[icut] -> Fill(etFake);
+		if (etaRegion==4) LHIdOnlyIDPtEndcap2[icut] -> Fill(etFake);
+	      }
+	      if ( isIsolCutBased ) {
+		LHIdOnlyIsoEta[icut]->Fill(etaFake);
+		LHIdOnlyIsoPt[icut]->Fill(etFake);
+		LHIdOnlyIsoPU[icut]->Fill(nPU);
+		if (highPt) {
+		  LHIdOnlyIsoEtaHighPt[icut]->Fill(etaFake);
+		  LHIdOnlyIsoPUHighPt[icut]->Fill(nPU);
+		}
+		if (lowPt) {
+		  LHIdOnlyIsoEtaLowPt[icut]->Fill(etaFake);
+		  LHIdOnlyIsoPULowPt[icut]->Fill(nPU);
+		}
+		if (isInEB) LHIdOnlyIsoPtBarrel[icut]->Fill(etFake);
+		if (isInEE) LHIdOnlyIsoPtEndcap[icut]->Fill(etFake);
+		if (etaRegion==1) LHIdOnlyIsoPtBarrel1[icut] -> Fill(etFake);
+		if (etaRegion==2) LHIdOnlyIsoPtBarrel2[icut] -> Fill(etFake);
+		if (etaRegion==3) LHIdOnlyIsoPtEndcap1[icut] -> Fill(etFake);
+		if (etaRegion==4) LHIdOnlyIsoPtEndcap2[icut] -> Fill(etFake);
+	      }
+	      if ( isConvRejCutBased ) {
+		LHIdOnlyConvEta[icut]->Fill(etaFake);
+		LHIdOnlyConvPt[icut]->Fill(etFake);
+		LHIdOnlyConvPU[icut]->Fill(nPU);
+		if (highPt) {
+		  LHIdOnlyConvEtaHighPt[icut]->Fill(etaFake);
+		  LHIdOnlyConvPUHighPt[icut]->Fill(nPU);
+		}
+		if (lowPt) {
+		  LHIdOnlyConvEtaLowPt[icut]->Fill(etaFake);
+		  LHIdOnlyConvPULowPt[icut]->Fill(nPU);
+		}
+		if (isInEB) LHIdOnlyConvPtBarrel[icut]->Fill(etFake);
+		if (isInEE) LHIdOnlyConvPtEndcap[icut]->Fill(etFake);
+		if (etaRegion==1) LHIdOnlyConvPtBarrel1[icut] -> Fill(etFake);
+		if (etaRegion==2) LHIdOnlyConvPtBarrel2[icut] -> Fill(etFake);
+		if (etaRegion==3) LHIdOnlyConvPtEndcap1[icut] -> Fill(etFake);
+		if (etaRegion==4) LHIdOnlyConvPtEndcap2[icut] -> Fill(etFake);
+	      }
+	      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) { 
+		LHIdEta[icut]->Fill(etaFake);
+		LHIdPt[icut]->Fill(etFake);
+		LHIdPU[icut]->Fill(nPU);
+		if (highPt) {
+		  LHIdEtaHighPt[icut]->Fill(etaFake);
+		  LHIdPUHighPt[icut]->Fill(nPU);
+		}
+		if (lowPt) {
+		  LHIdEtaLowPt[icut]->Fill(etaFake);
+		  LHIdPULowPt[icut]->Fill(nPU);
+		}
+		if (isInEB) LHIdPtBarrel[icut]->Fill(etFake);
+		if (isInEE) LHIdPtEndcap[icut]->Fill(etFake);
+		if (etaRegion==1) LHIdPtBarrel1[icut] -> Fill(etFake);
+		if (etaRegion==2) LHIdPtBarrel2[icut] -> Fill(etFake);
+		if (etaRegion==3) LHIdPtEndcap1[icut] -> Fill(etFake);
+		if (etaRegion==4) LHIdPtEndcap2[icut] -> Fill(etFake);
+	      }	  
+	    }
 	}	
       } // electron acceptance & pt cut
       
     } // loop ele
-  
-    //    cout << "nEleReco = " << nEleReco << " nJetsReco = " << nJetsReco << endl;
-  
-  }// loop events
-  
+    
+  } // loop events
   
   char filename[200];
   sprintf(filename,"%s-EleMisidEta.root",outname);
   EfficiencyEvaluator ElectronEffEta(filename);
-  //  ElectronEffEta.AddNumerator(GenEta);
   ElectronEffEta.AddNumerator(RecoEta);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
@@ -2214,13 +2055,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
       ElectronEffEta.AddNumerator(LHIdOnlyIsoEta[icut]);
       ElectronEffEta.AddNumerator(LHIdOnlyConvEta[icut]);
     }
-  for (int icut=0;icut<EgammaCiCBasedID.size();++icut)
-    {
-      ElectronEffEta.AddNumerator(CiCIdEta[icut]);
-      ElectronEffEta.AddNumerator(CiCIdOnlyIDEta[icut]);
-      ElectronEffEta.AddNumerator(CiCIdOnlyIsoEta[icut]);
-      ElectronEffEta.AddNumerator(CiCIdOnlyConvEta[icut]);
-    }
   ElectronEffEta.SetDenominator(RecoEta);
   ElectronEffEta.ComputeEfficiencies();
   ElectronEffEta.SetTitle("fake rate vs #eta");
@@ -2231,7 +2065,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
   sprintf(filename,"%s-EleMisidEtaHighPt.root",outname);
   EfficiencyEvaluator ElectronEffEtaHighPt(filename);
-  //  ElectronEffEtaHighPt.AddNumerator(GenEtaHighPt);
   ElectronEffEtaHighPt.AddNumerator(RecoEtaHighPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
@@ -2247,13 +2080,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
       ElectronEffEtaHighPt.AddNumerator(LHIdOnlyIsoEtaHighPt[icut]);
       ElectronEffEtaHighPt.AddNumerator(LHIdOnlyConvEtaHighPt[icut]);
     }
-  for (int icut=0;icut<EgammaCiCBasedID.size();++icut)
-    {
-      ElectronEffEtaHighPt.AddNumerator(CiCIdEtaHighPt[icut]);
-      ElectronEffEtaHighPt.AddNumerator(CiCIdOnlyIDEtaHighPt[icut]);
-      ElectronEffEtaHighPt.AddNumerator(CiCIdOnlyIsoEtaHighPt[icut]);
-      ElectronEffEtaHighPt.AddNumerator(CiCIdOnlyConvEtaHighPt[icut]);
-    }
   ElectronEffEtaHighPt.SetDenominator(RecoEtaHighPt);
   ElectronEffEtaHighPt.ComputeEfficiencies();
   ElectronEffEtaHighPt.SetTitle("fake rate vs #eta");
@@ -2264,7 +2090,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
   sprintf(filename,"%s-EleMisidEtaLowPt.root",outname);
   EfficiencyEvaluator ElectronEffEtaLowPt(filename);
-  //  ElectronEffEtaLowPt.AddNumerator(GenEtaLowPt);
   ElectronEffEtaLowPt.AddNumerator(RecoEtaLowPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
@@ -2280,13 +2105,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
       ElectronEffEtaLowPt.AddNumerator(LHIdOnlyIsoEtaLowPt[icut]);
       ElectronEffEtaLowPt.AddNumerator(LHIdOnlyConvEtaLowPt[icut]);
     }
-  for (int icut=0;icut<EgammaCiCBasedID.size();++icut)
-    {
-      ElectronEffEtaLowPt.AddNumerator(CiCIdEtaLowPt[icut]);
-      ElectronEffEtaLowPt.AddNumerator(CiCIdOnlyIDEtaLowPt[icut]);
-      ElectronEffEtaLowPt.AddNumerator(CiCIdOnlyIsoEtaLowPt[icut]);
-      ElectronEffEtaLowPt.AddNumerator(CiCIdOnlyConvEtaLowPt[icut]);
-    }
   ElectronEffEtaLowPt.SetDenominator(RecoEtaLowPt);
   ElectronEffEtaLowPt.ComputeEfficiencies();
   ElectronEffEtaLowPt.SetTitle("fake rate vs #eta");
@@ -2297,7 +2115,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
   sprintf(filename,"%s-EleMisidPt.root",outname);
   EfficiencyEvaluator ElectronEffPt(filename);
-  //  ElectronEffPt.AddNumerator(GenPt);
   ElectronEffPt.AddNumerator(RecoPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
@@ -2313,14 +2130,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
       ElectronEffPt.AddNumerator(LHIdOnlyIsoPt[icut]);
       ElectronEffPt.AddNumerator(LHIdOnlyConvPt[icut]);
     }
-  for (int icut=0;icut<EgammaCiCBasedID.size();++icut)
-    {
-      ElectronEffPt.AddNumerator(CiCIdPt[icut]);
-      ElectronEffPt.AddNumerator(CiCIdOnlyIDPt[icut]);
-      ElectronEffPt.AddNumerator(CiCIdOnlyIsoPt[icut]);
-      ElectronEffPt.AddNumerator(CiCIdOnlyConvPt[icut]);
-    }
-
   ElectronEffPt.SetDenominator(RecoPt);
   ElectronEffPt.ComputeEfficiencies();
   ElectronEffPt.SetTitle("fake rate vs p_{T}");
@@ -2331,7 +2140,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
   sprintf(filename,"%s-EleMisidPtBarrel.root",outname);
   EfficiencyEvaluator ElectronEffPtBarrel(filename);
-  //  ElectronEffPtBarrel.AddNumerator(GenPtBarrel);
   ElectronEffPtBarrel.AddNumerator(RecoPtBarrel);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
@@ -2347,13 +2155,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
       ElectronEffPtBarrel.AddNumerator(LHIdOnlyIsoPtBarrel[icut]);
       ElectronEffPtBarrel.AddNumerator(LHIdOnlyConvPtBarrel[icut]);
     }
-  for (int icut=0;icut<EgammaCiCBasedID.size();++icut)
-    {
-      ElectronEffPtBarrel.AddNumerator(CiCIdPtBarrel[icut]);
-      ElectronEffPtBarrel.AddNumerator(CiCIdOnlyIDPtBarrel[icut]);
-      ElectronEffPtBarrel.AddNumerator(CiCIdOnlyIsoPtBarrel[icut]);
-      ElectronEffPtBarrel.AddNumerator(CiCIdOnlyConvPtBarrel[icut]);
-    }
 
   ElectronEffPtBarrel.SetDenominator(RecoPtBarrel);
   ElectronEffPtBarrel.ComputeEfficiencies();
@@ -2363,9 +2164,60 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   ElectronEffPtBarrel.SetYaxisMin(0.0);
   ElectronEffPtBarrel.Write();
 
+  sprintf(filename,"%s-EleMisidPtBarrel1.root",outname);
+  EfficiencyEvaluator ElectronEffPtBarrel1(filename);
+  ElectronEffPtBarrel1.AddNumerator(RecoPtBarrel1);
+  for (int icut=0;icut<EgammaCutBasedID.size();++icut)
+    {
+      ElectronEffPtBarrel1.AddNumerator(CutIdPtBarrel1[icut]);
+      ElectronEffPtBarrel1.AddNumerator(CutIdOnlyIDPtBarrel1[icut]);
+      ElectronEffPtBarrel1.AddNumerator(CutIdOnlyIsoPtBarrel1[icut]);
+      ElectronEffPtBarrel1.AddNumerator(CutIdOnlyConvPtBarrel1[icut]);
+    }
+  for (int icut=0;icut<EgammaLHBasedID.size();++icut)
+    {
+      ElectronEffPtBarrel1.AddNumerator(LHIdPtBarrel1[icut]);
+      ElectronEffPtBarrel1.AddNumerator(LHIdOnlyIDPtBarrel1[icut]);
+      ElectronEffPtBarrel1.AddNumerator(LHIdOnlyIsoPtBarrel1[icut]);
+      ElectronEffPtBarrel1.AddNumerator(LHIdOnlyConvPtBarrel1[icut]);
+    }
+
+  ElectronEffPtBarrel1.SetDenominator(RecoPtBarrel1);
+  ElectronEffPtBarrel1.ComputeEfficiencies();
+  ElectronEffPtBarrel1.SetTitle("fake rate vs p_{T}");
+  ElectronEffPtBarrel1.SetXaxisTitle("electron p_{T} (GeV)");
+  ElectronEffPtBarrel1.SetYaxisTitle("Fake rate");
+  ElectronEffPtBarrel1.SetYaxisMin(0.0);
+  ElectronEffPtBarrel1.Write();
+
+  sprintf(filename,"%s-EleMisidPtBarrel2.root",outname);
+  EfficiencyEvaluator ElectronEffPtBarrel2(filename);
+  ElectronEffPtBarrel2.AddNumerator(RecoPtBarrel2);
+  for (int icut=0;icut<EgammaCutBasedID.size();++icut)
+    {
+      ElectronEffPtBarrel2.AddNumerator(CutIdPtBarrel2[icut]);
+      ElectronEffPtBarrel2.AddNumerator(CutIdOnlyIDPtBarrel2[icut]);
+      ElectronEffPtBarrel2.AddNumerator(CutIdOnlyIsoPtBarrel2[icut]);
+      ElectronEffPtBarrel2.AddNumerator(CutIdOnlyConvPtBarrel2[icut]);
+    }
+  for (int icut=0;icut<EgammaLHBasedID.size();++icut)
+    {
+      ElectronEffPtBarrel2.AddNumerator(LHIdPtBarrel2[icut]);
+      ElectronEffPtBarrel2.AddNumerator(LHIdOnlyIDPtBarrel2[icut]);
+      ElectronEffPtBarrel2.AddNumerator(LHIdOnlyIsoPtBarrel2[icut]);
+      ElectronEffPtBarrel2.AddNumerator(LHIdOnlyConvPtBarrel2[icut]);
+    }
+
+  ElectronEffPtBarrel2.SetDenominator(RecoPtBarrel2);
+  ElectronEffPtBarrel2.ComputeEfficiencies();
+  ElectronEffPtBarrel2.SetTitle("fake rate vs p_{T}");
+  ElectronEffPtBarrel2.SetXaxisTitle("electron p_{T} (GeV)");
+  ElectronEffPtBarrel2.SetYaxisTitle("Fake rate");
+  ElectronEffPtBarrel2.SetYaxisMin(0.0);
+  ElectronEffPtBarrel2.Write();
+
   sprintf(filename,"%s-EleMisidPtEndcap.root",outname);
   EfficiencyEvaluator ElectronEffPtEndcap(filename);
-  //  ElectronEffPtEndcap.AddNumerator(GenPtEndcap);
   ElectronEffPtEndcap.AddNumerator(RecoPtEndcap);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
@@ -2381,14 +2233,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
       ElectronEffPtEndcap.AddNumerator(LHIdOnlyIsoPtEndcap[icut]);
       ElectronEffPtEndcap.AddNumerator(LHIdOnlyConvPtEndcap[icut]);
     }
-  for (int icut=0;icut<EgammaCiCBasedID.size();++icut)
-    {
-      ElectronEffPtEndcap.AddNumerator(CiCIdPtEndcap[icut]);
-      ElectronEffPtEndcap.AddNumerator(CiCIdOnlyIDPtEndcap[icut]);
-      ElectronEffPtEndcap.AddNumerator(CiCIdOnlyIsoPtEndcap[icut]);
-      ElectronEffPtEndcap.AddNumerator(CiCIdOnlyConvPtEndcap[icut]);
-    }
-
   ElectronEffPtEndcap.SetDenominator(RecoPtEndcap);
   ElectronEffPtEndcap.ComputeEfficiencies();
   ElectronEffPtEndcap.SetTitle("fake rate vs p_{T}");
@@ -2397,10 +2241,58 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
   ElectronEffPtEndcap.SetYaxisMin(0.0);
   ElectronEffPtEndcap.Write();
 
+  sprintf(filename,"%s-EleMisidPtEndcap1.root",outname);
+  EfficiencyEvaluator ElectronEffPtEndcap1(filename);
+  ElectronEffPtEndcap1.AddNumerator(RecoPtEndcap1);
+  for (int icut=0;icut<EgammaCutBasedID.size();++icut)
+    {
+      ElectronEffPtEndcap1.AddNumerator(CutIdPtEndcap1[icut]);
+      ElectronEffPtEndcap1.AddNumerator(CutIdOnlyIDPtEndcap1[icut]);
+      ElectronEffPtEndcap1.AddNumerator(CutIdOnlyIsoPtEndcap1[icut]);
+      ElectronEffPtEndcap1.AddNumerator(CutIdOnlyConvPtEndcap1[icut]);
+    }
+  for (int icut=0;icut<EgammaLHBasedID.size();++icut)
+    {
+      ElectronEffPtEndcap1.AddNumerator(LHIdPtEndcap1[icut]);
+      ElectronEffPtEndcap1.AddNumerator(LHIdOnlyIDPtEndcap1[icut]);
+      ElectronEffPtEndcap1.AddNumerator(LHIdOnlyIsoPtEndcap1[icut]);
+      ElectronEffPtEndcap1.AddNumerator(LHIdOnlyConvPtEndcap1[icut]);
+    }
+  ElectronEffPtEndcap1.SetDenominator(RecoPtEndcap1);
+  ElectronEffPtEndcap1.ComputeEfficiencies();
+  ElectronEffPtEndcap1.SetTitle("fake rate vs p_{T}");
+  ElectronEffPtEndcap1.SetXaxisTitle("electron p_{T} (GeV)");
+  ElectronEffPtEndcap1.SetYaxisTitle("Fake rate");
+  ElectronEffPtEndcap1.SetYaxisMin(0.0);
+  ElectronEffPtEndcap1.Write();
+
+  sprintf(filename,"%s-EleMisidPtEndcap2.root",outname);
+  EfficiencyEvaluator ElectronEffPtEndcap2(filename);
+  ElectronEffPtEndcap2.AddNumerator(RecoPtEndcap2);
+  for (int icut=0;icut<EgammaCutBasedID.size();++icut)
+    {
+      ElectronEffPtEndcap2.AddNumerator(CutIdPtEndcap2[icut]);
+      ElectronEffPtEndcap2.AddNumerator(CutIdOnlyIDPtEndcap2[icut]);
+      ElectronEffPtEndcap2.AddNumerator(CutIdOnlyIsoPtEndcap2[icut]);
+      ElectronEffPtEndcap2.AddNumerator(CutIdOnlyConvPtEndcap2[icut]);
+    }
+  for (int icut=0;icut<EgammaLHBasedID.size();++icut)
+    {
+      ElectronEffPtEndcap2.AddNumerator(LHIdPtEndcap2[icut]);
+      ElectronEffPtEndcap2.AddNumerator(LHIdOnlyIDPtEndcap2[icut]);
+      ElectronEffPtEndcap2.AddNumerator(LHIdOnlyIsoPtEndcap2[icut]);
+      ElectronEffPtEndcap2.AddNumerator(LHIdOnlyConvPtEndcap2[icut]);
+    }
+  ElectronEffPtEndcap2.SetDenominator(RecoPtEndcap2);
+  ElectronEffPtEndcap2.ComputeEfficiencies();
+  ElectronEffPtEndcap2.SetTitle("fake rate vs p_{T}");
+  ElectronEffPtEndcap2.SetXaxisTitle("electron p_{T} (GeV)");
+  ElectronEffPtEndcap2.SetYaxisTitle("Fake rate");
+  ElectronEffPtEndcap2.SetYaxisMin(0.0);
+  ElectronEffPtEndcap2.Write();
 
   sprintf(filename,"%s-EleMisidPU.root",outname);
   EfficiencyEvaluator ElectronEffPU(filename);
-  //  ElectronEffPU.AddNumerator(GenPU);
   ElectronEffPU.AddNumerator(RecoPU);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
@@ -2416,13 +2308,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
       ElectronEffPU.AddNumerator(LHIdOnlyIsoPU[icut]);
       ElectronEffPU.AddNumerator(LHIdOnlyConvPU[icut]);
     }
-  for (int icut=0;icut<EgammaCiCBasedID.size();++icut)
-    {
-      ElectronEffPU.AddNumerator(CiCIdPU[icut]);
-      ElectronEffPU.AddNumerator(CiCIdOnlyIDPU[icut]);
-      ElectronEffPU.AddNumerator(CiCIdOnlyIsoPU[icut]);
-      ElectronEffPU.AddNumerator(CiCIdOnlyConvPU[icut]);
-    }
   ElectronEffPU.SetDenominator(RecoPU);
   ElectronEffPU.ComputeEfficiencies();
   ElectronEffPU.SetTitle("fake rate vs n PU");
@@ -2433,7 +2318,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
   sprintf(filename,"%s-EleMisidPUHighPt.root",outname);
   EfficiencyEvaluator ElectronEffPUHighPt(filename);
-  //  ElectronEffPUHighPt.AddNumerator(GenPUHighPt);
   ElectronEffPUHighPt.AddNumerator(RecoPUHighPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
@@ -2449,13 +2333,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
       ElectronEffPUHighPt.AddNumerator(LHIdOnlyIsoPUHighPt[icut]);
       ElectronEffPUHighPt.AddNumerator(LHIdOnlyConvPUHighPt[icut]);
     }
-  for (int icut=0;icut<EgammaCiCBasedID.size();++icut)
-    {
-      ElectronEffPUHighPt.AddNumerator(CiCIdPUHighPt[icut]);
-      ElectronEffPUHighPt.AddNumerator(CiCIdOnlyIDPUHighPt[icut]);
-      ElectronEffPUHighPt.AddNumerator(CiCIdOnlyIsoPUHighPt[icut]);
-      ElectronEffPUHighPt.AddNumerator(CiCIdOnlyConvPUHighPt[icut]);
-    }
   ElectronEffPUHighPt.SetDenominator(RecoPUHighPt);
   ElectronEffPUHighPt.ComputeEfficiencies();
   ElectronEffPUHighPt.SetTitle("fake rate vs n PU");
@@ -2466,7 +2343,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
   sprintf(filename,"%s-EleMisidPULowPt.root",outname);
   EfficiencyEvaluator ElectronEffPULowPt(filename);
-  //  ElectronEffPULowPt.AddNumerator(GenPULowPt);
   ElectronEffPULowPt.AddNumerator(RecoPULowPt);
   for (int icut=0;icut<EgammaCutBasedID.size();++icut)
     {
@@ -2481,13 +2357,6 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
       ElectronEffPULowPt.AddNumerator(LHIdOnlyIDPULowPt[icut]);
       ElectronEffPULowPt.AddNumerator(LHIdOnlyIsoPULowPt[icut]);
       ElectronEffPULowPt.AddNumerator(LHIdOnlyConvPULowPt[icut]);
-    }
-  for (int icut=0;icut<EgammaCiCBasedID.size();++icut)
-    {
-      ElectronEffPULowPt.AddNumerator(CiCIdPULowPt[icut]);
-      ElectronEffPULowPt.AddNumerator(CiCIdOnlyIDPULowPt[icut]);
-      ElectronEffPULowPt.AddNumerator(CiCIdOnlyIsoPULowPt[icut]);
-      ElectronEffPULowPt.AddNumerator(CiCIdOnlyConvPULowPt[icut]);
     }
   ElectronEffPULowPt.SetDenominator(RecoPULowPt);
   ElectronEffPULowPt.ComputeEfficiencies();
@@ -4172,7 +4041,6 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   // to study which ET cut we want to apply on the jet (for Wjets HWW studies)
   TH1F *FakeJetForThresholdPT = new TH1F("FakeJetForThresholdPT", "fakeable jets p_{T}", 20, 0., 100.);
 
-
   // -----------------------------------------------------------------------
   // study vs eta
   float minEta = -2.5;
@@ -4282,34 +4150,37 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
 
   // -----------------------------------------------------------------------
   // study vs pT
-  Float_t LowerPt[6];
+  Float_t LowerPt[9];
   LowerPt[0]=10;
   LowerPt[1]=15;
   LowerPt[2]=20;  
   LowerPt[3]=25;
   LowerPt[4]=30;  
   LowerPt[5]=35;  
-  TH1F *FakeableJetsPt = new TH1F( "FakeableJetsPt",  "fakeable jets p_{T} (GeV)", 5, LowerPt);
-  TH1F *RecoPt         = new TH1F( "RecoPt",          "reconstructed p_{T} (GeV)", 5, LowerPt);
-  TH1F *RecoPtBarrel   = new TH1F( "RecoPtBarrel",    "reconstructed p_{T} (GeV)", 5, LowerPt);
-  TH1F *RecoPtBarrel1  = new TH1F( "RecoPtBarrel1",   "reconstructed p_{T} (GeV)", 5, LowerPt);    // this is done to subsplit barrel and endcap in 2 
-  TH1F *RecoPtBarrel2  = new TH1F( "RecoPtBarrel2",   "reconstructed p_{T} (GeV)", 5, LowerPt);
-  TH1F *RecoPtEndcap   = new TH1F( "RecoPtEndcap",    "reconstructed p_{T} (GeV)", 5, LowerPt);
-  TH1F *RecoPtEndcap1  = new TH1F( "RecoPtEndcap1",   "reconstructed p_{T} (GeV)", 5, LowerPt);
-  TH1F *RecoPtEndcap2  = new TH1F( "RecoPtEndcap2",   "reconstructed p_{T} (GeV)", 5, LowerPt);
+  LowerPt[6]=40;  
+  LowerPt[7]=45;  
+  LowerPt[8]=50;  
+  TH1F *FakeableJetsPt = new TH1F( "FakeableJetsPt",  "fakeable jets p_{T} (GeV)", 8, LowerPt);
+  TH1F *RecoPt         = new TH1F( "RecoPt",          "reconstructed p_{T} (GeV)", 8, LowerPt);
+  TH1F *RecoPtBarrel   = new TH1F( "RecoPtBarrel",    "reconstructed p_{T} (GeV)", 8, LowerPt);
+  TH1F *RecoPtBarrel1  = new TH1F( "RecoPtBarrel1",   "reconstructed p_{T} (GeV)", 8, LowerPt);    // this is done to subsplit 
+  TH1F *RecoPtBarrel2  = new TH1F( "RecoPtBarrel2",   "reconstructed p_{T} (GeV)", 8, LowerPt);    // barrel and endcap in 2 parts 
+  TH1F *RecoPtEndcap   = new TH1F( "RecoPtEndcap",    "reconstructed p_{T} (GeV)", 8, LowerPt);
+  TH1F *RecoPtEndcap1  = new TH1F( "RecoPtEndcap1",   "reconstructed p_{T} (GeV)", 8, LowerPt);
+  TH1F *RecoPtEndcap2  = new TH1F( "RecoPtEndcap2",   "reconstructed p_{T} (GeV)", 8, LowerPt);
 
   std::vector<TH1F*> CutIdPt;
   std::vector<TH1F*> CutIdOnlyIDPt;
   std::vector<TH1F*> CutIdOnlyIsoPt;
   std::vector<TH1F*> CutIdOnlyConvPt;
   for (int i=0;i<EgammaCutBasedID.size();++i) {
-    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"Pt",   "cut ID #eta", 5, LowerPt );
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"Pt",   "cut ID #eta", 8, LowerPt );
     CutIdPt.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPt",   "cut ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPt",   "cut ID #eta", 8, LowerPt );
     CutIdOnlyIDPt.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPt",  "cut ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPt",  "cut ID #eta", 8, LowerPt );
     CutIdOnlyIsoPt.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPt", "cut ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPt", "cut ID #eta", 8, LowerPt );
     CutIdOnlyConvPt.push_back(aHisto);
   }
   
@@ -4318,13 +4189,13 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   std::vector<TH1F*> LHIdOnlyIsoPt;
   std::vector<TH1F*> LHIdOnlyConvPt;
   for (int i=0;i<EgammaLHBasedID.size();++i) {
-    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"Pt", "like ID #eta",   5, LowerPt );
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"Pt", "like ID #eta",   8, LowerPt );
     LHIdPt.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPt", "like ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPt", "like ID #eta",   8, LowerPt );
     LHIdOnlyIDPt.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPt", "like ID #eta",  5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPt", "like ID #eta",  8, LowerPt );
     LHIdOnlyIsoPt.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPt", "like ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPt", "like ID #eta", 8, LowerPt );
     LHIdOnlyConvPt.push_back(aHisto);
   }
 
@@ -4334,13 +4205,13 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   std::vector<TH1F*> CutIdOnlyIsoPtBarrel;
   std::vector<TH1F*> CutIdOnlyConvPtBarrel;
   for (int i=0;i<EgammaCutBasedID.size();++i) {
-    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtBarrel", "cut ID #eta",   5, LowerPt );
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtBarrel", "cut ID #eta",   8, LowerPt );
     CutIdPtBarrel.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtBarrel", "cut ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtBarrel", "cut ID #eta",   8, LowerPt );
     CutIdOnlyIDPtBarrel.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtBarrel", "cut ID #eta",  5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtBarrel", "cut ID #eta",  8, LowerPt );
     CutIdOnlyIsoPtBarrel.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtBarrel", "cut ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtBarrel", "cut ID #eta", 8, LowerPt );
     CutIdOnlyConvPtBarrel.push_back(aHisto);
   }
 
@@ -4350,13 +4221,13 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   std::vector<TH1F*> LHIdOnlyIsoPtBarrel;
   std::vector<TH1F*> LHIdOnlyConvPtBarrel;
   for (int i=0;i<EgammaLHBasedID.size();++i) {
-    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtBarrel", "like ID #eta",   5, LowerPt );
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtBarrel", "like ID #eta",   8, LowerPt );
     LHIdPtBarrel.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtBarrel", "like ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtBarrel", "like ID #eta",   8, LowerPt );
     LHIdOnlyIDPtBarrel.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtBarrel", "like ID #eta",  5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtBarrel", "like ID #eta",  8, LowerPt );
     LHIdOnlyIsoPtBarrel.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtBarrel", "like ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtBarrel", "like ID #eta", 8, LowerPt );
     LHIdOnlyConvPtBarrel.push_back(aHisto);
   }
 
@@ -4371,21 +4242,21 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   std::vector<TH1F*> CutIdOnlyConvPtBarrel2;
 
   for (int i=0;i<EgammaCutBasedID.size();++i) {
-    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtBarrel1", "cut ID #eta",   5, LowerPt );
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtBarrel1", "cut ID #eta",   8, LowerPt );
     CutIdPtBarrel1.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtBarrel1", "cut ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtBarrel1", "cut ID #eta",   8, LowerPt );
     CutIdOnlyIDPtBarrel1.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtBarrel1", "cut ID #eta",  5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtBarrel1", "cut ID #eta",  8, LowerPt );
     CutIdOnlyIsoPtBarrel1.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtBarrel1", "cut ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtBarrel1", "cut ID #eta", 8, LowerPt );
     CutIdOnlyConvPtBarrel1.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtBarrel2", "cut ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtBarrel2", "cut ID #eta",   8, LowerPt );
     CutIdPtBarrel2.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtBarrel2", "cut ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtBarrel2", "cut ID #eta",   8, LowerPt );
     CutIdOnlyIDPtBarrel2.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtBarrel2", "cut ID #eta",  5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtBarrel2", "cut ID #eta",  8, LowerPt );
     CutIdOnlyIsoPtBarrel2.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtBarrel2", "cut ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtBarrel2", "cut ID #eta", 8, LowerPt );
     CutIdOnlyConvPtBarrel2.push_back(aHisto);
   }
 
@@ -4399,21 +4270,21 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   std::vector<TH1F*> LHIdOnlyIsoPtBarrel2;
   std::vector<TH1F*> LHIdOnlyConvPtBarrel2;
   for (int i=0;i<EgammaLHBasedID.size();++i) {
-    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtBarrel1", "like ID #eta",   5, LowerPt );
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtBarrel1", "like ID #eta",   8, LowerPt );
     LHIdPtBarrel1.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtBarrel1", "like ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtBarrel1", "like ID #eta",   8, LowerPt );
     LHIdOnlyIDPtBarrel1.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtBarrel1", "like ID #eta",  5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtBarrel1", "like ID #eta",  8, LowerPt );
     LHIdOnlyIsoPtBarrel1.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtBarrel1", "like ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtBarrel1", "like ID #eta", 8, LowerPt );
     LHIdOnlyConvPtBarrel1.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtBarrel2", "like ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtBarrel2", "like ID #eta",   8, LowerPt );
     LHIdPtBarrel2.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtBarrel2", "like ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtBarrel2", "like ID #eta",   8, LowerPt );
     LHIdOnlyIDPtBarrel2.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtBarrel2", "like ID #eta",  5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtBarrel2", "like ID #eta",  8, LowerPt );
     LHIdOnlyIsoPtBarrel2.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtBarrel2", "like ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtBarrel2", "like ID #eta", 8, LowerPt );
     LHIdOnlyConvPtBarrel2.push_back(aHisto);
   }
 
@@ -4423,13 +4294,13 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   std::vector<TH1F*> CutIdOnlyIsoPtEndcap;
   std::vector<TH1F*> CutIdOnlyConvPtEndcap;
   for (int i=0;i<EgammaCutBasedID.size();++i) {
-    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtEndcap", "cut ID #eta",   5, LowerPt );
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtEndcap", "cut ID #eta",   8, LowerPt );
     CutIdPtEndcap.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtEndcap", "cut ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtEndcap", "cut ID #eta",   8, LowerPt );
     CutIdOnlyIDPtEndcap.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtEndcap", "cut ID #eta",  5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtEndcap", "cut ID #eta",  8, LowerPt );
     CutIdOnlyIsoPtEndcap.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtEndcap", "cut ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtEndcap", "cut ID #eta", 8, LowerPt );
     CutIdOnlyConvPtEndcap.push_back(aHisto);
   }
 
@@ -4439,13 +4310,13 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   std::vector<TH1F*> LHIdOnlyIsoPtEndcap;
   std::vector<TH1F*> LHIdOnlyConvPtEndcap;
   for (int i=0;i<EgammaLHBasedID.size();++i) {
-    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtEndcap", "like ID #eta",   5, LowerPt);
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtEndcap", "like ID #eta",   8, LowerPt);
     LHIdPtEndcap.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtEndcap", "like ID #eta",   5, LowerPt);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtEndcap", "like ID #eta",   8, LowerPt);
     LHIdOnlyIDPtEndcap.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtEndcap", "like ID #eta",  5, LowerPt);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtEndcap", "like ID #eta",  8, LowerPt);
     LHIdOnlyIsoPtEndcap.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtEndcap", "like ID #eta", 5, LowerPt);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtEndcap", "like ID #eta", 8, LowerPt);
     LHIdOnlyConvPtEndcap.push_back(aHisto);
   }
 
@@ -4459,21 +4330,21 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   std::vector<TH1F*> CutIdOnlyConvPtEndcap1;
   std::vector<TH1F*> CutIdOnlyConvPtEndcap2;
   for (int i=0;i<EgammaCutBasedID.size();++i) {
-    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtEndcap1", "cut ID #eta",   5, LowerPt );
+    TH1F* aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtEndcap1", "cut ID #eta",   8, LowerPt );
     CutIdPtEndcap1.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtEndcap1", "cut ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtEndcap1", "cut ID #eta",   8, LowerPt );
     CutIdOnlyIDPtEndcap1.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtEndcap1", "cut ID #eta",  5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtEndcap1", "cut ID #eta",  8, LowerPt );
     CutIdOnlyIsoPtEndcap1.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtEndcap1", "cut ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtEndcap1", "cut ID #eta", 8, LowerPt );
     CutIdOnlyConvPtEndcap1.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtEndcap2", "cut ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"PtEndcap2", "cut ID #eta",   8, LowerPt );
     CutIdPtEndcap2.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtEndcap2", "cut ID #eta",   5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIDPtEndcap2", "cut ID #eta",   8, LowerPt );
     CutIdOnlyIDPtEndcap2.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtEndcap2", "cut ID #eta",  5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyIsoPtEndcap2", "cut ID #eta",  8, LowerPt );
     CutIdOnlyIsoPtEndcap2.push_back(aHisto);
-    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtEndcap2", "cut ID #eta", 5, LowerPt );
+    aHisto = new TH1F( "CutId"+TString(EgammaCutBasedIDWPs[i])+"OnlyConvPtEndcap2", "cut ID #eta", 8, LowerPt );
     CutIdOnlyConvPtEndcap2.push_back(aHisto);
   }
 
@@ -4487,21 +4358,21 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   std::vector<TH1F*> LHIdOnlyConvPtEndcap1;
   std::vector<TH1F*> LHIdOnlyConvPtEndcap2;
   for (int i=0;i<EgammaLHBasedID.size();++i) {
-    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtEndcap1", "like ID #eta",   5, LowerPt);
+    TH1F* aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtEndcap1", "like ID #eta",   8, LowerPt);
     LHIdPtEndcap1.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtEndcap1", "like ID #eta",   5, LowerPt);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtEndcap1", "like ID #eta",   8, LowerPt);
     LHIdOnlyIDPtEndcap1.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtEndcap1", "like ID #eta",  5, LowerPt);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtEndcap1", "like ID #eta",  8, LowerPt);
     LHIdOnlyIsoPtEndcap1.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtEndcap1", "like ID #eta", 5, LowerPt);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtEndcap1", "like ID #eta", 8, LowerPt);
     LHIdOnlyConvPtEndcap1.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtEndcap2", "like ID #eta",   5, LowerPt);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"PtEndcap2", "like ID #eta",   8, LowerPt);
     LHIdPtEndcap2.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtEndcap2", "like ID #eta",   5, LowerPt);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIDPtEndcap2", "like ID #eta",   8, LowerPt);
     LHIdOnlyIDPtEndcap2.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtEndcap2", "like ID #eta",  5, LowerPt);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyIsoPtEndcap2", "like ID #eta",  8, LowerPt);
     LHIdOnlyIsoPtEndcap2.push_back(aHisto);
-    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtEndcap2", "like ID #eta", 5, LowerPt);
+    aHisto = new TH1F( "LHId"+TString(EgammaLHBasedIDWPs[i])+"OnlyConvPtEndcap2", "like ID #eta", 8, LowerPt);
     LHIdOnlyConvPtEndcap2.push_back(aHisto);
   }
 
@@ -4623,6 +4494,8 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v5");
   requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v6");
   requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v7");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v8");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v9");
   // 
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v1");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v2");
@@ -4631,11 +4504,18 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v5");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v6");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v7");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v8");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v9");
   // 
-  // for mc Winter10 and for spring11
-  // requiredTriggers.push_back("HLT_Ele10_SW_L1R_v2");
-  // requiredTriggers.push_back("HLT_Ele17_SW_L1R_v2");
-
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v1");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v2");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v3");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v4");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v5");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v6");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v7");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v8");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v9");
 
   // loop on events
   unsigned int lastLumi = 0;
@@ -4669,16 +4549,16 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     myCounter.IncrVar("event",1);
 
     // event selection: trigger
-    reloadTriggerMask(true);
-    bool passedHLT = hasPassedHLT();
-    if ( !passedHLT ) continue;      
+    reloadTriggerMask(true);           // chiara, to comment when running on MC
+    bool passedHLT = hasPassedHLT();   // chiara, to comment when running on MC
+    if ( !passedHLT ) continue;        // chiara, to comment when running on MC
     myCounter.IncrVar("trigger",1);    
 
     // electrons passing the denominator selection to reduce W and Z contamination
     std::vector<int> denomElectrons;
     for(int iele=0; iele<nEle; iele++) {
-      bool isGoodDenom = isDenomFake_HwwEgamma(iele);    
-      // bool isGoodDenom = isDenomFake_smurfs(iele);
+      // bool isGoodDenom = isDenomFake_HwwEgamma(iele);    
+      bool isGoodDenom = isDenomFake_smurfs(iele);             
       if (!isGoodDenom) continue;
       denomElectrons.push_back(iele);
     } 
@@ -4704,8 +4584,8 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     int leadingJet = -1;
     for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
       TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
-      bool HLTmatch = triggerMatch(p3Jet.Eta(),p3Jet.Phi(),0.2);
-      if (HLTmatch) continue;
+      bool HLTmatch = triggerMatch(p3Jet.Eta(),p3Jet.Phi(),0.2);      // chiara, to comment when running on MC
+      if (HLTmatch) continue;                                         // chiara, to comment when running on MC
       if ( fabs(p3Jet.Eta()) < maxEta && p3Jet.Pt() > maxEt) {   
 	maxEt = p3Jet.Pt();
 	leadingJet = jet;
@@ -4748,8 +4628,8 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     // minimal cut on leading jet or photon ET
     // if (p3LeadingCut.Pt()<15) continue;   
     // if (p3LeadingCut.Pt()<20) continue;   
-    if (p3LeadingCut.Pt()<30) continue;        // chiara
-    // if (p3LeadingCut.Pt()<35) continue;   
+    // if (p3LeadingCut.Pt()<30) continue;        // chiara
+    if (p3LeadingCut.Pt()<35) continue;   
     // if (p3LeadingCut.Pt()<50) continue;   
     myCounter.IncrVar("leadingPT",1);    
     
@@ -4765,11 +4645,12 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     // - sigma ieta ieta
     // - deltaEta
     // - deltaPhi 
-    // conversion rejection ?? 
+    // IP
+    // conversion rejection 
 
     // weight to the events to reweight for jet pT
     float theWeight = 1.;
-
+    
     // fill the denominator: take only the highest pT denominator candidate
     Utils anaUtils;
     float etaFake = fabs(tv3Denom1.Eta()); 
@@ -4828,7 +4709,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
     bool isDenomIP = true;
     int gsfTrack = gsfTrackIndexEle[theDenom1];
     float dxyEle = transvImpactParGsfTrack[gsfTrack];
-    float dzEle  = PVzPV[0] - trackVzGsfTrack[gsfTrack];   
+    float dzEle  = eleDzPV(theDenom1,0);
     if ( fabs(dxyEle)>0.02 ) isDenomIP = false;
     if ( fabs(dzEle)>0.10 )  isDenomIP = false;
     // does this denominator pass the IP cut as for H->WW ?  
@@ -4913,7 +4794,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
 	if (etaRegion==4) CutIdOnlyConvPtEndcap2[icut] -> Fill(etFake, theWeight);      
       }
       
-      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {  // chiara: IP cut added
+      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {
 	CutIdEta[icut]->Fill(etaFake, theWeight);
 	CutIdPt[icut] ->Fill(etFake, theWeight);
 	CutIdPU[icut] ->Fill(nPV, theWeight);
@@ -4943,8 +4824,8 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
       
       // to combine high pT and low pT likelihood
       // this way for 5 and 6 we superimpose in any case the 6 at low pT
-      if(TString(EgammaLHBasedIDWPs[icut].c_str()).Contains("PFIso") && etFake<20.) 
-        isEleID(&EgammaLHBasedID[6],theDenom1,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);    // chiara: ema e' quel che vuoi?
+      if(TString(EgammaLHBasedIDWPs[icut].c_str()).Contains("HyperTightPFIso") && etFake<20.) 
+        isEleID(&EgammaLHBasedID[6],theDenom1,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);    
 
       if ( isEleIDCutBased ) {
 	LHIdOnlyIDEta[icut]->Fill(etaFake, theWeight);
@@ -5006,7 +4887,7 @@ void LikelihoodAnalysis::estimateFakeRateForHToWW_EGAMMA(const char *outname) {
 	if (etaRegion==4) LHIdOnlyConvPtEndcap2[icut] -> Fill(etFake, theWeight);      
       }
       
-      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {  // chiara: IP added
+      if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {  
 	LHIdEta[icut]->Fill(etaFake, theWeight);
 	LHIdPt[icut] ->Fill(etFake, theWeight);
 	LHIdPU[icut] ->Fill(nPV, theWeight);
@@ -5586,10 +5467,6 @@ bool LikelihoodAnalysis::isDenomFake_smurfs(int theEle) {
   
   TVector3 p3Ele(pxEle[theEle], pyEle[theEle], pzEle[theEle]);
   
-  // match with the HLT firing candidates
-  // bool HLTmatch = triggerMatch(p3Ele.Eta(),p3Ele.Phi(),0.2);
-  // if (!HLTmatch) isGoodDenom = false;
-  
   // acceptance for the fake electron
   if( fabs(p3Ele.Eta()) > 2.5 ) isGoodDenom = false;
   if( p3Ele.Pt() < 10. )        isGoodDenom = false;
@@ -5650,10 +5527,18 @@ bool LikelihoodAnalysis::isDenomFake_smurfs(int theEle) {
 
   // impact parameter cuts 
   float dxyEle = transvImpactParGsfTrack[gsf];
-  float dzEle  = PVzPV[0] - trackVzGsfTrack[gsf];
+  float dzEle  = eleDzPV(theEle,0);
   if (fabs(dxyEle)>0.02) isGoodDenom = false;
   if (fabs(dzEle)>0.10)  isGoodDenom = false;
 
   return isGoodDenom;
 }
 
+// to compute the correct dZ wrt PV
+double LikelihoodAnalysis::eleDzPV(int iele, int iPV) {
+  TVector3 PVPos(PVxPV[iPV],PVyPV[iPV],PVzPV[iPV]);
+  int gsfTrack = gsfTrackIndexEle[iele];
+  TVector3 lepVPos(trackVxGsfTrack[gsfTrack],trackVyGsfTrack[gsfTrack],trackVzGsfTrack[gsfTrack]);
+  TVector3 lepMom(pxEle[iele],pyEle[iele],pzEle[iele]);
+  return trackDzPV(PVPos,lepVPos,lepMom);
+}
