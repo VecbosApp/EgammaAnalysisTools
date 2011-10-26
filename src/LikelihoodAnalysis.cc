@@ -5542,3 +5542,9 @@ double LikelihoodAnalysis::eleDzPV(int iele, int iPV) {
   TVector3 lepMom(pxEle[iele],pyEle[iele],pzEle[iele]);
   return trackDzPV(PVPos,lepVPos,lepMom);
 }
+
+/// dz parameter with respect to PV for tracks                                                                                  
+double LikelihoodAnalysis::trackDzPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom) {
+  float trackPt = trackMom.Pt();
+  return (trackVPos.Z()-PVPos.Z()) - ((trackVPos.X()-PVPos.X())*trackMom.X()+(trackVPos.Y()-PVPos.Y())*trackMom.Y())/trackPt *trackMom.Pz()/trackPt;
+}
