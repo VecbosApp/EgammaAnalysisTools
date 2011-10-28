@@ -37,32 +37,42 @@ void RedEleIDTree::addElectronIdBits() {
 
   myTree->Branch("WP95",         &myCutBasedId[0],         "WP95/I");
   myTree->Branch("WP90",         &myCutBasedId[1],         "WP90/I");
-  myTree->Branch("WP80",         &myCutBasedId[2],         "WP80/I");
-  myTree->Branch("WP70",         &myCutBasedId[3],         "WP70/I");
-//   myTree->Branch("CutBasedIdOlyID",    myCutBasedIdOnlyID,   "CutBasedIdOnlyID[4]/I");
-//   myTree->Branch("CutBasedIdOnlyIso",  myCutBasedIdOnlyIso,  "CutBasedIdOnlyIso[4]/I");
-//   myTree->Branch("CutBasedIdOnlyConv", myCutBasedIdOnlyConv, "CutBasedIdOnlyConv[4]/I");
-  myTree->Branch("LHVeryLoose",  &myLHBasedId[0],          "LHVeryLoose/I");
-  myTree->Branch("LHLoose",      &myLHBasedId[1],          "LHLoose/I");
-  myTree->Branch("LHMedium",     &myLHBasedId[2],          "LHMedium/I");
-  myTree->Branch("LHTight",      &myLHBasedId[3],          "LHTight/I");
-  myTree->Branch("LHHyperTight", &myLHBasedId[4],          "LHHyperTight/I");
-//   myTree->Branch("LHBasedIdOlyID",     myLHBasedIdOnlyID,    "LHBasedIdOnlyID[5]/I");
-//   myTree->Branch("LHBasedIdOnlyIso",   myLHBasedIdOnlyIso,   "LHBasedIdOnlyIso[5]/I");
-//   myTree->Branch("LHBasedIdOnlyConv",  myLHBasedIdOnlyConv,  "LHBasedIdOnlyConv[5]/I");
-  myTree->Branch("CiCVeryLoose",       &myCiCBasedId[0],         "CiCVeryLoose/I");
-  myTree->Branch("CiCLoose",           &myCiCBasedId[1],         "CiCLoose/I");
-  myTree->Branch("CiCMedium",          &myCiCBasedId[2],         "CiCMedium/I");
-  myTree->Branch("CiCTight",           &myCiCBasedId[3],         "CiCTight/I");
-  myTree->Branch("CiCSuperTight",      &myCiCBasedId[4],         "CiCSuperTight/I");
-  myTree->Branch("CiCHyperTight",      &myCiCBasedId[5],         "CiCHyperTight/I");
-  myTree->Branch("CiCHyperTight2",     &myCiCBasedId[6],         "CiCHyperTight2/I");
-  myTree->Branch("CiCHyperTight3",     &myCiCBasedId[7],         "CiCHyperTight3/I");
-  myTree->Branch("CiCHyperTight4",     &myCiCBasedId[8],         "CiCHyperTight4/I");
-//   myTree->Branch("CiCBasedIdOlyID",    myCiCBasedIdOnlyID,   "CiCBasedIdOnlyID[9]/I");
-//   myTree->Branch("CiCBasedIdOnlyIso",  myCiCBasedIdOnlyIso,  "CiCBasedIdOnlyIso[9]/I");
-//   myTree->Branch("CiCBasedIdOnlyConv", myCiCBasedIdOnlyConv, "CiCBasedIdOnlyConv[9]/I");
+  myTree->Branch("WP85",         &myCutBasedId[2],         "WP85/I");
+  myTree->Branch("WP80",         &myCutBasedId[3],         "WP80/I");
+  myTree->Branch("WP70",         &myCutBasedId[4],         "WP70/I");
+  myTree->Branch("WPSmurf",      &myCutBasedId[5],         "WPSmurf/I");
+  myTree->Branch("CutBasedIdOlyID",    myCutBasedIdOnlyID,   "CutBasedIdOnlyID[6]/I");
+  myTree->Branch("CutBasedIdOnlyIso",  myCutBasedIdOnlyIso,  "CutBasedIdOnlyIso[6]/I");
+  myTree->Branch("CutBasedIdOnlyConv", myCutBasedIdOnlyConv, "CutBasedIdOnlyConv[6]/I");
 
+  myTree->Branch("LHVeryLoose",  &myLHBasedId[0],            "LHVeryLoose/I");
+  myTree->Branch("LHLoose",      &myLHBasedId[1],            "LHLoose/I");
+  myTree->Branch("LHMedium",     &myLHBasedId[2],            "LHMedium/I");
+  myTree->Branch("LHTight",      &myLHBasedId[3],            "LHTight/I");
+  myTree->Branch("LHHyperTight", &myLHBasedId[4],            "LHHyperTight/I");
+  myTree->Branch("LHBasedIdOlyID",     myLHBasedIdOnlyID,    "LHBasedIdOnlyID[5]/I");
+  myTree->Branch("LHBasedIdOnlyIso",   myLHBasedIdOnlyIso,   "LHBasedIdOnlyIso[5]/I");
+  myTree->Branch("LHBasedIdOnlyConv",  myLHBasedIdOnlyConv,  "LHBasedIdOnlyConv[5]/I");
+
+  myTree->Branch("LHPFIsoVeryLoose",  &myLHBasedPFIsoId[0],            "LHPFIsoVeryLoose/I");
+  myTree->Branch("LHPFIsoLoose",      &myLHBasedPFIsoId[1],            "LHPFIsoLoose/I");
+  myTree->Branch("LHPFIsoMedium",     &myLHBasedPFIsoId[2],            "LHPFIsoMedium/I");
+  myTree->Branch("LHPFIsoTight",      &myLHBasedPFIsoId[3],            "LHPFIsoTight/I");
+  myTree->Branch("LHPFIsoHyperTight", &myLHBasedPFIsoId[4],            "LHPFIsoHyperTight/I");
+  myTree->Branch("LHPFIsoBasedIdOlyID",     myLHBasedPFIsoIdOnlyID,    "LHPFIsoBasedIdOnlyID[5]/I");
+  myTree->Branch("LHPFIsoBasedIdOnlyIso",   myLHBasedPFIsoIdOnlyIso,   "LHPFIsoBasedIdOnlyIso[5]/I");
+  myTree->Branch("LHPFIsoBasedIdOnlyConv",  myLHBasedPFIsoIdOnlyConv,  "LHPFIsoBasedIdOnlyConv[5]/I");
+
+  myTree->Branch("DenomFake",          &myDenomFake,             "DenomFake/I");
+  myTree->Branch("DenomFakeSmurf",     &myDenomFakeSmurf,        "DenomFakeSmurf/I");
+  myTree->Branch("BDTIdOnlyId",        &myBDTIdOnlyId,           "BDTIdOnlyId/I");
+}
+
+void RedEleIDTree::addRunInfos() {
+
+  myTree->Branch("run", &myRun,     "run/I");
+  myTree->Branch("lumi", &myLS,     "lumi/I");
+  myTree->Branch("event", &myEvent, "event/I");
 }
 
 void RedEleIDTree::addAttributesBackground() {
@@ -188,8 +198,8 @@ void RedEleIDTree::fillGamma(float atg, float aeg, float ahg, int ig) {
   myIsGamma=ig;
 }
 
-void RedEleIDTree::fillCutBasedIDBits(int CutBasedId[4], int CutBasedIdOnlyID[4], int CutBasedIdOnlyIso[4], int CutBasedIdOnlyConv[4]) {
-  for(int i=0; i<4; i++) {
+void RedEleIDTree::fillCutBasedIDBits(int CutBasedId[6], int CutBasedIdOnlyID[6], int CutBasedIdOnlyIso[6], int CutBasedIdOnlyConv[6]) {
+  for(int i=0; i<6; i++) {
     myCutBasedId[i] = CutBasedId[i];
     myCutBasedIdOnlyID[i] = CutBasedIdOnlyID[i];
     myCutBasedIdOnlyIso[i] = CutBasedIdOnlyIso[i];
@@ -197,12 +207,21 @@ void RedEleIDTree::fillCutBasedIDBits(int CutBasedId[4], int CutBasedIdOnlyID[4]
   }
 }
 
-void RedEleIDTree::fillLHBasedIDBits(int LHBasedId[4], int LHBasedIdOnlyID[4], int LHBasedIdOnlyIso[4], int LHBasedIdOnlyConv[4]) {
+void RedEleIDTree::fillLHBasedIDBits(int LHBasedId[5], int LHBasedIdOnlyID[5], int LHBasedIdOnlyIso[5], int LHBasedIdOnlyConv[5]) {
   for(int i=0; i<5; i++) {
     myLHBasedId[i] = LHBasedId[i];
     myLHBasedIdOnlyID[i] = LHBasedIdOnlyID[i];
     myLHBasedIdOnlyIso[i] = LHBasedIdOnlyIso[i];
     myLHBasedIdOnlyConv[i] = LHBasedIdOnlyConv[i];
+  }
+}
+
+void RedEleIDTree::fillLHBasedPFIsoIDBits(int LHBasedPFIsoId[5], int LHBasedPFIsoIdOnlyID[5], int LHBasedPFIsoIdOnlyIso[5], int LHBasedPFIsoIdOnlyConv[5]) {
+  for(int i=0; i<5; i++) {
+    myLHBasedPFIsoId[i] = LHBasedPFIsoId[i];
+    myLHBasedPFIsoIdOnlyID[i] = LHBasedPFIsoIdOnlyID[i];
+    myLHBasedPFIsoIdOnlyIso[i] = LHBasedPFIsoIdOnlyIso[i];
+    myLHBasedPFIsoIdOnlyConv[i] = LHBasedPFIsoIdOnlyConv[i];
   }
 }
 
@@ -213,4 +232,19 @@ void RedEleIDTree::fillCiCBasedIDBits(int CiCBasedId[9], int CiCBasedIdOnlyID[9]
     myCiCBasedIdOnlyIso[i] = CiCBasedIdOnlyIso[i];
     myCiCBasedIdOnlyConv[i] = CiCBasedIdOnlyConv[i];
   }
+}
+
+void RedEleIDTree::fillFakeRateDenomBits(int isDenom, int isDenomSmurf) {
+  myDenomFake = isDenom;
+  myDenomFakeSmurf = isDenomSmurf;
+}
+
+void RedEleIDTree::fillBDTBasedIDBits(int isBDTOnlyId) {
+  myBDTIdOnlyId = isBDTOnlyId;
+}
+
+void RedEleIDTree::fillRunInfos(int run, int lumi, int event) {
+  myRun = run;
+  myLS = lumi;
+  myEvent = event;
 }

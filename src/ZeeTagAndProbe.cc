@@ -38,68 +38,126 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
 
   // to read good run list
   if (m_selection->getSwitch("goodRunLS") && m_selection->getSwitch("isData")) {
-    std::string goodRunGiasoneFile = "config/json/myGolden.json";
+    std::string goodRunGiasoneFile = "config/json/goodCollisions2011.json";
     setJsonGoodRunList(goodRunGiasoneFile);
     fillRunLSMap();
   }
 
   // single electron efficiency
-  EgammaCutBasedIDWPs.push_back("WP95");
-  EgammaCutBasedIDWPs.push_back("WP90");
-  EgammaCutBasedIDWPs.push_back("WP85");
-  EgammaCutBasedIDWPs.push_back("WP80");
-  EgammaCutBasedIDWPs.push_back("WP70");
+  // simple cuts 2011 (ours and smurfs)
+  EgammaCutBasedIDLowPtWPs.push_back("WP95");  // 0
+  EgammaCutBasedIDLowPtWPs.push_back("WP90");  // 1
+  EgammaCutBasedIDLowPtWPs.push_back("WP85");  // 2
+  EgammaCutBasedIDLowPtWPs.push_back("WP80");  // 3
+  EgammaCutBasedIDLowPtWPs.push_back("WP70");  // 4
+  EgammaCutBasedIDLowPtWPs.push_back("WP70Smurf");  // 5
 
-  EgammaCiCBasedIDWPs.push_back("CiCVeryLoose");
-  EgammaCiCBasedIDWPs.push_back("CiCLoose");
-  EgammaCiCBasedIDWPs.push_back("CiCMedium");
-  EgammaCiCBasedIDWPs.push_back("CiCTight");
-  EgammaCiCBasedIDWPs.push_back("CiCSuperTight");
-  EgammaCiCBasedIDWPs.push_back("CiCHyperTight");
-  EgammaCiCBasedIDWPs.push_back("CiCHyperTight2");
-  EgammaCiCBasedIDWPs.push_back("CiCHyperTight3");
-  EgammaCiCBasedIDWPs.push_back("CiCHyperTight4");
+  EgammaCutBasedIDHighPtWPs.push_back("WP95");  // 0
+  EgammaCutBasedIDHighPtWPs.push_back("WP90");  // 1
+  EgammaCutBasedIDHighPtWPs.push_back("WP85");  // 2
+  EgammaCutBasedIDHighPtWPs.push_back("WP80");  // 3
+  EgammaCutBasedIDHighPtWPs.push_back("WP70");  // 4
+  EgammaCutBasedIDHighPtWPs.push_back("WP80Smurf");  // 5
 
-  EgammaLHBasedIDWPs.push_back("LHVeryLoose");
-  EgammaLHBasedIDWPs.push_back("LHLoose");
-  EgammaLHBasedIDWPs.push_back("LHMedium");
-  EgammaLHBasedIDWPs.push_back("LHTight");
-  EgammaLHBasedIDWPs.push_back("LHHyperTight");
+  // LH + detector based isolation
+  EgammaLHBasedIDLowPtWPs.push_back("LHVeryLooseLowPt");  // 0
+  EgammaLHBasedIDLowPtWPs.push_back("LHLooseLowPt");  // 1
+  EgammaLHBasedIDLowPtWPs.push_back("LHMediumLowPt");  // 2
+  EgammaLHBasedIDLowPtWPs.push_back("LHTightLowPt");  // 3
+  EgammaLHBasedIDLowPtWPs.push_back("LHHyperTightLowPt");  // 4
+
+  EgammaLHBasedIDHighPtWPs.push_back("LHVeryLoose");  // 0
+  EgammaLHBasedIDHighPtWPs.push_back("LHLoose");  //  1
+  EgammaLHBasedIDHighPtWPs.push_back("LHMedium");  // 2
+  EgammaLHBasedIDHighPtWPs.push_back("LHTight");  // 3
+  EgammaLHBasedIDHighPtWPs.push_back("LHHyperTight");  // 4
+
+  // LH + PFIso
+  EgammaLHBasedPFIsoIDLowPtWPs.push_back("LHVeryLoosePFIsoLowPt"); // 0
+  EgammaLHBasedPFIsoIDLowPtWPs.push_back("LHLoosePFIsoLowPt");  // 1
+  EgammaLHBasedPFIsoIDLowPtWPs.push_back("LHMediumPFIsoLowPt");  // 2
+  EgammaLHBasedPFIsoIDLowPtWPs.push_back("LHTightPFIsoLowPt");  // 3
+  EgammaLHBasedPFIsoIDLowPtWPs.push_back("LHHyperTightPFIsoLowPt");  // 4
+
+  EgammaLHBasedPFIsoIDHighPtWPs.push_back("LHVeryLoosePFIso");  // 0
+  EgammaLHBasedPFIsoIDHighPtWPs.push_back("LHLoosePFIso");  // 1
+  EgammaLHBasedPFIsoIDHighPtWPs.push_back("LHMediumPFIso");  // 2
+  EgammaLHBasedPFIsoIDHighPtWPs.push_back("LHTightPFIso");  // 3
+  EgammaLHBasedPFIsoIDHighPtWPs.push_back("LHHyperTightPFIso");  // 4
+
+
 
   // single electron efficiency
-  for (int i=0;i<EgammaCutBasedIDWPs.size();++i)
+  for (int i=0;i<EgammaCutBasedIDLowPtWPs.size();++i)
     {
       CutBasedEleIDSelector aSelector;
       
       char configDir[50];
-      sprintf(configDir,"config/%s",EgammaCutBasedIDWPs[i].c_str());
-      std::cout << "===== Configuring " <<  EgammaCutBasedIDWPs[i] << " ElectronID ==========" << std::endl;
+      sprintf(configDir,"config/%s",EgammaCutBasedIDLowPtWPs[i].c_str());
+      std::cout << "===== Configuring " <<  EgammaCutBasedIDLowPtWPs[i] << " ElectronID ==========" << std::endl;
       aSelector.ConfigureNoClass(configDir);
       //  aSelector.ConfigureEcalCleaner("config/");
-      EgammaCutBasedID.push_back(aSelector);
-    }  
+      EgammaCutBasedIDLowPt.push_back(aSelector);
+    }
 
-  for (int i=0;i<EgammaLHBasedIDWPs.size();++i)
+  for (int i=0;i<EgammaCutBasedIDHighPtWPs.size();++i)
+    {
+      CutBasedEleIDSelector aSelector;
+      
+      char configDir[50];
+      sprintf(configDir,"config/%s",EgammaCutBasedIDHighPtWPs[i].c_str());
+      std::cout << "===== Configuring " <<  EgammaCutBasedIDHighPtWPs[i] << " ElectronID ==========" << std::endl;
+      aSelector.ConfigureNoClass(configDir);
+      //  aSelector.ConfigureEcalCleaner("config/");
+      EgammaCutBasedIDHighPt.push_back(aSelector);
+    }
+
+  for (int i=0;i<EgammaLHBasedIDLowPtWPs.size();++i)
     {
       CutBasedEleIDSelector aSelector;
 
       char configDir[50];
-      sprintf(configDir,"config/%s",EgammaLHBasedIDWPs[i].c_str());
-      std::cout << "===== Configuring " <<  EgammaLHBasedIDWPs[i] << " ElectronID ==========" << std::endl;
+      sprintf(configDir,"config/%s",EgammaLHBasedIDLowPtWPs[i].c_str());
+      std::cout << "===== Configuring " <<  EgammaLHBasedIDLowPtWPs[i] << " ElectronID ==========" << std::endl;
       aSelector.ConfigureNoClass(configDir);
   //  aSelector.ConfigureEcalCleaner("config/");
-      EgammaLHBasedID.push_back(aSelector);
+      EgammaLHBasedIDLowPt.push_back(aSelector);
     }  
 
-  for (int i=0;i<EgammaCiCBasedIDWPs.size();++i)
+  for (int i=0;i<EgammaLHBasedIDHighPtWPs.size();++i)
     {
-      CiCBasedEleSelector aSelector;
+      CutBasedEleIDSelector aSelector;
 
       char configDir[50];
-      std::cout << "===== Configuring " <<  EgammaCiCBasedIDWPs[i] << " ElectronID ==========" << std::endl;
-      aSelector.Configure(EgammaCiCBasedIDWPs[i],1,1,2);
+      sprintf(configDir,"config/%s",EgammaLHBasedIDHighPtWPs[i].c_str());
+      std::cout << "===== Configuring " <<  EgammaLHBasedIDHighPtWPs[i] << " ElectronID ==========" << std::endl;
+      aSelector.ConfigureNoClass(configDir);
   //  aSelector.ConfigureEcalCleaner("config/");
-      EgammaCiCBasedID.push_back(aSelector);
+      EgammaLHBasedIDHighPt.push_back(aSelector);
+    }  
+
+  for (int i=0;i<EgammaLHBasedPFIsoIDLowPtWPs.size();++i)
+    {
+      CutBasedEleIDSelector aSelector;
+
+      char configDir[50];
+      sprintf(configDir,"config/%s",EgammaLHBasedPFIsoIDLowPtWPs[i].c_str());
+      std::cout << "===== Configuring " <<  EgammaLHBasedPFIsoIDLowPtWPs[i] << " ElectronID ==========" << std::endl;
+      aSelector.ConfigureNoClass(configDir);
+  //  aSelector.ConfigureEcalCleaner("config/");
+      EgammaLHBasedPFIsoIDLowPt.push_back(aSelector);
+    }  
+
+  for (int i=0;i<EgammaLHBasedPFIsoIDHighPtWPs.size();++i)
+    {
+      CutBasedEleIDSelector aSelector;
+
+      char configDir[50];
+      sprintf(configDir,"config/%s",EgammaLHBasedPFIsoIDHighPtWPs[i].c_str());
+      std::cout << "===== Configuring " <<  EgammaLHBasedPFIsoIDHighPtWPs[i] << " ElectronID ==========" << std::endl;
+      aSelector.ConfigureNoClass(configDir);
+  //  aSelector.ConfigureEcalCleaner("config/");
+      EgammaLHBasedPFIsoIDHighPt.push_back(aSelector);
     }  
 
 
@@ -117,9 +175,31 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
   defaultSwitches.m_useEoverP = false;
   defaultSwitches.m_useSigmaPhiPhi = true;
   defaultSwitches.m_useHoverE = false;        
+  defaultSwitches.m_useOneOverEMinusOneOverP = true;
 
   LH = new ElectronLikelihood(&(*EB0lt15dir), &(*EB1lt15dir), &(*EElt15dir), &(*EB0gt15dir), &(*EB1gt15dir), &(*EEgt15dir),
                               defaultSwitches, std::string("class"),std::string("class"),true,true);
+
+  // configuring the electron BDT
+  fMVA = new ElectronIDMVA();
+  fMVA->Initialize("BDTG method",
+                   "elebdtweights/Subdet0LowPt_WithIPInfo_BDTG.weights.xml",
+                   "elebdtweights/Subdet1LowPt_WithIPInfo_BDTG.weights.xml",
+                   "elebdtweights/Subdet2LowPt_WithIPInfo_BDTG.weights.xml",
+                   "elebdtweights/Subdet0HighPt_WithIPInfo_BDTG.weights.xml",
+                   "elebdtweights/Subdet1HighPt_WithIPInfo_BDTG.weights.xml",
+                   "elebdtweights/Subdet2HighPt_WithIPInfo_BDTG.weights.xml" ,                
+                   ElectronIDMVA::kWithIPInfo);
+
+  // Reading GoodRUN LS
+  std::cout << "[GoodRunLS]::goodRunLS is " << m_selection->getSwitch("goodRunLS") << " isData is " <<  m_selection->getSwitch("isData") << std::endl;
+  
+  // To read good run list!
+  if (m_selection->getSwitch("goodRunLS") && m_selection->getSwitch("isData")) {
+    std::string goodRunJsonFile       = "config/json/goodCollisions2011.json";
+    setJsonGoodRunList(goodRunJsonFile);
+    fillRunLSMap();
+  }
 
 }
 
@@ -142,6 +222,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
   reducedTree.addAttributesSignal();
   reducedTree.addElectronIdBits();
   reducedTree.addIsolations();
+  reducedTree.addRunInfos();
   reducedTree.addMore();
   
   // counters
@@ -161,6 +242,12 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
   unsigned int lastLumi=0;
   unsigned int lastRun=0;
 
+  // triggers
+  std::vector<std::string> mask;
+  // do one trigger at a time because one need to match the tag with the single Trigger leg
+  mask.push_back("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v");
+  mask.push_back("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_v");
+
   // loop over entries
   Long64_t nbytes = 0, nb = 0;
   Long64_t nentries = fChain->GetEntries();
@@ -172,7 +259,8 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
-    // reload trigger mask
+    // reload trigger mask (the bit)
+    setRequiredTriggers(mask);
     reloadTriggerMask(true);
     
     // Good Run selection 
@@ -194,7 +282,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
     // trigger
     Utils anaUtils;
     bool passedHLT = hasPassedHLT();
-    if ( m_selection->getSwitch("requireTriggerSignal") && !passedHLT ) continue;   
+    //    if ( !passedHLT ) continue;   
     trigger++;
 
     // best tag-probe pair = mee closest to Z mass
@@ -215,6 +303,8 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
 
         if( m_selection->getSwitch("ptEleAcc")  && (!m_selection->passCut("ptEleAcc",electron1.Pt()) || !m_selection->passCut("ptEleAcc",electron2.Pt()) ) ) continue;
 	elePt++;
+
+        
 	
         mass = (electron1+electron2).M();
         float pull=fabs(mass-91.1876);
@@ -242,6 +332,11 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           probe=electrons[0];
         }
 
+        // match the tag electron
+        bool tagMatch = triggerMatch(etaEle[tag],phiEle[tag],0.2);
+        bool tagProbe = triggerMatch(etaEle[probe],phiEle[probe],0.2);
+        //        if((!tagMatch) || (!tagProbe)) continue;
+
         TLorentzVector probeP4(pxEle[probe],pyEle[probe],pzEle[probe],energyEle[probe]);
         TLorentzVector tagP4(pxEle[tag],    pyEle[tag],  pzEle[tag],  energyEle[tag]);
 
@@ -250,52 +345,66 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
         float pt   = probeP4.Pt();
         float eta  = etaEle[probe];
 
-        // apply the electron ID tight (WP80) on the tag electron
+        // apply the electron ID tight (WP70Smurf) on the tag electron
 	bool tagIdentified, tagIsolated, tagConvRej;
         tagIdentified = tagIsolated = tagConvRej = false;
-        isEleID(&EgammaCutBasedID[2],tag,&tagIdentified,&tagIsolated,&tagConvRej);
+        isEleID(&EgammaCutBasedIDLowPt[5],tag,&tagIdentified,&tagIsolated,&tagConvRej);
         if (tagIdentified && tagIsolated && tagConvRej) {
 
           // look at the probe
-          int CutBasedId[5], CutBasedIdOnlyID[5], CutBasedIdOnlyIso[5], CutBasedIdOnlyConv[5];
-          int CiCBasedId[9], CiCBasedIdOnlyID[9], CiCBasedIdOnlyIso[9], CiCBasedIdOnlyConv[9];
+          int CutBasedId[6], CutBasedIdOnlyID[6], CutBasedIdOnlyIso[6], CutBasedIdOnlyConv[6];
           int LHBasedId[5], LHBasedIdOnlyID[5], LHBasedIdOnlyIso[5], LHBasedIdOnlyConv[5];
+          int LHBasedPFIsoId[5], LHBasedPFIsoIdOnlyID[5], LHBasedPFIsoIdOnlyIso[5], LHBasedPFIsoIdOnlyConv[5];
           
-          for (int icut=0;icut<EgammaCutBasedIDWPs.size();++icut)
+          int cutssize = (pt > 20) ? EgammaCutBasedIDHighPtWPs.size() : EgammaCutBasedIDLowPtWPs.size();
+
+          for (int icut=0;icut<cutssize;++icut)
           {
             bool isEleIDCutBased, isIsolCutBased, isConvRejCutBased;
             isEleIDCutBased = isIsolCutBased = isConvRejCutBased = false;
-            isEleID(&EgammaCutBasedID[icut],probe,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
+            if(pt > 20) isEleID(&EgammaCutBasedIDHighPt[icut],probe,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
+            else {
+              isEleID(&EgammaCutBasedIDLowPt[icut],probe,&isEleIDCutBased,&isIsolCutBased,&isConvRejCutBased);
+              if(TString(EgammaCutBasedIDLowPtWPs[icut].c_str()).Contains("Smurf") && pt<15.) {
+                isEleIDCutBased = isEleIDCutBased && (fbremEle[probe]>0.15 || (fabs(etaEle[probe])<1.0 && eSuperClusterOverPEle[probe]>0.95));
+              }
+            }
             CutBasedIdOnlyID[icut] = (isEleIDCutBased) ? 1 : 0;
             CutBasedIdOnlyIso[icut] = (isIsolCutBased) ? 1 : 0;
             CutBasedIdOnlyConv[icut] = (isConvRejCutBased) ? 1 : 0;
             CutBasedId[icut] = (isEleIDCutBased && isIsolCutBased && isConvRejCutBased) ? 1 : 0;
           }
-
-          for (int icut=0;icut<EgammaLHBasedIDWPs.size();++icut)
+          
+          cutssize = (pt > 20) ? EgammaLHBasedIDHighPtWPs.size() : EgammaLHBasedIDLowPtWPs.size();
+          
+          for (int icut=0;icut<cutssize;++icut)
             {
               bool isEleIDLHBased, isIsolLHBased, isConvRejLHBased;
               isEleIDLHBased = isIsolLHBased = isConvRejLHBased = false;
-              isEleID(&EgammaLHBasedID[icut],probe,&isEleIDLHBased,&isIsolLHBased,&isConvRejLHBased);
+              if(pt > 20) isEleID(&EgammaLHBasedIDHighPt[icut],probe,&isEleIDLHBased,&isIsolLHBased,&isConvRejLHBased);
+              else isEleID(&EgammaLHBasedIDLowPt[icut],probe,&isEleIDLHBased,&isIsolLHBased,&isConvRejLHBased);
               LHBasedIdOnlyID[icut] = (isEleIDLHBased) ? 1 : 0;
               LHBasedIdOnlyIso[icut] = (isIsolLHBased) ? 1 : 0;
               LHBasedIdOnlyConv[icut] = (isConvRejLHBased) ? 1 : 0;
               LHBasedId[icut] = (isEleIDLHBased && isIsolLHBased && isConvRejLHBased) ? 1 : 0;
             }
-              
-          for (int icut=0;icut<EgammaCiCBasedIDWPs.size();++icut)
-            {
-              bool isEleIDCiCBased, isIsolCiCBased, isConvRejCiCBased;
-              isEleIDCiCBased = isIsolCiCBased = isConvRejCiCBased = false;
-              isEleID(&EgammaCiCBasedID[icut],probe,&isEleIDCiCBased,&isIsolCiCBased,&isConvRejCiCBased);
-              CiCBasedIdOnlyID[icut] = (isEleIDCiCBased) ? 1 : 0;
-              CiCBasedIdOnlyIso[icut] = (isIsolCiCBased) ? 1 : 0;
-              CiCBasedIdOnlyConv[icut] = (isConvRejCiCBased) ? 1 : 0;
-              CiCBasedId[icut] = (isEleIDCiCBased && isIsolCiCBased && isConvRejCiCBased) ? 1 : 0;
-            }
 
+          cutssize = (pt > 20) ? EgammaLHBasedPFIsoIDHighPtWPs.size() : EgammaLHBasedPFIsoIDLowPtWPs.size();
+          
+          for (int icut=0;icut<cutssize;++icut)
+            {
+              bool isEleIDLHBasedPFIso, isIsolLHBasedPFIso, isConvRejLHBasedPFIso;
+              isEleIDLHBasedPFIso = isIsolLHBasedPFIso = isConvRejLHBasedPFIso = false;
+              if(pt > 20) isEleID(&EgammaLHBasedPFIsoIDHighPt[icut],probe,&isEleIDLHBasedPFIso,&isIsolLHBasedPFIso,&isConvRejLHBasedPFIso);
+              else isEleID(&EgammaLHBasedPFIsoIDLowPt[icut],probe,&isEleIDLHBasedPFIso,&isIsolLHBasedPFIso,&isConvRejLHBasedPFIso);
+              LHBasedPFIsoIdOnlyID[icut] = (isEleIDLHBasedPFIso) ? 1 : 0;
+              LHBasedPFIsoIdOnlyIso[icut] = (isIsolLHBasedPFIso) ? 1 : 0;
+              LHBasedPFIsoIdOnlyConv[icut] = (isConvRejLHBasedPFIso) ? 1 : 0;
+              LHBasedPFIsoId[icut] = (isEleIDLHBasedPFIso && isIsolLHBasedPFIso && isConvRejLHBasedPFIso) ? 1 : 0;
+            }
+              
           // some eleID variables
-          float HoE, s9s25, deta, dphi, fbrem, see, spp, eopout, eop, nbrems, recoFlag;
+          float HoE, s9s25, deta, dphi, fbrem, see, spp, eopout, eop, nbrems, recoFlag, EleSCEta;
           bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[probe], isEcalDriven);
           HoE = hOverEEle[probe];
           deta = deltaEtaAtVtxEle[probe];
@@ -310,6 +419,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
             see = sqrt(covIEtaIEtaSC[sc]);
             spp = sqrt(covIPhiIPhiSC[sc]);
             recoFlag = recoFlagSC[sc];
+            EleSCEta = etaSC[sc];
           } else {
             int sc = PFsuperClusterIndexEle[probe];
             if(sc>-1) {
@@ -317,6 +427,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
               see = sqrt(covIEtaIEtaPFSC[sc]);
               spp = sqrt(covIPhiIPhiPFSC[sc]);
               recoFlag = recoFlagPFSC[sc];
+              EleSCEta = etaPFSC[sc];
             } else {
               s9s25 = 999.;
               see = 999.;
@@ -325,6 +436,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           }
 
           float lh=likelihoodRatio(probe,*LH);
+          float bdt = eleBDT(fMVA,probe);
 
           // fill the reduced tree
 	  reducedTree.fillVariables(eopout,eop,HoE,deta,dphi,s9s25,see,spp,fbrem,nbrems,pt,eta,charge);
@@ -335,11 +447,13 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           reducedTree.fillMore(nPV,rhoFastjet);
           reducedTree.fillCutBasedIDBits(CutBasedId,CutBasedIdOnlyID,CutBasedIdOnlyIso,CutBasedIdOnlyConv);
           reducedTree.fillLHBasedIDBits(LHBasedId,LHBasedIdOnlyID,LHBasedIdOnlyIso,LHBasedIdOnlyConv);
-          reducedTree.fillCiCBasedIDBits(CiCBasedId,CiCBasedIdOnlyID,CiCBasedIdOnlyIso,CiCBasedIdOnlyConv);
+          reducedTree.fillLHBasedPFIsoIDBits(LHBasedPFIsoId,LHBasedPFIsoIdOnlyID,LHBasedPFIsoIdOnlyIso,LHBasedPFIsoIdOnlyConv);
+          reducedTree.fillFakeRateDenomBits(isDenomFake(probe),isDenomFake_smurfs(probe));
+          reducedTree.fillBDTBasedIDBits(passEleBDT(pt,EleSCEta,bdt));
+          reducedTree.fillRunInfos(runNumber, lumiBlock, eventNumber);
           reducedTree.store();
-
         } // tag identified
-	
+
       } // loop over the 2 Z electrons
       
     } // end tag and probe
@@ -370,7 +484,6 @@ void ZeeTagAndProbe::isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool
 
   Utils anaUtils;
   int gsf = gsfTrackIndexEle[eleIndex];
-  TVector3 pTrkAtOuter(pxAtOuterGsfTrack[gsf],pyAtOuterGsfTrack[gsf],pzAtOuterGsfTrack[gsf]);
 
   TVector3 pEle(pxEle[eleIndex],pyEle[eleIndex],pzEle[eleIndex]);
 
@@ -417,7 +530,8 @@ void ZeeTagAndProbe::isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool
     }
   }
 
-  float lh=likelihoodRatio(eleIndex,*LH);
+  //  float lh=likelihoodRatio(eleIndex,*LH);
+  float lh = eleIdLikelihoodEle[eleIndex];
   bool isEleEB= anaUtils.fiducialFlagECAL(fiducialFlagsEle[eleIndex], isEB);
   selector->SetEcalFiducialRegion( fiducialFlagsEle[eleIndex] );
   selector->SetRecoFlag(recoFlagsEle[eleIndex]);
@@ -434,7 +548,7 @@ void ZeeTagAndProbe::isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool
   selector->SetEOverPout( eopout );
   selector->SetEOverPin( eop );
   selector->SetElectronClass ( classificationEle[eleIndex] );
-  selector->SetEgammaCutBasedID ( anaUtils.electronIdVal(eleIdCutsEle[eleIndex],eleIdLoose) );
+  //  selector->SetEgammaCutBasedID ( anaUtils.electronIdVal(eleIdCutsEle[eleIndex],eleIdLoose) );
   selector->SetLikelihood( lh );
   selector->SetEcalIsolation( (dr03EcalRecHitSumEtEle[eleIndex] - rhoFastjet*TMath::Pi()*0.3*0.3)/pEle.Pt() );
   selector->SetTrkIsolation( (dr03TkSumPtEle[eleIndex] - rhoFastjet*TMath::Pi()*0.3*0.3)/pEle.Pt() );
@@ -443,10 +557,12 @@ void ZeeTagAndProbe::isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool
   if (isEleEB) combinedIso = dr03TkSumPtEle[eleIndex] + TMath::Max(0.0,dr03EcalRecHitSumEtEle[eleIndex]-1.0) + dr03HcalTowerSumEtFullConeEle[eleIndex];
   else combinedIso = dr03TkSumPtEle[eleIndex] + dr03EcalRecHitSumEtEle[eleIndex] + dr03HcalTowerSumEtFullConeEle[eleIndex];
   selector->SetCombinedIsolation( (combinedIso - rhoFastjet*TMath::Pi()*0.3*0.3) / pEle.Pt() ); 
+  selector->SetCombinedPFIsolation( (pfCombinedIsoEle[eleIndex]) / pEle.Pt() );
 
   selector->SetMissingHits( expInnerLayersGsfTrack[gsf] );
   selector->SetConvDist( fabs(convDistEle[eleIndex]) );
   selector->SetConvDcot( fabs(convDcotEle[eleIndex]) );
+  selector->SetHasMatchedConversion ( hasMatchedConversionEle[eleIndex] );
 
   // ECAL cleaning variables
   //selector->m_cleaner->SetE1(e1);
@@ -469,7 +585,6 @@ void ZeeTagAndProbe::isEleID(CiCBasedEleSelector *selector, int eleIndex, bool *
 
   Utils anaUtils;
   int gsf = gsfTrackIndexEle[eleIndex];
-  TVector3 pTrkAtOuter(pxAtOuterGsfTrack[gsf],pyAtOuterGsfTrack[gsf],pzAtOuterGsfTrack[gsf]);
 
   TVector3 pEle(pxEle[eleIndex],pyEle[eleIndex],pzEle[eleIndex]);
 
@@ -531,6 +646,7 @@ void ZeeTagAndProbe::isEleID(CiCBasedEleSelector *selector, int eleIndex, bool *
   //  std::cout << eop << "," <<  eSeedOverPoutEle[eleIndex] << ","<< eseedopin*sce/rawe << "," << fbremEle[eleIndex] << "," << nbremsEle[eleIndex] << std::endl;;
   
   //  float lh=likelihoodRatio(eleIndex,*LH);
+  float lh = eleIdLikelihoodEle[eleIndex];
   selector->reset();
   selector->SetEcalFiducialRegion( fiducialFlagsEle[eleIndex] );
   selector->SetRecoFlag(recoFlagsEle[eleIndex]);
@@ -563,6 +679,148 @@ void ZeeTagAndProbe::isEleID(CiCBasedEleSelector *selector, int eleIndex, bool *
   *isolOutput = selector->outputIso();
   *convRejOutput = selector->outputConv();
 
+}
+
+// denominator for fake rate: for HtoWW, egamma triggers
+int ZeeTagAndProbe::isDenomFake(int theEle) {
+  
+  Utils anaUtils;
+  bool isGoodDenom = true;
+  
+  TVector3 p3Ele(pxEle[theEle], pyEle[theEle], pzEle[theEle]);
+
+  // match with the HLT firing candidates
+  //  bool HLTmatch = triggerMatch(p3Ele.Eta(),p3Ele.Phi(),0.2);
+  //  if (!HLTmatch) isGoodDenom = false;
+  
+  // acceptance for the fake electron
+  if( fabs(p3Ele.Eta()) > 2.5 ) isGoodDenom = false;
+  if( p3Ele.Pt() < 10. )        isGoodDenom = false;
+
+  // barrel or endcap
+  bool isEleEB = anaUtils.fiducialFlagECAL(fiducialFlagsEle[theEle], isEB);    
+
+  // taking shower shape                                                                                                             
+  int sc;
+  bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[theEle], bits::isEcalDriven);
+  float thisSigmaIeIe = -1.;
+  if (ecalDriven) {
+    sc = superClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaSC[sc]);
+  }
+  if (!ecalDriven) {
+    sc = PFsuperClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaPFSC[sc]);
+  }
+  if ( sc<0 ) { isGoodDenom = false; }
+
+  // sigmaIetaIeta                                                                                                                   
+  if ( isEleEB && thisSigmaIeIe>0.01) { isGoodDenom = false; }
+  if (!isEleEB && thisSigmaIeIe>0.03) { isGoodDenom = false; }
+
+  // H/E
+  if ( isEleEB && hOverEEle[theEle]>0.12) isGoodDenom = false;   
+  if (!isEleEB && hOverEEle[theEle]>0.10) isGoodDenom = false;
+  
+  // deltaEta
+  if ( isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.007) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.009) ) isGoodDenom = false;
+  
+  // deltaPhi
+  if ( isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.15) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.10) ) isGoodDenom = false;
+
+  // isolation 
+  float ecalIsol    = (dr03EcalRecHitSumEtEle[theEle])/p3Ele.Pt();
+  float hcalIsol    = (dr03HcalTowerSumEtEle[theEle])/p3Ele.Pt();
+  float trackerIsol = (dr03TkSumPtEle[theEle])/p3Ele.Pt();                
+  if(ecalIsol>0.2)    isGoodDenom = false;
+  if(hcalIsol>0.2)    isGoodDenom = false;
+  if(trackerIsol>0.2) isGoodDenom = false;                                
+   
+  if(isGoodDenom) return 1;
+  return 0;
+}
+
+
+// denominator for fake rate: for HtoWW, egamma triggers, same as smurfs
+int ZeeTagAndProbe::isDenomFake_smurfs(int theEle) {
+  
+  Utils anaUtils;
+  bool isGoodDenom = true;
+  
+  TVector3 p3Ele(pxEle[theEle], pyEle[theEle], pzEle[theEle]);
+  
+  // match with the HLT firing candidates
+  // bool HLTmatch = triggerMatch(p3Ele.Eta(),p3Ele.Phi(),0.2);
+  // if (!HLTmatch) isGoodDenom = false;
+  
+  // acceptance for the fake electron
+  if( fabs(p3Ele.Eta()) > 2.5 ) isGoodDenom = false;
+  if( p3Ele.Pt() < 10. )        isGoodDenom = false;
+
+  // taking shower shape                                                                                                             
+  int sc;
+  bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[theEle], bits::isEcalDriven);
+  float thisSigmaIeIe = -1.;
+  float scEta = -1.;                                                               
+  if (ecalDriven) {
+    sc = superClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaSC[sc]);
+    scEta = etaSC[sc];
+  }
+  if (!ecalDriven) {
+    sc = PFsuperClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaPFSC[sc]);
+    scEta = etaPFSC[sc];
+  }
+  if ( sc<0 ) { isGoodDenom = false; }
+
+  // barrel or endcap
+  bool isEleEB = false;
+  if (fabs(scEta)<1.479) isEleEB = true;   
+  
+  // sigmaIetaIeta                                                                                                                   
+  if ( isEleEB && thisSigmaIeIe>0.01) { isGoodDenom = false; }
+  if (!isEleEB && thisSigmaIeIe>0.03) { isGoodDenom = false; }
+
+  // isolation
+  float ecalIsolAbs = 0.0;
+  if ( isEleEB ) ecalIsolAbs = max(0.0,dr03EcalRecHitSumEtEle[theEle]-1.0);
+  else ecalIsolAbs = dr03EcalRecHitSumEtEle[theEle];
+  float ecalIsol = ecalIsolAbs/p3Ele.Pt(); 
+  float hcalIsol    = (dr03HcalTowerSumEtEle[theEle])/p3Ele.Pt();
+  float trackerIsol = (dr03TkSumPtEle[theEle])/p3Ele.Pt();                
+  if(ecalIsol>0.2)    isGoodDenom = false;
+  if(hcalIsol>0.2)    isGoodDenom = false;
+  if(trackerIsol>0.2) isGoodDenom = false;                                
+
+  // H/E
+  if ( isEleEB && hOverEEle[theEle]>0.12) isGoodDenom = false;   
+  if (!isEleEB && hOverEEle[theEle]>0.10) isGoodDenom = false;
+  
+  // deltaEta
+  if ( isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.007) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.009) ) isGoodDenom = false;
+  
+  // deltaPhi
+  if ( isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.15) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.10) ) isGoodDenom = false;
+  
+  // full conversion rejection 
+  int gsf = gsfTrackIndexEle[theEle];
+  int missHits = expInnerLayersGsfTrack[gsf];
+  bool matchConv = hasMatchedConversionEle[theEle];
+  if (missHits>0 || matchConv) isGoodDenom = false;
+
+  // impact parameter cuts 
+  float dxyEle = transvImpactParGsfTrack[gsf];
+  float dzEle  = PVzPV[0] - trackVzGsfTrack[gsf];
+  if (fabs(dxyEle)>0.02) isGoodDenom = false;
+  if (fabs(dzEle)>0.10)  isGoodDenom = false;
+
+  if(isGoodDenom) return 1;
+  return 0;
 }
 
 

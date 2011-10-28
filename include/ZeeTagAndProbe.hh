@@ -13,6 +13,7 @@
 #include "EgammaAnalysisTools/include/CiCBasedEleSelector.hh"
 #include "EgammaAnalysisTools/include/Egamma.h"
 #include "EgammaAnalysisTools/include/ElectronLikelihood.h"
+#include "EgammaAnalysisTools/include/ElectronIDMVA.h"
 #include <TLorentzVector.h>
 
 class ZeeTagAndProbe : public Egamma {
@@ -35,18 +36,22 @@ private:
 
   //! apply the custom offline electron ID
   void isEleID(CiCBasedEleSelector *selector, int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput);
+
+  //! for the prompt rate for fake rate
+  int isDenomFake(int eleIndex);
+  int isDenomFake_smurfs(int theEle);
   
   float SigmaiEiE(int electron);
   float SigmaiPiP(int electron);
   
   //! class members
-  std::vector<CutBasedEleIDSelector> EgammaCutBasedID;
-  std::vector<CiCBasedEleSelector> EgammaCiCBasedID;
-  std::vector<CutBasedEleIDSelector> EgammaLHBasedID;
+  std::vector<CutBasedEleIDSelector> EgammaCutBasedIDLowPt, EgammaCutBasedIDHighPt;
+  std::vector<CutBasedEleIDSelector> EgammaLHBasedIDLowPt, EgammaLHBasedIDHighPt;
+  std::vector<CutBasedEleIDSelector> EgammaLHBasedPFIsoIDLowPt, EgammaLHBasedPFIsoIDHighPt;
 
-  std::vector<std::string> EgammaCutBasedIDWPs;
-  std::vector<std::string> EgammaCiCBasedIDWPs;
-  std::vector<std::string> EgammaLHBasedIDWPs;
+  std::vector<std::string> EgammaCutBasedIDLowPtWPs, EgammaCutBasedIDHighPtWPs;
+  std::vector<std::string> EgammaLHBasedIDLowPtWPs, EgammaLHBasedIDHighPtWPs;
+  std::vector<std::string> EgammaLHBasedPFIsoIDLowPtWPs, EgammaLHBasedPFIsoIDHighPtWPs;
 
   ElectronLikelihood *LH;
 
@@ -57,6 +62,9 @@ private:
 
   // the tag and the probe
   int electrons[2];
+
+  /// MVA for electron ID. To be created and initialized from the children classes
+  ElectronIDMVA *fMVA;
 
 };
 

@@ -19,6 +19,8 @@ public:
   void addElectronIdBits();
   void addIsolations();
   void addGamma();
+  //! add run,lumi, event number (for data)
+  void addRunInfos();
 
   //! fill the tree with electron id variables
   void fillVariables(float EoPout, float EoP, float HoE, float DEta, float DPhi, float s9s25, float See, float Spp, float fbrem, int nbrems, float pt, float eta, int charge);
@@ -28,9 +30,12 @@ public:
   void fillIsolations(float tkIso, float ecalIso, float hcalIso);
 
   //! fill the electron ID bits
-  void fillCutBasedIDBits(int CutBasedId[4], int CutBasedIdOnlyID[4], int CutBasedIdOnlyIso[4], int CutBasedIdOnlyConv[4]);
+  void fillCutBasedIDBits(int CutBasedId[6], int CutBasedIdOnlyID[6], int CutBasedIdOnlyIso[6], int CutBasedIdOnlyConv[6]);
   void fillLHBasedIDBits(int LHBasedId[5], int LHBasedIdOnlyID[5], int LHBasedIdOnlyIso[5], int LHBasedIdOnlyConv[5]);
+  void fillLHBasedPFIsoIDBits(int LHBasedPFIsoId[5], int LHBasedPFIsoIdOnlyID[5], int LHBasedPFIsoIdOnlyIso[5], int LHBasedPFIsoIdOnlyConv[5]);
   void fillCiCBasedIDBits(int CiCBasedId[9], int CiCBasedIdOnlyID[9], int CiCBasedIdOnlyIso[9], int CiCBasedIdOnlyConv[9]);
+  void fillFakeRateDenomBits(int isDenom, int isDenomSmurf);
+  void fillBDTBasedIDBits(int isBDTOnlyId);
 
   //! fill electron attributes + z mass for the tag and probe
   //! note: when both electrons from Z are probes, the same Z mass is repeated
@@ -41,6 +46,8 @@ public:
   void fillCategories(int iecal, int iptbin, int iclass, int nbr);
   void fillMore(float nVtx, float rho);
   void fillGamma(float atg, float aeg, float ahg, int ig);
+  //! fill the run,lumi, event number
+  void fillRunInfos(int run, int lumi, int event);   
 
   void store();
   void save();
@@ -63,12 +70,16 @@ private:
   int myCharge;
   float myEta;
   float myPt;
+  int myRun, myLS, myEvent;
 
   float myZmass;
 
-  int myCutBasedId[4], myCutBasedIdOnlyID[4], myCutBasedIdOnlyIso[4], myCutBasedIdOnlyConv[4];
+  int myCutBasedId[6], myCutBasedIdOnlyID[6], myCutBasedIdOnlyIso[6], myCutBasedIdOnlyConv[6];
   int myLHBasedId[5], myLHBasedIdOnlyID[5], myLHBasedIdOnlyIso[5], myLHBasedIdOnlyConv[5];
+  int myLHBasedPFIsoId[5], myLHBasedPFIsoIdOnlyID[5], myLHBasedPFIsoIdOnlyIso[5], myLHBasedPFIsoIdOnlyConv[5];
   int myCiCBasedId[9], myCiCBasedIdOnlyID[9], myCiCBasedIdOnlyIso[9], myCiCBasedIdOnlyConv[9];
+  int myDenomFake, myDenomFakeSmurf;
+  int myBDTIdOnlyId;
 
   float myQCDDeltaphi;
   float myQCDInvmass;

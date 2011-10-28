@@ -7,6 +7,7 @@
 
 #include "EgammaAnalysisTools/include/ElectronLikelihood.h"
 #include "EgammaAnalysisTools/include/EgammaBase.h"
+#include "EgammaAnalysisTools/include/ElectronIDMVA.h"
 // ROOT includes
 #include <TLorentzVector.h>
 #include <TVector3.h>
@@ -56,6 +57,10 @@ public:
   float SigmaiPiP(int electron);
   // get the likelihood electron ID
   float likelihoodRatio(int eleIndex, ElectronLikelihood &lh);
+  /// return the value of electron BDT
+  float eleBDT(ElectronIDMVA *mva, int iele);
+  /// apply the BDT cut
+  bool passEleBDT(float pt, float eta, float bdtoutput);
 
 protected:
   ///goodRUN/LS list
@@ -71,7 +76,14 @@ protected:
   /// calculate transverse mass
   /// definitions in http://indico.cern.ch/getFile.py/access?contribId=4&resId=0&materialId=slides&confId=104213
   float mT3(TLorentzVector pl1, TLorentzVector pl2, TVector3 met);
-
+  /// dxy, dz and dsz parameters with respect to PV for tracks
+  double trackDxyPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom);
+  double trackDzPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom);
+  double trackDszPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom);
+  /// dxy, dz and dsz parameters with respect to PV for electrons
+  double eleDxyPV(int iele, int iPV);
+  double eleDzPV(int iele, int iPV);
+  double eleDszPV(int iele, int iPV);
 
   /// some useful template  
   template <typename T>

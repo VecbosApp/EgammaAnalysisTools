@@ -110,7 +110,9 @@ bool Egamma::reloadTriggerMask(bool newVersion)
       {   
         for(unsigned int i=0; i<nameHLT->size(); i++)
           {
-            if( !strcmp ((*fIter).c_str(), nameHLT->at(i).c_str() ) )
+            //if( !strcmp ((*fIter).c_str(), nameHLT->at(i).c_str() ) )
+            // nameHLT[i] has ..._vXXX
+            if(nameHLT->at(i).find(*fIter) != std::string::npos)
               {
                 triggerMask.push_back( indexHLT[i] ) ;
                 break;
@@ -261,3 +263,133 @@ bool Egamma::triggerMatch(float eta, float phi, float Dr){
   return match;
 }
 
+// dxy parameter with respect to PV for tracks
+double Egamma::trackDxyPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom) {
+  return ( - (trackVPos.X()-PVPos.X())*trackMom.Y() + (trackVPos.Y()-PVPos.Y())*trackMom.X() ) / trackMom.Pt(); 
+}
+
+/// dz parameter with respect to PV for tracks
+double Egamma::trackDzPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom) {
+  float trackPt = trackMom.Pt();
+  return (trackVPos.Z()-PVPos.Z()) - ((trackVPos.X()-PVPos.X())*trackMom.X()+(trackVPos.Y()-PVPos.Y())*trackMom.Y())/trackPt *trackMom.Pz()/trackPt; 
+}
+
+/// dsz parameter with respect to PV for tracks
+double Egamma::trackDszPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom) {
+  float trackPt = trackMom.Pt();
+  float trackP  = trackMom.Mag();
+  return (trackVPos.Z()-PVPos.Z())*trackPt/trackP - ((trackVPos.X()-PVPos.X())*trackMom.X()+(trackVPos.Y()-PVPos.Y())*trackMom.Y())/trackPt *trackMom.Pz()/trackP; 
+}
+
+/// dxy, dz and dsz parameters with respect to PV for electrons
+double Egamma::eleDxyPV(int iele, int iPV) {
+  TVector3 PVPos(PVxPV[iPV],PVyPV[iPV],PVzPV[iPV]);
+  int gsfTrack = gsfTrackIndexEle[iele];
+  TVector3 lepVPos(trackVxGsfTrack[gsfTrack],trackVyGsfTrack[gsfTrack],trackVzGsfTrack[gsfTrack]);
+  TVector3 lepMom(pxEle[iele],pyEle[iele],pzEle[iele]);
+  return trackDxyPV(PVPos,lepVPos,lepMom);
+}
+
+double Egamma::eleDzPV(int iele, int iPV) {
+  TVector3 PVPos(PVxPV[iPV],PVyPV[iPV],PVzPV[iPV]);
+  int gsfTrack = gsfTrackIndexEle[iele];
+  TVector3 lepVPos(trackVxGsfTrack[gsfTrack],trackVyGsfTrack[gsfTrack],trackVzGsfTrack[gsfTrack]);
+  TVector3 lepMom(pxEle[iele],pyEle[iele],pzEle[iele]);
+  return trackDzPV(PVPos,lepVPos,lepMom);
+}
+
+double Egamma::eleDszPV(int iele, int iPV) {
+  TVector3 PVPos(PVxPV[iPV],PVyPV[iPV],PVzPV[iPV]);
+  int gsfTrack = gsfTrackIndexEle[iele];
+  TVector3 lepVPos(trackVxGsfTrack[gsfTrack],trackVyGsfTrack[gsfTrack],trackVzGsfTrack[gsfTrack]);
+  TVector3 lepMom(pxEle[iele],pyEle[iele],pzEle[iele]);
+  return trackDszPV(PVPos,lepVPos,lepMom);
+}
+
+float Egamma::eleBDT(ElectronIDMVA *mva, int eleIndex) {
+  
+  if(mva==0) {
+    std::cout << "electron BDT not created/initialized. BIG PROBLEM. Returning false output -999!" << std::endl; 
+    return -999.;
+  }
+  
+  int gsfTrack = gsfTrackIndexEle[eleIndex]; 
+
+  float ElePt = GetPt(pxEle[eleIndex],pyEle[eleIndex]);
+
+  float EleDEtaIn = deltaEtaAtVtxEle[eleIndex];
+  float EleDPhiIn = deltaPhiAtVtxEle[eleIndex];
+  float EleHoverE = hOverEEle[eleIndex];
+  float EleD0 = transvImpactParGsfTrack[gsfTrack];
+  float EleFBrem = fbremEle[eleIndex];
+  float EleEOverP = eSuperClusterOverPEle[eleIndex];
+  float EleESeedClusterOverPout = eSeedOverPoutEle[eleIndex];
+  float EleNBrem = nbremsEle[eleIndex];
+  TVector3 pInGsf(pxGsfTrack[gsfTrack],pyGsfTrack[gsfTrack],pzGsfTrack[gsfTrack]);
+
+  double gsfsign   = (-eleDxyPV(eleIndex,0) >=0 ) ? 1. : -1.;
+  float EleIP3d = gsfsign * impactPar3DGsfTrack[gsfTrack];
+  float EleIP3dSig = EleIP3d/impactPar3DErrorGsfTrack[gsfTrack];
+
+  // we have not pout and seed cluster energy in the trees. Gymnastyc...
+  float Pout = pInGsf.Mag() - fbremEle[eleIndex] * pInGsf.Mag();
+  float SCSeedEnergy = EleESeedClusterOverPout * Pout;
+  float EleESeedClusterOverPIn = SCSeedEnergy/pInGsf.Mag();      
+
+  float EleSigmaIEtaIEta, EleSigmaIPhiIPhi, EleOneOverEMinusOneOverP, EleSCEta;
+
+  Utils anaUtils;
+  bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[eleIndex], isEcalDriven);
+  if(ecaldriven) {
+    int sc = superClusterIndexEle[eleIndex];
+    EleSigmaIEtaIEta = sqrt(covIEtaIEtaSC[sc]);
+    EleSigmaIPhiIPhi = sqrt(covIPhiIPhiSC[sc]);
+    EleOneOverEMinusOneOverP = 1./energySC[sc]  - 1./pInGsf.Mag();
+    EleSCEta = etaSC[sc];
+  } else {
+    int sc = PFsuperClusterIndexEle[eleIndex];
+    if(sc>-1) {
+      EleSigmaIEtaIEta = sqrt(covIEtaIEtaPFSC[sc]);
+      EleSigmaIPhiIPhi = sqrt(covIPhiIPhiPFSC[sc]);
+      EleOneOverEMinusOneOverP = 1./energyPFSC[sc]  - 1./pInGsf.Mag();
+      EleSCEta = etaPFSC[sc];
+    } else {
+      EleSigmaIEtaIEta = 999.;
+      EleSigmaIPhiIPhi = 999.;
+      EleOneOverEMinusOneOverP = 999.;
+      EleESeedClusterOverPIn = 999.;
+      EleSCEta = 0.;
+    }
+  }
+
+  return mva->MVAValue(ElePt, EleSCEta,
+                       EleSigmaIEtaIEta,
+                       EleDEtaIn,
+                       EleDPhiIn,
+                       EleHoverE,
+                       EleD0,
+                       EleFBrem,
+                       EleEOverP,
+                       EleESeedClusterOverPout,
+                       EleSigmaIPhiIPhi,
+                       EleNBrem,
+                       EleOneOverEMinusOneOverP,
+                       EleESeedClusterOverPIn,
+                       EleIP3d,
+                       EleIP3dSig );
+
+}
+
+bool Egamma::passEleBDT(float pt, float eta, float bdt) {
+
+  if(pt < 20 && fabs(eta) < 1.0) return (bdt > 0.139);
+  if(pt < 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdt > 0.525);
+  if(pt < 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdt > 0.543);
+  if(pt >= 20 && fabs(eta) < 1.0) return (bdt > 0.947);
+  if(pt >= 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdt > 0.950);
+  if(pt >= 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdt > 0.884);
+
+  // here we are cutting the events with |SC eta|>2.5. If the acceptance is done with |ele eta|<2.5 then will cut some event more. Fine. Synch with this.
+  return false;
+
+}
