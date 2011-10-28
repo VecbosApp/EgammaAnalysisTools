@@ -4,7 +4,7 @@
 
 ROOTCFLAGS    = $(shell root-config --cflags)
 ROOTLIBS      = $(shell root-config --libs)
-ROOTGLIBS     = $(shell root-config --glibs)
+ROOTGLIBS     = $(shell root-config --glibs) -lTMVA
 
 CXX           = g++
 CXXFLAGS      = -g -fPIC -Wno-deprecated -O -ansi -D_GNU_SOURCE -g -O2
@@ -92,6 +92,8 @@ $(OUTLIBCOMMON)SprDataFiller.o: $(INCLUDEDIRCOMMON)/CommonTools/src/SprDataFille
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)SprDataFiller.o $<
 $(OUTLIBCOMMON)TriggerMask.o: $(INCLUDEDIRCOMMON)/CommonTools/src/TriggerMask.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)TriggerMask.o $<
+$(OUTLIB)ElectronIDMVA.o: $(INCLUDEDIR)/src/ElectronIDMVA.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ElectronIDMVA.o $<
 $(OUTLIB)RedEleIDTree.o: $(INCLUDEDIR)/src/RedEleIDTree.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RedEleIDTree.o $<
 $(OUTLIB)FakeTree.o: $(INCLUDEDIR)/src/FakeTree.cc
@@ -140,6 +142,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIBCOMMON)SprDataFiller.o \
 	$(OUTLIBCOMMON)TriggerMask.o \
 	$(OUTLIBCOMMON)Utils.o \
+	$(OUTLIB)ElectronIDMVA.o \
 	$(OUTLIB)RedEleIDTree.o \
 	$(OUTLIB)FakeTree.o \
 	$(OUTLIB)sPlotsPdfsComparison.o \
