@@ -559,7 +559,7 @@ void ZeeTagAndProbe::isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool
   selector->SetCombinedIsolation( (combinedIso - rhoFastjet*TMath::Pi()*0.3*0.3) / pEle.Pt() ); 
 
   // selector->SetCombinedPFIsolation( (pfCombinedIsoEle[eleIndex]) / pEle.Pt() );
-  selector->SetCombinedPFIsolation( (pfCombinedIsoEle[eleIndex] - rhoFastjet*TMath::Pi()*0.3*0.3) / pEle.Pt() );
+  selector->SetCombinedPFIsolation( (pfCombinedIsoEle[eleIndex] - rhoFastjet*TMath::Pi()*0.4*0.4) / pEle.Pt() );
 
   selector->SetMissingHits( expInnerLayersGsfTrack[gsf] );
   selector->SetConvDist( fabs(convDistEle[eleIndex]) );
