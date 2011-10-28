@@ -557,7 +557,9 @@ void ZeeTagAndProbe::isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool
   if (isEleEB) combinedIso = dr03TkSumPtEle[eleIndex] + TMath::Max(0.0,dr03EcalRecHitSumEtEle[eleIndex]-1.0) + dr03HcalTowerSumEtFullConeEle[eleIndex];
   else combinedIso = dr03TkSumPtEle[eleIndex] + dr03EcalRecHitSumEtEle[eleIndex] + dr03HcalTowerSumEtFullConeEle[eleIndex];
   selector->SetCombinedIsolation( (combinedIso - rhoFastjet*TMath::Pi()*0.3*0.3) / pEle.Pt() ); 
-  selector->SetCombinedPFIsolation( (pfCombinedIsoEle[eleIndex]) / pEle.Pt() );
+
+  // selector->SetCombinedPFIsolation( (pfCombinedIsoEle[eleIndex]) / pEle.Pt() );
+  selector->SetCombinedPFIsolation( (pfCombinedIsoEle[eleIndex] - rhoFastjet*TMath::Pi()*0.3*0.3) / pEle.Pt() );
 
   selector->SetMissingHits( expInnerLayersGsfTrack[gsf] );
   selector->SetConvDist( fabs(convDistEle[eleIndex]) );
@@ -741,7 +743,6 @@ int ZeeTagAndProbe::isDenomFake(int theEle) {
   if(isGoodDenom) return 1;
   return 0;
 }
-
 
 // denominator for fake rate: for HtoWW, egamma triggers, same as smurfs
 int ZeeTagAndProbe::isDenomFake_smurfs(int theEle) {
