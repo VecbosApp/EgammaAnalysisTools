@@ -314,20 +314,20 @@ float Egamma::eleBDT(ElectronIDMVA *mva, int eleIndex) {
   }
   
   int gsfTrack = gsfTrackIndexEle[eleIndex]; 
+  double gsfsign   = (-eleDxyPV(eleIndex,0) >=0 ) ? 1. : -1.;
 
   float ElePt = GetPt(pxEle[eleIndex],pyEle[eleIndex]);
 
   float EleDEtaIn = deltaEtaAtVtxEle[eleIndex];
   float EleDPhiIn = deltaPhiAtVtxEle[eleIndex];
   float EleHoverE = hOverEEle[eleIndex];
-  float EleD0 = transvImpactParGsfTrack[gsfTrack];
+  float EleD0 = gsfsign * transvImpactParGsfTrack[gsfTrack];
   float EleFBrem = fbremEle[eleIndex];
   float EleEOverP = eSuperClusterOverPEle[eleIndex];
   float EleESeedClusterOverPout = eSeedOverPoutEle[eleIndex];
   float EleNBrem = nbremsEle[eleIndex];
   TVector3 pInGsf(pxGsfTrack[gsfTrack],pyGsfTrack[gsfTrack],pzGsfTrack[gsfTrack]);
 
-  double gsfsign   = (-eleDxyPV(eleIndex,0) >=0 ) ? 1. : -1.;
   float EleIP3d = gsfsign * impactPar3DGsfTrack[gsfTrack];
   float EleIP3dSig = EleIP3d/impactPar3DErrorGsfTrack[gsfTrack];
 
