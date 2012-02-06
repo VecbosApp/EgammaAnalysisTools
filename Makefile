@@ -94,6 +94,8 @@ $(OUTLIBCOMMON)TriggerMask.o: $(INCLUDEDIRCOMMON)/CommonTools/src/TriggerMask.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)TriggerMask.o $<
 $(OUTLIB)ElectronIDMVA.o: $(INCLUDEDIR)/src/ElectronIDMVA.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ElectronIDMVA.o $<
+$(OUTLIB)ElectronIDMVAHZZ.o: $(INCLUDEDIR)/src/ElectronIDMVAHZZ.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ElectronIDMVAHZZ.o $<
 $(OUTLIB)RedEleIDTree.o: $(INCLUDEDIR)/src/RedEleIDTree.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RedEleIDTree.o $<
 $(OUTLIB)FakeTree.o: $(INCLUDEDIR)/src/FakeTree.cc
@@ -143,6 +145,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIBCOMMON)TriggerMask.o \
 	$(OUTLIBCOMMON)Utils.o \
 	$(OUTLIB)ElectronIDMVA.o \
+	$(OUTLIB)ElectronIDMVAHZZ.o \
 	$(OUTLIB)RedEleIDTree.o \
 	$(OUTLIB)FakeTree.o \
 	$(OUTLIB)sPlotsPdfsComparison.o \
