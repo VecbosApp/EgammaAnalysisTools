@@ -69,11 +69,11 @@ void RedEleIDTree::addElectronIdBits() {
 }
 
 void RedEleIDTree::addRunInfos() {
-
-  myTree->Branch("run", &myRun,     "run/I");
-  myTree->Branch("lumi", &myLS,     "lumi/I");
-  myTree->Branch("event", &myEvent, "event/I");
-  myTree->Branch("npu", myNpu, "npu[3]/I");
+  myTree->Branch("run",     &myRun,     "run/I");
+  myTree->Branch("lumi",    &myLS,      "lumi/I");
+  myTree->Branch("event",   &myEvent,   "event/I");
+  myTree->Branch("npu",      myNpu,     "npu[3]/I");
+  myTree->Branch("mcmatch", &myMCMatch, "mcmatch/I");
 }
 
 void RedEleIDTree::addAttributesBackground() {
@@ -258,9 +258,10 @@ void RedEleIDTree::fillBDTBasedIDBits(int isBDTOnlyId) {
   myBDTIdOnlyId = isBDTOnlyId;
 }
 
-void RedEleIDTree::fillRunInfos(int run, int lumi, int event, int npu[3]) {
+void RedEleIDTree::fillRunInfos(int run, int lumi, int event, int npu[3], int mcmatch) {
   myRun = run;
   myLS = lumi;
   myEvent = event;
   for(int i=0;i<3;i++) myNpu[i]=npu[i];
+  myMCMatch = mcmatch;
 }

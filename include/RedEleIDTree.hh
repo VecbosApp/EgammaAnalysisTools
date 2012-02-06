@@ -48,8 +48,8 @@ public:
   void fillCategories(int iecal, int iptbin, int iclass, int nbr);
   void fillMore(float nVtx, float rho, float bdthww, float bdthzz);
   void fillGamma(float atg, float aeg, float ahg, int ig);
-  //! fill the run,lumi, event number
-  void fillRunInfos(int run, int lumi, int event, int npu[3]);   
+  //! fill the run,lumi, event number, mc match
+  void fillRunInfos(int run, int lumi, int event, int npu[3], int mcmatch);   
 
   void store();
   void save();
@@ -73,7 +73,7 @@ private:
   float myEta;
   float myPt;
   int myNpu[3];
-  int myRun, myLS, myEvent;
+  int myRun, myLS, myEvent, myMCMatch;
 
   float myZmass;
 
