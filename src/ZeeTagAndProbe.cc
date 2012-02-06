@@ -285,10 +285,10 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
     }
     allevents++;
     
-    // trigger
+    // trigger on data
     Utils anaUtils;
     bool passedHLT = hasPassedHLT();
-    //    if ( !passedHLT ) continue;   
+    if (isData_ && !passedHLT ) continue;   
     trigger++;
 
     // best tag-probe pair = mee closest to Z mass
@@ -338,7 +338,10 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           probe=electrons[0];
         }
 
-        // match the tag electron
+        bool mcmatch=false;
+        if(!isData_) mcmatch = mcMatches(probe,tag);
+
+        // match the tag electron with HLT candidate
         bool tagMatch = triggerMatch(etaEle[tag],phiEle[tag],0.2);
         bool tagProbe = triggerMatch(etaEle[probe],phiEle[probe],0.2);
         //        if((!tagMatch) || (!tagProbe)) continue;
@@ -459,7 +462,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           reducedTree.fillLHBasedPFIsoIDBits(LHBasedPFIsoId,LHBasedPFIsoIdOnlyID,LHBasedPFIsoIdOnlyIso,LHBasedPFIsoIdOnlyConv);
           reducedTree.fillFakeRateDenomBits(isDenomFake(probe),isDenomFake_smurfs(probe));
           reducedTree.fillBDTBasedIDBits(passEleBDT(pt,EleSCEta,bdthww));
-          reducedTree.fillRunInfos(runNumber, lumiBlock, eventNumber, nPU);
+          reducedTree.fillRunInfos(runNumber, lumiBlock, eventNumber, nPU, mcmatch);
           reducedTree.store();
         } // tag identified
 
@@ -845,3 +848,40 @@ void ZeeTagAndProbe::configSelection(Selection* selection) {
 
 }
 
+
+bool ZeeTagAndProbe::mcMatches(int probe, int tag) {
+  
+  bool probematch=true;
+  bool tagmatch=true;
+
+  int ep,em;
+  ep=em=-1;
+  
+  for(int imc=0; imc<16; ++imc) {
+    if(idMc[imc]==11 && abs(idMc[mothMc[imc]])==23) em=imc;
+    else if(idMc[imc]==-11 && abs(idMc[mothMc[imc]])==23) ep=imc;
+    if(em>-1 && ep>-1) break;
+  }
+  
+  TVector3 probeP(pxEle[probe],pyEle[probe],pzEle[probe]);
+  int probemc, tagmc;
+  probemc=tagmc=-1;
+  if(chargeEle[probe]>0) {
+    probemc=ep;
+    tagmc=em;
+  } else {
+    probemc=em;
+    tagmc=ep;
+  }
+  TVector3 probemcP;
+  probemcP.SetMagThetaPhi(pMc[probemc],thetaMc[probemc],phiMc[probemc]);
+  if(probemcP.DeltaR(probeP)>0.1) probematch=false;
+  
+  if(tag>-1) {
+    TVector3 tagP(pxEle[tag],pyEle[tag],pzEle[tag]);
+    TVector3 tagmcP;
+    tagmcP.SetMagThetaPhi(pMc[tagmc],thetaMc[tagmc],phiMc[tagmc]);
+    if(tagmcP.DeltaR(tagP)>0.1) tagmatch=false;
+  }
+  return (probematch && tagmatch);
+}

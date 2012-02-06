@@ -38,6 +38,9 @@ private:
   //! apply the custom offline electron ID
   void isEleID(CiCBasedEleSelector *selector, int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput);
 
+  //! match the Z->ee MC truth: always match the probe, if tag==-1 then the tag is not matched
+  bool mcMatches(int probe, int tag=-1);
+  
   //! for the prompt rate for fake rate
   int isDenomFake(int eleIndex);
   int isDenomFake_smurfs(int theEle);
