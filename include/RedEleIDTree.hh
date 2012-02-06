@@ -27,7 +27,9 @@ public:
   void fillVariables(float EoPout, float EoP, float HoE, float DEta, float DPhi, float s9s25, float s1s9, float See, float Spp, float fBrem, int nHits, float dcot, float dist, float pt, float eta, int charge);
 
   //! fill the tree with isolation variables
-  void fillIsolations(float tkIso, float ecalIso, float hcalIso);
+  void fillIsolations(float tkIso, float ecalIso, float hcalIso,
+                      float combPFiso,
+                      float chaPFiso, float neuPFiso, float phoPFiso);
 
   //! fill the electron ID bits
   void fillCutBasedIDBits(int CutBasedId[6], int CutBasedIdOnlyID[6], int CutBasedIdOnlyIso[6], int CutBasedIdOnlyConv[6]);
@@ -44,10 +46,10 @@ public:
   void fillAttributesBackground(float dphi, float invmass, float met, float pth);
   //! fill the splitting categories of the PDFs
   void fillCategories(int iecal, int iptbin, int iclass, int nbr);
-  void fillMore(float nVtx, float rho);
+  void fillMore(float nVtx, float rho, float bdthww, float bdthzz);
   void fillGamma(float atg, float aeg, float ahg, int ig);
   //! fill the run,lumi, event number
-  void fillRunInfos(int run, int lumi, int event);   
+  void fillRunInfos(int run, int lumi, int event, int npu[3]);   
 
   void store();
   void save();
@@ -70,6 +72,7 @@ private:
   int myCharge;
   float myEta;
   float myPt;
+  int myNpu[3];
   int myRun, myLS, myEvent;
 
   float myZmass;
@@ -94,9 +97,12 @@ private:
   float myTrkIso;
   float myEcalIso;
   float myHcalIso;
+  float myPFCandCombinedIsoHWW;
+  float myPFCandChargedIso, myPFCandNeutralIso, myPFCandPhotonIso;
 
   float myNVtx;
   float myRho;
+  float myBdtHww, myBdtHzz;
 
   float myAbsTrackerIsolGammaCand;
   float myAbsEcalIsolGammaCand;

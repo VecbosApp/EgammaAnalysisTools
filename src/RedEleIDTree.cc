@@ -73,6 +73,7 @@ void RedEleIDTree::addRunInfos() {
   myTree->Branch("run", &myRun,     "run/I");
   myTree->Branch("lumi", &myLS,     "lumi/I");
   myTree->Branch("event", &myEvent, "event/I");
+  myTree->Branch("npu", myNpu, "npu[3]/I");
 }
 
 void RedEleIDTree::addAttributesBackground() {
@@ -95,11 +96,17 @@ void RedEleIDTree::addIsolations() {
   myTree->Branch("trkIso",  &myTrkIso,    "trkIso/F");
   myTree->Branch("ecalIso", &myEcalIso,   "ecalIso/F");
   myTree->Branch("hcalIso", &myHcalIso,   "hcalIso/F");
+  myTree->Branch("combPFIsoHWW", &myPFCandCombinedIsoHWW, "combPFIsoHWW/F");
+  myTree->Branch("chaPFIso",     &myPFCandChargedIso,     "chPFIso/F");
+  myTree->Branch("neuPFIso",     &myPFCandNeutralIso,     "neuPFIso/F");
+  myTree->Branch("phoPFIso",     &myPFCandPhotonIso,      "phoPFIso/F");
 }
 
 void RedEleIDTree::addMore() {
-  myTree->Branch("vertices",   &myNVtx,   "vertices/F");
-  myTree->Branch("rho",    &myRho,    "rho/F");
+  myTree->Branch("bdthww",   &myBdtHww, "bdthww/F");
+  myTree->Branch("bdthzz",   &myBdtHzz, "bdthzz/F");
+  myTree->Branch("vertices", &myNVtx, "vertices/F");
+  myTree->Branch("rho",      &myRho,  "rho/F");
 }
 
 void RedEleIDTree::addGamma() {
@@ -158,10 +165,16 @@ void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float Deta,
   myCharge=charge;
 }
 
-void RedEleIDTree::fillIsolations(float trkIso, float ecalIso, float hcalIso) {
+void RedEleIDTree::fillIsolations(float trkIso, float ecalIso, float hcalIso,
+                                  float combPFiso,
+                                  float chaPFiso, float neuPFiso, float phoPFiso) {
   myTrkIso=trkIso;
   myEcalIso=ecalIso;
   myHcalIso=hcalIso;
+  myPFCandCombinedIsoHWW=combPFiso;
+  myPFCandChargedIso=chaPFiso;
+  myPFCandNeutralIso=neuPFiso;
+  myPFCandPhotonIso=phoPFiso;
 }
 
 void RedEleIDTree::fillAttributesSignal(float zmass) {
@@ -185,9 +198,11 @@ void RedEleIDTree::fillCategories(int iecal, int iptbin, int iclass, int nbr) {
   mynbrem=nbr;
 }
 
-void RedEleIDTree::fillMore(float nVtx, float rho) {
+void RedEleIDTree::fillMore(float nVtx, float rho, float bdthww, float bdthzz) {
   myNVtx=nVtx;
   myRho=rho;
+  myBdtHww=bdthww;
+  myBdtHzz=bdthzz;
 }
 
 void RedEleIDTree::fillGamma(float atg, float aeg, float ahg, int ig) {
@@ -243,8 +258,9 @@ void RedEleIDTree::fillBDTBasedIDBits(int isBDTOnlyId) {
   myBDTIdOnlyId = isBDTOnlyId;
 }
 
-void RedEleIDTree::fillRunInfos(int run, int lumi, int event) {
+void RedEleIDTree::fillRunInfos(int run, int lumi, int event, int npu[3]) {
   myRun = run;
   myLS = lumi;
   myEvent = event;
+  for(int i=0;i<3;i++) myNpu[i]=npu[i];
 }

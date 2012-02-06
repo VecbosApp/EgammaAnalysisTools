@@ -190,6 +190,12 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
                    "elebdtweights/Subdet1HighPt_WithIPInfo_BDTG.weights.xml",
                    "elebdtweights/Subdet2HighPt_WithIPInfo_BDTG.weights.xml" ,                
                    ElectronIDMVA::kWithIPInfo);
+  
+  // configuring the electron BDT for H->ZZ
+  fMVAHZZ = new ElectronIDMVAHZZ();
+  fMVAHZZ->Initialize("BDTSimpleCat",
+                      "elebdtweights/HZZBDT_BDTSimpleCat.weights.xml",
+                      ElectronIDMVAHZZ::kBDTSimpleCat);
 
   // Reading GoodRUN LS
   std::cout << "[GoodRunLS]::goodRunLS is " << m_selection->getSwitch("goodRunLS") << " isData is " <<  m_selection->getSwitch("isData") << std::endl;
@@ -436,21 +442,24 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           }
 
           float lh=likelihoodRatio(probe,*LH);
-          float bdt = eleBDT(fMVA,probe);
+          float bdthww = eleBDT(fMVA,probe);
+          float bdthzz = eleBDT(fMVAHZZ,probe);
 
           // fill the reduced tree
 	  reducedTree.fillVariables(eopout,eop,HoE,deta,dphi,s9s25,see,spp,fbrem,nbrems,pt,eta,charge);
           reducedTree.fillAttributesSignal(okmass);
           reducedTree.fillIsolations(dr03TkSumPtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                      dr03EcalRecHitSumEtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
-                                     dr03HcalTowerSumEtFullConeEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3);
-          reducedTree.fillMore(nPV,rhoFastjet);
+                                     dr03HcalTowerSumEtFullConeEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
+                                     pfCombinedIsoEle[probe],
+                                     pfCandChargedIsoMuon[probe],pfCandNeutralIsoMuon[probe],pfCandPhotonIsoMuon[probe]);
+          reducedTree.fillMore(nPV,rhoFastjet,bdthww,bdthzz);
           reducedTree.fillCutBasedIDBits(CutBasedId,CutBasedIdOnlyID,CutBasedIdOnlyIso,CutBasedIdOnlyConv);
           reducedTree.fillLHBasedIDBits(LHBasedId,LHBasedIdOnlyID,LHBasedIdOnlyIso,LHBasedIdOnlyConv);
           reducedTree.fillLHBasedPFIsoIDBits(LHBasedPFIsoId,LHBasedPFIsoIdOnlyID,LHBasedPFIsoIdOnlyIso,LHBasedPFIsoIdOnlyConv);
           reducedTree.fillFakeRateDenomBits(isDenomFake(probe),isDenomFake_smurfs(probe));
-          reducedTree.fillBDTBasedIDBits(passEleBDT(pt,EleSCEta,bdt));
-          reducedTree.fillRunInfos(runNumber, lumiBlock, eventNumber);
+          reducedTree.fillBDTBasedIDBits(passEleBDT(pt,EleSCEta,bdthww));
+          reducedTree.fillRunInfos(runNumber, lumiBlock, eventNumber, nPU);
           reducedTree.store();
         } // tag identified
 
@@ -556,10 +565,10 @@ void ZeeTagAndProbe::isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool
   float combinedIso = 0.0;
   if (isEleEB) combinedIso = dr03TkSumPtEle[eleIndex] + TMath::Max(0.0,dr03EcalRecHitSumEtEle[eleIndex]-1.0) + dr03HcalTowerSumEtFullConeEle[eleIndex];
   else combinedIso = dr03TkSumPtEle[eleIndex] + dr03EcalRecHitSumEtEle[eleIndex] + dr03HcalTowerSumEtFullConeEle[eleIndex];
-  selector->SetCombinedIsolation( (combinedIso - rhoFastjet*TMath::Pi()*0.3*0.3) / pEle.Pt() ); 
+  selector->SetCombinedIsolation( (combinedIso - rhoFastjet*TMath::Pi()*0.3*0.3) / pEle.Pt() );
 
-  // selector->SetCombinedPFIsolation( (pfCombinedIsoEle[eleIndex]) / pEle.Pt() );
-  selector->SetCombinedPFIsolation( (pfCombinedIsoEle[eleIndex] - rhoFastjet*TMath::Pi()*0.4*0.4) / pEle.Pt() );
+  selector->SetCombinedPFIsolation( (pfCombinedIsoEle[eleIndex]) / pEle.Pt() );
+  // selector->SetCombinedPFIsolation( (pfCombinedIsoEle[eleIndex] - rhoFastjet*TMath::Pi()*0.4*0.4) / pEle.Pt() );
 
   selector->SetMissingHits( expInnerLayersGsfTrack[gsf] );
   selector->SetConvDist( fabs(convDistEle[eleIndex]) );

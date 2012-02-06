@@ -14,6 +14,7 @@
 #include "EgammaAnalysisTools/include/Egamma.h"
 #include "EgammaAnalysisTools/include/ElectronLikelihood.h"
 #include "EgammaAnalysisTools/include/ElectronIDMVA.h"
+#include "EgammaAnalysisTools/include/ElectronIDMVAHZZ.h"
 #include <TLorentzVector.h>
 
 class ZeeTagAndProbe : public Egamma {
@@ -65,6 +66,7 @@ private:
 
   /// MVA for electron ID. To be created and initialized from the children classes
   ElectronIDMVA *fMVA;
+  ElectronIDMVAHZZ *fMVAHZZ;
 
 };
 

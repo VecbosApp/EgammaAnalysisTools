@@ -306,6 +306,7 @@ double Egamma::eleDszPV(int iele, int iPV) {
   return trackDszPV(PVPos,lepVPos,lepMom);
 }
 
+// using HWW BDT (paper 2011) 
 float Egamma::eleBDT(ElectronIDMVA *mva, int eleIndex) {
   
   if(mva==0) {
@@ -377,6 +378,75 @@ float Egamma::eleBDT(ElectronIDMVA *mva, int eleIndex) {
                        EleESeedClusterOverPIn,
                        EleIP3d,
                        EleIP3dSig );
+
+}
+
+// using HZZ BDT
+float Egamma::eleBDT(ElectronIDMVAHZZ *mva, int eleIndex) {
+  
+  if(mva==0) {
+    std::cout << "electron BDT not created/initialized. BIG PROBLEM. Returning false output -999!" << std::endl; 
+    return -999.;
+  }
+  
+  int gsfTrack = gsfTrackIndexEle[eleIndex]; 
+  int kfTrack = trackIndexEle[eleIndex];
+  float ElePt = GetPt(pxEle[eleIndex],pyEle[eleIndex]);
+
+  float EleFBrem = fbremEle[eleIndex];
+  float EleDEtaIn = deltaEtaAtVtxEle[eleIndex];
+  float EleDPhiIn = deltaPhiAtVtxEle[eleIndex];
+  float EleHoverE = hOverEEle[eleIndex];
+  float EleSuperClusterEOverP = eSuperClusterOverPEle[eleIndex];
+  float EleEOverPout = eEleClusterOverPoutEle[eleIndex];
+  float EleDEtaEleOut = deltaEtaEleClusterTrackAtCaloEle[eleIndex];
+  float EleKFChi2 = (kfTrack>-1) ? trackNormalizedChi2Track[kfTrack] : 0.0;
+  float EleKFHits = (kfTrack>-1) ? trackerLayersWithMeasurementTrack[kfTrack] : -1.0;
+  float EleMissHits = expInnerLayersGsfTrack[gsfTrack];
+  float EleDistConv = convDistEle[eleIndex];
+  float EleDcotConv = convDcotEle[eleIndex];
+  float NVtx = float(nPV);
+  Utils anaUtils;
+  bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[eleIndex], isEcalDriven);
+  float EleEcalSeeded = (ecaldriven) ? 1. : 0.;
+
+  float EleSigmaIEtaIEta, EleE1x5E5x5, EleSCEta;
+
+  if(ecaldriven) {
+    int sc = superClusterIndexEle[eleIndex];
+    EleSigmaIEtaIEta = sqrt(covIEtaIEtaSC[sc]);
+    EleE1x5E5x5 = (e5x5SC[sc] - e1x5SC[sc])/e5x5SC[sc];
+    EleSCEta = etaSC[sc];
+  } else {
+    int sc = PFsuperClusterIndexEle[eleIndex];
+    if(sc>-1) {
+      EleSigmaIEtaIEta = sqrt(covIEtaIEtaPFSC[sc]);
+      EleE1x5E5x5 = (e5x5PFSC[sc] - e1x5PFSC[sc])/e5x5PFSC[sc];
+      EleSCEta = etaPFSC[sc];
+    } else {
+      EleSigmaIEtaIEta = 999.;
+      EleE1x5E5x5 = 999.;
+      EleSCEta = 0.;
+    }
+  }
+
+  return mva->MVAValue(ElePt, EleSCEta,
+                       EleFBrem,
+                       EleDEtaIn,
+                       EleDPhiIn,
+                       EleDEtaEleOut,
+                       EleSigmaIEtaIEta,
+                       EleHoverE,
+                       EleSuperClusterEOverP,
+                       EleE1x5E5x5,
+                       EleEOverPout,
+                       EleKFChi2,
+                       EleKFHits,
+                       EleMissHits,
+                       EleDistConv,
+                       EleDcotConv,
+                       NVtx,
+                       EleEcalSeeded);
 
 }
 

@@ -8,6 +8,7 @@
 #include "EgammaAnalysisTools/include/ElectronLikelihood.h"
 #include "EgammaAnalysisTools/include/EgammaBase.h"
 #include "EgammaAnalysisTools/include/ElectronIDMVA.h"
+#include "EgammaAnalysisTools/include/ElectronIDMVAHZZ.h"
 // ROOT includes
 #include <TLorentzVector.h>
 #include <TVector3.h>
@@ -57,8 +58,10 @@ public:
   float SigmaiPiP(int electron);
   // get the likelihood electron ID
   float likelihoodRatio(int eleIndex, ElectronLikelihood &lh);
-  /// return the value of electron BDT
+  /// return the value of electron BDT: HWW BDT
   float eleBDT(ElectronIDMVA *mva, int iele);
+  /// return the value of electron BDT: HZZ BDT
+  float eleBDT(ElectronIDMVAHZZ *mva, int iele);
   /// apply the BDT cut
   bool passEleBDT(float pt, float eta, float bdtoutput);
 
