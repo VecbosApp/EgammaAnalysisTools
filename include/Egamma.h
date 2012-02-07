@@ -64,6 +64,8 @@ public:
   float eleBDT(ElectronIDMVAHZZ *mva, int iele);
   /// apply the BDT cut
   bool passEleBDT(float pt, float eta, float bdtoutput);
+  /// calculate EA corrected PF isolation
+  float combPFIsoEACorr(int iele);
 
 protected:
   ///goodRUN/LS list
