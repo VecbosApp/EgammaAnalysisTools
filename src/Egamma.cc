@@ -263,6 +263,23 @@ bool Egamma::triggerMatch(float eta, float phi, float Dr){
   return match;
 }
 
+// two highest pT electrons 
+std::pair<int,int> Egamma::getBestGoodElePair(std::vector<int> goodElectrons) {
+  
+  int theEle1=-1;
+  int theEle2=-1;
+  float maxPt1=-1000.;
+  float maxPt2=-1001.;
+  for(int iEle=0;iEle<goodElectrons.size();iEle++) {
+    int eleIndex = goodElectrons[iEle];
+    TVector3 pEle(pxEle[eleIndex],pyEle[eleIndex],pzEle[eleIndex]);
+    float thisPt=pEle.Pt();
+    if (thisPt>maxPt1 && thisPt>maxPt2){ maxPt2 = maxPt1; maxPt1 = thisPt; theEle2 = theEle1; theEle1 = eleIndex; }
+    if (thisPt<maxPt1 && thisPt>maxPt2){ maxPt2 = thisPt; theEle2 = eleIndex; }
+  }
+  return std::make_pair(theEle1,theEle2);
+}
+
 // dxy parameter with respect to PV for tracks
 double Egamma::trackDxyPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom) {
   return ( - (trackVPos.X()-PVPos.X())*trackMom.Y() + (trackVPos.Y()-PVPos.Y())*trackMom.X() ) / trackMom.Pt(); 

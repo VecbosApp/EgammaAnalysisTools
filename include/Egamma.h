@@ -81,6 +81,8 @@ protected:
   /// calculate transverse mass
   /// definitions in http://indico.cern.ch/getFile.py/access?contribId=4&resId=0&materialId=slides&confId=104213
   float mT3(TLorentzVector pl1, TLorentzVector pl2, TVector3 met);
+  // get the highest pt pair
+  std::pair<int,int> getBestGoodElePair(std::vector<int> goodElectrons);
   /// dxy, dz and dsz parameters with respect to PV for tracks
   double trackDxyPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom);
   double trackDzPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom);
