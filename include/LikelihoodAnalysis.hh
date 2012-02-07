@@ -51,10 +51,6 @@ private:
   float SigmaiEiE(int electron);
   float SigmaiPiP(int electron);
 
-  double eleDzPV(int iele, int iPV);
-  double trackDzPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom);
-
-  std::pair<int,int> getBestGoodElePair(std::vector<int> goodElectrons);
   bool isDenomFake_HwwEgamma(int theEle);
   bool isDenomFake_smurfs(int theEle);
 

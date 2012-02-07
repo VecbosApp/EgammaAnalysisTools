@@ -5820,23 +5820,6 @@ float LikelihoodAnalysis::SigmaiPiP(int electron) {
 */
 
 
-// two highest pT electrons - passing the denominator selection  
-std::pair<int,int> LikelihoodAnalysis::getBestGoodElePair(std::vector<int> goodElectrons) {
-  
-  int theEle1=-1;
-  int theEle2=-1;
-  float maxPt1=-1000.;
-  float maxPt2=-1001.;
-  for(int iEle=0;iEle<goodElectrons.size();iEle++) {
-    int eleIndex = goodElectrons[iEle];
-    TVector3 pEle(pxEle[eleIndex],pyEle[eleIndex],pzEle[eleIndex]);
-    float thisPt=pEle.Pt();
-    if (thisPt>maxPt1 && thisPt>maxPt2){ maxPt2 = maxPt1; maxPt1 = thisPt; theEle2 = theEle1; theEle1 = eleIndex; }
-    if (thisPt<maxPt1 && thisPt>maxPt2){ maxPt2 = thisPt; theEle2 = eleIndex; }
-  }
-  return make_pair(theEle1,theEle2);
-}
-
 // denominator for fake rate: for HtoWW, egamma triggers
 bool LikelihoodAnalysis::isDenomFake_HwwEgamma(int theEle) {
   
@@ -5976,17 +5959,3 @@ bool LikelihoodAnalysis::isDenomFake_smurfs(int theEle) {
   return isGoodDenom;
 }
 
-// to compute the correct dZ wrt PV
-double LikelihoodAnalysis::eleDzPV(int iele, int iPV) {
-  TVector3 PVPos(PVxPV[iPV],PVyPV[iPV],PVzPV[iPV]);
-  int gsfTrack = gsfTrackIndexEle[iele];
-  TVector3 lepVPos(trackVxGsfTrack[gsfTrack],trackVyGsfTrack[gsfTrack],trackVzGsfTrack[gsfTrack]);
-  TVector3 lepMom(pxEle[iele],pyEle[iele],pzEle[iele]);
-  return trackDzPV(PVPos,lepVPos,lepMom);
-}
-
-/// dz parameter with respect to PV for tracks                                                                                  
-double LikelihoodAnalysis::trackDzPV(TVector3 PVPos, TVector3 trackVPos, TVector3 trackMom) {
-  float trackPt = trackMom.Pt();
-  return (trackVPos.Z()-PVPos.Z()) - ((trackVPos.X()-PVPos.X())*trackMom.X()+(trackVPos.Y()-PVPos.Y())*trackMom.Y())/trackPt *trackMom.Pz()/trackPt;
-}
