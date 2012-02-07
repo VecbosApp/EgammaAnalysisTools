@@ -756,14 +756,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
       bool lowPt= (eleP3.Perp()<=20.);
       RecoEta->Fill(mcEta);
       RecoPt->Fill(mcPt);
-      RecoPU->Fill(nPU);
+      RecoPU->Fill(nPU[1]);
       if (highPt) {
         RecoEtaHighPt->Fill(mcEta);
-        RecoPUHighPt->Fill(nPU);
+        RecoPUHighPt->Fill(nPU[1]);
       }
       if (lowPt) {
         RecoEtaLowPt->Fill(mcEta);
-        RecoPULowPt->Fill(nPU);
+        RecoPULowPt->Fill(nPU[1]);
       }
       if (isInEB) RecoPtBarrel->Fill(mcPt);
       if (isInEE) RecoPtEndcap->Fill(mcPt);
@@ -784,14 +784,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  if ( isEleIDCutBased ) {
 	    CutIdOnlyIDEta[icut]->Fill(mcEta);
 	    CutIdOnlyIDPt[icut]->Fill(mcPt);
-            CutIdOnlyIDPU[icut]->Fill(nPU);
+            CutIdOnlyIDPU[icut]->Fill(nPU[1]);
 	    if (highPt) {
               CutIdOnlyIDEtaHighPt[icut]->Fill(mcEta);
-              CutIdOnlyIDPUHighPt[icut]->Fill(nPU);
+              CutIdOnlyIDPUHighPt[icut]->Fill(nPU[1]);
             }
 	    if (lowPt) {
               CutIdOnlyIDEtaLowPt[icut]->Fill(mcEta);
-              CutIdOnlyIDPULowPt[icut]->Fill(nPU);
+              CutIdOnlyIDPULowPt[icut]->Fill(nPU[1]);
             }
 	    if (isInEB) CutIdOnlyIDPtBarrel[icut]->Fill(mcPt);
 	    if (isInEE) CutIdOnlyIDPtEndcap[icut]->Fill(mcPt);
@@ -799,14 +799,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  if ( isIsolCutBased ) {
 	    CutIdOnlyIsoEta[icut]->Fill(mcEta);
 	    CutIdOnlyIsoPt[icut]->Fill(mcPt);
-            CutIdOnlyIsoPU[icut]->Fill(nPU);
+            CutIdOnlyIsoPU[icut]->Fill(nPU[1]);
 	    if (highPt) {
               CutIdOnlyIsoEtaHighPt[icut]->Fill(mcEta);
-              CutIdOnlyIsoPUHighPt[icut]->Fill(nPU);
+              CutIdOnlyIsoPUHighPt[icut]->Fill(nPU[1]);
             }
 	    if (lowPt) {
               CutIdOnlyIsoEtaLowPt[icut]->Fill(mcEta);
-              CutIdOnlyIsoPULowPt[icut]->Fill(nPU);
+              CutIdOnlyIsoPULowPt[icut]->Fill(nPU[1]);
             }
 	    if (isInEB) CutIdOnlyIsoPtBarrel[icut]->Fill(mcPt);
 	    if (isInEE) CutIdOnlyIsoPtEndcap[icut]->Fill(mcPt);
@@ -814,14 +814,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  if ( isConvRejCutBased ) {
 	    CutIdOnlyConvEta[icut]->Fill(mcEta);
 	    CutIdOnlyConvPt[icut]->Fill(mcPt);
-            CutIdOnlyConvPU[icut]->Fill(nPU);
+            CutIdOnlyConvPU[icut]->Fill(nPU[1]);
 	    if (highPt) {
               CutIdOnlyConvEtaHighPt[icut]->Fill(mcEta);
-              CutIdOnlyConvPUHighPt[icut]->Fill(nPU);
+              CutIdOnlyConvPUHighPt[icut]->Fill(nPU[1]);
             }
 	    if (lowPt) {
               CutIdOnlyConvEtaLowPt[icut]->Fill(mcEta);
-              CutIdOnlyConvPULowPt[icut]->Fill(nPU);
+              CutIdOnlyConvPULowPt[icut]->Fill(nPU[1]);
             }
 	    if (isInEB) CutIdOnlyConvPtBarrel[icut]->Fill(mcPt);
 	    if (isInEE) CutIdOnlyConvPtEndcap[icut]->Fill(mcPt);
@@ -829,14 +829,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased ) {
 	    CutIdEta[icut]->Fill(mcEta);
 	    CutIdPt[icut]->Fill(mcPt);
-            CutIdPU[icut]->Fill(nPU);
+            CutIdPU[icut]->Fill(nPU[1]);
 	    if (highPt) {
               CutIdEtaHighPt[icut]->Fill(mcEta);
-              CutIdPUHighPt[icut]->Fill(nPU);
+              CutIdPUHighPt[icut]->Fill(nPU[1]);
             }
 	    if (lowPt) {
               CutIdEtaLowPt[icut]->Fill(mcEta);
-              CutIdPULowPt[icut]->Fill(nPU);
+              CutIdPULowPt[icut]->Fill(nPU[1]);
             }
             if (isInEB) CutIdPtBarrel[icut]->Fill(mcPt);
 	    if (isInEE) CutIdPtEndcap[icut]->Fill(mcPt);
@@ -868,14 +868,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  if ( isEleIDCutBased ) {
 	    LHIdOnlyIDEta[icut]->Fill(mcEta);
 	    LHIdOnlyIDPt[icut]->Fill(mcPt);
-            LHIdOnlyIDPU[icut]->Fill(nPU);
+            LHIdOnlyIDPU[icut]->Fill(nPU[1]);
 	    if (highPt) {
               LHIdOnlyIDEtaHighPt[icut]->Fill(mcEta);
-              LHIdOnlyIDPUHighPt[icut]->Fill(nPU);
+              LHIdOnlyIDPUHighPt[icut]->Fill(nPU[1]);
             }
 	    if (lowPt) {
               LHIdOnlyIDEtaLowPt[icut]->Fill(mcEta);
-              LHIdOnlyIDPULowPt[icut]->Fill(nPU);
+              LHIdOnlyIDPULowPt[icut]->Fill(nPU[1]);
             }
 	    if (isInEB) LHIdOnlyIDPtBarrel[icut]->Fill(mcPt);
 	    if (isInEE) LHIdOnlyIDPtEndcap[icut]->Fill(mcPt);
@@ -883,14 +883,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  if ( isIsolCutBased ) {
 	    LHIdOnlyIsoEta[icut]->Fill(mcEta);
 	    LHIdOnlyIsoPt[icut]->Fill(mcPt);
-            LHIdOnlyIsoPU[icut]->Fill(nPU);
+            LHIdOnlyIsoPU[icut]->Fill(nPU[1]);
 	    if (highPt) {
               LHIdOnlyIsoEtaHighPt[icut]->Fill(mcEta);
-              LHIdOnlyIsoPUHighPt[icut]->Fill(nPU);
+              LHIdOnlyIsoPUHighPt[icut]->Fill(nPU[1]);
             }
 	    if (lowPt) {
               LHIdOnlyIsoEtaLowPt[icut]->Fill(mcEta);
-              LHIdOnlyIsoPULowPt[icut]->Fill(nPU);
+              LHIdOnlyIsoPULowPt[icut]->Fill(nPU[1]);
             }
 	    if (isInEB) LHIdOnlyIsoPtBarrel[icut]->Fill(mcPt);
 	    if (isInEE) LHIdOnlyIsoPtEndcap[icut]->Fill(mcPt);
@@ -898,14 +898,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  if ( isConvRejCutBased ) {
 	    LHIdOnlyConvEta[icut]->Fill(mcEta);
 	    LHIdOnlyConvPt[icut]->Fill(mcPt);
-            LHIdOnlyConvPU[icut]->Fill(nPU);
+            LHIdOnlyConvPU[icut]->Fill(nPU[1]);
 	    if (highPt) {
               LHIdOnlyConvEtaHighPt[icut]->Fill(mcEta);
-              LHIdOnlyConvPUHighPt[icut]->Fill(nPU);
+              LHIdOnlyConvPUHighPt[icut]->Fill(nPU[1]);
             }
 	    if (lowPt) {
               LHIdOnlyConvEtaLowPt[icut]->Fill(mcEta);
-              LHIdOnlyConvPULowPt[icut]->Fill(nPU);
+              LHIdOnlyConvPULowPt[icut]->Fill(nPU[1]);
             }
 	    if (isInEB) LHIdOnlyConvPtBarrel[icut]->Fill(mcPt);
 	    if (isInEE) LHIdOnlyConvPtEndcap[icut]->Fill(mcPt);
@@ -913,14 +913,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased ) {
 	    LHIdEta[icut]->Fill(mcEta);
 	    LHIdPt[icut]->Fill(mcPt);
-            LHIdPU[icut]->Fill(nPU);
+            LHIdPU[icut]->Fill(nPU[1]);
 	    if (highPt) {
               LHIdEtaHighPt[icut]->Fill(mcEta);
-              LHIdPUHighPt[icut]->Fill(nPU);
+              LHIdPUHighPt[icut]->Fill(nPU[1]);
             }
 	    if (lowPt) {
               LHIdEtaLowPt[icut]->Fill(mcEta);
-              LHIdPULowPt[icut]->Fill(nPU);
+              LHIdPULowPt[icut]->Fill(nPU[1]);
             }
 	    if (isInEB) LHIdPtBarrel[icut]->Fill(mcPt);
 	    if (isInEE) LHIdPtEndcap[icut]->Fill(mcPt);
@@ -937,14 +937,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  if ( isEleIDCutBased ) {
 	    CiCIdOnlyIDEta[icut]->Fill(mcEta);
 	    CiCIdOnlyIDPt[icut]->Fill(mcPt);
-            CiCIdOnlyIDPU[icut]->Fill(nPU);
+            CiCIdOnlyIDPU[icut]->Fill(nPU[1]);
 	    if (highPt) {
               CiCIdOnlyIDEtaHighPt[icut]->Fill(mcEta);
-              CiCIdOnlyIDPUHighPt[icut]->Fill(nPU);
+              CiCIdOnlyIDPUHighPt[icut]->Fill(nPU[1]);
             }
 	    if (lowPt) {
               CiCIdOnlyIDEtaLowPt[icut]->Fill(mcEta);
-              CiCIdOnlyIDPULowPt[icut]->Fill(nPU);
+              CiCIdOnlyIDPULowPt[icut]->Fill(nPU[1]);
             }
 	    if (isInEB) CiCIdOnlyIDPtBarrel[icut]->Fill(mcPt);
 	    if (isInEE) CiCIdOnlyIDPtEndcap[icut]->Fill(mcPt);
@@ -952,14 +952,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  if ( isIsolCutBased ) {
 	    CiCIdOnlyIsoEta[icut]->Fill(mcEta);
 	    CiCIdOnlyIsoPt[icut]->Fill(mcPt);
-            CiCIdOnlyIsoPU[icut]->Fill(nPU);
+            CiCIdOnlyIsoPU[icut]->Fill(nPU[1]);
 	    if (highPt) {
               CiCIdOnlyIsoEtaHighPt[icut]->Fill(mcEta);
-              CiCIdOnlyIsoPUHighPt[icut]->Fill(nPU);
+              CiCIdOnlyIsoPUHighPt[icut]->Fill(nPU[1]);
             }
 	    if (lowPt) {
               CiCIdOnlyIsoEtaLowPt[icut]->Fill(mcEta);
-              CiCIdOnlyIsoPULowPt[icut]->Fill(nPU);
+              CiCIdOnlyIsoPULowPt[icut]->Fill(nPU[1]);
             }
 	    if (isInEB) CiCIdOnlyIsoPtBarrel[icut]->Fill(mcPt);
 	    if (isInEE) CiCIdOnlyIsoPtEndcap[icut]->Fill(mcPt);
@@ -967,14 +967,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  if ( isConvRejCutBased ) {
 	    CiCIdOnlyConvEta[icut]->Fill(mcEta);
 	    CiCIdOnlyConvPt[icut]->Fill(mcPt);
-            CiCIdOnlyConvPU[icut]->Fill(nPU);
+            CiCIdOnlyConvPU[icut]->Fill(nPU[1]);
 	    if (highPt) {
               CiCIdOnlyConvEtaHighPt[icut]->Fill(mcEta);
-              CiCIdOnlyConvPUHighPt[icut]->Fill(nPU);
+              CiCIdOnlyConvPUHighPt[icut]->Fill(nPU[1]);
             }
 	    if (lowPt) {
               CiCIdOnlyConvEtaLowPt[icut]->Fill(mcEta);
-              CiCIdOnlyConvPULowPt[icut]->Fill(nPU);
+              CiCIdOnlyConvPULowPt[icut]->Fill(nPU[1]);
             }
 	    if (isInEB) CiCIdOnlyConvPtBarrel[icut]->Fill(mcPt);
 	    if (isInEE) CiCIdOnlyConvPtEndcap[icut]->Fill(mcPt);
@@ -982,14 +982,14 @@ void LikelihoodAnalysis::estimateIDEfficiency(const char *outname) {
 	  if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased ) {
 	    CiCIdEta[icut]->Fill(mcEta);
 	    CiCIdPt[icut]->Fill(mcPt);
-            CiCIdPU[icut]->Fill(nPU);
+            CiCIdPU[icut]->Fill(nPU[1]);
 	    if (highPt) {
               CiCIdEtaHighPt[icut]->Fill(mcEta);
-              CiCIdPUHighPt[icut]->Fill(nPU);
+              CiCIdPUHighPt[icut]->Fill(nPU[1]);
             }
 	    if (lowPt) {
               CiCIdEtaLowPt[icut]->Fill(mcEta);
-              CiCIdPULowPt[icut]->Fill(nPU);
+              CiCIdPULowPt[icut]->Fill(nPU[1]);
             }
 	    if (isInEB) CiCIdPtBarrel[icut]->Fill(mcPt);
 	    if (isInEE) CiCIdPtEndcap[icut]->Fill(mcPt);
@@ -1960,7 +1960,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 	  // filling
 	  RecoEta->Fill(etaFake);
 	  RecoPt->Fill(etFake);
-          RecoPU->Fill(nPU);
+          RecoPU->Fill(nPU[1]);
 	  if (highPt) RecoEtaHighPt->Fill(etaFake);
 	  if (lowPt)  RecoEtaLowPt->Fill(etaFake);
 
@@ -2004,7 +2004,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
                 CutIdOnlyIDEta[icut]->Fill(etaFake);
                 CutIdOnlyIDPt[icut] ->Fill(etFake);
-                CutIdOnlyIDPU[icut] ->Fill(nPU);
+                CutIdOnlyIDPU[icut] ->Fill(nPU[1]);
 
                 if (highPt) CutIdOnlyIDEtaHighPt[icut]->Fill(etaFake);
                 if (lowPt)  CutIdOnlyIDEtaLowPt[icut] ->Fill(etaFake);
@@ -2021,7 +2021,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
               if ( isIsolCutBased ) {
                 CutIdOnlyIsoEta[icut]->Fill(etaFake);
                 CutIdOnlyIsoPt[icut] ->Fill(etFake);
-                CutIdOnlyIsoPU[icut] ->Fill(nPU);
+                CutIdOnlyIsoPU[icut] ->Fill(nPU[1]);
 
                 if (highPt) CutIdOnlyIsoEtaHighPt[icut]->Fill(etaFake);
                 if (lowPt)  CutIdOnlyIsoEtaLowPt[icut] ->Fill(etaFake);
@@ -2038,7 +2038,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
               if ( isConvRejCutBased ) {
                 CutIdOnlyConvEta[icut]->Fill(etaFake);
                 CutIdOnlyConvPt[icut] ->Fill(etFake);
-                CutIdOnlyConvPU[icut] ->Fill(nPU);
+                CutIdOnlyConvPU[icut] ->Fill(nPU[1]);
 
                 if (highPt) CutIdOnlyConvEtaHighPt[icut]->Fill(etaFake);
                 if (lowPt)  CutIdOnlyConvEtaLowPt[icut] ->Fill(etaFake);
@@ -2055,7 +2055,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
               if ( isEleIDCutBased && isIsolCutBased && isConvRejCutBased && isDenomIP) {
                 CutIdEta[icut]->Fill(etaFake);
                 CutIdPt[icut] ->Fill(etFake);
-                CutIdPU[icut] ->Fill(nPU);
+                CutIdPU[icut] ->Fill(nPU[1]);
 
                 if (highPt) CutIdEtaHighPt[icut]->Fill(etaFake);
                 if (lowPt)  CutIdEtaLowPt[icut] ->Fill(etaFake);
@@ -2081,7 +2081,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
 		LHIdOnlyIDEta[icut]->Fill(etaFake);
 		LHIdOnlyIDPt[icut] ->Fill(etFake);
-		LHIdOnlyIDPU[icut] ->Fill(nPU);
+		LHIdOnlyIDPU[icut] ->Fill(nPU[1]);
 
 		if (highPt) LHIdOnlyIDEtaHighPt[icut]->Fill(etaFake);
 		if (lowPt)  LHIdOnlyIDEtaLowPt[icut] ->Fill(etaFake);
@@ -2099,7 +2099,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
 		LHIdOnlyIsoEta[icut]->Fill(etaFake);
 		LHIdOnlyIsoPt[icut]->Fill(etFake);
-		LHIdOnlyIsoPU[icut]->Fill(nPU);
+		LHIdOnlyIsoPU[icut]->Fill(nPU[1]);
 
 		if (highPt) LHIdOnlyIsoEtaHighPt[icut]->Fill(etaFake);
 		if (lowPt)  LHIdOnlyIsoEtaLowPt[icut] ->Fill(etaFake);
@@ -2117,7 +2117,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
 		LHIdOnlyConvEta[icut]->Fill(etaFake);
 		LHIdOnlyConvPt[icut]->Fill(etFake);
-		LHIdOnlyConvPU[icut]->Fill(nPU);
+		LHIdOnlyConvPU[icut]->Fill(nPU[1]);
 		
 		if (highPt) LHIdOnlyConvEtaHighPt[icut]->Fill(etaFake);
 		if (lowPt)  LHIdOnlyConvEtaLowPt[icut] ->Fill(etaFake);
@@ -2135,7 +2135,7 @@ void LikelihoodAnalysis::estimateFakeRate(const char *outname) {
 
 		LHIdEta[icut]->Fill(etaFake);
 		LHIdPt[icut]->Fill(etFake);
-		LHIdPU[icut]->Fill(nPU);
+		LHIdPU[icut]->Fill(nPU[1]);
 
 		if (highPt) LHIdEtaHighPt[icut]->Fill(etaFake);
 		if (lowPt)  LHIdEtaLowPt[icut] ->Fill(etaFake);
