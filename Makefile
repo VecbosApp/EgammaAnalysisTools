@@ -102,6 +102,8 @@ $(OUTLIB)FakeTree.o: $(INCLUDEDIR)/src/FakeTree.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FakeTree.o $<
 $(OUTLIB)LikelihoodAnalysis.o: $(INCLUDEDIR)/src/LikelihoodAnalysis.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LikelihoodAnalysis.o $<
+$(OUTLIB)FakeElectronSelector.o: $(INCLUDEDIR)/src/FakeElectronSelector.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FakeElectronSelector.o $<
 $(OUTLIB)ZeeTagAndProbe.o: $(INCLUDEDIR)/src/ZeeTagAndProbe.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ZeeTagAndProbe.o $<
 $(OUTLIB)LHPdfsProducer.o: $(INCLUDEDIR)/src/LHPdfsProducer.cc
@@ -158,6 +160,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)LikelihoodPdfProduct.o \
 	$(OUTLIB)ElectronLikelihood.o \
 	$(OUTLIB)LikelihoodAnalysis.o \
+	$(OUTLIB)FakeElectronSelector.o \
 	$(OUTLIB)ZeeTagAndProbe.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
