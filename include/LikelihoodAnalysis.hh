@@ -43,11 +43,11 @@ public:
 private:
 
   //! apply the custom offline electron ID
-  void isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput);
+  void isEleID(CutBasedEleIDSelector *selector, int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput, bool applyBDTIdNotCutbased);
 
   //! apply the custom offline electron ID
-  void isEleID(CiCBasedEleSelector *selector, int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput);
-  
+  void isEleID(CiCBasedEleSelector *selector, int eleIndex, bool *eleIdOutput, bool *isolOutput, bool *convRejOutput);  
+
   float SigmaiEiE(int electron);
   float SigmaiPiP(int electron);
 
@@ -61,14 +61,17 @@ private:
   CutBasedEleIDSelector EgammaCutBasedIDHWW;
 
   std::vector<CutBasedEleIDSelector> EgammaCutBasedID;
-  std::vector<CiCBasedEleSelector> EgammaCiCBasedID;
+  std::vector<CiCBasedEleSelector>   EgammaCiCBasedID;
   std::vector<CutBasedEleIDSelector> EgammaLHBasedID;
+  std::vector<CutBasedEleIDSelector> EgammaBdtBasedID;
 
   std::vector<std::string> EgammaCutBasedIDWPs;
   std::vector<std::string> EgammaCiCBasedIDWPs;
   std::vector<std::string> EgammaLHBasedIDWPs;
+  std::vector<std::string> EgammaBdtBasedIDWPs;
 
   ElectronLikelihood *LH;
+  ElectronIDMVA *fMVA;
 
   //! contains the class-dependent electron ID cuts
   std::vector<Selection*> m_EgammaCutIDSelection;
@@ -78,7 +81,7 @@ private:
   // counters
   Counters myCounter;
 
-  //! reduced trees                                                                                                                 
+  //! reduced trees      
   FakeTree *myOutTree;
   FakeTree *myOutTreePassed;
 };
