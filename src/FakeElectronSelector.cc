@@ -1,0 +1,475 @@
+
+#include <iostream>
+#include <math.h>
+
+#include "TVector3.h"
+#include "TH1F.h"
+
+#include "CommonTools/include/Utils.hh"
+#include "CommonTools/include/EfficiencyEvaluator.hh"
+#include "CommonTools/include/LeptonIdBits.h"
+#include "EgammaAnalysisTools/include/FakeElectronSelector.hh"
+#include "CommonTools/include/Counters.hh"
+
+using namespace bits;
+using namespace std;
+
+FakeElectronSelector::FakeElectronSelector(TTree *tree)
+  : Egamma(tree) {
+  
+  _isData = true;       // chiara
+  
+  // configuring the electron BDT
+  fMVA = new ElectronIDMVA();
+  fMVA->Initialize("BDTG method",
+                   "elebdtweights/Subdet0LowPt_WithIPInfo_BDTG.weights.xml",   
+                   "elebdtweights/Subdet1LowPt_WithIPInfo_BDTG.weights.xml",
+                   "elebdtweights/Subdet2LowPt_WithIPInfo_BDTG.weights.xml",
+                   "elebdtweights/Subdet0HighPt_WithIPInfo_BDTG.weights.xml",
+                   "elebdtweights/Subdet1HighPt_WithIPInfo_BDTG.weights.xml",
+                   "elebdtweights/Subdet2HighPt_WithIPInfo_BDTG.weights.xml" ,
+                   ElectronIDMVA::kWithIPInfo);
+  
+  // configuring the electron BDT for H->ZZ
+  fMVAHZZ = new ElectronIDMVAHZZ();
+  fMVAHZZ->Initialize("BDTSimpleCat",
+                      "elebdtweights/HZZBDT_BDTSimpleCat.weights.xml",
+                      ElectronIDMVAHZZ::kBDTSimpleCat);
+
+  // chiara
+  // to read good run list
+  if (_isData) {
+    std::string goodRunGiasoneFile = "config/json/goodCollisions2011.json";
+    setJsonGoodRunList(goodRunGiasoneFile); 
+    fillRunLSMap();
+  }
+  
+  // counter initialize
+  myCounter.SetTitle("EVENT_COUNTER");
+  myCounter.AddVar("event");
+  myCounter.AddVar("trigger");
+  myCounter.AddVar("denom");
+  myCounter.AddVar("met");
+  myCounter.AddVar("trasvMass");
+  myCounter.AddVar("Zmass");
+  myCounter.AddVar("leadingExist");
+  myCounter.AddVar("deltaPhi");
+  myCounter.AddVar("leadingPT");
+}
+
+FakeElectronSelector::~FakeElectronSelector() { }
+
+
+void FakeElectronSelector::Loop(const char *outname) {
+
+  // study vs eta
+  float minEta = -2.5;
+  float maxEta =  2.5;
+
+  // ---------------------------------------------------------------------
+  // to study the event selection
+  char filename[200];
+  sprintf(filename,"%s_FakeKineTree.root",outname);
+  myOutKineTree = new FakeTree(filename);
+  sprintf(filename,"%s_FakeIDTree.root",outname);
+  myOutIDTree = new RedEleIDTree(filename);
+  myOutIDTree->addDenominatorFakeBits();
+  myOutIDTree->addIsolations();
+  myOutIDTree->addRunInfos();
+  myOutIDTree->addMore();
+
+  // trigger: electrons - chiara
+  cout << "using electrons triggers" << endl;
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v1");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v2");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v3");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v4");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v5");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v6");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v7");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v8");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v9");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v10");
+  // 
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v1");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v2");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v3");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v4");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v5");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v6");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v7");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v8");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v9");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v10");
+  // 
+  /*
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v1");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v2");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v3");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v4");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v5");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v6");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v7");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v8");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v9");
+  */
+
+  // loop on events
+  unsigned int lastLumi = 0;
+  unsigned int lastRun  = 0;
+  Long64_t nbytes = 0, nb = 0;
+  Long64_t nentries = fChain->GetEntries();
+  std::cout << "Number of entries = " << nentries << std::endl;
+  for (Long64_t jentry=0; jentry<nentries;jentry++) {
+    Long64_t ientry = LoadTree(jentry);
+    if (ientry < 0) break;
+    
+    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
+    
+    // good runs selection 
+    if (_isData && !isGoodRunLS()) {
+      if ( lastRun!= runNumber || lastLumi != lumiBlock) {
+        lastRun  = runNumber;
+        lastLumi = lumiBlock;
+	std::cout << "[GoodRunLS]::Run " << lastRun << " LS " << lastLumi << " is rejected" << std::endl;
+      }
+      continue;
+    }
+    if (_isData && ( lastRun!= runNumber || lastLumi != lumiBlock) ) {
+      lastRun = runNumber;
+      lastLumi = lumiBlock;
+      std::cout << "[GoodRunLS]::Run " << lastRun << " LS " << lastLumi << " is OK" << std::endl;
+    }
+    
+    // skipping even numbered events (2011A, used for eleID BDT training) - chiara
+    // if (runNumber<=173692 && eventNumber%2==0) continue;
+    
+    // all events
+    myCounter.IncrVar("event",1);
+
+    // event selection: trigger
+    reloadTriggerMask(true);           
+    bool passedHLT = hasPassedHLT();   
+    if ( _isData && !passedHLT ) continue;
+    myCounter.IncrVar("trigger",1);
+
+    // electrons passing the denominator selection to reduce W and Z contamination
+    std::vector<int> denomElectrons;
+    for(int iele=0; iele<nEle; iele++) {
+      bool isGoodDenom = isDenomFake_smurfs(iele);             
+      if (!isGoodDenom) continue;
+      denomElectrons.push_back(iele);
+    }
+    
+    // event selection: at least one candidate for denominator
+    if (denomElectrons.size()==0) continue;
+    myCounter.IncrVar("denom",1);    
+
+    // denominators: kinematics
+    std::pair<int,int> possibleDenom = getBestGoodElePair(denomElectrons);     
+    int theDenom1(possibleDenom.first);
+    int theDenom2(possibleDenom.second);
+    TLorentzVector tlvDenom1, tlvDenom2;
+    tlvDenom1.SetXYZT(pxEle[theDenom1],pyEle[theDenom1],pzEle[theDenom1],energyEle[theDenom1]);
+    tlvDenom2.SetXYZT(pxEle[theDenom2],pyEle[theDenom2],pzEle[theDenom2],energyEle[theDenom2]);
+    TVector3 tv3Denom1, tv3Denom2;
+    tv3Denom1.SetXYZ(pxEle[theDenom1],pyEle[theDenom1],pzEle[theDenom1]);
+    tv3Denom2.SetXYZ(pxEle[theDenom2],pyEle[theDenom2],pzEle[theDenom2]);
+    if (theDenom1==-1) cout << "sanity check: impossibile!" << endl;
+
+    // look for the leading jet not matching the HLT object - to further reduce the W contribution
+    float maxEt = -1.;
+    int leadingJet = -1;
+    for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
+      TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
+      // bool HLTmatch = triggerMatch(p3Jet.Eta(),p3Jet.Phi(),0.2);      
+      // if (HLTmatch) continue;                                         
+      if ( fabs(p3Jet.Eta()) < maxEta && p3Jet.Pt() > maxEt) {   
+	maxEt = p3Jet.Pt();
+	leadingJet = jet;
+      }
+    }
+
+    // variables used in the selection
+    TVector3 p3Met(pxPFMet[0],pyPFMet[0],0.0);
+    TVector3 p3LeadingCut(pxAK5PFPUcorrJet[leadingJet],pyAK5PFPUcorrJet[leadingJet],pzAK5PFPUcorrJet[leadingJet]);
+    float WmT = sqrt(2*tlvDenom1.Pt()*p3Met.Pt()*(1-cos(tv3Denom1.Angle(p3Met))) );      
+    float theInvMass = -10.;
+    if (theDenom1>-1 && theDenom2>-1) theInvMass = (tlvDenom1+tlvDenom2).M();
+    float deltaPhi = fabs(p3LeadingCut.DeltaPhi(tv3Denom1));
+
+    // fill the kine tree - after HLT and denominator
+    myOutKineTree -> fill( p3Met.Pt(), WmT, theInvMass, maxEt, tv3Denom1.Pt(), deltaPhi);
+    myOutKineTree -> store();
+    
+    // event selection: met cut to reduce W->enu
+    if( p3Met.Pt() > 20 ) continue;       
+    myCounter.IncrVar("met",1);    
+
+    // event selection: mT cut to reduce W->enu [highest pT denominator candidate used] // chiara
+    // if (WmT > 25. ) continue;  
+    myCounter.IncrVar("trasvMass",1);    
+
+    // event selection: invariant mass between two electrons passing the denominator selection to reduce Z->ee and low resonances
+    if (theInvMass>60. && theInvMass<120.) continue;  
+    if (theInvMass>0.1 && theInvMass<12.)  continue;  
+    myCounter.IncrVar("Zmass",1);    
+    
+    // need at least one reco jet
+    if ( leadingJet < 0 ) continue;
+    myCounter.IncrVar("leadingExist",1);    
+
+    // the leading jet must be back-to-back wrt the fake candidate
+    if ( deltaPhi<1 ) continue;
+    myCounter.IncrVar("deltaPhi",1);  
+    
+    // minimal cut on leading jet or photon ET
+    // if (p3LeadingCut.Pt()<15) continue;   
+    // if (p3LeadingCut.Pt()<20) continue;   
+    // if (p3LeadingCut.Pt()<30) continue;        // chiara
+    if (p3LeadingCut.Pt()<35) continue;   
+    // if (p3LeadingCut.Pt()<50) continue;   
+    myCounter.IncrVar("leadingPT",1);    
+        
+    // consider as denominator all the reco electrons matching the HLT candidate 
+    // passing some requirements on the following variables:
+    // Gsf Electron (Ecal or tracker driven)
+    // - ecal, hcal and tracker Isolation as in the trigger
+    // - H/E, sigma ieta ieta, deltaEta, deltaPhi
+    // - full IP
+    // - full conversion rejection 
+
+    // weight to the events to reweight for jet pT
+    // float theWeight = 1.;
+    
+    // fill the denominator: take only the highest pT denominator candidate
+    Utils anaUtils;
+    float etaFake = fabs(tv3Denom1.Eta()); 
+    float etFake  = tv3Denom1.Pt();
+
+    // for the systematics of HWW - init
+    float dREleJet_min = 1000;
+    int closestJet=-1;
+    for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
+      TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
+      if ( fabs(p3Jet.Eta()) < 2.5 && p3Jet.Pt() > 10.0 ) {          
+	float dREleJet = p3Jet.DeltaR(tv3Denom1);
+	if(dREleJet<dREleJet_min) {
+	  closestJet=jet;
+	  dREleJet_min=dREleJet;
+	}}}
+    // for the systematics of HWW - end
+
+    // does this denominator pass the IP cut as for H->WW ?  // chiara, hardcoded
+    bool isDenomIP = true;
+    int gsfTrack = gsfTrackIndexEle[theDenom1];
+    float dxyEle = transvImpactParGsfTrack[gsfTrack];
+    float dzEle  = eleDzPV(theDenom1,0);
+    if ( fabs(dxyEle)>0.02 ) isDenomIP = false;
+    if ( fabs(dzEle)>0.10 )  isDenomIP = false;
+    // does this denominator pass the IP cut as for H->WW ?  
+    
+    // some eleID variables
+    float HoE, s9s25, deta, dphi, fbrem, see, spp, eopout, eop, nbrems, recoFlag, EleSCEta;
+    bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[theDenom1], isEcalDriven);
+    HoE = hOverEEle[theDenom1];
+    deta = deltaEtaAtVtxEle[theDenom1];
+    dphi = deltaPhiAtVtxEle[theDenom1];
+    fbrem = fbremEle[theDenom1];
+    nbrems = nbremsEle[theDenom1];
+    eopout = eSeedOverPoutEle[theDenom1];
+    eop = eSuperClusterOverPEle[theDenom1];
+    if(ecaldriven) {
+      int sc = superClusterIndexEle[theDenom1];
+      s9s25 = e3x3SC[sc]/e5x5SC[sc];
+      see = sqrt(covIEtaIEtaSC[sc]);
+      spp = sqrt(covIPhiIPhiSC[sc]);
+      recoFlag = recoFlagSC[sc];
+      EleSCEta = etaSC[sc];
+    } else {
+      int sc = PFsuperClusterIndexEle[theDenom1];
+      if(sc>-1) {
+        s9s25 = e3x3PFSC[sc]/e5x5PFSC[sc];
+        see = sqrt(covIEtaIEtaPFSC[sc]);
+        spp = sqrt(covIPhiIPhiPFSC[sc]);
+        recoFlag = recoFlagPFSC[sc];
+        EleSCEta = etaPFSC[sc];
+      } else {
+        s9s25 = 999.;
+        see = 999.;
+        spp = 999.;
+      }
+    }
+    
+    float bdthww = eleBDT(fMVA,theDenom1);
+    float bdthzz = eleBDT(fMVAHZZ,theDenom1);
+
+    // fill the reduced tree
+    float pt = tlvDenom1.Pt();
+    float eta = tlvDenom1.Eta();
+    int charge = chargeEle[theDenom1];
+    myOutIDTree->fillVariables(eopout,eop,HoE,deta,dphi,s9s25,see,spp,fbrem,nbrems,pt,eta,charge);
+    myOutIDTree->fillIsolations(dr03TkSumPtEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,
+                               dr03EcalRecHitSumEtEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,
+                               dr03HcalTowerSumEtFullConeEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,
+                               pfCombinedIsoEle[theDenom1],
+                               pfCandChargedIsoEle[theDenom1],pfCandNeutralIsoEle[theDenom1],pfCandPhotonIsoEle[theDenom1]);
+    myOutIDTree->fillFakeRateDenomBits(isDenomFake_HwwEgamma(theDenom1),isDenomFake_smurfs(theDenom1));
+    myOutIDTree->fillMore(nPV,rhoFastjet,bdthww,bdthzz);
+    myOutIDTree->fillRunInfos(runNumber, lumiBlock, eventNumber, nPU, -1);
+    myOutIDTree->store();
+    
+  } // loop events
+
+  // saving the counters
+  sprintf(filename,"%sCounters.root",outname);
+  myCounter.Save(filename,"recreate");
+  
+  // saving the output tree
+  myOutKineTree -> save();
+  myOutIDTree   -> save();
+
+}
+
+// denominator for fake rate: for HtoWW, egamma triggers
+int FakeElectronSelector::isDenomFake_HwwEgamma(int theEle) {
+  
+  Utils anaUtils;
+  bool isGoodDenom = true;
+  
+  TVector3 p3Ele(pxEle[theEle], pyEle[theEle], pzEle[theEle]);
+
+  // match with the HLT firing candidates
+  bool HLTmatch = triggerMatch(p3Ele.Eta(),p3Ele.Phi(),0.2);
+  if (!HLTmatch) isGoodDenom = false;
+  
+  // acceptance for the fake electron
+  if( fabs(p3Ele.Eta()) > 2.5 ) isGoodDenom = false;
+  if( p3Ele.Pt() < 10. )        isGoodDenom = false;
+
+  // barrel or endcap
+  bool isEleEB = anaUtils.fiducialFlagECAL(fiducialFlagsEle[theEle], isEB);    
+
+  // taking shower shape                                                                                                             
+  int sc;
+  bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[theEle], bits::isEcalDriven);
+  float thisSigmaIeIe = -1.;
+  if (ecalDriven) {
+    sc = superClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaSC[sc]);
+  }
+  if (!ecalDriven) {
+    sc = PFsuperClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaPFSC[sc]);
+  }
+  if ( sc<0 ) { isGoodDenom = false; }
+
+  // sigmaIetaIeta                                                                                                                   
+  if ( isEleEB && thisSigmaIeIe>0.01) { isGoodDenom = false; }
+  if (!isEleEB && thisSigmaIeIe>0.03) { isGoodDenom = false; }
+
+  // H/E
+  if ( isEleEB && hOverEEle[theEle]>0.12) isGoodDenom = false;   
+  if (!isEleEB && hOverEEle[theEle]>0.10) isGoodDenom = false;
+  
+  // deltaEta
+  if ( isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.007) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.009) ) isGoodDenom = false;
+  
+  // deltaPhi
+  if ( isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.15) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.10) ) isGoodDenom = false;
+
+  // isolation 
+  float ecalIsol    = (dr03EcalRecHitSumEtEle[theEle])/p3Ele.Pt();
+  float hcalIsol    = (dr03HcalTowerSumEtEle[theEle])/p3Ele.Pt();
+  float trackerIsol = (dr03TkSumPtEle[theEle])/p3Ele.Pt();                
+  if(ecalIsol>0.2)    isGoodDenom = false;
+  if(hcalIsol>0.2)    isGoodDenom = false;
+  if(trackerIsol>0.2) isGoodDenom = false;                                
+
+  if(isGoodDenom) return 1;
+  else return 0;
+}
+
+// denominator for fake rate: for HtoWW, egamma triggers, same as smurfs
+int FakeElectronSelector::isDenomFake_smurfs(int theEle) {
+  
+  Utils anaUtils;
+  bool isGoodDenom = true;
+  
+  TVector3 p3Ele(pxEle[theEle], pyEle[theEle], pzEle[theEle]);
+  
+  // acceptance for the fake electron
+  if( fabs(p3Ele.Eta()) > 2.5 ) isGoodDenom = false;
+  if( p3Ele.Pt() < 10. )        isGoodDenom = false;
+
+  // match with the HLT firing candidates
+  bool HLTmatch = triggerMatch(p3Ele.Eta(),p3Ele.Phi(),0.2);     // chiara, to comment when running on MC
+  if (!HLTmatch) isGoodDenom = false;                            // chiara, to comment when running on MC  
+  
+  // taking shower shape                                                                                                             
+  int sc;
+  bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[theEle], bits::isEcalDriven);
+  float thisSigmaIeIe = -1.;
+  float scEta = -1.;                                                               
+  if (ecalDriven) {
+    sc = superClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaSC[sc]);
+    scEta = etaSC[sc];
+  }
+  if (!ecalDriven) {
+    sc = PFsuperClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaPFSC[sc]);
+    scEta = etaPFSC[sc];
+  }
+  if ( sc<0 ) { isGoodDenom = false; }
+
+  // barrel or endcap
+  bool isEleEB = false;
+  if (fabs(scEta)<1.479) isEleEB = true;   
+  
+  // sigmaIetaIeta                                                                                                                   
+  if ( isEleEB && thisSigmaIeIe>0.01) { isGoodDenom = false; }
+  if (!isEleEB && thisSigmaIeIe>0.03) { isGoodDenom = false; }
+
+  // isolation
+  float ecalIsolAbs = 0.0;
+  if ( isEleEB ) ecalIsolAbs = max(0.0,dr03EcalRecHitSumEtEle[theEle]-1.0);
+  else ecalIsolAbs = dr03EcalRecHitSumEtEle[theEle];
+  float ecalIsol = ecalIsolAbs/p3Ele.Pt(); 
+  float hcalIsol    = (dr03HcalTowerSumEtEle[theEle])/p3Ele.Pt();
+  float trackerIsol = (dr03TkSumPtEle[theEle])/p3Ele.Pt();                
+  if(ecalIsol>0.2)    isGoodDenom = false;
+  if(hcalIsol>0.2)    isGoodDenom = false;
+  if(trackerIsol>0.2) isGoodDenom = false;                                
+
+  // H/E
+  if ( isEleEB && hOverEEle[theEle]>0.12) isGoodDenom = false;   
+  if (!isEleEB && hOverEEle[theEle]>0.10) isGoodDenom = false;
+  
+  // deltaEta
+  if ( isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.007) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.009) ) isGoodDenom = false;
+  
+  // deltaPhi
+  if ( isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.15) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.10) ) isGoodDenom = false;
+  
+  // full conversion rejection 
+  int gsf = gsfTrackIndexEle[theEle];
+  int missHits = expInnerLayersGsfTrack[gsf];
+  bool matchConv = hasMatchedConversionEle[theEle];
+  if (missHits>0 || matchConv) isGoodDenom = false;
+
+  // impact parameter cuts 
+  float dxyEle = transvImpactParGsfTrack[gsf];
+  float dzEle  = eleDzPV(theEle,0);
+  if (fabs(dxyEle)>0.02) isGoodDenom = false;
+  if (fabs(dzEle)>0.10)  isGoodDenom = false;
+
+  if(isGoodDenom) return 1;
+  else return 0;
+}
+
