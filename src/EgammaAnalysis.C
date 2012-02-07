@@ -50,6 +50,9 @@
 #if Application == 9
 #include "EgammaAnalysisTools/include/TestTurnOnCurve.hh"
 #endif
+#if Application == 10
+#include "EgammaAnalysisTools/include/FakeElectronSelector.hh"
+#endif
 
 int main(int argc, char* argv[]) {
 
@@ -110,8 +113,8 @@ int main(int argc, char* argv[]) {
   // analysis.findEquivalentLHCut( 0.957 );          // loose eleID
   // analysis.estimateIDEfficiency(outputFileName);
   // analysis.estimateFakeRate(outputFileName);
+  //analysis.estimateFakeRateQCD(outputFileName); 
   analysis.estimateFakeRateForHToWW_EGAMMA(outputFileName);
-  
 #endif
 
 #if Application == 2
@@ -236,6 +239,13 @@ int main(int argc, char* argv[]) {
   TestTurnOnCurve analysis(theChain);
   analysis.measureTurnOn(outputFileName);
   
+#endif
+
+#if Application == 10
+
+  FakeElectronSelector analysis(theChain);
+  analysis.Loop(outputFileName);
+
 #endif
 
   return 0;
