@@ -17,6 +17,7 @@ public:
   void addCategories();
   void addMore();
   void addElectronIdBits();
+  void addDenominatorFakeBits();
   void addIsolations();
   void addGamma();
   //! add run,lumi, event number (for data)

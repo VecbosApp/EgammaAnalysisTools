@@ -68,6 +68,11 @@ void RedEleIDTree::addElectronIdBits() {
   myTree->Branch("BDTIdOnlyId",        &myBDTIdOnlyId,           "BDTIdOnlyId/I");
 }
 
+void RedEleIDTree::addDenominatorFakeBits() {
+  myTree->Branch("DenomFake",          &myDenomFake,             "DenomFake/I");
+  myTree->Branch("DenomFakeSmurf",     &myDenomFakeSmurf,        "DenomFakeSmurf/I");
+}
+
 void RedEleIDTree::addRunInfos() {
   myTree->Branch("run",     &myRun,     "run/I");
   myTree->Branch("lumi",    &myLS,      "lumi/I");
