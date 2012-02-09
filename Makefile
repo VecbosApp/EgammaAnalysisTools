@@ -86,6 +86,8 @@ $(OUTLIB)EcalCleaner.o: $(INCLUDEDIR)/src/EcalCleaner.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)EcalCleaner.o $<
 $(OUTLIBCOMMON)EfficiencyEvaluator.o: $(INCLUDEDIRCOMMON)/CommonTools/src/EfficiencyEvaluator.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)EfficiencyEvaluator.o $<
+$(OUTLIBCOMMON)FiguresOfMeritEvaluator.o: $(INCLUDEDIRCOMMON)/CommonTools/src/FiguresOfMeritEvaluator.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)FiguresOfMeritEvaluator.o $<
 $(OUTLIBCOMMON)Monitor.o: $(INCLUDEDIRCOMMON)/CommonTools/src/Monitor.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIBCOMMON)Monitor.o $<
 $(OUTLIBCOMMON)SprDataFiller.o: $(INCLUDEDIRCOMMON)/CommonTools/src/SprDataFiller.cc
@@ -141,6 +143,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)CutBasedEleIDSelector.o \
 	$(OUTLIB)EcalCleaner.o \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o \
+	$(OUTLIBCOMMON)FiguresOfMeritEvaluator.o \
 	$(OUTLIBCOMMON)Counters.o \
 	$(OUTLIBCOMMON)Monitor.o \
 	$(OUTLIBCOMMON)SprDataFiller.o \
@@ -219,6 +222,10 @@ CompareSignalIsolation: $(INCLUDEDIR)/src/CompareSignalIsolation.C
 
 MakeROC: $(INCLUDEDIR)/src/MakeROC.C
 	$(CXX) $(CXXFLAGS) -o MakeROC $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
+
+CompareROC: $(INCLUDEDIR)/src/CompareROC.C \
+	$(OUTLIBCOMMON)FiguresOfMeritEvaluator.o 
+	$(CXX) $(CXXFLAGS) -o CompareROC $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
 
 EgammaAnalysis.clean:
