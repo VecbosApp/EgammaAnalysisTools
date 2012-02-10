@@ -115,7 +115,7 @@ Double_t ElectronIDMVAHZZ::MVAValue(Double_t ElePt , Double_t EleSCEta,
   fMVAVar_EleE1x5E5x5 = EleE1x5E5x5;
   fMVAVar_EleEOverPout = EleEOverPout;
   fMVAVar_EleKFChi2 = EleKFChi2;
-  fMVAVar_EleKFHits = EleMissHits;
+  fMVAVar_EleKFHits = EleKFHits;
   fMVAVar_EleMissHits = EleMissHits;
   fMVAVar_EleDistConv = EleDistConv;
   fMVAVar_EleDcotConv = EleDcotConv;
