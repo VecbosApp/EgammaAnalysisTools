@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
   vector<TString> cutBackground;
   for(int i=0;i<(int)cutBase.size();++i)
     cutBackground.push_back(cutBase[i]+TString("&& DenomFakeSmurf"));
-                            
+
   vector<TString> id;
   id.push_back(TString("ROC_inEB_LowPt.pdf"));
   id.push_back(TString("ROC_outEB_LowPt.pdf"));
@@ -85,9 +85,14 @@ void makeCurve(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, T
 
   TH1F *bdthww_sig = new TH1F("bdthww_sig","",30,-1.0,1.0);
   TH1F *bdthww_bkg = new TH1F("bdthww_bkg","",30,-1.0,1.0);
-  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",30,-0.6,0.3);
-  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",30,-0.6,0.3);
+  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",30,-0.4,0.3);
+  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",30,-0.4,0.3);
   
+  treeSig->Project("bdthww_sig","bdthww",cutSig);
+  treeBkg->Project("bdthww_bkg","bdthww",cutBkg);
+  treeSig->Project("bdthzz_sig","bdthzz",cutSig);
+  treeBkg->Project("bdthzz_bkg","bdthzz",cutBkg);
+
   FiguresOfMeritEvaluator roc;
   roc.addSignal("HWW BDT", bdthww_sig);
   roc.addBackgrounds(bdthww_bkg);
