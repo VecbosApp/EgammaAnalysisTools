@@ -25,7 +25,9 @@ public:
 
   //! fill the tree with electron id variables
   void fillVariables(float EoPout, float EoP, float HoE, float DEta, float DPhi, float s9s25, float See, float Spp, float fbrem, int nbrems, float pt, float eta, int charge);
-  void fillVariables(float EoPout, float EoP, float HoE, float DEta, float DPhi, float s9s25, float s1s9, float See, float Spp, float fBrem, int nHits, float dcot, float dist, float pt, float eta, int charge);
+  void fillVariables(float eleEoPout, float EoPout, float EoP, float HoE, float Deta, float Dphi, float s9s25, float s1s9, float See, float Spp, float fbrem, 
+                     int nbrems, int nHits, float dcot, float dist, float pt, float eta, int charge, float phiwidth, float etawidth,
+                     float IoEmIoP, float eledeta, float d0, float ip3d, float ip3ds, int kfhits, float kfchi2, float e1x5e5x5, int ecaldriven, int matchConv);
 
   //! fill the tree with isolation variables
   void fillIsolations(float tkIso, float ecalIso, float hcalIso,
@@ -57,18 +59,9 @@ public:
 
 private:
 
-  float myEoPout;
-  float myEoP   ;
-  float myHoE;
-  float myDeta;
-  float myDphi;
-  float mys9s25;
-  float mys1s9 ;
-  float mySee;
-  float mySpp;
-  float myFbrem;
-  int myNbrems;
-  int myMissHits;
+  float myEleEoPout, myEoPout, myEoP,myHoE,myDeta,myDphi,mys9s25,mys1s9,mySee,mySpp,myFbrem, myPhiWidth, myEtaWidth;
+  float myIoEoIoP, myEleDeta, myD0, myIP3d, myIP3dSig, myKFChi2, myE1x5E5x5;
+  int myNbrems, myKFHits, myEcalDriven, myMissHits, myMatchConv;
   float myDist, myDcot;
   int myCharge;
   float myEta;

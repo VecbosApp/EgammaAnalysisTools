@@ -6,12 +6,17 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myFile->mkdir("eleIDdir");
   myTree = new TTree("T1","eleID tree");
 
+  myTree->Branch("eleEoPout",       &myEleEoPout,       "eleEoPout/F");
   myTree->Branch("EoPout",          &myEoPout,          "EoPout/F");
   myTree->Branch("EoP",             &myEoP,             "EoP/F");
+  myTree->Branch("IoEmIoP",         &myIoEoIoP,         "IoEmIoP/F");
   myTree->Branch("HoE",             &myHoE,             "HoE/F");
+  myTree->Branch("eledeta",         &myEleDeta,         "eledeta/F");
   myTree->Branch("deta",            &myDeta,            "deta/F");
   myTree->Branch("dphi",            &myDphi,            "dphi/F");
   myTree->Branch("s9s25",           &mys9s25,           "s9s25/F");
+  myTree->Branch("phiwidth",        &myPhiWidth,        "phiwidth/F");
+  myTree->Branch("etawidth",        &myEtaWidth,        "etawidth/F");
   myTree->Branch("see",             &mySee,             "see/F");
   myTree->Branch("spp",             &mySpp,             "spp/F");
   myTree->Branch("fbrem",           &myFbrem,           "fbrem/F");
@@ -19,9 +24,18 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myTree->Branch("missHits",        &myMissHits,        "missHits/I");
   myTree->Branch("dist",            &myDist,            "dist/F");
   myTree->Branch("dcot",            &myDcot,            "dcot/F");
+  myTree->Branch("d0",              &myD0,              "d0/F");
+  myTree->Branch("ip3d",            &myIP3d,            "ip3d/F");
+  myTree->Branch("ip3ds",           &myIP3dSig,         "ip3ds/F");
+  myTree->Branch("kfhits",          &myKFHits,          "kfhits/I");
+  myTree->Branch("kfchi2",          &myKFChi2,          "kfchi2/F");
+  myTree->Branch("e1x5e5x5",        &myE1x5E5x5,        "e1x5e5x5/F");
+  myTree->Branch("matchConv",       &myMatchConv,       "matchConv/I");
+  myTree->Branch("ecaldriven",      &myEcalDriven,      "ecaldriven/I");
   myTree->Branch("pt",              &myPt,              "pt/F");
   myTree->Branch("eta",             &myEta,             "eta/F");
   myTree->Branch("charge",          &myCharge,          "charge/I");
+  
 }
 
 RedEleIDTree::~RedEleIDTree() {
@@ -150,8 +164,10 @@ void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float DEta,
   myCharge=charge;
 }
 
-void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float Deta, float Dphi, float s9s25, float s1s9, float See, float Spp, float fbrem, int nHits, float dcot, float dist, float pt, float eta, int charge) {
-
+void RedEleIDTree::fillVariables(float eleEoPout, float EoPout, float EoP, float HoE, float Deta, float Dphi, float s9s25, float s1s9, float See, float Spp, float fbrem, 
+                                 int nbrems, int nHits, float dcot, float dist, float pt, float eta, int charge, float phiwidth, float etawidth,
+                                 float IoEmIoP, float eledeta, float d0, float ip3d, float ip3ds, int kfhits, float kfchi2, float e1x5e5x5, int ecaldriven, int matchConv) {
+  myEleEoPout=eleEoPout;
   myEoPout=EoPout;
   myEoP=EoP;
   myHoE=HoE;
@@ -162,12 +178,25 @@ void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float Deta,
   mySee=See;
   mySpp=Spp;
   myFbrem=fbrem;
+  myNbrems=nbrems;
   myMissHits=nHits;
   myDist=dist;
   myDcot=dcot;
   myPt=pt;
   myEta=eta;
   myCharge=charge;
+  myPhiWidth=phiwidth;
+  myEtaWidth=etawidth;
+  myIoEoIoP=IoEmIoP;
+  myEleDeta=eledeta;
+  myD0=d0;
+  myIP3d=ip3d;
+  myIP3dSig=ip3ds;
+  myKFHits=kfhits;
+  myKFChi2=kfchi2;
+  myE1x5E5x5=e1x5e5x5;
+  myEcalDriven=ecaldriven;
+  myMatchConv=matchConv;
 }
 
 void RedEleIDTree::fillIsolations(float trkIso, float ecalIso, float hcalIso,
