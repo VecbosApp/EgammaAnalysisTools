@@ -413,28 +413,59 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
             }
               
           // some eleID variables
-          float HoE, s9s25, deta, dphi, fbrem, see, spp, eopout, eop, nbrems, recoFlag, EleSCEta;
+          float HoE, s1s9, s9s25, phiwidth, etawidth, deta, dphi, fbrem, see, spp, eleopout, eopout, eop, nbrems, recoFlag, EleSCEta;
+          float oneoveremoneoverp, eledeta, d0, ip3d, ip3ds, kfhits, kfchi2, e1x5e5x5, dcot, dist;
+
+          int gsfTrack = gsfTrackIndexEle[probe];   
+          int kfTrack = trackIndexEle[probe];
+          double gsfsign   = (-eleDxyPV(probe,0) >=0 ) ? 1. : -1.;
+          int matchConv = (hasMatchedConversionEle[probe]) ? 1 : 0;
+
+          d0 = gsfsign * transvImpactParGsfTrack[gsfTrack];
+          ip3d = gsfsign * impactPar3DGsfTrack[gsfTrack];
+          ip3ds = ip3d/impactPar3DErrorGsfTrack[gsfTrack];
+          kfchi2 = (kfTrack>-1) ? trackNormalizedChi2Track[kfTrack] : 0.0;
+          kfhits = (kfTrack>-1) ? trackerLayersWithMeasurementTrack[kfTrack] : -1.0;
+          int misshits = expInnerLayersGsfTrack[gsfTrack];
+          dcot = convDistEle[probe];
+          dist = convDcotEle[probe];
+
           bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[probe], isEcalDriven);
+          int ecalseed;
           HoE = hOverEEle[probe];
+          eledeta = deltaEtaEleClusterTrackAtCaloEle[probe];
           deta = deltaEtaAtVtxEle[probe];
           dphi = deltaPhiAtVtxEle[probe];
           fbrem = fbremEle[probe];
           nbrems = nbremsEle[probe];
+          eleopout = eEleClusterOverPoutEle[probe];
           eopout = eSeedOverPoutEle[probe];
           eop = eSuperClusterOverPEle[probe];
           if(ecaldriven) {
+            ecalseed = 1;
             int sc = superClusterIndexEle[probe];
+            s1s9 = eMaxSC[sc]/eMaxSC[sc];
             s9s25 = e3x3SC[sc]/e5x5SC[sc];
+            e1x5e5x5 = (e5x5SC[sc] - e1x5SC[sc])/e5x5SC[sc];
+            phiwidth = phiWidthSC[sc];
+            etawidth = etaWidthSC[sc];
             see = sqrt(covIEtaIEtaSC[sc]);
             spp = sqrt(covIPhiIPhiSC[sc]);
+            oneoveremoneoverp = 1./energySC[sc]  - 1./probeP4.Vect().Mag();
             recoFlag = recoFlagSC[sc];
             EleSCEta = etaSC[sc];
           } else {
+            ecalseed = 0;
             int sc = PFsuperClusterIndexEle[probe];
             if(sc>-1) {
               s9s25 = e3x3PFSC[sc]/e5x5PFSC[sc];
+              s1s9 = eMaxPFSC[sc]/eMaxPFSC[sc];
+              e1x5e5x5 = (e5x5PFSC[sc] - e1x5PFSC[sc])/e5x5PFSC[sc];
+              phiwidth = phiWidthPFSC[sc];
+              etawidth = etaWidthPFSC[sc];
               see = sqrt(covIEtaIEtaPFSC[sc]);
               spp = sqrt(covIPhiIPhiPFSC[sc]);
+              oneoveremoneoverp = 1./energyPFSC[sc]  - 1./probeP4.Vect().Mag();
               recoFlag = recoFlagPFSC[sc];
               EleSCEta = etaPFSC[sc];
             } else {
@@ -449,7 +480,9 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           float bdthzz = eleBDT(fMVAHZZ,probe);
 
           // fill the reduced tree
-	  reducedTree.fillVariables(eopout,eop,HoE,deta,dphi,s9s25,see,spp,fbrem,nbrems,pt,eta,charge);
+	  reducedTree.fillVariables(eleopout,eopout,eop,HoE,deta,dphi,s9s25,s1s9,see,spp,fbrem,
+                                    nbrems,misshits,dcot,dist,pt,eta,charge,phiwidth,etawidth,
+                                    oneoveremoneoverp,eledeta,d0,ip3d,ip3ds,kfhits,kfchi2,e1x5e5x5,ecalseed,matchConv);
           reducedTree.fillAttributesSignal(okmass);
           reducedTree.fillIsolations(dr03TkSumPtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                      dr03EcalRecHitSumEtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
