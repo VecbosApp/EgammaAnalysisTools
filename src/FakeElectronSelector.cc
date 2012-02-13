@@ -102,7 +102,6 @@ void FakeElectronSelector::Loop(const char *outname) {
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v9");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v10");
   // 
-  /*
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v1");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v2");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v3");
@@ -112,7 +111,6 @@ void FakeElectronSelector::Loop(const char *outname) {
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v7");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v8");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v9");
-  */
 
   // loop on events
   unsigned int lastLumi = 0;
@@ -154,7 +152,7 @@ void FakeElectronSelector::Loop(const char *outname) {
     if ( _isData && !passedHLT ) continue;
     myCounter.IncrVar("trigger",1);
 
-    // electrons passing the denominator selection to reduce W and Z contamination
+    // electrons passing the denominator selection (removed to get it unbiased. Set a bit at the end)
     std::vector<int> denomElectrons;
     for(int iele=0; iele<nEle; iele++) {
       bool isGoodDenom = isDenomFake_smurfs(iele);             
@@ -271,28 +269,58 @@ void FakeElectronSelector::Loop(const char *outname) {
     // does this denominator pass the IP cut as for H->WW ?  
     
     // some eleID variables
-    float HoE, s9s25, deta, dphi, fbrem, see, spp, eopout, eop, nbrems, recoFlag, EleSCEta;
+    float HoE, s1s9, s9s25, phiwidth, etawidth, deta, dphi, fbrem, see, spp, eleopout, eopout, eop, nbrems, recoFlag, EleSCEta;
+    float oneoveremoneoverp, eledeta, d0, ip3d, ip3ds, kfhits, kfchi2, e1x5e5x5, dcot, dist;
+
+    int kfTrack = trackIndexEle[theDenom1];
+    double gsfsign   = (-eleDxyPV(theDenom1,0) >=0 ) ? 1. : -1.;
+    int matchConv = (hasMatchedConversionEle[theDenom1]) ? 1 : 0;
+    
+    d0 = gsfsign * transvImpactParGsfTrack[gsfTrack];
+    ip3d = gsfsign * impactPar3DGsfTrack[gsfTrack];
+    ip3ds = ip3d/impactPar3DErrorGsfTrack[gsfTrack];
+    kfchi2 = (kfTrack>-1) ? trackNormalizedChi2Track[kfTrack] : 0.0;
+    kfhits = (kfTrack>-1) ? trackerLayersWithMeasurementTrack[kfTrack] : -1.0;
+    int misshits = expInnerLayersGsfTrack[gsfTrack];
+    dcot = convDistEle[theDenom1];
+    dist = convDcotEle[theDenom1];
+
     bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[theDenom1], isEcalDriven);
+    int ecalseed;
     HoE = hOverEEle[theDenom1];
+    eledeta = deltaEtaEleClusterTrackAtCaloEle[theDenom1];
     deta = deltaEtaAtVtxEle[theDenom1];
     dphi = deltaPhiAtVtxEle[theDenom1];
     fbrem = fbremEle[theDenom1];
     nbrems = nbremsEle[theDenom1];
+    eleopout = eEleClusterOverPoutEle[theDenom1];
     eopout = eSeedOverPoutEle[theDenom1];
     eop = eSuperClusterOverPEle[theDenom1];
     if(ecaldriven) {
+      ecalseed = 1;
       int sc = superClusterIndexEle[theDenom1];
+      s1s9 = eMaxSC[sc]/eMaxSC[sc];
       s9s25 = e3x3SC[sc]/e5x5SC[sc];
+      e1x5e5x5 = (e5x5SC[sc] - e1x5SC[sc])/e5x5SC[sc];
+      phiwidth = phiWidthSC[sc];
+      etawidth = etaWidthSC[sc];
       see = sqrt(covIEtaIEtaSC[sc]);
       spp = sqrt(covIPhiIPhiSC[sc]);
+      oneoveremoneoverp = 1./energySC[sc]  - 1./tv3Denom1.Mag();
       recoFlag = recoFlagSC[sc];
       EleSCEta = etaSC[sc];
     } else {
+      ecalseed = 0;
       int sc = PFsuperClusterIndexEle[theDenom1];
       if(sc>-1) {
         s9s25 = e3x3PFSC[sc]/e5x5PFSC[sc];
+        s1s9 = eMaxPFSC[sc]/eMaxPFSC[sc];
+        e1x5e5x5 = (e5x5PFSC[sc] - e1x5PFSC[sc])/e5x5PFSC[sc];
+        phiwidth = phiWidthPFSC[sc];
+        etawidth = etaWidthPFSC[sc];
         see = sqrt(covIEtaIEtaPFSC[sc]);
         spp = sqrt(covIPhiIPhiPFSC[sc]);
+        oneoveremoneoverp = 1./energyPFSC[sc]  - 1./tv3Denom1.Mag();
         recoFlag = recoFlagPFSC[sc];
         EleSCEta = etaPFSC[sc];
       } else {
@@ -301,7 +329,7 @@ void FakeElectronSelector::Loop(const char *outname) {
         spp = 999.;
       }
     }
-    
+
     float bdthww = eleBDT(fMVA,theDenom1);
     float bdthzz = eleBDT(fMVAHZZ,theDenom1);
 
@@ -309,7 +337,9 @@ void FakeElectronSelector::Loop(const char *outname) {
     float pt = tlvDenom1.Pt();
     float eta = tlvDenom1.Eta();
     int charge = chargeEle[theDenom1];
-    myOutIDTree->fillVariables(eopout,eop,HoE,deta,dphi,s9s25,see,spp,fbrem,nbrems,pt,eta,charge);
+    myOutIDTree->fillVariables(eleopout,eopout,eop,HoE,deta,dphi,s9s25,s1s9,see,spp,fbrem,
+                              nbrems,misshits,dcot,dist,pt,eta,charge,phiwidth,etawidth,
+                              oneoveremoneoverp,eledeta,d0,ip3d,ip3ds,kfhits,kfchi2,e1x5e5x5,ecalseed,matchConv);
     myOutIDTree->fillIsolations(dr03TkSumPtEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                dr03EcalRecHitSumEtEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                dr03HcalTowerSumEtFullConeEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,
@@ -406,9 +436,11 @@ int FakeElectronSelector::isDenomFake_smurfs(int theEle) {
   if( p3Ele.Pt() < 10. )        isGoodDenom = false;
 
   // match with the HLT firing candidates
-  bool HLTmatch = triggerMatch(p3Ele.Eta(),p3Ele.Phi(),0.2);     // chiara, to comment when running on MC
-  if (!HLTmatch) isGoodDenom = false;                            // chiara, to comment when running on MC  
-  
+  if(_isData) {
+    bool HLTmatch = triggerMatch(p3Ele.Eta(),p3Ele.Phi(),0.2);
+    if (!HLTmatch) isGoodDenom = false;
+  }
+
   // taking shower shape                                                                                                             
   int sc;
   bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[theEle], bits::isEcalDriven);
@@ -472,4 +504,3 @@ int FakeElectronSelector::isDenomFake_smurfs(int theEle) {
   if(isGoodDenom) return 1;
   else return 0;
 }
-
