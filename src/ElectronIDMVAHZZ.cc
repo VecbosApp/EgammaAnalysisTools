@@ -43,7 +43,6 @@ void ElectronIDMVAHZZ::Initialize( std::string methodName,
     fTMVAReader[i]->SetVerbose(kTRUE);
 
     if (type == kBDTSimpleCat) {
-
       fTMVAReader[i]->AddVariable("fbrem",       &fMVAVar_EleFBrem);
       fTMVAReader[i]->AddVariable("detain",      &fMVAVar_EleDEtaIn);
       fTMVAReader[i]->AddVariable("dphiin",      &fMVAVar_EleDPhiIn);
@@ -59,13 +58,36 @@ void ElectronIDMVAHZZ::Initialize( std::string methodName,
       fTMVAReader[i]->AddVariable("dist",        &fMVAVar_EleDistConv);
       fTMVAReader[i]->AddVariable("dcot",        &fMVAVar_EleDcotConv);
       fTMVAReader[i]->AddVariable("nvtx",        &fMVAVar_NVtx);  // for the new weight file
-
       fTMVAReader[i]->AddSpectator("eta",        &fMVAVar_EleSCEta);
       fTMVAReader[i]->AddSpectator("pt",         &fMVAVar_ElePt);
       fTMVAReader[i]->AddSpectator("ecalseed",   &fMVAVar_EleEcalSeeded);
-
     }
-    
+
+    if (type == kBDTSimpleCatData) {
+      fTMVAReader[i]->AddVariable("fbrem",       &fMVAVar_EleFBrem);
+      fTMVAReader[i]->AddVariable("detain",      &fMVAVar_EleDEtaIn);
+      fTMVAReader[i]->AddVariable("dphiin",      &fMVAVar_EleDPhiIn);
+      fTMVAReader[i]->AddVariable("sieie",       &fMVAVar_EleSigmaIEtaIEta);
+      fTMVAReader[i]->AddVariable("sc_etawidth", &fMVAVar_EleEtaWidth);
+      fTMVAReader[i]->AddVariable("sc_phiwidth", &fMVAVar_ElePhiWidth);
+      fTMVAReader[i]->AddVariable("hoe",         &fMVAVar_EleHoverE);
+      fTMVAReader[i]->AddVariable("eop",         &fMVAVar_EleSuperClusterEOverP);
+      fTMVAReader[i]->AddVariable("e1x5e5x5",    &fMVAVar_EleE1x5E5x5);
+      fTMVAReader[i]->AddVariable("eleopout",    &fMVAVar_EleEOverPout);
+      fTMVAReader[i]->AddVariable("detaeleout",  &fMVAVar_EleDEtaEleOut);
+      fTMVAReader[i]->AddVariable("kfchi2",      &fMVAVar_EleKFChi2);
+      fTMVAReader[i]->AddVariable("kfhits",      &fMVAVar_EleKFHits);
+      fTMVAReader[i]->AddVariable("dist",        &fMVAVar_EleDistConv);
+      fTMVAReader[i]->AddVariable("dcot",        &fMVAVar_EleDcotConv);
+      fTMVAReader[i]->AddVariable("d0",          &fMVAVar_EleD0); 
+      fTMVAReader[i]->AddVariable("ip3d",        &fMVAVar_EleIP3d); 
+      fTMVAReader[i]->AddVariable("ip3ds",       &fMVAVar_EleIP3dSig); 
+      fTMVAReader[i]->AddVariable("nvtx",        &fMVAVar_NVtx);  // for the new weight file
+      fTMVAReader[i]->AddSpectator("eta",        &fMVAVar_EleSCEta);
+      fTMVAReader[i]->AddSpectator("pt",         &fMVAVar_ElePt);
+      fTMVAReader[i]->AddSpectator("ecalseed",   &fMVAVar_EleEcalSeeded);
+    }
+
     if (i==0) fTMVAReader[i]->BookMVA(fMethodname , weights );
 
   }
@@ -94,7 +116,12 @@ Double_t ElectronIDMVAHZZ::MVAValue(Double_t ElePt , Double_t EleSCEta,
                                     Double_t EleDistConv,
                                     Double_t EleDcotConv,
                                     Double_t NVtx,
-                                    Double_t EleEcalSeeded
+                                    Double_t EleEcalSeeded,
+                                    Double_t EleEtaWidth,
+                                    Double_t ElePhiWidth,
+                                    Double_t EleD0,
+                                    Double_t EleIP3d,
+                                    Double_t EleIP3dSig
                                     ) {
   
   if (!fIsInitialized) { 
@@ -121,6 +148,11 @@ Double_t ElectronIDMVAHZZ::MVAValue(Double_t ElePt , Double_t EleSCEta,
   fMVAVar_EleDcotConv = EleDcotConv;
   fMVAVar_NVtx = NVtx;
   fMVAVar_EleEcalSeeded = EleEcalSeeded;
+  fMVAVar_EleEtaWidth = EleEtaWidth;
+  fMVAVar_ElePhiWidth = ElePhiWidth;
+  fMVAVar_EleD0 = EleD0;
+  fMVAVar_EleIP3d = EleIP3d;
+  fMVAVar_EleIP3dSig = EleIP3dSig;
 
   // apply the boundaries used in the training
   if(fMVAVar_EleFBrem < -1.)

@@ -21,6 +21,7 @@ class ElectronIDMVAHZZ {
 
     enum MVAType {
       kBDTSimpleCat = 0,      // the BDT used in H->ZZ
+      kBDTSimpleCatData      // the BDT used in H->ZZ, trained on DATA
     };
 
     void   Initialize(std::string methodName,
@@ -44,7 +45,12 @@ class ElectronIDMVAHZZ {
                     double EleDistConv,
                     double EleDcotConv,
                     double NVtx,
-                    double EleEcalSeeded);
+                    double EleEcalSeeded,
+                    double EleEtaWidth,
+                    double ElePhiWidth,
+                    double EleD0,
+                    double EleIP3d,
+                    double EleIP3dSig);
 
 
 
@@ -72,6 +78,11 @@ class ElectronIDMVAHZZ {
     Float_t                   fMVAVar_EleDcotConv;
     Float_t                   fMVAVar_NVtx;
     Float_t                   fMVAVar_EleEcalSeeded;
+    Float_t                   fMVAVar_EleEtaWidth;
+    Float_t                   fMVAVar_ElePhiWidth;
+    Float_t                   fMVAVar_EleD0;
+    Float_t                   fMVAVar_EleIP3d;
+    Float_t                   fMVAVar_EleIP3dSig;
     
 };
 
