@@ -193,9 +193,15 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
   
   // configuring the electron BDT for H->ZZ
   fMVAHZZ = new ElectronIDMVAHZZ();
+  // Default H->ZZ MC training
+  //   fMVAHZZ->Initialize("BDTSimpleCat",
+  //                       "elebdtweights/HZZBDT_BDTSimpleCat.weights.xml",
+  //                       ElectronIDMVAHZZ::kBDTSimpleCat);
+
+  // New H->ZZ DATA training
   fMVAHZZ->Initialize("BDTSimpleCat",
-                      "elebdtweights/HZZBDT_BDTSimpleCat.weights.xml",
-                      ElectronIDMVAHZZ::kBDTSimpleCat);
+                      "elebdtweights/HZZBDT_BDTSimpleCat_Data.weights.xml",
+                      ElectronIDMVAHZZ::kBDTSimpleCatData);
 
   // Reading GoodRUN LS
   std::cout << "[GoodRunLS]::goodRunLS is " << m_selection->getSwitch("goodRunLS") << " isData is " <<  m_selection->getSwitch("isData") << std::endl;

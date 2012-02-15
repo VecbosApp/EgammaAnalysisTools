@@ -427,22 +427,34 @@ float Egamma::eleBDT(ElectronIDMVAHZZ *mva, int eleIndex) {
   bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[eleIndex], isEcalDriven);
   float EleEcalSeeded = (ecaldriven) ? 1. : 0.;
 
-  float EleSigmaIEtaIEta, EleE1x5E5x5, EleSCEta;
+  // IP variables
+  double gsfsign   = (-eleDxyPV(eleIndex,0) >=0 ) ? 1. : -1.;
+  float EleD0 = gsfsign * transvImpactParGsfTrack[gsfTrack];
+  float EleIP3d = gsfsign * impactPar3DGsfTrack[gsfTrack];
+  float EleIP3dSig = EleIP3d/impactPar3DErrorGsfTrack[gsfTrack];
+
+  float EleSigmaIEtaIEta, EleE1x5E5x5, EleSCEta, EleEtaWidth, ElePhiWidth;
 
   if(ecaldriven) {
     int sc = superClusterIndexEle[eleIndex];
     EleSigmaIEtaIEta = sqrt(covIEtaIEtaSC[sc]);
     EleE1x5E5x5 = (e5x5SC[sc] - e1x5SC[sc])/e5x5SC[sc];
+    EleEtaWidth = etaWidthSC[sc];
+    ElePhiWidth = phiWidthSC[sc];
     EleSCEta = etaSC[sc];
   } else {
     int sc = PFsuperClusterIndexEle[eleIndex];
     if(sc>-1) {
       EleSigmaIEtaIEta = sqrt(covIEtaIEtaPFSC[sc]);
       EleE1x5E5x5 = (e5x5PFSC[sc] - e1x5PFSC[sc])/e5x5PFSC[sc];
+      EleEtaWidth = etaWidthPFSC[sc];
+      ElePhiWidth = phiWidthPFSC[sc];
       EleSCEta = etaPFSC[sc];
     } else {
       EleSigmaIEtaIEta = 999.;
       EleE1x5E5x5 = 999.;
+      EleEtaWidth = 999.;
+      ElePhiWidth = 999.;  
       EleSCEta = 0.;
     }
   }
@@ -463,7 +475,12 @@ float Egamma::eleBDT(ElectronIDMVAHZZ *mva, int eleIndex) {
                        EleDistConv,
                        EleDcotConv,
                        NVtx,
-                       EleEcalSeeded);
+                       EleEcalSeeded,
+                       EleEtaWidth,
+                       ElePhiWidth,
+                       EleD0,
+                       EleIP3d,
+                       EleIP3dSig);
 
 }
 
