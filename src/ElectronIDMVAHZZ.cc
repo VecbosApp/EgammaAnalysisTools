@@ -63,6 +63,27 @@ void ElectronIDMVAHZZ::Initialize( std::string methodName,
       fTMVAReader[i]->AddSpectator("ecalseed",   &fMVAVar_EleEcalSeeded);
     }
 
+    if (type == kBDTSimpleCatNoIPData) {
+      fTMVAReader[i]->AddVariable("fbrem",       &fMVAVar_EleFBrem);
+      fTMVAReader[i]->AddVariable("detain",      &fMVAVar_EleDEtaIn);
+      fTMVAReader[i]->AddVariable("dphiin",      &fMVAVar_EleDPhiIn);
+      fTMVAReader[i]->AddVariable("sieie",       &fMVAVar_EleSigmaIEtaIEta);
+      fTMVAReader[i]->AddVariable("sc_phiwidth", &fMVAVar_ElePhiWidth);
+      fTMVAReader[i]->AddVariable("hoe",         &fMVAVar_EleHoverE);
+      fTMVAReader[i]->AddVariable("eop",         &fMVAVar_EleSuperClusterEOverP);
+      fTMVAReader[i]->AddVariable("e1x5e5x5",    &fMVAVar_EleE1x5E5x5);
+      fTMVAReader[i]->AddVariable("eleopout",    &fMVAVar_EleEOverPout);
+      fTMVAReader[i]->AddVariable("detaeleout",  &fMVAVar_EleDEtaEleOut);
+      fTMVAReader[i]->AddVariable("kfchi2",      &fMVAVar_EleKFChi2);
+      fTMVAReader[i]->AddVariable("kfhits",      &fMVAVar_EleKFHits);
+      fTMVAReader[i]->AddVariable("dist",        &fMVAVar_EleDistConv);
+      fTMVAReader[i]->AddVariable("dcot",        &fMVAVar_EleDcotConv);
+      fTMVAReader[i]->AddVariable("nvtx",        &fMVAVar_NVtx);  // for the new weight file
+      fTMVAReader[i]->AddSpectator("eta",        &fMVAVar_EleSCEta);
+      fTMVAReader[i]->AddSpectator("pt",         &fMVAVar_ElePt);
+      fTMVAReader[i]->AddSpectator("ecalseed",   &fMVAVar_EleEcalSeeded);
+    }
+
     if (type == kBDTSimpleCatData) {
       fTMVAReader[i]->AddVariable("fbrem",       &fMVAVar_EleFBrem);
       fTMVAReader[i]->AddVariable("detain",      &fMVAVar_EleDEtaIn);

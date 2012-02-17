@@ -21,7 +21,8 @@ class ElectronIDMVAHZZ {
 
     enum MVAType {
       kBDTSimpleCat = 0,      // the BDT used in H->ZZ
-      kBDTSimpleCatData      // the BDT used in H->ZZ, trained on DATA
+      kBDTSimpleCatNoIPData, // the BDT used in H->ZZ, trained on DATA 
+      kBDTSimpleCatData      // the BDT used in H->ZZ, including IP, trained on DATA
     };
 
     void   Initialize(std::string methodName,
