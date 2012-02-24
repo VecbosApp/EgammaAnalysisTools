@@ -79,19 +79,19 @@ float getCut(TString presel, TString cut1, TString var2, float min2, float max2,
 
 void lookForCutsIso() {
   
-  getCut("abs(eta) <  1.0","combPFIsoHWW/pt<0.13",
+  getCut("DenomFakeSmurf && abs(eta) <  1.0","combPFIsoHWW/pt<0.13",
 	 "(chaPFIso + (neuPFIso+phoPFIso - 0.18 * rho))/pt",-0.1,2.0,"<");
-  getCut("abs(eta)>1.0 && abs(eta)<1.479","combPFIsoHWW/pt<0.13",
+  getCut("DenomFakeSmurf && abs(eta)>1.0 && abs(eta)<1.479","combPFIsoHWW/pt<0.13",
 	 "(chaPFIso + (neuPFIso+phoPFIso - 0.19 * rho))/pt",-0.1,2.0,"<");
-  getCut("abs(eta)>1.479 && abs(eta)<2.0","combPFIsoHWW/pt<0.09",
+  getCut("DenomFakeSmurf && abs(eta)>1.479 && abs(eta)<2.0","combPFIsoHWW/pt<0.09",
 	 "(chaPFIso + (neuPFIso+phoPFIso - 0.21 * rho))/pt",-0.1,2.0,"<");
-  getCut("abs(eta)>2.0 && abs(eta)<2.2","combPFIsoHWW/pt<0.09",
+  getCut("DenomFakeSmurf && abs(eta)>2.0 && abs(eta)<2.2","combPFIsoHWW/pt<0.09",
 	 "(chaPFIso + (neuPFIso+phoPFIso - 0.38 * rho))/pt",-0.1,2.0,"<");
-  getCut("abs(eta)>2.2 && abs(eta)<2.3","combPFIsoHWW/pt<0.09",
+  getCut("DenomFakeSmurf && abs(eta)>2.2 && abs(eta)<2.3","combPFIsoHWW/pt<0.09",
 	 "(chaPFIso + (neuPFIso+phoPFIso - 0.61 * rho))/pt",-0.1,2.0,"<");
-  getCut("abs(eta)>2.3 && abs(eta)<2.4","combPFIsoHWW/pt<0.09",
+  getCut("DenomFakeSmurf && abs(eta)>2.3 && abs(eta)<2.4","combPFIsoHWW/pt<0.09",
 	 "(chaPFIso + (neuPFIso+phoPFIso - 0.73 * rho))/pt",-0.1,2.0,"<");
-  getCut("abs(eta)>2.4","combPFIsoHWW/pt<0.09",
+  getCut("DenomFakeSmurf && abs(eta)>2.4","combPFIsoHWW/pt<0.09",
 	 "(chaPFIso + (neuPFIso+phoPFIso - 0.90 * rho))/pt",-0.1,2.0,"<");
 
 
@@ -109,12 +109,12 @@ void lookForCutsIso() {
 
 void lookForCutsHZZId() {
 
-  getCut("pt < 20 && abs(eta)<1.0","bdthww>0.139","bdthzz",-0.3,0.3,">");
-  getCut("pt < 20 && abs(eta)>=1.0 && abs(eta)<1.479","bdthww>0.525","bdthzz",-0.3,0.3,">");
-  getCut("pt < 20 && abs(eta)>=1.479 && abs(eta)<2.5","bdthww>0.543","bdthzz",-0.3,0.3,">");
+  getCut("DenomFakeSmurf && pt < 20 && abs(eta)<1.0","bdthww>0.139","bdthzz",-0.3,0.3,">");
+  getCut("DenomFakeSmurf && pt < 20 && abs(eta)>=1.0 && abs(eta)<1.479","bdthww>0.525","bdthzz",-0.3,0.3,">");
+  getCut("DenomFakeSmurf && pt < 20 && abs(eta)>=1.479 && abs(eta)<2.5","bdthww>0.543","bdthzz",-0.3,0.3,">");
 
-  getCut("pt >= 20 && abs(eta)<1.0","bdthww>0.947","bdthzz",-0.3,0.3,">");
-  getCut("pt >= 20 && abs(eta)>=1.0 && abs(eta)<1.479","bdthww>0.950","bdthzz",-0.3,0.3,">");
-  getCut("pt >= 20 && abs(eta)>=1.479 && abs(eta)<2.5","bdthww>0.884","bdthzz",-0.3,0.3,">");
+  getCut("DenomFakeSmurf && pt >= 20 && abs(eta)<1.0","bdthww>0.947","bdthzz",-0.3,0.3,">");
+  getCut("DenomFakeSmurf && pt >= 20 && abs(eta)>=1.0 && abs(eta)<1.479","bdthww>0.950","bdthzz",-0.3,0.3,">");
+  getCut("DenomFakeSmurf && pt >= 20 && abs(eta)>=1.479 && abs(eta)<2.5","bdthww>0.884","bdthzz",-0.3,0.3,">");
 
 }
