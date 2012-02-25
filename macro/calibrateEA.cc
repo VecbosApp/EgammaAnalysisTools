@@ -129,45 +129,52 @@ void calibrateEA(const char* filename, const char* outfilename, const char *cut=
   legend->Draw();
   c1->SaveAs(outfilename);
 
+  TString png(outfilename);
+  png.ReplaceAll("pdf","png");
+  c1->SaveAs(png);
+
 }
 
 void calcAllAeff() {
 
   vector<TString> cut;
-  cut.push_back(TString("abseta<1.479 && pt<20"));
-  cut.push_back(TString("abseta<1.479 && pt>20"));
-  cut.push_back(TString("abseta>1.479 && pt<20"));
-  cut.push_back(TString("abseta>1.479 && pt>20"));
+  cut.push_back(TString("abs(eta)<1.0"));                    // 0
+  cut.push_back(TString("abs(eta)>1.0 && abs(eta)<1.479"));  // 1 
+  cut.push_back(TString("abs(eta)>1.479 && abs(eta)<2.0"));  // 2
+  cut.push_back(TString("abs(eta)>2.0 && abs(eta)<2.2"));    // 3
+  cut.push_back(TString("abs(eta)>2.2 && abs(eta)<2.3"));    // 4
+  cut.push_back(TString("abs(eta)>2.3 && abs(eta)<2.4"));    // 5
+  cut.push_back(TString("abs(eta)>2.4"));                    // 6
   
   vector<TString> id;
-  id.push_back(TString("isopf_EAcalib_EB_LowPt.pdf"));
-  id.push_back(TString("isopf_EAcalib_EB_HighPt.pdf"));
-  id.push_back(TString("isopf_EAcalib_EE_LowPt.pdf"));
-  id.push_back(TString("isopf_EAcalib_EE_HighPt.pdf"));
+  id.push_back(TString("isopf_EAcalib_EB_10.pdf"));
+  id.push_back(TString("isopf_EAcalib_EB_15.pdf"));
+  id.push_back(TString("isopf_EAcalib_EE_20.pdf"));
+  id.push_back(TString("isopf_EAcalib_EE_22.pdf"));
+  id.push_back(TString("isopf_EAcalib_EE_23.pdf"));
+  id.push_back(TString("isopf_EAcalib_EE_24.pdf"));
+  id.push_back(TString("isopf_EAcalib_EE_30.pdf"));
 
   vector<float> max;
-  max.push_back(15);
-  max.push_back(24);
-  max.push_back(15);
-  max.push_back(24);
-
+  for(int i=0; i<(int)cut.size()-3; i++) max.push_back(24);
+  max[4] = 20;
+  max[5] = 15;
+  max[6] = 15;
+  
   vector<float> rebin;
-  rebin.push_back(2);
-  rebin.push_back(1);
-  rebin.push_back(2);
-  rebin.push_back(1);
+  for(int i=0; i<(int)cut.size(); i++) rebin.push_back(1);
 
   Aeff.reserve(id.size());
   Aeff_err.reserve(id.size());
 
-  for(int i=0; (int)i<4; ++i) {
+  for(int i=0; i<(int)cut.size(); ++i) {
     calibrateEA("results_data/merged.root",id[i].Data(),cut[i].Data(),max[i],rebin[i]);
     Aeff[i] = neu[0]/rho[0];
     Aeff_err[i] = Aeff[i] * sqrt(pow(neu[1]/neu[0],2)+pow(rho[1]/rho[0],2));
   }
 
   cout << " ==== RESULTS ==== " << endl;
-  for(int i=0; (int)i<4; ++i) 
+  for(int i=0; i<(int)cut.size(); ++i) 
     cout << "CUT = " << cut[i].Data() << "\tAeff = " << Aeff[i] << " +/- " << Aeff_err[i] << endl;
 
 }
@@ -262,6 +269,10 @@ void rhoEASubtracted(const char* filename, const char* outfilename, float aeff, 
   legend->Draw();
   c1->SaveAs(outfilename);
 
+  TString png(outfilename);
+  png.ReplaceAll("pdf","png");
+  c1->SaveAs(png);
+
 }
 
 void doAll() {
@@ -270,31 +281,34 @@ void doAll() {
   calcAllAeff();
 
   vector<TString> cut;
-  cut.push_back(TString("abseta<1.479 && pt<20"));
-  cut.push_back(TString("abseta<1.479 && pt>20"));
-  cut.push_back(TString("abseta>1.479 && pt<20"));
-  cut.push_back(TString("abseta>1.479 && pt>20"));
+  cut.push_back(TString("abs(eta)<1.0"));
+  cut.push_back(TString("abs(eta)>1.0 && abs(eta)<1.479"));
+  cut.push_back(TString("abs(eta)>1.479 && abs(eta)<2.0"));
+  cut.push_back(TString("abs(eta)>2.0 && abs(eta)<2.2"));
+  cut.push_back(TString("abs(eta)>2.2 && abs(eta)<2.3"));
+  cut.push_back(TString("abs(eta)>2.3 && abs(eta)<2.4"));
+  cut.push_back(TString("abs(eta)>2.4"));
   
   vector<TString> id;
-  id.push_back(TString("isocorrpf_EAcalib_EB_LowPt.pdf"));
-  id.push_back(TString("isocorrpf_EAcalib_EB_HighPt.pdf"));
-  id.push_back(TString("isocorrpf_EAcalib_EE_LowPt.pdf"));
-  id.push_back(TString("isocorrpf_EAcalib_EE_HighPt.pdf"));
+  id.push_back(TString("isocorrpf_EAcalib_EB_10.pdf"));
+  id.push_back(TString("isocorrpf_EAcalib_EB_15.pdf"));
+  id.push_back(TString("isocorrpf_EAcalib_EE_20.pdf"));
+  id.push_back(TString("isocorrpf_EAcalib_EE_22.pdf"));
+  id.push_back(TString("isocorrpf_EAcalib_EE_23.pdf"));
+  id.push_back(TString("isocorrpf_EAcalib_EE_24.pdf"));
+  id.push_back(TString("isocorrpf_EAcalib_EE_30.pdf"));
 
   vector<float> max;
-  max.push_back(15);
-  max.push_back(24);
-  max.push_back(15);
-  max.push_back(24);
+  for(int i=0; i<(int)cut.size()-3; i++) max.push_back(24);
+  max[4] = 20;
+  max[5] = 15;
+  max[6] = 15;
 
   vector<float> rebin;
-  rebin.push_back(2);
-  rebin.push_back(1);
-  rebin.push_back(2);
-  rebin.push_back(1);
+  for(int i=0; i<(int)cut.size(); i++) rebin.push_back(1);
   
   // plot the raw / corrected isolation
-   for(int i=0; (int)i<4; ++i) 
+  for(int i=0; i<(int)cut.size(); ++i) 
      rhoEASubtracted("results_data/merged.root",id[i].Data(),Aeff[i],cut[i].Data(),max[i],rebin[i]);
 
 }
