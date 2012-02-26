@@ -137,3 +137,58 @@ void drawIsolations() {
   drawOneToOne(puSet1,puSet2,"PF isolation","PF isolation, EA corr","# vertices");
 
 }
+
+void drawIds() {
+
+  // here isolation only, WP80. Corrected and not
+  TFile *file = TFile::Open("fakerates.root");
+
+  // eta
+  TH1F *BdtHWWIdWP80EtaHighPt = (TH1F*)file->Get("BdtHWWIdWP80EtaHighPt_Eff");
+  TH1F *BdtHWWIdWP80EtaLowPt = (TH1F*)file->Get("BdtHWWIdWP80EtaLowPt_Eff");
+  // ---> HZZ id + EA corrected isolation
+  TH1F *BdtHZZIdWP80EAEtaHighPt = (TH1F*)file->Get("BdtHZZIdWP80EAEtaHighPt_Eff");
+  TH1F *BdtHZZIdWP80EAEtaLowPt = (TH1F*)file->Get("BdtHZZIdWP80EAEtaLowPt_Eff");
+
+  vector<TH1F*> etaSet1, etaSet2;
+  etaSet1.push_back(BdtHWWIdWP80EtaHighPt);
+  etaSet1.push_back(BdtHWWIdWP80EtaLowPt);
+  etaSet2.push_back(BdtHZZIdWP80EAEtaHighPt);
+  etaSet2.push_back(BdtHZZIdWP80EAEtaLowPt);
+  
+  drawOneToOne(etaSet1,etaSet2,"H #rightarrow WW 2011","H #rightarrow ZZ 2012","#eta");
+
+  // pt
+  TH1F *BdtHWWIdWP80PtBarrel1 = (TH1F*)file->Get("BdtHWWIdWP80PtBarrel1_Eff");
+  TH1F *BdtHWWIdWP80PtBarrel2 = (TH1F*)file->Get("BdtHWWIdWP80PtBarrel2_Eff");
+  TH1F *BdtHWWIdWP80PtEndcap1 = (TH1F*)file->Get("BdtHWWIdWP80PtEndcap1_Eff");
+  TH1F *BdtHWWIdWP80PtEndcap2 = (TH1F*)file->Get("BdtHWWIdWP80PtEndcap2_Eff");
+  // ---> HZZ id + EA corrected isolation
+  TH1F *BdtHZZIdWP80EAPtBarrel1 = (TH1F*)file->Get("BdtHZZIdWP80EAPtBarrel1_Eff");
+  TH1F *BdtHZZIdWP80EAPtBarrel2 = (TH1F*)file->Get("BdtHZZIdWP80EAPtBarrel2_Eff");
+  TH1F *BdtHZZIdWP80EAPtEndcap1 = (TH1F*)file->Get("BdtHZZIdWP80EAPtEndcap1_Eff");
+  TH1F *BdtHZZIdWP80EAPtEndcap2 = (TH1F*)file->Get("BdtHZZIdWP80EAPtEndcap2_Eff");
+
+  vector<TH1F*> ptSet1, ptSet2;
+  ptSet1.push_back(BdtHWWIdWP80PtBarrel1);
+  ptSet1.push_back(BdtHWWIdWP80PtBarrel2);
+  ptSet1.push_back(BdtHWWIdWP80PtEndcap1);
+  ptSet1.push_back(BdtHWWIdWP80PtEndcap2);
+  ptSet2.push_back(BdtHZZIdWP80EAPtBarrel1);
+  ptSet2.push_back(BdtHZZIdWP80EAPtBarrel2);
+  ptSet2.push_back(BdtHZZIdWP80EAPtEndcap1);
+  ptSet2.push_back(BdtHZZIdWP80EAPtEndcap2);
+
+  drawOneToOne(ptSet1,ptSet2,"H #rightarrow WW 2011","H #rightarrow ZZ 2012","p_{T} [GeV]");
+
+  // PU
+  TH1F *BdtHWWIdWP80PU = (TH1F*)file->Get("BdtHWWIdWP80PU_Eff");
+  // ---> EA corrected
+  TH1F *BdtHZZIdWP80EAPU = (TH1F*)file->Get("BdtHZZIdWP80EAPU_Eff");
+  vector<TH1F*> puSet1, puSet2;
+  puSet1.push_back(BdtHWWIdWP80PU);
+  puSet2.push_back(BdtHZZIdWP80EAPU);
+
+  drawOneToOne(puSet1,puSet2,"H #rightarrow WW 2011","H #rightarrow ZZ 2012","# vertices");
+
+}
