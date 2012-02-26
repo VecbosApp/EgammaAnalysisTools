@@ -614,22 +614,22 @@ bool estimateFakeRate::passID(estimateFakeRate::idType type) {
 
   if(type == kBDTHZZ_withIP) {
     // WP with same fake rate as HWW with IP
-    if(pt < 20 && fabs(eta) < 1.0) return (bdthww > 0.077);
-    if(pt < 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthww > 0.077);
-    if(pt < 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthww > 0.092);
-    if(pt >= 20 && fabs(eta) < 1.0) return (bdthww > 0.065);
-    if(pt >= 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthww > 0.074);
-    if(pt >= 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthww > 0.068);
+    if(pt < 20 && fabs(eta) < 1.0) return (bdthzz > 0.075);
+    if(pt < 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthzz > 0.075);
+    if(pt < 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthzz > 0.091);
+    if(pt >= 20 && fabs(eta) < 1.0) return (bdthzz > 0.064);
+    if(pt >= 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthzz > 0.071);
+    if(pt >= 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthzz > 0.067);
   }
 
   if(type == kBDTHZZ_noIP) {
     // not optimized WP!
-    if(pt < 20 && fabs(eta) < 1.0) return (bdthww > 0.077);
-    if(pt < 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthww > 0.077);
-    if(pt < 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthww > 0.092);
-    if(pt >= 20 && fabs(eta) < 1.0) return (bdthww > 0.068);
-    if(pt >= 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthww > 0.071);
-    if(pt >= 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthww > 0.071);
+    if(pt < 20 && fabs(eta) < 1.0) return (bdthzz > 0.075);
+    if(pt < 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthzz > 0.075);
+    if(pt < 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthzz > 0.091);
+    if(pt >= 20 && fabs(eta) < 1.0) return (bdthzz > 0.064);
+    if(pt >= 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthzz > 0.071);
+    if(pt >= 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthzz > 0.067);
   }
   return false;
 }
