@@ -23,8 +23,87 @@
 
 using namespace std;
 
-void makeCurve(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile);
-void make3Curves(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile);
+
+void makeIdCurve(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile) {
+
+  TH1F *bdthww_sig = new TH1F("bdthww_sig","",100,-1.0,1.0);
+  TH1F *bdthww_bkg = new TH1F("bdthww_bkg","",100,-1.0,1.0);
+  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",100,-0.4,0.3);
+  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",100,-0.4,0.3);
+  
+  treeSig->Project("bdthww_sig","bdthww",cutSig);
+  treeBkg->Project("bdthww_bkg","bdthww",cutBkg);
+  treeSig->Project("bdthzz_sig","bdthzz",cutSig);
+  treeBkg->Project("bdthzz_bkg","bdthzz",cutBkg);
+
+  FiguresOfMeritEvaluator roc;
+  roc.addSignal("H #rightarrow WW BDT", bdthww_sig);
+  roc.addBackgrounds(bdthww_bkg);
+  roc.setCutDirection(">");
+  roc.addSignal("H #rightarrow ZZ BDT", bdthzz_sig);
+  roc.addBackgrounds(bdthzz_bkg);
+  roc.setCutDirection(">");
+
+  roc.drawResults(namefile.Data());
+}
+
+void make3IdCurves(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile) {
+
+  TH1F *bdthww_sig = new TH1F("bdthww_sig","",100,-1.0,1.0);
+  TH1F *bdthww_bkg = new TH1F("bdthww_bkg","",100,-1.0,1.0);
+  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",100,-0.4,0.3);
+  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",100,-0.4,0.3);
+  TH1F *bdthzznoip_sig = new TH1F("bdthzznoip_sig","",100,-0.4,0.3);
+  TH1F *bdthzznoip_bkg = new TH1F("bdthzznoip_bkg","",100,-0.4,0.3);
+
+  cout << "cut sig = " << cutSig << " bkg = " << cutBkg << endl;
+  
+  treeSig->Project("bdthww_sig","bdthww",cutSig);
+  treeBkg->Project("bdthww_bkg","bdthww",cutBkg);
+  treeSig->Project("bdthzz_sig","bdthzz",cutSig);
+  treeBkg->Project("bdthzz_bkg","bdthzz",cutBkg);
+  treeSig->Project("bdthzznoip_sig","bdthzznoip",cutSig);
+  treeBkg->Project("bdthzznoip_bkg","bdthzznoip",cutBkg);
+
+  FiguresOfMeritEvaluator roc;
+  roc.addSignal("H #rightarrow WW BDT", bdthww_sig);
+  roc.addBackgrounds(bdthww_bkg);
+  roc.setCutDirection(">");
+  roc.addSignal("H #rightarrow ZZ BDT", bdthzz_sig);
+  roc.addBackgrounds(bdthzz_bkg);
+  roc.setCutDirection(">");
+  roc.addSignal("H #rightarrow ZZ BDT (no IP)", bdthzznoip_sig);
+  roc.addBackgrounds(bdthzznoip_bkg);
+  roc.setCutDirection(">");
+
+  roc.drawResults(namefile.Data());
+}
+
+
+void makeIsolationCurve(TTree *treeSig, TTree* treeBkg, 
+			TString cutSig, TString cutBkg, TString namefile) {
+
+  TH1F *isohww_sig = new TH1F("isohww_sig","",100,0.0,2.0);
+  TH1F *isohww_bkg = new TH1F("isohww_bkg","",100,0.0,2.0);
+  TH1F *isohzz_sig = new TH1F("isohzz_sig","",100,-1.0,2.0);
+  TH1F *isohzz_bkg = new TH1F("isohzz_bkg","",100,-1.0,2.0);
+  
+  treeSig->Project("isohww_sig","combPFIsoHWW/pt",cutSig);
+  treeBkg->Project("isohww_bkg","combPFIsoHWW/pt",cutBkg);
+  treeSig->Project("isohzz_sig","combPFIsoHZZ/pt",cutSig);
+  treeBkg->Project("isohzz_bkg","combPFIsoHZZ/pt",cutBkg);
+
+  FiguresOfMeritEvaluator roc;
+  roc.addSignal("H #rightarrow WW iso", isohww_sig);
+  roc.addBackgrounds(isohww_bkg);
+  roc.setCutDirection("<");
+  roc.addSignal("H #rightarrow ZZ iso", isohzz_sig);
+  roc.addBackgrounds(isohzz_bkg);
+  roc.setCutDirection("<");
+
+  roc.drawResults(namefile.Data());
+}
+
 
 int main(int argc, char* argv[]) {
 
@@ -70,71 +149,47 @@ int main(int argc, char* argv[]) {
     cutBackground.push_back(cutBase[i]+TString("&& DenomFakeSmurf"));
 
   vector<TString> id;
-  id.push_back(TString("ROC_Data_inEB_LowPt.pdf"));
-  id.push_back(TString("ROC_Data_outEB_LowPt.pdf"));
-  id.push_back(TString("ROC_Data_EE_LowPt.pdf"));
-  id.push_back(TString("ROC_Data_inEB_HighPt.pdf"));
-  id.push_back(TString("ROC_Data_outEB_HighPt.pdf"));
-  id.push_back(TString("ROC_Data_EE_HighPt.pdf"));
+  id.push_back(TString("ROC_IdOnly_Data_inEB_LowPt.pdf"));
+  id.push_back(TString("ROC_IdOnly_Data_outEB_LowPt.pdf"));
+  id.push_back(TString("ROC_IdOnly_Data_EE_LowPt.pdf"));
+  id.push_back(TString("ROC_IdOnly_Data_inEB_HighPt.pdf"));
+  id.push_back(TString("ROC_IdOnly_Data_outEB_HighPt.pdf"));
+  id.push_back(TString("ROC_IdOnly_Data_EE_HighPt.pdf"));
 
   for(int i=0;i<(int)cutBase.size();++i) 
-    makeCurve(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
+    makeIdCurve(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
   // make3Curves(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
 
+  // HZZ isolations are in friend trees
+  treeSig->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/merged_hzzisoFriend.root");
+  treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data_fakes/merged_hzzisoFriend.root");
+
+  for(int i=0;i<(int)cutBase.size();++i) {
+    id[i].ReplaceAll("IdOnly","IsoOnly");
+    makeIsolationCurve(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
+  }
+
+  // and now in 2 big bins in nvtx
+  vector<TString> cutSignalHiPU, cutSignalLoPU, cutBackgroundHiPU, cutBackgroundLoPU;
+
+  for(int i=0;i<(int)cutBase.size();++i) {
+    cutSignalLoPU.push_back(cutSignal[i]+TString(" && vertices<8"));
+    cutBackgroundLoPU.push_back(cutBackground[i]+TString(" && vertices<8"));
+    id[i].ReplaceAll("IsoOnly","IsoOnlyVtx1To7");
+    makeIsolationCurve(treeSig,treeBkg,cutSignalLoPU[i],cutBackgroundLoPU[i],id[i]);
+    id[i].ReplaceAll("IsoOnlyVtx1To7","IdOnlyVtx1To7");
+    makeIdCurve(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
+  }
+
+  for(int i=0;i<(int)cutBase.size();++i) {
+    cutSignalHiPU.push_back(cutSignal[i]+TString(" && vertices>=8"));
+    cutBackgroundHiPU.push_back(cutBackground[i]+TString(" && vertices>=8"));
+    id[i].ReplaceAll("IdOnlyVtx1To7","IsoOnlyVtx8ToInf");
+    makeIsolationCurve(treeSig,treeBkg,cutSignalHiPU[i],cutBackgroundHiPU[i],id[i]);
+    id[i].ReplaceAll("IsoOnlyVtx8ToInf","IdOnlyVtx8ToInf");
+    makeIdCurve(treeSig,treeBkg,cutSignalHiPU[i],cutBackgroundHiPU[i],id[i]);
+  }
+
+
   return 0;
-}
-
-void makeCurve(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile) {
-
-  TH1F *bdthww_sig = new TH1F("bdthww_sig","",100,-1.0,1.0);
-  TH1F *bdthww_bkg = new TH1F("bdthww_bkg","",100,-1.0,1.0);
-  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",100,-0.4,0.3);
-  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",100,-0.4,0.3);
-  
-  treeSig->Project("bdthww_sig","bdthww",cutSig);
-  treeBkg->Project("bdthww_bkg","bdthww",cutBkg);
-  treeSig->Project("bdthzz_sig","bdthzz",cutSig);
-  treeBkg->Project("bdthzz_bkg","bdthzz",cutBkg);
-
-  FiguresOfMeritEvaluator roc;
-  roc.addSignal("H #rightarrow WW BDT", bdthww_sig);
-  roc.addBackgrounds(bdthww_bkg);
-  roc.setCutDirection(">");
-  roc.addSignal("H #rightarrow ZZ BDT", bdthzz_sig);
-  roc.addBackgrounds(bdthzz_bkg);
-  roc.setCutDirection(">");
-
-  roc.drawResults(namefile.Data());
-}
-
-void make3Curves(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile) {
-
-  TH1F *bdthww_sig = new TH1F("bdthww_sig","",100,-1.0,1.0);
-  TH1F *bdthww_bkg = new TH1F("bdthww_bkg","",100,-1.0,1.0);
-  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",100,-0.4,0.3);
-  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",100,-0.4,0.3);
-  TH1F *bdthzznoip_sig = new TH1F("bdthzznoip_sig","",100,-0.4,0.3);
-  TH1F *bdthzznoip_bkg = new TH1F("bdthzznoip_bkg","",100,-0.4,0.3);
-
-  cout << "cut sig = " << cutSig << " bkg = " << cutBkg << endl;
-  
-  treeSig->Project("bdthww_sig","bdthww",cutSig);
-  treeBkg->Project("bdthww_bkg","bdthww",cutBkg);
-  treeSig->Project("bdthzz_sig","bdthzz",cutSig);
-  treeBkg->Project("bdthzz_bkg","bdthzz",cutBkg);
-  treeSig->Project("bdthzznoip_sig","bdthzznoip",cutSig);
-  treeBkg->Project("bdthzznoip_bkg","bdthzznoip",cutBkg);
-
-  FiguresOfMeritEvaluator roc;
-  roc.addSignal("H #rightarrow WW BDT", bdthww_sig);
-  roc.addBackgrounds(bdthww_bkg);
-  roc.setCutDirection(">");
-  roc.addSignal("H #rightarrow ZZ BDT", bdthzz_sig);
-  roc.addBackgrounds(bdthzz_bkg);
-  roc.setCutDirection(">");
-  roc.addSignal("H #rightarrow ZZ BDT (no IP)", bdthzznoip_sig);
-  roc.addBackgrounds(bdthzznoip_bkg);
-  roc.setCutDirection(">");
-
-  roc.drawResults(namefile.Data());
 }
