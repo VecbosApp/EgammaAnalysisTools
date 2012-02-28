@@ -24,6 +24,7 @@
 using namespace std;
 
 void makeCurve(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile);
+void make3Curves(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile);
 
 int main(int argc, char* argv[]) {
 
@@ -34,13 +35,14 @@ int main(int argc, char* argv[]) {
 
   fileSig = TFile::Open("macro/results_data/merged.root");
   fileBkg = TFile::Open("macro/results_data_fakes/merged.root");
-  if( fileSig && fileBkg ) {
+  if( fileSig && fileBkg) {
     fileSig->cd();
     treeSig = (TTree*)fileSig->Get("eleIDdir/T1");
     fileBkg->cd();
     treeBkg = (TTree*)fileBkg->Get("eleIDdir/T1");
   } else {
-    cout << "File " << fileSig << " or " << fileBkg << " not existing !" << endl;
+    cout << "File " << fileSig << " or " << fileBkg
+	 << " not existing !" << endl;
     return 0;
   }
 
@@ -68,25 +70,26 @@ int main(int argc, char* argv[]) {
     cutBackground.push_back(cutBase[i]+TString("&& DenomFakeSmurf"));
 
   vector<TString> id;
-  id.push_back(TString("ROC_inEB_LowPt.pdf"));
-  id.push_back(TString("ROC_outEB_LowPt.pdf"));
-  id.push_back(TString("ROC_EE_LowPt.pdf"));
-  id.push_back(TString("ROC_inEB_HighPt.pdf"));
-  id.push_back(TString("ROC_outEB_HighPt.pdf"));
-  id.push_back(TString("ROC_EE_HighPt.pdf"));
+  id.push_back(TString("ROC_Data_inEB_LowPt.pdf"));
+  id.push_back(TString("ROC_Data_outEB_LowPt.pdf"));
+  id.push_back(TString("ROC_Data_EE_LowPt.pdf"));
+  id.push_back(TString("ROC_Data_inEB_HighPt.pdf"));
+  id.push_back(TString("ROC_Data_outEB_HighPt.pdf"));
+  id.push_back(TString("ROC_Data_EE_HighPt.pdf"));
 
   for(int i=0;i<(int)cutBase.size();++i) 
     makeCurve(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
+  // make3Curves(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
 
   return 0;
 }
 
 void makeCurve(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile) {
 
-  TH1F *bdthww_sig = new TH1F("bdthww_sig","",30,-1.0,1.0);
-  TH1F *bdthww_bkg = new TH1F("bdthww_bkg","",30,-1.0,1.0);
-  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",30,-0.4,0.3);
-  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",30,-0.4,0.3);
+  TH1F *bdthww_sig = new TH1F("bdthww_sig","",100,-1.0,1.0);
+  TH1F *bdthww_bkg = new TH1F("bdthww_bkg","",100,-1.0,1.0);
+  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",100,-0.4,0.3);
+  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",100,-0.4,0.3);
   
   treeSig->Project("bdthww_sig","bdthww",cutSig);
   treeBkg->Project("bdthww_bkg","bdthww",cutBkg);
@@ -94,11 +97,43 @@ void makeCurve(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, T
   treeBkg->Project("bdthzz_bkg","bdthzz",cutBkg);
 
   FiguresOfMeritEvaluator roc;
-  roc.addSignal("HWW BDT", bdthww_sig);
+  roc.addSignal("H #rightarrow WW BDT", bdthww_sig);
   roc.addBackgrounds(bdthww_bkg);
   roc.setCutDirection(">");
-  roc.addSignal("HZZ BDT", bdthzz_sig);
+  roc.addSignal("H #rightarrow ZZ BDT", bdthzz_sig);
   roc.addBackgrounds(bdthzz_bkg);
+  roc.setCutDirection(">");
+
+  roc.drawResults(namefile.Data());
+}
+
+void make3Curves(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile) {
+
+  TH1F *bdthww_sig = new TH1F("bdthww_sig","",100,-1.0,1.0);
+  TH1F *bdthww_bkg = new TH1F("bdthww_bkg","",100,-1.0,1.0);
+  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",100,-0.4,0.3);
+  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",100,-0.4,0.3);
+  TH1F *bdthzznoip_sig = new TH1F("bdthzznoip_sig","",100,-0.4,0.3);
+  TH1F *bdthzznoip_bkg = new TH1F("bdthzznoip_bkg","",100,-0.4,0.3);
+
+  cout << "cut sig = " << cutSig << " bkg = " << cutBkg << endl;
+  
+  treeSig->Project("bdthww_sig","bdthww",cutSig);
+  treeBkg->Project("bdthww_bkg","bdthww",cutBkg);
+  treeSig->Project("bdthzz_sig","bdthzz",cutSig);
+  treeBkg->Project("bdthzz_bkg","bdthzz",cutBkg);
+  treeSig->Project("bdthzznoip_sig","bdthzznoip",cutSig);
+  treeBkg->Project("bdthzznoip_bkg","bdthzznoip",cutBkg);
+
+  FiguresOfMeritEvaluator roc;
+  roc.addSignal("H #rightarrow WW BDT", bdthww_sig);
+  roc.addBackgrounds(bdthww_bkg);
+  roc.setCutDirection(">");
+  roc.addSignal("H #rightarrow ZZ BDT", bdthzz_sig);
+  roc.addBackgrounds(bdthzz_bkg);
+  roc.setCutDirection(">");
+  roc.addSignal("H #rightarrow ZZ BDT (no IP)", bdthzznoip_sig);
+  roc.addBackgrounds(bdthzznoip_bkg);
   roc.setCutDirection(">");
 
   roc.drawResults(namefile.Data());
