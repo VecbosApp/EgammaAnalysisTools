@@ -152,7 +152,6 @@ void estimateFakeRate::Loop(const char *outname)
   // to compute the FR in 4 eta bins ( barrel )
   std::vector<TH1F*> BdtHWWIdPtBarrel1;
   std::vector<TH1F*> BdtHWWIdPtBarrel2;
-
   for (int i=0;i<(int)EgammaBdtHWWBasedID.size();++i) {
     TH1F* aHisto = new TH1F( "BdtHWWId"+TString(EgammaBdtHWWBasedID[i])+"PtBarrel1", "HWW BDT ID #eta",   8, LowerPt );
     BdtHWWIdPtBarrel1.push_back(aHisto);
@@ -196,9 +195,9 @@ void estimateFakeRate::Loop(const char *outname)
   std::vector<TH1F*> BdtHZZIdPtEndcap1;
   std::vector<TH1F*> BdtHZZIdPtEndcap2;
   for (int i=0;i<(int)EgammaBdtHZZBasedID.size();++i) {
-    TH1F* aHisto = new TH1F( "BdtHZZId"+TString(EgammaBdtHZZBasedID[i])+"PtEndcap1", "HZZ BDT ID #eta",   8, LowerPt);
+    TH1F* aHisto = new TH1F( "BdtHZZId"+TString(EgammaBdtHZZBasedID[i])+"PtEndcap1", "HZZ BDT ID #eta",   8, LowerPt );
     BdtHZZIdPtEndcap1.push_back(aHisto);
-    aHisto = new TH1F( "BdtHZZId"+TString(EgammaBdtHZZBasedID[i])+"PtEndcap2", "HZZ BDT ID #eta",   8, LowerPt);
+    aHisto = new TH1F( "BdtHZZId"+TString(EgammaBdtHZZBasedID[i])+"PtEndcap2", "HZZ BDT ID #eta",   8, LowerPt );
     BdtHZZIdPtEndcap2.push_back(aHisto);
   }
 
@@ -225,6 +224,44 @@ void estimateFakeRate::Loop(const char *outname)
   for (int i=0;i<(int)EgammaBdtHZZBasedID.size();++i) {
     TH1F* aHisto = new TH1F( "BdtHZZId"+TString(EgammaBdtHZZBasedID[i])+"PU", "HZZ BDT ID nPU",  8, LowerPU );
     BdtHZZIdPU.push_back(aHisto);
+  }
+
+  // to compute the FR in 4 eta bins ( barrel )
+  std::vector<TH1F*> BdtHWWIdPUBarrel1;
+  std::vector<TH1F*> BdtHWWIdPUBarrel2;
+  for (int i=0;i<(int)EgammaBdtHWWBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "BdtHWWId"+TString(EgammaBdtHWWBasedID[i])+"PUBarrel1", "HWW BDT ID #eta",   8, LowerPU );
+    BdtHWWIdPUBarrel1.push_back(aHisto);
+    aHisto = new TH1F( "BdtHWWId"+TString(EgammaBdtHWWBasedID[i])+"PUBarrel2", "HWW BDT ID #eta",   8, LowerPU );
+    BdtHWWIdPUBarrel2.push_back(aHisto);
+  }
+
+  std::vector<TH1F*> BdtHZZIdPUBarrel1;
+  std::vector<TH1F*> BdtHZZIdPUBarrel2;
+  for (int i=0;i<(int)EgammaBdtHZZBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "BdtHZZId"+TString(EgammaBdtHZZBasedID[i])+"PUBarrel1", "HZZ BDT ID #eta",   8, LowerPU );
+    BdtHZZIdPUBarrel1.push_back(aHisto);
+    aHisto = new TH1F( "BdtHZZId"+TString(EgammaBdtHZZBasedID[i])+"PUBarrel2", "HZZ BDT ID #eta",   8, LowerPU );
+    BdtHZZIdPUBarrel2.push_back(aHisto);
+  }
+
+  // to compute the FR in 4 eta bins (endcap)
+  std::vector<TH1F*> BdtHWWIdPUEndcap1;
+  std::vector<TH1F*> BdtHWWIdPUEndcap2;
+  for (int i=0;i<(int)EgammaBdtHWWBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "BdtHWWId"+TString(EgammaBdtHWWBasedID[i])+"PUEndcap1", "HWW BDT ID #eta",   8, LowerPU );
+    BdtHWWIdPUEndcap1.push_back(aHisto);
+    aHisto = new TH1F( "BdtHWWId"+TString(EgammaBdtHWWBasedID[i])+"PUEndcap2", "HWW BDT ID #eta",   8, LowerPU );
+    BdtHWWIdPUEndcap2.push_back(aHisto);
+  }
+
+  std::vector<TH1F*> BdtHZZIdPUEndcap1;
+  std::vector<TH1F*> BdtHZZIdPUEndcap2;
+  for (int i=0;i<(int)EgammaBdtHZZBasedID.size();++i) {
+    TH1F* aHisto = new TH1F( "BdtHZZId"+TString(EgammaBdtHZZBasedID[i])+"PUEndcap1", "HZZ BDT ID #eta",   8, LowerPU );
+    BdtHZZIdPUEndcap1.push_back(aHisto);
+    aHisto = new TH1F( "BdtHZZId"+TString(EgammaBdtHZZBasedID[i])+"PUEndcap2", "HZZ BDT ID #eta",   8, LowerPU );
+    BdtHZZIdPUEndcap2.push_back(aHisto);
   }
 
   // loop on events
@@ -281,10 +318,22 @@ void estimateFakeRate::Loop(const char *outname)
       if (lowPt)  BdtHWWIdEtaLowPt[kWP80] ->Fill(etaFake);
       if (isInEB) BdtHWWIdPtBarrel[kWP80] ->Fill(etFake);
       if (isInEE) BdtHWWIdPtEndcap[kWP80] ->Fill(etFake);
-      if (etaRegion==1) BdtHWWIdPtBarrel1[kWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==2) BdtHWWIdPtBarrel2[kWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==3) BdtHWWIdPtEndcap1[kWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==4) BdtHWWIdPtEndcap2[kWP80] -> Fill(etFake);  //, theWeight);     
+      if (etaRegion==1) {
+	BdtHWWIdPtBarrel1[kWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUBarrel1[kWP80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==2) {
+	BdtHWWIdPtBarrel2[kWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUBarrel2[kWP80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==3) { 
+	BdtHWWIdPtEndcap1[kWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUEndcap1[kWP80] -> Fill(vertices); //, theWeight);      
+      }
+      if (etaRegion==4) {
+	BdtHWWIdPtEndcap2[kWP80] -> Fill(etFake);   //, theWeight);     
+	BdtHWWIdPUEndcap2[kWP80] -> Fill(vertices); //, theWeight);     
+      }
     }
     // === WP80 HWW BDT + EA corr Iso ===
     if(passID(kIsoEACorr) && passID(kBDTHWW2011_withIP)) {
@@ -295,10 +344,22 @@ void estimateFakeRate::Loop(const char *outname)
       if (lowPt)  BdtHWWIdEtaLowPt[kWP80EA] ->Fill(etaFake);
       if (isInEB) BdtHWWIdPtBarrel[kWP80EA] ->Fill(etFake);
       if (isInEE) BdtHWWIdPtEndcap[kWP80EA] ->Fill(etFake);
-      if (etaRegion==1) BdtHWWIdPtBarrel1[kWP80EA] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==2) BdtHWWIdPtBarrel2[kWP80EA] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==3) BdtHWWIdPtEndcap1[kWP80EA] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==4) BdtHWWIdPtEndcap2[kWP80EA] -> Fill(etFake);  //, theWeight);     
+      if (etaRegion==1) {
+	BdtHWWIdPtBarrel1[kWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUBarrel1[kWP80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==2) {
+	BdtHWWIdPtBarrel2[kWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUBarrel2[kWP80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==3) { 
+	BdtHWWIdPtEndcap1[kWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUEndcap1[kWP80] -> Fill(vertices); //, theWeight);      
+      }
+      if (etaRegion==4) {
+	BdtHWWIdPtEndcap2[kWP80] -> Fill(etFake);   //, theWeight);     
+	BdtHWWIdPUEndcap2[kWP80] -> Fill(vertices); //, theWeight);     
+      }
     }
     // === HWW 2011 Iso ===
     if(passID(kIsoHWW2011)) {
@@ -309,10 +370,22 @@ void estimateFakeRate::Loop(const char *outname)
       if (lowPt)  BdtHWWIdEtaLowPt[kIsoWP80] ->Fill(etaFake);
       if (isInEB) BdtHWWIdPtBarrel[kIsoWP80] ->Fill(etFake);
       if (isInEE) BdtHWWIdPtEndcap[kIsoWP80] ->Fill(etFake);
-      if (etaRegion==1) BdtHWWIdPtBarrel1[kIsoWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==2) BdtHWWIdPtBarrel2[kIsoWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==3) BdtHWWIdPtEndcap1[kIsoWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==4) BdtHWWIdPtEndcap2[kIsoWP80] -> Fill(etFake);  //, theWeight);     
+      if (etaRegion==1) {
+	BdtHWWIdPtBarrel1[kIsoWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUBarrel1[kIsoWP80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==2) {
+	BdtHWWIdPtBarrel2[kIsoWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUBarrel2[kIsoWP80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==3) { 
+	BdtHWWIdPtEndcap1[kIsoWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUEndcap1[kIsoWP80] -> Fill(vertices); //, theWeight);      
+      }
+      if (etaRegion==4) {
+	BdtHWWIdPtEndcap2[kIsoWP80] -> Fill(etFake);   //, theWeight);     
+	BdtHWWIdPUEndcap2[kIsoWP80] -> Fill(vertices); //, theWeight);     
+      }
     }
     // === EA corr Iso ===
     if(passID(kIsoEACorr)) {
@@ -323,10 +396,22 @@ void estimateFakeRate::Loop(const char *outname)
       if (lowPt)  BdtHWWIdEtaLowPt[kIsoWP80EA] ->Fill(etaFake);
       if (isInEB) BdtHWWIdPtBarrel[kIsoWP80EA] ->Fill(etFake);
       if (isInEE) BdtHWWIdPtEndcap[kIsoWP80EA] ->Fill(etFake);
-      if (etaRegion==1) BdtHWWIdPtBarrel1[kIsoWP80EA] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==2) BdtHWWIdPtBarrel2[kIsoWP80EA] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==3) BdtHWWIdPtEndcap1[kIsoWP80EA] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==4) BdtHWWIdPtEndcap2[kIsoWP80EA] -> Fill(etFake);  //, theWeight);     
+      if (etaRegion==1) {
+	BdtHWWIdPtBarrel1[kIsoWP80EA] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUBarrel1[kIsoWP80EA] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==2) {
+	BdtHWWIdPtBarrel2[kIsoWP80EA] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUBarrel2[kIsoWP80EA] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==3) { 
+	BdtHWWIdPtEndcap1[kIsoWP80EA] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUEndcap1[kIsoWP80EA] -> Fill(vertices); //, theWeight);      
+      }
+      if (etaRegion==4) {
+	BdtHWWIdPtEndcap2[kIsoWP80EA] -> Fill(etFake);   //, theWeight);     
+	BdtHWWIdPUEndcap2[kIsoWP80EA] -> Fill(vertices); //, theWeight);     
+      }
     }
     // === HWW 2011 BDT ===
     if(passID(kBDTHWW2011_withIP)) {
@@ -337,10 +422,22 @@ void estimateFakeRate::Loop(const char *outname)
       if (lowPt)  BdtHWWIdEtaLowPt[kIdWP80] ->Fill(etaFake);
       if (isInEB) BdtHWWIdPtBarrel[kIdWP80] ->Fill(etFake);
       if (isInEE) BdtHWWIdPtEndcap[kIdWP80] ->Fill(etFake);
-      if (etaRegion==1) BdtHWWIdPtBarrel1[kIdWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==2) BdtHWWIdPtBarrel2[kIdWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==3) BdtHWWIdPtEndcap1[kIdWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==4) BdtHWWIdPtEndcap2[kIdWP80] -> Fill(etFake);  //, theWeight);     
+      if (etaRegion==1) {
+	BdtHWWIdPtBarrel1[kIdWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUBarrel1[kIdWP80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==2) {
+	BdtHWWIdPtBarrel2[kIdWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUBarrel2[kIdWP80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==3) { 
+	BdtHWWIdPtEndcap1[kIdWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHWWIdPUEndcap1[kIdWP80] -> Fill(vertices); //, theWeight);      
+      }
+      if (etaRegion==4) {
+	BdtHWWIdPtEndcap2[kIdWP80] -> Fill(etFake);   //, theWeight);     
+	BdtHWWIdPUEndcap2[kIdWP80] -> Fill(vertices); //, theWeight);     
+      }
     }
     // === WP80 HZZ 2012 + HWW 2011 Iso ===
     if(passID(kIsoHWW2011) && passID(kBDTHZZ_withIP)) {
@@ -351,10 +448,22 @@ void estimateFakeRate::Loop(const char *outname)
       if (lowPt)  BdtHZZIdEtaLowPt[kWP80] ->Fill(etaFake);
       if (isInEB) BdtHZZIdPtBarrel[kWP80] ->Fill(etFake);
       if (isInEE) BdtHZZIdPtEndcap[kWP80] ->Fill(etFake);
-      if (etaRegion==1) BdtHZZIdPtBarrel1[kWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==2) BdtHZZIdPtBarrel2[kWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==3) BdtHZZIdPtEndcap1[kWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==4) BdtHZZIdPtEndcap2[kWP80] -> Fill(etFake);  //, theWeight);     
+      if (etaRegion==1) {
+	BdtHZZIdPtBarrel1[kWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHZZIdPUBarrel1[kWP80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==2) {
+	BdtHZZIdPtBarrel2[kWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHZZIdPUBarrel2[kWP80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==3) {
+	BdtHZZIdPtEndcap1[kWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHZZIdPUEndcap1[kWP80] -> Fill(vertices); //, theWeight); 
+      }
+      if (etaRegion==4) {
+	BdtHZZIdPtEndcap2[kWP80] -> Fill(etFake);   //, theWeight);     
+	BdtHZZIdPUEndcap2[kWP80] -> Fill(vertices); //, theWeight);
+      }
     }
     // === WP80 HZZ BDT + EA corr Iso ===
     if(passID(kIsoEACorr) && passID(kBDTHZZ_withIP)) {
@@ -365,10 +474,22 @@ void estimateFakeRate::Loop(const char *outname)
       if (lowPt)  BdtHZZIdEtaLowPt[kWP80EA] ->Fill(etaFake);
       if (isInEB) BdtHZZIdPtBarrel[kWP80EA] ->Fill(etFake);
       if (isInEE) BdtHZZIdPtEndcap[kWP80EA] ->Fill(etFake);
-      if (etaRegion==1) BdtHZZIdPtBarrel1[kWP80EA] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==2) BdtHZZIdPtBarrel2[kWP80EA] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==3) BdtHZZIdPtEndcap1[kWP80EA] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==4) BdtHZZIdPtEndcap2[kWP80EA] -> Fill(etFake);  //, theWeight);     
+      if (etaRegion==1) {
+	BdtHZZIdPtBarrel1[kWP80EA] -> Fill(etFake);   //, theWeight);      
+	BdtHZZIdPUBarrel1[kWP80EA] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==2) {
+	BdtHZZIdPtBarrel2[kWP80EA] -> Fill(etFake);   //, theWeight);      
+	BdtHZZIdPUBarrel2[kWP80EA] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==3) {
+	BdtHZZIdPtEndcap1[kWP80EA] -> Fill(etFake);   //, theWeight);      
+	BdtHZZIdPUEndcap1[kWP80EA] -> Fill(vertices); //, theWeight); 
+      }
+      if (etaRegion==4) {
+	BdtHZZIdPtEndcap2[kWP80EA] -> Fill(etFake);   //, theWeight);     
+	BdtHZZIdPUEndcap2[kWP80EA] -> Fill(vertices); //, theWeight);
+      }
     }
     // === HZZ 2011 BDT ===
     if(passID(kBDTHZZ_withIP)) {
@@ -379,10 +500,22 @@ void estimateFakeRate::Loop(const char *outname)
       if (lowPt)  BdtHZZIdEtaLowPt[kIdWP80] ->Fill(etaFake);
       if (isInEB) BdtHZZIdPtBarrel[kIdWP80] ->Fill(etFake);
       if (isInEE) BdtHZZIdPtEndcap[kIdWP80] ->Fill(etFake);
-      if (etaRegion==1) BdtHZZIdPtBarrel1[kIdWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==2) BdtHZZIdPtBarrel2[kIdWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==3) BdtHZZIdPtEndcap1[kIdWP80] -> Fill(etFake);  //, theWeight);      
-      if (etaRegion==4) BdtHZZIdPtEndcap2[kIdWP80] -> Fill(etFake);  //, theWeight);     
+      if (etaRegion==1) {
+	BdtHZZIdPtBarrel1[kIdWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHZZIdPUBarrel1[kIdWP80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==2) {
+	BdtHZZIdPtBarrel2[kIdWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHZZIdPUBarrel2[kIdWP80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==3) {
+	BdtHZZIdPtEndcap1[kIdWP80] -> Fill(etFake);   //, theWeight);      
+	BdtHZZIdPUEndcap1[kIdWP80] -> Fill(vertices); //, theWeight); 
+      }
+      if (etaRegion==4) {
+	BdtHZZIdPtEndcap2[kIdWP80] -> Fill(etFake);   //, theWeight);     
+	BdtHZZIdPUEndcap2[kIdWP80] -> Fill(vertices); //, theWeight);
+      }
     }
   }
 
@@ -553,6 +686,78 @@ void estimateFakeRate::Loop(const char *outname)
   ElectronEffPU.SetYaxisTitle("Fake rate");
   ElectronEffPU.SetYaxisMin(0.0);
   ElectronEffPU.Write();
+
+  sprintf(filename,"%s-EleMisidPUBarrel1.root",outname);
+  EfficiencyEvaluator ElectronEffPUBarrel1(filename);
+  ElectronEffPUBarrel1.AddNumerator(RecoPU);
+  for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
+    ElectronEffPUBarrel1.AddNumerator(BdtHWWIdPUBarrel1[icut]);
+  }
+  for (int icut=0;icut<(int)EgammaBdtHZZBasedID.size();++icut){
+    ElectronEffPUBarrel1.AddNumerator(BdtHZZIdPUBarrel1[icut]);
+  }
+
+  ElectronEffPUBarrel1.SetDenominator(RecoPU);
+  ElectronEffPUBarrel1.ComputeEfficiencies();
+  ElectronEffPUBarrel1.SetTitle("fake rate vs vertices");
+  ElectronEffPUBarrel1.SetXaxisTitle("# vertices");
+  ElectronEffPUBarrel1.SetYaxisTitle("Fake rate");
+  ElectronEffPUBarrel1.SetYaxisMin(0.0);
+  ElectronEffPUBarrel1.Write();
+
+  sprintf(filename,"%s-EleMisidPUBarrel2.root",outname);
+  EfficiencyEvaluator ElectronEffPUBarrel2(filename);
+  ElectronEffPUBarrel2.AddNumerator(RecoPU);
+  for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
+    ElectronEffPUBarrel2.AddNumerator(BdtHWWIdPUBarrel2[icut]);
+  }
+  for (int icut=0;icut<(int)EgammaBdtHZZBasedID.size();++icut){
+    ElectronEffPUBarrel2.AddNumerator(BdtHZZIdPUBarrel2[icut]);
+  }
+
+  ElectronEffPUBarrel2.SetDenominator(RecoPU);
+  ElectronEffPUBarrel2.ComputeEfficiencies();
+  ElectronEffPUBarrel2.SetTitle("fake rate vs vertices");
+  ElectronEffPUBarrel2.SetXaxisTitle("# vertices");
+  ElectronEffPUBarrel2.SetYaxisTitle("Fake rate");
+  ElectronEffPUBarrel2.SetYaxisMin(0.0);
+  ElectronEffPUBarrel2.Write();
+
+  sprintf(filename,"%s-EleMisidPUEndcap1.root",outname);
+  EfficiencyEvaluator ElectronEffPUEndcap1(filename);
+  ElectronEffPUEndcap1.AddNumerator(RecoPU);
+  for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
+    ElectronEffPUEndcap1.AddNumerator(BdtHWWIdPUEndcap1[icut]);
+  }
+  for (int icut=0;icut<(int)EgammaBdtHZZBasedID.size();++icut){
+    ElectronEffPUEndcap1.AddNumerator(BdtHZZIdPUEndcap1[icut]);
+  }
+
+  ElectronEffPUEndcap1.SetDenominator(RecoPU);
+  ElectronEffPUEndcap1.ComputeEfficiencies();
+  ElectronEffPUEndcap1.SetTitle("fake rate vs vertices");
+  ElectronEffPUEndcap1.SetXaxisTitle("# vertices");
+  ElectronEffPUEndcap1.SetYaxisTitle("Fake rate");
+  ElectronEffPUEndcap1.SetYaxisMin(0.0);
+  ElectronEffPUEndcap1.Write();
+
+  sprintf(filename,"%s-EleMisidPUEndcap2.root",outname);
+  EfficiencyEvaluator ElectronEffPUEndcap2(filename);
+  ElectronEffPUEndcap2.AddNumerator(RecoPU);
+  for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
+    ElectronEffPUEndcap2.AddNumerator(BdtHWWIdPUEndcap2[icut]);
+  }
+  for (int icut=0;icut<(int)EgammaBdtHZZBasedID.size();++icut){
+    ElectronEffPUEndcap2.AddNumerator(BdtHZZIdPUEndcap2[icut]);
+  }
+
+  ElectronEffPUEndcap2.SetDenominator(RecoPU);
+  ElectronEffPUEndcap2.ComputeEfficiencies();
+  ElectronEffPUEndcap2.SetTitle("fake rate vs vertices");
+  ElectronEffPUEndcap2.SetXaxisTitle("# vertices");
+  ElectronEffPUEndcap2.SetYaxisTitle("Fake rate");
+  ElectronEffPUEndcap2.SetYaxisMin(0.0);
+  ElectronEffPUEndcap2.Write();
 
   
 }
