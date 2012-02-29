@@ -3,6 +3,7 @@
 
 #include <TFile.h>
 #include <TH1F.h>
+#include <TF1.h>
 #include <TCanvas.h>
 #include <TStyle.h>
 #include <TString.h>
@@ -28,6 +29,7 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
   colors.push_back(kTeal+3);
 
   gStyle->SetOptStat(0);
+  gStyle->SetOptFit(1111);
 
   TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
   TLegend* legend = new TLegend(0.20, 0.70, 0.43, 0.86);
@@ -40,12 +42,16 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
   for(int i=0;i<(int)histos.size();++i) {
     
     histos[i]->SetMinimum(0);
-    histos[i]->SetMaximum(0.5);
+    histos[i]->SetMaximum(0.2);
     histos[i]->SetMarkerSize(2);
     histos[i]->SetMarkerStyle(20);
     histos[i]->SetMarkerColor(colors[i]);
     histos[i]->SetLineColor(colors[i]);
     histos[i]->SetTitle("");
+    if(TString(histos[i]->GetName()).Contains("PU")) {
+      histos[i]->Fit("pol1","","same",1,25);
+      histos[i]->GetFunction("pol1")->SetLineColor(colors[i]);
+    }
     histos[i]->GetXaxis()->SetTitle(xaxislabel);
     histos[i]->GetYaxis()->SetTitle("efficiency");
 
@@ -57,6 +63,7 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
   legend->Draw();
 
   TString basename(filename);
+  basename.ReplaceAll("Eff","FR");
   c1->SaveAs(basename+TString(".png"));
   c1->SaveAs(basename+TString(".pdf"));
 
@@ -182,13 +189,35 @@ void drawIds() {
   drawOneToOne(ptSet1,ptSet2,"H #rightarrow WW 2011","H #rightarrow ZZ 2012","p_{T} [GeV]");
 
   // PU
-  TH1F *BdtHWWIdWP80PU = (TH1F*)file->Get("BdtHWWIdWP80PU_Eff");
-  // ---> EA corrected
-  TH1F *BdtHZZIdWP80EAPU = (TH1F*)file->Get("BdtHZZIdWP80EAPU_Eff");
+  TH1F *BdtHWWIdWP80PUBarrel1 = (TH1F*)file->Get("BdtHWWIdWP80PUBarrel1_Eff");
+  TH1F *BdtHWWIdWP80PUBarrel2 = (TH1F*)file->Get("BdtHWWIdWP80PUBarrel2_Eff");
+  TH1F *BdtHWWIdWP80PUEndcap1 = (TH1F*)file->Get("BdtHWWIdWP80PUEndcap1_Eff");
+  TH1F *BdtHWWIdWP80PUEndcap2 = (TH1F*)file->Get("BdtHWWIdWP80PUEndcap2_Eff");
+  // ---> HZZ id + EA corrected isolation
+  TH1F *BdtHZZIdWP80EAPUBarrel1 = (TH1F*)file->Get("BdtHZZIdWP80EAPUBarrel1_Eff");
+  TH1F *BdtHZZIdWP80EAPUBarrel2 = (TH1F*)file->Get("BdtHZZIdWP80EAPUBarrel2_Eff");
+  TH1F *BdtHZZIdWP80EAPUEndcap1 = (TH1F*)file->Get("BdtHZZIdWP80EAPUEndcap1_Eff");
+  TH1F *BdtHZZIdWP80EAPUEndcap2 = (TH1F*)file->Get("BdtHZZIdWP80EAPUEndcap2_Eff");
+
   vector<TH1F*> puSet1, puSet2;
-  puSet1.push_back(BdtHWWIdWP80PU);
-  puSet2.push_back(BdtHZZIdWP80EAPU);
+  puSet1.push_back(BdtHWWIdWP80PUBarrel1);
+  puSet1.push_back(BdtHWWIdWP80PUBarrel2);
+  puSet1.push_back(BdtHWWIdWP80PUEndcap1);
+  puSet1.push_back(BdtHWWIdWP80PUEndcap2);
+  puSet2.push_back(BdtHZZIdWP80EAPUBarrel1);
+  puSet2.push_back(BdtHZZIdWP80EAPUBarrel2);
+  puSet2.push_back(BdtHZZIdWP80EAPUEndcap1);
+  puSet2.push_back(BdtHZZIdWP80EAPUEndcap2);
 
   drawOneToOne(puSet1,puSet2,"H #rightarrow WW 2011","H #rightarrow ZZ 2012","# vertices");
+
+  // TH1F *BdtHWWIdWP80PU = (TH1F*)file->Get("BdtHWWIdWP80PU_Eff");
+  // // ---> EA corrected
+  // TH1F *BdtHZZIdWP80EAPU = (TH1F*)file->Get("BdtHZZIdWP80EAPU_Eff");
+  // vector<TH1F*> puSet1, puSet2;
+  // puSet1.push_back(BdtHWWIdWP80PU);
+  // puSet2.push_back(BdtHZZIdWP80EAPU);
+
+  // drawOneToOne(puSet1,puSet2,"H #rightarrow WW 2011","H #rightarrow ZZ 2012","# vertices");
 
 }
