@@ -59,6 +59,19 @@ void reduce(const char* filename) {
    Float_t         chaPFIso;
    Float_t         neuPFIso;
    Float_t         phoPFIso;
+   Float_t         EoPout;
+   Float_t         EoP;
+   Float_t         HoE;
+   Float_t         deta;
+   Float_t         dphi;
+   Float_t         s9s25;
+   Float_t         see;
+   Float_t         spp;
+   Float_t         fbrem;
+   Int_t           nbrem;
+   Int_t           missHits;
+   Float_t         dist;
+   Float_t         dcot;
 
 
    treeOrig->SetBranchAddress("mass", &mass);
@@ -90,12 +103,26 @@ void reduce(const char* filename) {
    treeOrig->SetBranchAddress("bdthww", &bdthww);
    treeOrig->SetBranchAddress("bdthzz", &bdthzz);
    treeOrig->SetBranchAddress("rho", &rho);
+   treeOrig->SetBranchAddress("EoPout", &EoPout);
+   treeOrig->SetBranchAddress("EoP", &EoP);
+   treeOrig->SetBranchAddress("HoE", &HoE);
+   treeOrig->SetBranchAddress("deta", &deta);
+   treeOrig->SetBranchAddress("dphi", &dphi);
+   treeOrig->SetBranchAddress("s9s25", &s9s25);
+   treeOrig->SetBranchAddress("see", &see);
+   treeOrig->SetBranchAddress("spp", &spp);
+   treeOrig->SetBranchAddress("fbrem", &fbrem);
+   treeOrig->SetBranchAddress("nbrem", &nbrem);
+   treeOrig->SetBranchAddress("missHits", &missHits);
+   treeOrig->SetBranchAddress("dist", &dist);
+   treeOrig->SetBranchAddress("dcot", &dcot);
 
    Float_t abseta;
 
    // copy branches
    treeNew->Branch("mass", &mass, "mass/F");
    treeNew->Branch("pt", &pt, "pt/F");
+   treeNew->Branch("eta", &eta, "eta/F");
    treeNew->Branch("abseta", &abseta, "abseta/F");
    treeNew->Branch("vertices", &vertices, "vertices/F");
    treeNew->Branch("PFIso", &LHPFIsoBasedIdOnlyIso[4], "PFIso/I");
@@ -124,6 +151,19 @@ void reduce(const char* filename) {
    treeNew->Branch("bdthzz", &bdthzz, "bdthzz/F");
    treeNew->Branch("rho", &rho, "rho/F");
    treeNew->Branch("puW", &puW, "puW/F");
+   treeNew->Branch("EoPout", &EoPout, "EoPout/F");
+   treeNew->Branch("EoP", &EoP, "EoP/F");
+   treeNew->Branch("HoE", &HoE, "HoE/F");
+   treeNew->Branch("deta", &deta, "deta/F");
+   treeNew->Branch("dphi", &dphi, "dphi/F");
+   treeNew->Branch("s9s25", &s9s25, "s9s25/F");
+   treeNew->Branch("see", &see, "see/F");
+   treeNew->Branch("spp", &spp, "spp/F");
+   treeNew->Branch("fbrem", &fbrem, "fbrem/F");
+   treeNew->Branch("nbrem", &nbrem, "nbrem/I");
+   treeNew->Branch("missHits", &missHits, "missHits/I");
+   treeNew->Branch("dist", &dist, "dist/F");
+   treeNew->Branch("dcot", &dcot, "dcot/F");
 
    // used for PU reweighting
    PUWeight* fPUWeightFull2011 = new PUWeight("summer11","DY",-1,"Full2011",-1); 

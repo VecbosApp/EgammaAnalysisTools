@@ -777,7 +777,7 @@ bool estimateFakeRate::passID(estimateFakeRate::idType type) {
     if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) combIso -= 0.38 * rho;
     if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) combIso -= 0.61 * rho;
     if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) combIso -= 0.73 * rho;
-    if(fabs(eta) >=  2.4) combIso -= 0.90 * rho;
+    if(fabs(eta) >=  2.4) combIso -= 0.78 * rho;
 
     if(pt>20) {
       if(fabs(eta) <  1.0) return (combIso/pt < 0.23); 
