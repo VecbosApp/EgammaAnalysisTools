@@ -38,7 +38,7 @@ weightfile  = ['weights/OptimizedCuts_weights_eta10_Pt10To20.xml',
 for i in range(len(cuts)):
     if len(cuts) != len(outputs):
         raise RuntimeError('cut set does not correspond to output set!')
-    os.system('python CutsOptimization.py -m CutsGA -a "'+cuts[i]+'" -o '+outputs[i])
-    os.system('mv weights/TMVAClassification_CutsGA.weights.xml '+weightfile[i])
+    os.system('python CutsOptimization.py -m Cuts -a "'+cuts[i]+'" -o '+outputs[i])
+    os.system('mv weights/TMVAClassification_Cuts.weights.xml '+weightfile[i])
 
 print "DONE!"
