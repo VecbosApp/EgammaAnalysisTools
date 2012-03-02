@@ -17,30 +17,66 @@ using namespace std;
 FakeElectronSelector::FakeElectronSelector(TTree *tree)
   : Egamma(tree) {
   
-  _isData = true;       // chiara
+  _isData = false;       // chiara
   
+  // configuring electron likelihood
+  TFile *fileLH = TFile::Open("pdfs_MC.root");
+  TDirectory *EB0lt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB1lt15dir = fileLH->GetDirectory("/");
+  TDirectory *EElt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB0gt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB1gt15dir = fileLH->GetDirectory("/");
+  TDirectory *EEgt15dir = fileLH->GetDirectory("/");
+  LikelihoodSwitches defaultSwitches;
+
+  defaultSwitches.m_useFBrem = true;
+  defaultSwitches.m_useEoverP = false;
+  defaultSwitches.m_useSigmaPhiPhi = true;
+  defaultSwitches.m_useHoverE = false;        
+  defaultSwitches.m_useOneOverEMinusOneOverP = true;
+
+  LH = new ElectronLikelihood(&(*EB0lt15dir), &(*EB1lt15dir), &(*EElt15dir), &(*EB0gt15dir), &(*EB1gt15dir), &(*EEgt15dir),
+                              defaultSwitches, std::string("class"),std::string("class"),true,true);
+
   // configuring the electron BDT
-  fMVA = new ElectronIDMVA();
-  fMVA->Initialize("BDTG method",
-                   "elebdtweights/Subdet0LowPt_WithIPInfo_BDTG.weights.xml",   
-                   "elebdtweights/Subdet1LowPt_WithIPInfo_BDTG.weights.xml",
-                   "elebdtweights/Subdet2LowPt_WithIPInfo_BDTG.weights.xml",
-                   "elebdtweights/Subdet0HighPt_WithIPInfo_BDTG.weights.xml",
-                   "elebdtweights/Subdet1HighPt_WithIPInfo_BDTG.weights.xml",
-                   "elebdtweights/Subdet2HighPt_WithIPInfo_BDTG.weights.xml" ,
-                   ElectronIDMVA::kWithIPInfo);
+  fMVAHWW = new ElectronIDMVA();
+  fMVAHWWNoIP = new ElectronIDMVA();
+  fMVAHWW->Initialize("BDTG method",
+                      "elebdtweights/Subdet0LowPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet1LowPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet2LowPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet0HighPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet1HighPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet2HighPt_WithIPInfo_BDTG.weights.xml" ,                
+                      ElectronIDMVA::kWithIPInfo);
+
+  fMVAHWWNoIP->Initialize("BDTG method",
+                          "elebdtweights/Subdet0LowPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet1LowPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet2LowPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet0HighPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet1HighPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet2HighPt_NoIPInfo_BDTG.weights.xml" ,                
+                      ElectronIDMVA::kNoIPInfo);
   
   // configuring the electron BDT for H->ZZ
+  fMVAHZZMC = new ElectronIDMVAHZZ();
   fMVAHZZ = new ElectronIDMVAHZZ();
+  fMVAHZZNoIP = new ElectronIDMVAHZZ();
   // Default H->ZZ MC training
-  //   fMVAHZZ->Initialize("BDTSimpleCat",
-  //                       "elebdtweights/HZZBDT_BDTSimpleCat.weights.xml",
-  //                       ElectronIDMVAHZZ::kBDTSimpleCat);
+  fMVAHZZMC->Initialize("BDTSimpleCat",
+                        "elebdtweights/HZZBDT_BDTSimpleCat.weights.xml",
+                        ElectronIDMVAHZZ::kBDTSimpleCat);
 
-  // New H->ZZ DATA training
+  // New H->ZZ DATA training, with IP
   fMVAHZZ->Initialize("BDTSimpleCat",
-                      "elebdtweights/HZZBDT_BDTSimpleCat_Data.weights.xml",
+                      "elebdtweights/HZZBDT_BDTSimpleCat_EBSplit_Data.weights.xml",
                       ElectronIDMVAHZZ::kBDTSimpleCatData);
+
+  // New H->ZZ DATA training, no IP
+  fMVAHZZNoIP->Initialize("BDTSimpleCat",
+                          "elebdtweights/HZZBDT_BDTSimpleCatNoIP_EBSplit_Data.weights.xml",
+                          ElectronIDMVAHZZ::kBDTSimpleCatNoIPData);
 
   // chiara
   // to read good run list
@@ -273,30 +309,37 @@ void FakeElectronSelector::Loop(const char *outname) {
     if ( fabs(dxyEle)>0.02 ) isDenomIP = false;
     if ( fabs(dzEle)>0.10 )  isDenomIP = false;
     // does this denominator pass the IP cut as for H->WW ?  
-    
+
     // some eleID variables
     float HoE, s1s9, s9s25, phiwidth, etawidth, deta, dphi, fbrem, see, spp, eleopout, eopout, eop, nbrems, recoFlag, EleSCEta;
     float oneoveremoneoverp, eledeta, d0, ip3d, ip3ds, kfhits, kfchi2, e1x5e5x5, dcot, dist;
+    float detacalo, dphicalo, sep, dz, gsfchi2, emaxovere, etopovere, ebottomovere, eleftovere, erightovere,
+      e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
+      e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,
+      EleSCPhi, scenergy, scrawenergy, scesenergy;
 
     int kfTrack = trackIndexEle[theDenom1];
     double gsfsign   = (-eleDxyPV(theDenom1,0) >=0 ) ? 1. : -1.;
     int matchConv = (hasMatchedConversionEle[theDenom1]) ? 1 : 0;
-    
+
     d0 = gsfsign * transvImpactParGsfTrack[gsfTrack];
+    dz = eleDzPV(theDenom1,0);
     ip3d = gsfsign * impactPar3DGsfTrack[gsfTrack];
     ip3ds = ip3d/impactPar3DErrorGsfTrack[gsfTrack];
     kfchi2 = (kfTrack>-1) ? trackNormalizedChi2Track[kfTrack] : 0.0;
     kfhits = (kfTrack>-1) ? trackerLayersWithMeasurementTrack[kfTrack] : -1.0;
+    gsfchi2 = trackNormalizedChi2GsfTrack[gsfTrack];
     int misshits = expInnerLayersGsfTrack[gsfTrack];
     dcot = convDistEle[theDenom1];
     dist = convDcotEle[theDenom1];
-
     bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[theDenom1], isEcalDriven);
     int ecalseed;
     HoE = hOverEEle[theDenom1];
     eledeta = deltaEtaEleClusterTrackAtCaloEle[theDenom1];
     deta = deltaEtaAtVtxEle[theDenom1];
     dphi = deltaPhiAtVtxEle[theDenom1];
+    detacalo = deltaEtaAtCaloEle[theDenom1];
+    dphicalo = deltaPhiAtCaloEle[theDenom1];
     fbrem = fbremEle[theDenom1];
     nbrems = nbremsEle[theDenom1];
     eleopout = eEleClusterOverPoutEle[theDenom1];
@@ -305,30 +348,74 @@ void FakeElectronSelector::Loop(const char *outname) {
     if(ecaldriven) {
       ecalseed = 1;
       int sc = superClusterIndexEle[theDenom1];
+      float seedEnergy = seedEnergySC[sc];
       s1s9 = eMaxSC[sc]/eMaxSC[sc];
       s9s25 = e3x3SC[sc]/e5x5SC[sc];
       e1x5e5x5 = (e5x5SC[sc] - e1x5SC[sc])/e5x5SC[sc];
       phiwidth = phiWidthSC[sc];
       etawidth = etaWidthSC[sc];
       see = sqrt(covIEtaIEtaSC[sc]);
+      sep = sqrt(covIEtaIPhiSC[sc]);
       spp = sqrt(covIPhiIPhiSC[sc]);
       oneoveremoneoverp = 1./energySC[sc]  - 1./tv3Denom1.Mag();
+      emaxovere = eMaxSC[sc]/seedEnergy;
+      etopovere = eTopSC[sc]/seedEnergy;
+      ebottomovere = eBottomSC[sc]/seedEnergy;
+      eleftovere = eLeftSC[sc]/seedEnergy;
+      erightovere = eRightSC[sc]/seedEnergy;
+      e2ndovere = e2ndSC[sc]/seedEnergy;
+      e2x5rightovere = e2x5RightSC[sc]/seedEnergy;
+      e2x5leftovere = e2x5LeftSC[sc]/seedEnergy;
+      e2x5topovere = e2x5TopSC[sc]/seedEnergy;
+      e2x5bottomovere = e2x5BottomSC[sc]/seedEnergy;
+      e2x5maxovere = e2x5MaxSC[sc]/seedEnergy;
+      e1x5overe = e1x5SC[sc]/seedEnergy;
+      e2x2overe = e2x2SC[sc]/seedEnergy;
+      e3x3overe = e3x3SC[sc]/seedEnergy;
+      e5x5overe = e5x5SC[sc]/seedEnergy;
+      r9 = e3x3SC[sc]/rawEnergySC[sc];
       recoFlag = recoFlagSC[sc];
       EleSCEta = etaSC[sc];
+      EleSCPhi = phiSC[sc];            
+      scenergy = energySC[sc];
+      scrawenergy = rawEnergySC[sc];
+      scesenergy = esEnergySC[sc];
     } else {
       ecalseed = 0;
       int sc = PFsuperClusterIndexEle[theDenom1];
       if(sc>-1) {
+        float seedEnergy = seedEnergyPFSC[sc];
         s9s25 = e3x3PFSC[sc]/e5x5PFSC[sc];
         s1s9 = eMaxPFSC[sc]/eMaxPFSC[sc];
         e1x5e5x5 = (e5x5PFSC[sc] - e1x5PFSC[sc])/e5x5PFSC[sc];
         phiwidth = phiWidthPFSC[sc];
         etawidth = etaWidthPFSC[sc];
         see = sqrt(covIEtaIEtaPFSC[sc]);
+        sep = sqrt(covIEtaIPhiPFSC[sc]);
         spp = sqrt(covIPhiIPhiPFSC[sc]);
         oneoveremoneoverp = 1./energyPFSC[sc]  - 1./tv3Denom1.Mag();
+        emaxovere = eMaxPFSC[sc]/seedEnergy;
+        etopovere = eTopPFSC[sc]/seedEnergy;
+        ebottomovere = eBottomPFSC[sc]/seedEnergy;
+        eleftovere = eLeftPFSC[sc]/seedEnergy;
+        erightovere = eRightPFSC[sc]/seedEnergy;
+        e2ndovere = e2ndPFSC[sc]/seedEnergy;
+        e2x5rightovere = e2x5RightPFSC[sc]/seedEnergy;
+        e2x5leftovere = e2x5LeftPFSC[sc]/seedEnergy;
+        e2x5topovere = e2x5TopPFSC[sc]/seedEnergy;
+        e2x5bottomovere = e2x5BottomPFSC[sc]/seedEnergy;
+        e2x5maxovere = e2x5MaxPFSC[sc]/seedEnergy;
+        e1x5overe = e1x5PFSC[sc]/seedEnergy;
+        e2x2overe = e2x2PFSC[sc]/seedEnergy;
+        e3x3overe = e3x3PFSC[sc]/seedEnergy;
+        e5x5overe = e5x5PFSC[sc]/seedEnergy;
+        r9 = e3x3PFSC[sc]/rawEnergyPFSC[sc];
         recoFlag = recoFlagPFSC[sc];
         EleSCEta = etaPFSC[sc];
+        EleSCPhi = phiPFSC[sc];     
+        scenergy = energyPFSC[sc];
+        scrawenergy = rawEnergyPFSC[sc];
+        scesenergy = esEnergyPFSC[sc];
       } else {
         s9s25 = 999.;
         see = 999.;
@@ -336,8 +423,14 @@ void FakeElectronSelector::Loop(const char *outname) {
       }
     }
 
-    float bdthww = eleBDT(fMVA,theDenom1);
+    // some MVAs...
+    float pfmva = pflowMVAEle[theDenom1];
+    float lh=likelihoodRatio(theDenom1,*LH);
+    float bdthww = eleBDT(fMVAHWW,theDenom1);
+    float bdthwwnoip = eleBDT(fMVAHWWNoIP,theDenom1);
     float bdthzz = eleBDT(fMVAHZZ,theDenom1);
+    float bdthzznoip = eleBDT(fMVAHZZNoIP,theDenom1);
+    float bdthzzmc = eleBDT(fMVAHZZMC,theDenom1);
 
     // fill the reduced tree
     float pt = tlvDenom1.Pt();
@@ -346,6 +439,10 @@ void FakeElectronSelector::Loop(const char *outname) {
     myOutIDTree->fillVariables(eleopout,eopout,eop,HoE,deta,dphi,s9s25,s1s9,see,spp,fbrem,
                               nbrems,misshits,dcot,dist,pt,eta,charge,phiwidth,etawidth,
                               oneoveremoneoverp,eledeta,d0,ip3d,ip3ds,kfhits,kfchi2,e1x5e5x5,ecalseed,matchConv);
+    myOutIDTree->fillVariables2(detacalo, dphicalo, sep, dz, gsfchi2, emaxovere, etopovere, ebottomovere, eleftovere, erightovere,
+                               e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
+                               e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,
+                               EleSCPhi, scenergy, scrawenergy, scesenergy);    
     myOutIDTree->fillIsolations(dr03TkSumPtEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                dr03EcalRecHitSumEtEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                dr03HcalTowerSumEtFullConeEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,

@@ -51,8 +51,9 @@ private:
   Counters myCounter;
 
   /// MVA for electron ID. To be created and initialized from the children classes
-  ElectronIDMVA *fMVA;
-  ElectronIDMVAHZZ *fMVAHZZ;
+  ElectronLikelihood *LH;
+  ElectronIDMVA *fMVAHWW, *fMVAHWWNoIP;
+  ElectronIDMVAHZZ *fMVAHZZ, *fMVAHZZNoIP, *fMVAHZZMC;
 
   // outputs for the kinematics and the id
   FakeTree *myOutKineTree;
