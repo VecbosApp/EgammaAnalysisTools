@@ -167,10 +167,12 @@ int main(int argc, char* argv[]) {
   sprintf(files,"macro/results_data/merged.root");
   sprintf(fileb,"macro/results_data_fakes/merged.root");
 
+  cout << "\t===> DOING ISOLATION FRIEND TREES <===" << endl;
   // isolation
-  // makeFriendHZZIsolation(files);
-  // makeFriendHZZIsolation(fileb);
+  makeFriendHZZIsolation(files);
+  makeFriendHZZIsolation(fileb);
 
+  cout << "\t===> DOING ID FRIEND TREES <===" << endl;
   // id bits
   makeFriendHZZIdBits(files);
   makeFriendHZZIdBits(fileb);
