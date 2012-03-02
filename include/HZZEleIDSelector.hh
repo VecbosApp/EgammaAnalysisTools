@@ -4,8 +4,8 @@
 class HZZEleIDSelector {
 public:
 
-  HZZEleIDSelector();
-  ~HZZEleIDSelector();
+  HZZEleIDSelector() {}
+  ~HZZEleIDSelector() {}
   enum wpfulliso {
     kWP95 = 0,
     kWP90, kWP85, kWP80, kWP70

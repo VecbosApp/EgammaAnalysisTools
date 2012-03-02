@@ -1,6 +1,10 @@
 #include "include/HZZEleIDSelector.hh"
 #include "EgammaAnalysisTools/include/eIDMVACuts.h"
+
 #include <math.h>
+#include <iostream>
+
+using namespace std;
 
 int HZZEleIDSelector::etabin(float eta) {
   if(fabs(eta)<1.0) return 0;
@@ -21,7 +25,11 @@ bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso,
   int ptb=ptbin(pt);
   float bdtcut=cutbdtfulliso[ptb][etab][WP];
   float isocut=cutfulliso[ptb][etab][WP];
-  return (bdt>bdtcut && iso<isocut);
+  // cout << "   eta = " << eta << " pt = " << pt 
+  //      << "   bdt = " << bdt << " (cut is: " << bdtcut << ")" 
+  //      << "   iso = " << iso << " (cut is: " << isocut << ")"
+  //      << endl;
+  return (bdt>bdtcut && iso/pt<isocut);
 }
 
 bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso, 
@@ -30,5 +38,5 @@ bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso,
   int ptb=ptbin(pt);
   float bdtcut=cutbdtchiso[ptb][etab][WP];
   float isocut=cutchiso[ptb][etab][WP];
-  return (bdt>bdtcut && iso<isocut);
+  return (bdt>bdtcut && iso/pt<isocut);
 }
