@@ -100,6 +100,7 @@ void makeFriendHZZIdBits(const char* file) {
 
   Float_t bdthww, combPFIsoHWW;
   Float_t iso, bdt, eta, pt, rho;
+  Float_t mass; // not dummy only for TP trees
   pT->SetBranchAddress("bdthww", &bdthww);
   pT->SetBranchAddress("combPFIsoHWW", &combPFIsoHWW);
   pT->SetBranchAddress("bdthzz",&bdt);
@@ -107,6 +108,8 @@ void makeFriendHZZIdBits(const char* file) {
   pT->SetBranchAddress("eta", &eta);
   pT->SetBranchAddress("pt", &pt);
   pT->SetBranchAddress("rho", &rho);
+  if(!TString(file).Contains("fake")) pT->SetBranchAddress("mass", &mass);
+  else mass=-1.0;
 
   fF->mkdir("eleIDdir");
   TTree *fT = new TTree("T1","tree with hzz isolation");
@@ -116,6 +119,7 @@ void makeFriendHZZIdBits(const char* file) {
   Int_t chWP95, chWP90, chWP85;
   // the hww2011 WP
   Int_t hwwWP;
+  fT->Branch("mass", &mass, "mass/F");
   fT->Branch("wp95", &WP95, "wp95/I");
   fT->Branch("wp90", &WP90, "wp90/I");
   fT->Branch("wp85", &WP85, "wp85/I");
