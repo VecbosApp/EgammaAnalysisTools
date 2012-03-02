@@ -99,8 +99,9 @@ void IsolationPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
         int iecal = (fabs( etaEle[probe])<1.479) ? 0 : 1;
         
         // apply the electron ID loose on the tag electron        
-        float tagIdentified = eleIdCutsEle[tag];
-        
+        //        float tagIdentified = eleIdCutsEle[probe];
+        float tagIdentified = false; // attention! variable no more in the ntuple
+
         // Tracker isolation
         // on the tag electron...
         
@@ -109,7 +110,8 @@ void IsolationPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
         // ID on the probe electron...
         bool probeIdentified = true;
         if ( m_selection->getSwitch("applyIDOnProbe") ) {
-          probeIdentified = eleIdCutsEle[probe];
+          //          probeIdentified = eleIdCutsEle[probe];
+          probeIdentified = false; // attention! variable no more in the ntuple
         }
         
         float TkSumPtRel = dr04TkSumPtEle[probe];
@@ -163,9 +165,10 @@ void IsolationPdfsProducer::LoopQCD() {
 
       if( m_selection->getSwitch("etaEleAcc") && 
           ! m_selection->passCut("etaEleAcc",etaEle[iele]) ) continue;
-      
-      if ( m_selection->getSwitch("applyIDOnProbe") &&
-           ! eleIdCutsEle[iele] ) continue;
+
+      // attention, variable no more in the ntuple
+//       if ( m_selection->getSwitch("applyIDOnProbe") &&
+//            ! eleIdCutsEle[iele] ) continue;
       
       TLorentzVector eleP4(pxEle[iele],pyEle[iele],pzEle[iele],energyEle[iele]);
 
@@ -246,9 +249,10 @@ void IsolationPdfsProducer::LoopWjets() {
       
       if( m_selection->getSwitch("etaEleAcc") && 
           ! m_selection->passCut("etaEleAcc",etaEle[iele]) ) continue;
-      
-      if ( m_selection->getSwitch("applyIDOnProbe") &&
-           ! eleIdCutsEle[iele] ) continue;
+
+      // attntion...
+//       if ( m_selection->getSwitch("applyIDOnProbe") &&
+//            ! eleIdCutsEle[iele] ) continue;
       
       
       /// define the bins in which can be splitted the PDFs

@@ -270,7 +270,8 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
           s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
 	  
           // fill the reduced tree
-	  reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
+          // changed: to be adapted
+	  // reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
           reducedTree.fillAttributesSignal(okmass);
           reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
           reducedTree.store();
@@ -446,7 +447,7 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
 
       // fill the reduced tree     
       if( isolated1 && iclass>-1 ) {
-	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
+        //	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
 	reducedTree.fillAttributesSignal(9999.);
 	reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
 	reducedTree.store();
@@ -506,7 +507,7 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
 
       // fill the reduced tree     
       if( isolated2 && iclass>-1 ) {
-	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
+        //	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
 	reducedTree.fillAttributesSignal(9999.);
 	reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
 	reducedTree.store();
@@ -716,7 +717,7 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
 
 	  // only if it matches with MC fill the reduced tree
 	  if (matchMc) { 
-	    reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
+            //	    reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
 	    reducedTree.fillAttributesSignal(okmass);
 	    reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
 	    reducedTree.store();
@@ -947,10 +948,10 @@ void LHPdfsProducer::LoopZwithMass(const char *treefilesuffix) {
 
 	// fill the reduced tree     
 	if( isolated1 && isolated2 && iclass1>-1 && iclass2>-1 ) {
-	  reducedTree.fillVariables(EoPout1,EoP1,HoE1,dEtaVtx1,dPhiVtx1,s9s251,sigmaIEtaIEta1,sigmaIPhiIPhi1,fbrem1,nbrem1,pt1,eta1,charge1);
+          //	  reducedTree.fillVariables(EoPout1,EoP1,HoE1,dEtaVtx1,dPhiVtx1,s9s251,sigmaIEtaIEta1,sigmaIPhiIPhi1,fbrem1,nbrem1,pt1,eta1,charge1);
 	  reducedTree.fillAttributesSignal(mass);
 	  reducedTree.fillCategories(iecal1,iptbin1,iclass1,nbrem1);
-	  reducedTree.fillVariables(EoPout2,EoP2,HoE2,dEtaVtx2,dPhiVtx2,s9s252,sigmaIEtaIEta2,sigmaIPhiIPhi2,fbrem2,nbrem2,pt2,eta2,charge2);
+          //	  reducedTree.fillVariables(EoPout2,EoP2,HoE2,dEtaVtx2,dPhiVtx2,s9s252,sigmaIEtaIEta2,sigmaIPhiIPhi2,fbrem2,nbrem2,pt2,eta2,charge2);
 	  reducedTree.fillAttributesSignal(mass);
 	  reducedTree.fillCategories(iecal2,iptbin2,iclass2,nbrem2);
 	  
@@ -1197,9 +1198,9 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     if (probeCandidates.size()>0) m_counters->IncrVar("oneele");
 
     // selecting jets in the acceptance to work as tag
-    for (int ijet=0; ijet<nAK5PFJet; ijet++){    
-      TVector3 p3Jet(pxAK5PFJet[ijet],pyAK5PFJet[ijet],pzAK5PFJet[ijet]);
-      if ( m_selection->getSwitch("etaJetAcc") && !m_selection->passCut("etaJetAcc",etaAK5PFJet[ijet]) ) continue;
+    for (int ijet=0; ijet<nAK5PFPUcorrJet; ijet++){    
+      TVector3 p3Jet(pxAK5PFPUcorrJet[ijet],pyAK5PFPUcorrJet[ijet],pzAK5PFPUcorrJet[ijet]);
+      if ( m_selection->getSwitch("etaJetAcc") && !m_selection->passCut("etaJetAcc",etaAK5PFPUcorrJet[ijet]) ) continue;
       if ( m_selection->getSwitch("etJetAcc")  && !m_selection->passCut("etJetAcc",p3Jet.Pt()) )   continue;
       tagCandidates.push_back(ijet);
     }
@@ -1214,8 +1215,8 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     for (int iJet=0; iJet<tagCandidates.size(); iJet++){ 
 
       TLorentzVector p4Jet;
-      TVector3 p3Jet(pxAK5PFJet[tagCandidates[iJet]],pyAK5PFJet[tagCandidates[iJet]],pzAK5PFJet[tagCandidates[iJet]]);
-      p4Jet.SetXYZT (pxAK5PFJet[tagCandidates[iJet]],pyAK5PFJet[tagCandidates[iJet]],pzAK5PFJet[tagCandidates[iJet]], energyAK5PFJet[tagCandidates[iJet]]);
+      TVector3 p3Jet(pxAK5PFPUcorrJet[tagCandidates[iJet]],pyAK5PFPUcorrJet[tagCandidates[iJet]],pzAK5PFPUcorrJet[tagCandidates[iJet]]);
+      p4Jet.SetXYZT (pxAK5PFPUcorrJet[tagCandidates[iJet]],pyAK5PFPUcorrJet[tagCandidates[iJet]],pzAK5PFPUcorrJet[tagCandidates[iJet]], energyAK5PFPUcorrJet[tagCandidates[iJet]]);
 
       // we use the highest ET jet (with a potential probe) as a tag 
       if (p3Jet.Pt()<tagEt) continue;
@@ -1261,8 +1262,8 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
     TLorentzVector p4Tag, p4Probe;	
     TVector3 p3Probe(pxEle[theProbe],pyEle[theProbe],pzEle[theProbe]);
     p4Probe.SetXYZT (pxEle[theProbe],pyEle[theProbe],pzEle[theProbe],energyEle[theProbe]);
-    TVector3 p3Tag(pxAK5PFJet[theTag],pyAK5PFJet[theTag],pzAK5PFJet[theTag]);
-    p4Tag.SetXYZT (pxAK5PFJet[theTag],pyAK5PFJet[theTag],pzAK5PFJet[theTag], energyAK5PFJet[theTag]);
+    TVector3 p3Tag(pxAK5PFPUcorrJet[theTag],pyAK5PFPUcorrJet[theTag],pzAK5PFPUcorrJet[theTag]);
+    p4Tag.SetXYZT (pxAK5PFPUcorrJet[theTag],pyAK5PFPUcorrJet[theTag],pzAK5PFPUcorrJet[theTag], energyAK5PFPUcorrJet[theTag]);
     float theDeltaPhi = fabs(p3Tag.DeltaPhi(p3Probe));
     float theInvMass  = (p4Tag+p4Probe).M();
     TVector3 p3Met(pxMet[0],pyMet[0],0.0);
@@ -1391,7 +1392,7 @@ void LHPdfsProducer::LoopQCDTagAndProbe(const char *treefilesuffix) {
       s9s25FullclassEle         [iecal][iptbin][ifullclass] -> Fill ( s9s25 );
 
       // fill the reduced tree
-      reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,theExpInnerLayers,convDcot,convDist,pt,eta,charge); 
+      //      reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,s1s9,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,theExpInnerLayers,convDcot,convDist,pt,eta,charge); 
 
       reducedTree.fillAttributesBackground(theDeltaPhi,theInvMass,theMet,genPtHat);
 
@@ -2027,7 +2028,6 @@ void LHPdfsProducer::isEleID(int eleIndex, bool *eleIdOutput, bool *isolOutput, 
 
   Utils anaUtils;
   int gsf = gsfTrackIndexEle[eleIndex];
-  TVector3 pTrkAtOuter(pxAtOuterGsfTrack[gsf],pyAtOuterGsfTrack[gsf],pzAtOuterGsfTrack[gsf]);
   TVector3 p3Ele(pxEle[eleIndex],pyEle[eleIndex],pzEle[eleIndex]);
   float pt = p3Ele.Pt();
 
@@ -2087,7 +2087,7 @@ void LHPdfsProducer::isEleID(int eleIndex, bool *eleIdOutput, bool *isolOutput, 
   EgammaCutBasedID.SetEOverPout( eopout );
   EgammaCutBasedID.SetEOverPin( eop );
   EgammaCutBasedID.SetElectronClass ( classificationEle[eleIndex] );
-  EgammaCutBasedID.SetEgammaCutBasedID ( anaUtils.electronIdVal(eleIdCutsEle[eleIndex],eleIdLoose) );
+  //  EgammaCutBasedID.SetEgammaCutBasedID ( anaUtils.electronIdVal(eleIdCutsEle[eleIndex],eleIdLoose) );
   EgammaCutBasedID.SetLikelihood( eleIdLikelihoodEle[eleIndex] );
   EgammaCutBasedID.SetEcalIsolation( dr03EcalRecHitSumEtEle[eleIndex] );
   EgammaCutBasedID.SetTrkIsolation( dr03TkSumPtEle[eleIndex] );
