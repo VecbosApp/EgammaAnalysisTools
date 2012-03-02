@@ -98,6 +98,8 @@ $(OUTLIB)ElectronIDMVA.o: $(INCLUDEDIR)/src/ElectronIDMVA.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ElectronIDMVA.o $<
 $(OUTLIB)ElectronIDMVAHZZ.o: $(INCLUDEDIR)/src/ElectronIDMVAHZZ.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ElectronIDMVAHZZ.o $<
+$(OUTLIB)HZZEleIDSelector.o: $(INCLUDEDIR)/src/HZZEleIDSelector.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)HZZEleIDSelector.o $<
 $(OUTLIB)RedEleIDTree.o: $(INCLUDEDIR)/src/RedEleIDTree.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RedEleIDTree.o $<
 $(OUTLIB)FakeTree.o: $(INCLUDEDIR)/src/FakeTree.cc
@@ -114,8 +116,8 @@ $(OUTLIB)sPlotsPdfsComparison.o: $(INCLUDEDIR)/src/sPlotsPdfsComparison.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)sPlotsPdfsComparison.o $<
 $(OUTLIB)IsolationPdfsProducer.o: $(INCLUDEDIR)/src/IsolationPdfsProducer.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)IsolationPdfsProducer.o $<
-$(OUTLIB)SuperClusterWSelection.o: $(INCLUDEDIR)/src/SuperClusterWSelection.cc
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)SuperClusterWSelection.o $<
+#$(OUTLIB)SuperClusterWSelection.o: $(INCLUDEDIR)/src/SuperClusterWSelection.cc
+#	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)SuperClusterWSelection.o $<
 $(OUTLIB)McTruthEvent.o: ../src/McTruthEvent.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)McTruthEvent.o $<
 $(OUTLIB)PFElectronSeedingEfficiency.o: $(INCLUDEDIR)/src/PFElectronSeedingEfficiency.cc
@@ -151,13 +153,12 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIBCOMMON)Utils.o \
 	$(OUTLIB)ElectronIDMVA.o \
 	$(OUTLIB)ElectronIDMVAHZZ.o \
+	$(OUTLIB)HZZEleIDSelector.o \
 	$(OUTLIB)RedEleIDTree.o \
 	$(OUTLIB)FakeTree.o \
 	$(OUTLIB)sPlotsPdfsComparison.o \
 	$(OUTLIB)LHPdfsProducer.o \
 	$(OUTLIB)IsolationPdfsProducer.o \
-	$(OUTLIB)SuperClusterWSelection.o \
-	$(OUTLIB)McTruthEvent.o \
 	$(OUTLIB)LikelihoodPdf.o \
 	$(OUTLIB)LikelihoodSpecies.o \
 	$(OUTLIB)LikelihoodPdfProduct.o \
@@ -188,6 +189,10 @@ CompareMisId_analysisPlots: $(INCLUDEDIR)/src/CompareMisId_analysisPlots.C \
 produceMCSubtractedFake: $(INCLUDEDIR)/src/produceMCSubtractedFake.cxx \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o
 	$(CXX) $(CXXFLAGS) -o produceMCSubtractedFake $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
+
+makeFriendTrees: $(INCLUDEDIR)/src/MakeFriendTrees.cc \
+	$(OUTLIB)HZZEleIDSelector.o
+	$(CXX) $(CXXFLAGS) -o makeFriendTrees $(OUTLIB)/*o $(GLIBS) $ $<
 
 CompareClasses: $(INCLUDEDIR)/src/CompareClasses.C \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o
