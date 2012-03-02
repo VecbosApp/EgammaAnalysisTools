@@ -14,10 +14,13 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myTree->Branch("eledeta",         &myEleDeta,         "eledeta/F");
   myTree->Branch("deta",            &myDeta,            "deta/F");
   myTree->Branch("dphi",            &myDphi,            "dphi/F");
+  myTree->Branch("detacalo",        &myDetaCalo,        "detacalo/F");
+  myTree->Branch("dphicalo",        &myDphiCalo,        "dphicalo/F");
   myTree->Branch("s9s25",           &mys9s25,           "s9s25/F");
   myTree->Branch("phiwidth",        &myPhiWidth,        "phiwidth/F");
   myTree->Branch("etawidth",        &myEtaWidth,        "etawidth/F");
   myTree->Branch("see",             &mySee,             "see/F");
+  myTree->Branch("sep",             &mySep,             "sep/F");
   myTree->Branch("spp",             &mySpp,             "spp/F");
   myTree->Branch("fbrem",           &myFbrem,           "fbrem/F");
   myTree->Branch("nbrem",           &myNbrems,          "nbrems/I");
@@ -25,15 +28,37 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myTree->Branch("dist",            &myDist,            "dist/F");
   myTree->Branch("dcot",            &myDcot,            "dcot/F");
   myTree->Branch("d0",              &myD0,              "d0/F");
+  myTree->Branch("dz",              &myDZ,              "dz/F");
   myTree->Branch("ip3d",            &myIP3d,            "ip3d/F");
   myTree->Branch("ip3ds",           &myIP3dSig,         "ip3ds/F");
   myTree->Branch("kfhits",          &myKFHits,          "kfhits/I");
   myTree->Branch("kfchi2",          &myKFChi2,          "kfchi2/F");
+  myTree->Branch("gsfchi2",         &myGSFChi2,         "gsfchi2/F");
   myTree->Branch("e1x5e5x5",        &myE1x5E5x5,        "e1x5e5x5/F");
+  myTree->Branch("SeedEMaxOverE",   &mySeedEMaxOverE,   "SeedEMaxOverE/F"); 
+  myTree->Branch("SeedETopOverE",   &mySeedETopOverE,   "SeedETopOverE/F"); 
+  myTree->Branch("SeedEBottomOverE",&mySeedEBottomOverE,"SeedEBottomOverE/F"); 
+  myTree->Branch("SeedELeftOverE",  &mySeedELeftOverE,  "SeedELeftOverE/F"); 
+  myTree->Branch("SeedERightOverE", &mySeedERightOverE, "SeedERightOverE/F"); 
+  myTree->Branch("SeedE2ndOverE",   &mySeedE2ndOverE,   "SeedE2ndOverE/F"); 
+  myTree->Branch("SeedE2x5RightOverE",  &mySeedE2x5RightOverE, "SeedE2x5RightOverE/F"); 
+  myTree->Branch("SeedE2x5LeftOverE",   &mySeedE2x5LeftOverE,  "SeedE2x5LeftOverE/F"); 
+  myTree->Branch("SeedE2x5TopOverE",&mySeedE2x5TopOverE,"SeedE2x5TopOverE/F"); 
+  myTree->Branch("SeedE2x5BottomOverE", &mySeedE2x5BottomOverE, "SeedE2x5BottomOverE/F"); 
+  myTree->Branch("SeedE2x5MaxOverE",&mySeedE2x5MaxOverE,"SeedE2x5MaxOverE/F"); 
+  myTree->Branch("SeedE1x5OverE",   &mySeedE1x5OverE,   "SeedE1x5OverE/F"); 
+  myTree->Branch("SeedE2x2OverE",   &mySeedE2x2OverE,   "SeedE2x2OverE/F"); 
+  myTree->Branch("SeedE3x3OverE",   &mySeedE3x3OverE,   "SeedE3x3OverE/F"); 
+  myTree->Branch("SeedE5x5OverE",   &mySeedE5x5OverE,   "SeedE5x5OverE/F"); 
+  myTree->Branch("R9",              &myR9,              "R9/F");
   myTree->Branch("matchConv",       &myMatchConv,       "matchConv/I");
   myTree->Branch("ecaldriven",      &myEcalDriven,      "ecaldriven/I");
+  myTree->Branch("scenergy",        &mySCEnergy,        "scenergy/F");
+  myTree->Branch("scrawenergy",     &mySCRawEnergy,     "scrawenergy/F");
+  myTree->Branch("scesenergy",      &mySCESEnergy,      "scesenergy/F");
   myTree->Branch("pt",              &myPt,              "pt/F");
   myTree->Branch("eta",             &myEta,             "eta/F");
+  myTree->Branch("phi",             &myPhi,             "phi/F");
   myTree->Branch("charge",          &myCharge,          "charge/I");
   
 }
@@ -123,7 +148,12 @@ void RedEleIDTree::addIsolations() {
 
 void RedEleIDTree::addMore() {
   myTree->Branch("bdthww",   &myBdtHww, "bdthww/F");
+  myTree->Branch("bdthwwnoip", &myBdtHwwNoIP, "bdthwwnoip/F");
   myTree->Branch("bdthzz",   &myBdtHzz, "bdthzz/F");
+  myTree->Branch("bdthzznoip", &myBdtHzzNoIP, "bdthzznoip/F");
+  myTree->Branch("bdthzzmc",   &myBdtHzzMC, "bdthzzmc/F");
+  myTree->Branch("lh",       &myLike,   "lh/F");
+  myTree->Branch("pfmva",    &myPFMVA,  "pfmva/F");
   myTree->Branch("vertices", &myNVtx, "vertices/F");
   myTree->Branch("rho",      &myRho,  "rho/F");
 }
@@ -199,6 +229,33 @@ void RedEleIDTree::fillVariables(float eleEoPout, float EoPout, float EoP, float
   myMatchConv=matchConv;
 }
 
+void RedEleIDTree::fillVariables2(float detacalo, float dphicalo, float sep, float dz, float gsfchi2, float emaxovere, float etopovere, float ebottomovere, float eleftovere, float erightovere,
+                                  float e2ndovere, float e2x5rightovere, float e2x5leftovere, float e2x5topevere, float e2x5bottomovere, 
+                                  float e2x5maxovere, float e1x5overe, float e2x2overe, float e3x3overe, float e5x5overe, float r9,
+                                  float phi, float scenergy, float scrawenergy, float scesenergy) {
+  myDetaCalo=detacalo;
+  myDphiCalo=dphicalo;
+  mySep=sep;
+  myDZ=dz;
+  myGSFChi2=gsfchi2;
+  mySeedEMaxOverE=emaxovere;
+  mySeedETopOverE=etopovere;
+  mySeedEBottomOverE=ebottomovere;
+  mySeedELeftOverE=eleftovere;
+  mySeedERightOverE=erightovere;
+  mySeedE2ndOverE=e2ndovere;
+  mySeedE2x5RightOverE=e2x5rightovere;
+  mySeedE1x5OverE=e1x5overe;
+  mySeedE2x2OverE=e2x2overe;
+  mySeedE3x3OverE=e3x3overe;
+  mySeedE5x5OverE=e5x5overe;
+  myR9=r9;
+  myPhi=phi;
+  mySCEnergy=scenergy;
+  mySCRawEnergy=scrawenergy;
+  mySCESEnergy=scesenergy;
+}
+
 void RedEleIDTree::fillIsolations(float trkIso, float ecalIso, float hcalIso,
                                   float combPFiso,
                                   float chaPFiso, float neuPFiso, float phoPFiso) {
@@ -237,6 +294,14 @@ void RedEleIDTree::fillMore(float nVtx, float rho, float bdthww, float bdthzz) {
   myRho=rho;
   myBdtHww=bdthww;
   myBdtHzz=bdthzz;
+}
+
+void RedEleIDTree::fillMore2(float bdthwwnoip, float bdthzznoip, float bdthzzmc, float pfmva, float like) {
+  myBdtHwwNoIP=bdthwwnoip;
+  myBdtHzzNoIP=bdthzznoip;
+  myBdtHzzMC=bdthzzmc;
+  myPFMVA=pfmva;
+  myLike=like;
 }
 
 void RedEleIDTree::fillGamma(float atg, float aeg, float ahg, int ig) {

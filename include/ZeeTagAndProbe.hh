@@ -68,8 +68,8 @@ private:
   int electrons[2];
 
   /// MVA for electron ID. To be created and initialized from the children classes
-  ElectronIDMVA *fMVA;
-  ElectronIDMVAHZZ *fMVAHZZ;
+  ElectronIDMVA *fMVAHWW, *fMVAHWWNoIP;
+  ElectronIDMVAHZZ *fMVAHZZ, *fMVAHZZNoIP, *fMVAHZZMC;
 
 };
 

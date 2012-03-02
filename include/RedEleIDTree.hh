@@ -24,10 +24,17 @@ public:
   void addRunInfos();
 
   //! fill the tree with electron id variables
+  //! minimal set
   void fillVariables(float EoPout, float EoP, float HoE, float DEta, float DPhi, float s9s25, float See, float Spp, float fbrem, int nbrems, float pt, float eta, int charge);
+  //! needed for HZZ BDT
   void fillVariables(float eleEoPout, float EoPout, float EoP, float HoE, float Deta, float Dphi, float s9s25, float s1s9, float See, float Spp, float fbrem, 
                      int nbrems, int nHits, float dcot, float dist, float pt, float eta, int charge, float phiwidth, float etawidth,
                      float IoEmIoP, float eledeta, float d0, float ip3d, float ip3ds, int kfhits, float kfchi2, float e1x5e5x5, int ecaldriven, int matchConv);
+  //! additional needed for HWW BDT
+  void fillVariables2(float detacalo, float dphicalo, float sep, float dz, float gsfchi2, float emaxovere, float etopovere, float ebottomovere, float eleftovere, float erightovere,
+                      float e2ndovere, float e2x5rightovere, float e2x5leftovere, float e2x5topevere, float e2x5bottomovere, 
+                      float e2x5maxovere, float e1x5overe, float e2x2overe, float e3x3overe, float e5x5overe, float r9,
+                      float phi, float scenergy, float scrawenergy, float scesenergy);
 
   //! fill the tree with isolation variables
   void fillIsolations(float tkIso, float ecalIso, float hcalIso,
@@ -50,6 +57,7 @@ public:
   //! fill the splitting categories of the PDFs
   void fillCategories(int iecal, int iptbin, int iclass, int nbr);
   void fillMore(float nVtx, float rho, float bdthww, float bdthzz);
+  void fillMore2(float bdthwwnoip, float bdthzznoip, float bdthzzmc, float pfmva, float like);
   void fillGamma(float atg, float aeg, float ahg, int ig);
   //! fill the run,lumi, event number, mc match
   void fillRunInfos(int run, int lumi, int event, int npu[3], int mcmatch);   
@@ -62,10 +70,12 @@ private:
   float myEleEoPout, myEoPout, myEoP,myHoE,myDeta,myDphi,mys9s25,mys1s9,mySee,mySpp,myFbrem, myPhiWidth, myEtaWidth;
   float myIoEoIoP, myEleDeta, myD0, myIP3d, myIP3dSig, myKFChi2, myE1x5E5x5;
   int myNbrems, myKFHits, myEcalDriven, myMissHits, myMatchConv;
+  float myDetaCalo, myDphiCalo, mySep, myDZ, myGSFChi2;
+  float mySeedEMaxOverE,mySeedETopOverE,mySeedEBottomOverE,mySeedELeftOverE,mySeedERightOverE,mySeedE2ndOverE,mySeedE2x5RightOverE,mySeedE2x5LeftOverE,mySeedE2x5TopOverE,mySeedE2x5BottomOverE;
+  float mySeedE2x5MaxOverE,mySeedE1x5OverE,mySeedE2x2OverE,mySeedE3x3OverE,mySeedE5x5OverE,myR9;
   float myDist, myDcot;
   int myCharge;
-  float myEta;
-  float myPt;
+  float myEta, myPhi, myPt, mySCEnergy, mySCRawEnergy, mySCESEnergy;
   int myNpu[3];
   int myRun, myLS, myEvent, myMCMatch;
 
@@ -96,7 +106,7 @@ private:
 
   float myNVtx;
   float myRho;
-  float myBdtHww, myBdtHzz;
+  float myBdtHww, myBdtHwwNoIP, myBdtHzz, myBdtHzzNoIP, myBdtHzzMC, myPFMVA, myLike;
 
   float myAbsTrackerIsolGammaCand;
   float myAbsEcalIsolGammaCand;

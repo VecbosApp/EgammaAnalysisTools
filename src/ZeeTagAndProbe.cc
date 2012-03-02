@@ -181,27 +181,44 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
                               defaultSwitches, std::string("class"),std::string("class"),true,true);
 
   // configuring the electron BDT
-  fMVA = new ElectronIDMVA();
-  fMVA->Initialize("BDTG method",
-                   "elebdtweights/Subdet0LowPt_WithIPInfo_BDTG.weights.xml",
-                   "elebdtweights/Subdet1LowPt_WithIPInfo_BDTG.weights.xml",
-                   "elebdtweights/Subdet2LowPt_WithIPInfo_BDTG.weights.xml",
-                   "elebdtweights/Subdet0HighPt_WithIPInfo_BDTG.weights.xml",
-                   "elebdtweights/Subdet1HighPt_WithIPInfo_BDTG.weights.xml",
-                   "elebdtweights/Subdet2HighPt_WithIPInfo_BDTG.weights.xml" ,                
-                   ElectronIDMVA::kWithIPInfo);
+  fMVAHWW = new ElectronIDMVA();
+  fMVAHWWNoIP = new ElectronIDMVA();
+  fMVAHWW->Initialize("BDTG method",
+                      "elebdtweights/Subdet0LowPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet1LowPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet2LowPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet0HighPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet1HighPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet2HighPt_WithIPInfo_BDTG.weights.xml" ,                
+                      ElectronIDMVA::kWithIPInfo);
+
+  fMVAHWWNoIP->Initialize("BDTG method",
+                          "elebdtweights/Subdet0LowPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet1LowPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet2LowPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet0HighPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet1HighPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet2HighPt_NoIPInfo_BDTG.weights.xml" ,                
+                      ElectronIDMVA::kNoIPInfo);
   
   // configuring the electron BDT for H->ZZ
+  fMVAHZZMC = new ElectronIDMVAHZZ();
   fMVAHZZ = new ElectronIDMVAHZZ();
+  fMVAHZZNoIP = new ElectronIDMVAHZZ();
   // Default H->ZZ MC training
-  //   fMVAHZZ->Initialize("BDTSimpleCat",
-  //                       "elebdtweights/HZZBDT_BDTSimpleCat.weights.xml",
-  //                       ElectronIDMVAHZZ::kBDTSimpleCat);
+  fMVAHZZMC->Initialize("BDTSimpleCat",
+                        "elebdtweights/HZZBDT_BDTSimpleCat.weights.xml",
+                        ElectronIDMVAHZZ::kBDTSimpleCat);
 
-  // New H->ZZ DATA training
+  // New H->ZZ DATA training, with IP
   fMVAHZZ->Initialize("BDTSimpleCat",
-                      "elebdtweights/HZZBDT_BDTSimpleCat_Data.weights.xml",
+                      "elebdtweights/HZZBDT_BDTSimpleCat_EBSplit_Data.weights.xml",
                       ElectronIDMVAHZZ::kBDTSimpleCatData);
+
+  // New H->ZZ DATA training, no IP
+  fMVAHZZNoIP->Initialize("BDTSimpleCat",
+                          "elebdtweights/HZZBDT_BDTSimpleCatNoIP_EBSplit_Data.weights.xml",
+                          ElectronIDMVAHZZ::kBDTSimpleCatNoIPData);
 
   // Reading GoodRUN LS
   std::cout << "[GoodRunLS]::goodRunLS is " << m_selection->getSwitch("goodRunLS") << " isData is " <<  m_selection->getSwitch("isData") << std::endl;
@@ -421,6 +438,10 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           // some eleID variables
           float HoE, s1s9, s9s25, phiwidth, etawidth, deta, dphi, fbrem, see, spp, eleopout, eopout, eop, nbrems, recoFlag, EleSCEta;
           float oneoveremoneoverp, eledeta, d0, ip3d, ip3ds, kfhits, kfchi2, e1x5e5x5, dcot, dist;
+          float detacalo, dphicalo, sep, dz, gsfchi2, emaxovere, etopovere, ebottomovere, eleftovere, erightovere,
+            e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
+            e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,
+            EleSCPhi, scenergy, scrawenergy, scesenergy;
 
           int gsfTrack = gsfTrackIndexEle[probe];   
           int kfTrack = trackIndexEle[probe];
@@ -428,20 +449,23 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           int matchConv = (hasMatchedConversionEle[probe]) ? 1 : 0;
 
           d0 = gsfsign * transvImpactParGsfTrack[gsfTrack];
+          dz = eleDzPV(probe,0);
           ip3d = gsfsign * impactPar3DGsfTrack[gsfTrack];
           ip3ds = ip3d/impactPar3DErrorGsfTrack[gsfTrack];
           kfchi2 = (kfTrack>-1) ? trackNormalizedChi2Track[kfTrack] : 0.0;
           kfhits = (kfTrack>-1) ? trackerLayersWithMeasurementTrack[kfTrack] : -1.0;
+          gsfchi2 = trackNormalizedChi2GsfTrack[gsfTrack];
           int misshits = expInnerLayersGsfTrack[gsfTrack];
           dcot = convDistEle[probe];
           dist = convDcotEle[probe];
-
           bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[probe], isEcalDriven);
           int ecalseed;
           HoE = hOverEEle[probe];
           eledeta = deltaEtaEleClusterTrackAtCaloEle[probe];
           deta = deltaEtaAtVtxEle[probe];
           dphi = deltaPhiAtVtxEle[probe];
+          detacalo = deltaEtaAtCaloEle[probe];
+          dphicalo = deltaPhiAtCaloEle[probe];
           fbrem = fbremEle[probe];
           nbrems = nbremsEle[probe];
           eleopout = eEleClusterOverPoutEle[probe];
@@ -450,30 +474,74 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           if(ecaldriven) {
             ecalseed = 1;
             int sc = superClusterIndexEle[probe];
+            float seedEnergy = seedEnergySC[sc];
             s1s9 = eMaxSC[sc]/eMaxSC[sc];
             s9s25 = e3x3SC[sc]/e5x5SC[sc];
             e1x5e5x5 = (e5x5SC[sc] - e1x5SC[sc])/e5x5SC[sc];
             phiwidth = phiWidthSC[sc];
             etawidth = etaWidthSC[sc];
             see = sqrt(covIEtaIEtaSC[sc]);
+            sep = sqrt(covIEtaIPhiSC[sc]);
             spp = sqrt(covIPhiIPhiSC[sc]);
             oneoveremoneoverp = 1./energySC[sc]  - 1./probeP4.Vect().Mag();
+            emaxovere = eMaxSC[sc]/seedEnergy;
+            etopovere = eTopSC[sc]/seedEnergy;
+            ebottomovere = eBottomSC[sc]/seedEnergy;
+            eleftovere = eLeftSC[sc]/seedEnergy;
+            erightovere = eRightSC[sc]/seedEnergy;
+            e2ndovere = e2ndSC[sc]/seedEnergy;
+            e2x5rightovere = e2x5RightSC[sc]/seedEnergy;
+            e2x5leftovere = e2x5LeftSC[sc]/seedEnergy;
+            e2x5topovere = e2x5TopSC[sc]/seedEnergy;
+            e2x5bottomovere = e2x5BottomSC[sc]/seedEnergy;
+            e2x5maxovere = e2x5MaxSC[sc]/seedEnergy;
+            e1x5overe = e1x5SC[sc]/seedEnergy;
+            e2x2overe = e2x2SC[sc]/seedEnergy;
+            e3x3overe = e3x3SC[sc]/seedEnergy;
+            e5x5overe = e5x5SC[sc]/seedEnergy;
+            r9 = e3x3SC[sc]/rawEnergySC[sc];
             recoFlag = recoFlagSC[sc];
             EleSCEta = etaSC[sc];
+            EleSCPhi = phiSC[sc];            
+            scenergy = energySC[sc];
+            scrawenergy = rawEnergySC[sc];
+            scesenergy = esEnergySC[sc];
           } else {
             ecalseed = 0;
             int sc = PFsuperClusterIndexEle[probe];
             if(sc>-1) {
+              float seedEnergy = seedEnergyPFSC[sc];
               s9s25 = e3x3PFSC[sc]/e5x5PFSC[sc];
               s1s9 = eMaxPFSC[sc]/eMaxPFSC[sc];
               e1x5e5x5 = (e5x5PFSC[sc] - e1x5PFSC[sc])/e5x5PFSC[sc];
               phiwidth = phiWidthPFSC[sc];
               etawidth = etaWidthPFSC[sc];
               see = sqrt(covIEtaIEtaPFSC[sc]);
+              sep = sqrt(covIEtaIPhiPFSC[sc]);
               spp = sqrt(covIPhiIPhiPFSC[sc]);
               oneoveremoneoverp = 1./energyPFSC[sc]  - 1./probeP4.Vect().Mag();
+              emaxovere = eMaxPFSC[sc]/seedEnergy;
+              etopovere = eTopPFSC[sc]/seedEnergy;
+              ebottomovere = eBottomPFSC[sc]/seedEnergy;
+              eleftovere = eLeftPFSC[sc]/seedEnergy;
+              erightovere = eRightPFSC[sc]/seedEnergy;
+              e2ndovere = e2ndPFSC[sc]/seedEnergy;
+              e2x5rightovere = e2x5RightPFSC[sc]/seedEnergy;
+              e2x5leftovere = e2x5LeftPFSC[sc]/seedEnergy;
+              e2x5topovere = e2x5TopPFSC[sc]/seedEnergy;
+              e2x5bottomovere = e2x5BottomPFSC[sc]/seedEnergy;
+              e2x5maxovere = e2x5MaxPFSC[sc]/seedEnergy;
+              e1x5overe = e1x5PFSC[sc]/seedEnergy;
+              e2x2overe = e2x2PFSC[sc]/seedEnergy;
+              e3x3overe = e3x3PFSC[sc]/seedEnergy;
+              e5x5overe = e5x5PFSC[sc]/seedEnergy;
+              r9 = e3x3PFSC[sc]/rawEnergyPFSC[sc];
               recoFlag = recoFlagPFSC[sc];
               EleSCEta = etaPFSC[sc];
+              EleSCPhi = phiPFSC[sc];     
+              scenergy = energyPFSC[sc];
+              scrawenergy = rawEnergyPFSC[sc];
+              scesenergy = esEnergyPFSC[sc];
             } else {
               s9s25 = 999.;
               see = 999.;
@@ -481,14 +549,23 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
             }
           }
 
+          // some MVAs...
+          float pfmva = pflowMVAEle[probe];
           float lh=likelihoodRatio(probe,*LH);
-          float bdthww = eleBDT(fMVA,probe);
+          float bdthww = eleBDT(fMVAHWW,probe);
+          float bdthwwnoip = eleBDT(fMVAHWWNoIP,probe);
           float bdthzz = eleBDT(fMVAHZZ,probe);
+          float bdthzznoip = eleBDT(fMVAHZZNoIP,probe);
+          float bdthzzmc = eleBDT(fMVAHZZMC,probe);
 
           // fill the reduced tree
 	  reducedTree.fillVariables(eleopout,eopout,eop,HoE,deta,dphi,s9s25,s1s9,see,spp,fbrem,
                                     nbrems,misshits,dcot,dist,pt,eta,charge,phiwidth,etawidth,
                                     oneoveremoneoverp,eledeta,d0,ip3d,ip3ds,kfhits,kfchi2,e1x5e5x5,ecalseed,matchConv);
+          reducedTree.fillVariables2(detacalo, dphicalo, sep, dz, gsfchi2, emaxovere, etopovere, ebottomovere, eleftovere, erightovere,
+                                     e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
+                                     e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,
+                                     EleSCPhi, scenergy, scrawenergy, scesenergy);
           reducedTree.fillAttributesSignal(okmass);
           reducedTree.fillIsolations(dr03TkSumPtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                      dr03EcalRecHitSumEtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
@@ -496,6 +573,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
                                      pfCombinedIsoEle[probe],
                                      pfCandChargedIsoEle[probe],pfCandNeutralIsoEle[probe],pfCandPhotonIsoEle[probe]);
           reducedTree.fillMore(nPV,rhoFastjet,bdthww,bdthzz);
+          reducedTree.fillMore2(bdthwwnoip,bdthzznoip,bdthzzmc,pfmva,lh);
           reducedTree.fillCutBasedIDBits(CutBasedId,CutBasedIdOnlyID,CutBasedIdOnlyIso,CutBasedIdOnlyConv);
           reducedTree.fillLHBasedIDBits(LHBasedId,LHBasedIdOnlyID,LHBasedIdOnlyIso,LHBasedIdOnlyConv);
           reducedTree.fillLHBasedPFIsoIDBits(LHBasedPFIsoId,LHBasedPFIsoIdOnlyID,LHBasedPFIsoIdOnlyIso,LHBasedPFIsoIdOnlyConv);
