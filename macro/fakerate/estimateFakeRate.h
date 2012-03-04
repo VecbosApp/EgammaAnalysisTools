@@ -29,12 +29,20 @@ public :
     kBDTHZZ_noIP 
   };
 
-  enum wp {
+  enum wphww {
     kWP80 = 0,
     kWP80EA,
     kIsoWP80,
     kIsoWP80EA,
     kIdWP80
+  };
+
+  enum wphzz {
+    kHzzWP80HWWFR = 0,
+    kHzzWP80,
+    kHzzWP80ch,
+    kHzzWP95,
+    kHzzWP95ch
   };
 
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain

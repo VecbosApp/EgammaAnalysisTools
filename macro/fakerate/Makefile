@@ -31,9 +31,12 @@ OUTLIB	         = ./lib/
 
 $(OUTLIB)EfficiencyEvaluator.o: $(INCLUDEDIRCOMMON)/CommonTools/src/EfficiencyEvaluator.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIB)EfficiencyEvaluator.o $<
+$(OUTLIB)HZZEleIDSelector.o: $(INCLUDEDIRCOMMON)EgammaAnalysisTools/src/HZZEleIDSelector.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIRCOMMON) -o $(OUTLIB)HZZEleIDSelector.o $<
 
 fakerate: fakerate.cc estimateFakeRate.C \
-	$(OUTLIB)EfficiencyEvaluator.o
+	$(OUTLIB)EfficiencyEvaluator.o \
+	$(OUTLIB)HZZEleIDSelector.o
 	$(CXX) $(CXXFLAGS) -o fakerate $(OUTLIB)/*.o $(GLIBS) $ $<
 
 clean:
