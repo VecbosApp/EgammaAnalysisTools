@@ -13,7 +13,7 @@ public:
 
   enum wpchiso {
     kWP95ChIso = 0,
-    kWP90ChIso, kWP85ChIso
+    kWP90ChIso, kWP85ChIso, kWP80ChIso, kWP70ChIso
   };
 
   bool output(float pt, float eta, float bdt, float iso, 
