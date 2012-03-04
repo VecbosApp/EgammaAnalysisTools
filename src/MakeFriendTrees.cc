@@ -99,7 +99,7 @@ void makeFriendHZZIdBits(const char* file) {
   TFile *fF = TFile::Open(nF,"recreate");
 
   Float_t bdthww, combPFIsoHWW;
-  Float_t iso, bdt, eta, pt, rho;
+  Float_t iso, bdt, eta, abseta, pt, rho, vertices;
   Float_t mass; // not dummy only for TP trees
   pT->SetBranchAddress("bdthww", &bdthww);
   pT->SetBranchAddress("combPFIsoHWW", &combPFIsoHWW);
@@ -108,6 +108,7 @@ void makeFriendHZZIdBits(const char* file) {
   pT->SetBranchAddress("eta", &eta);
   pT->SetBranchAddress("pt", &pt);
   pT->SetBranchAddress("rho", &rho);
+  pT->SetBranchAddress("vertices", &vertices);
   if(!TString(file).Contains("fake")) pT->SetBranchAddress("mass", &mass);
   else mass=-1.0;
 
@@ -119,7 +120,11 @@ void makeFriendHZZIdBits(const char* file) {
   Int_t chWP95, chWP90, chWP85;
   // the hww2011 WP
   Int_t hwwWP;
+  // first 4 variables needed for TP
   fT->Branch("mass", &mass, "mass/F");
+  fT->Branch("pt", &pt, "pt/F");
+  fT->Branch("abseta", &abseta, "abseta/F");
+  fT->Branch("vertices", &vertices, "vertices/F");
   fT->Branch("wp95", &WP95, "wp95/I");
   fT->Branch("wp90", &WP90, "wp90/I");
   fT->Branch("wp85", &WP85, "wp85/I");
@@ -135,6 +140,8 @@ void makeFriendHZZIdBits(const char* file) {
   for(int i=0; i<pT->GetEntries(); i++) {
     if (i%10000 == 0) std::cout << ">>> Analyzing event # " << i << " / " << pT->GetEntries() << " entries" << std::endl;
      pT->GetEntry(i);
+
+     abseta = fabs(eta);
 
      hwwWP=0;
      if(passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kBDTHWW2011_withIP) && 
