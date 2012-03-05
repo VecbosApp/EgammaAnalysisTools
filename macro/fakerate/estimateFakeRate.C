@@ -56,6 +56,8 @@ void estimateFakeRate::Loop(const char *outname)
   EgammaBdtHZZBasedID.push_back("WP80ch"); // ch is with tracker isolation only
   EgammaBdtHZZBasedID.push_back("WP95"); 
   EgammaBdtHZZBasedID.push_back("WP95ch"); // ch is with tracker isolation only
+  EgammaBdtHZZBasedID.push_back("WP70x80"); // low pT - high pT different WPs
+  EgammaBdtHZZBasedID.push_back("WP70x80ch"); // low pT - high pT different WPs (ch isolation only)
 
   // -----------------------------------------------------------------------
   // study vs eta
@@ -219,6 +221,10 @@ void estimateFakeRate::Loop(const char *outname)
   LowerPU[8] = 25;
 
   TH1F *RecoPU         = new TH1F( "RecoPU",         "reconstructed nPU", 8, LowerPU );
+  TH1F *RecoPUBarrel1  = new TH1F( "RecoPUBarrel1",  "reconstructed nPU", 8, LowerPU);    // this is done to subsplit 
+  TH1F *RecoPUBarrel2  = new TH1F( "RecoPUBarrel2",  "reconstructed nPU", 8, LowerPU);    // barrel and endcap in 2 parts 
+  TH1F *RecoPUEndcap1  = new TH1F( "RecoPUEndcap1",  "reconstructed nPU", 8, LowerPU);
+  TH1F *RecoPUEndcap2  = new TH1F( "RecoPUEndcap2",  "reconstructed nPU", 8, LowerPU);
 
   std::vector<TH1F*> BdtHWWPU;
   for (int i=0;i<(int)EgammaBdtHWWBasedID.size();++i) {
@@ -312,10 +318,22 @@ void estimateFakeRate::Loop(const char *outname)
     if (isInEB) RecoPtBarrel -> Fill(etFake);  //, theWeight);
     if (isInEE) RecoPtEndcap -> Fill(etFake);  //, theWeight);
 
-    if (etaRegion==1) RecoPtBarrel1 -> Fill(etFake);  //, theWeight);      
-    if (etaRegion==2) RecoPtBarrel2 -> Fill(etFake);  //, theWeight);      
-    if (etaRegion==3) RecoPtEndcap1 -> Fill(etFake);  //, theWeight);      
-    if (etaRegion==4) RecoPtEndcap2 -> Fill(etFake);  //, theWeight);      
+    if (etaRegion==1) {
+      RecoPtBarrel1 -> Fill(etFake);  //, theWeight);      
+      RecoPUBarrel1 -> Fill(vertices);  //, theWeight); 
+    }
+    if (etaRegion==2) {
+      RecoPtBarrel2 -> Fill(etFake);  //, theWeight);      
+      RecoPUBarrel2 -> Fill(vertices);  //, theWeight); 
+    }
+    if (etaRegion==3) {
+      RecoPtEndcap1 -> Fill(etFake);  //, theWeight);      
+      RecoPUEndcap1 -> Fill(vertices);  //, theWeight);  
+    }
+    if (etaRegion==4) {
+      RecoPtEndcap2 -> Fill(etFake);  //, theWeight);      
+      RecoPUEndcap2 -> Fill(vertices);  //, theWeight); 
+    }
 
     // fill the numerator(s)
     // === WP80 HWW 2011: BDT + ISO ===
@@ -584,6 +602,62 @@ void estimateFakeRate::Loop(const char *outname)
       }
     }
 
+    // === WP70 (pt<20 GeV) && WP80 (pt>20 GeV) HZZ reoptimized cut ===
+    if((etFake<20 && aSel.output(etFake,etaFake,bdthzz,combPFIsoHZZ/etFake,HZZEleIDSelector::kWP70)) ||
+       (etFake>=20 && aSel.output(etFake,etaFake,bdthzz,combPFIsoHZZ/etFake,HZZEleIDSelector::kWP80))) {
+      BdtHZZEta[kHzzWP70x80]->Fill(etaFake);
+      BdtHZZPt[kHzzWP70x80] ->Fill(etFake);
+      BdtHZZPU[kHzzWP70x80] ->Fill(vertices);
+      if (highPt) BdtHZZEtaHighPt[kHzzWP70x80]->Fill(etaFake);
+      if (lowPt)  BdtHZZEtaLowPt[kHzzWP70x80] ->Fill(etaFake);
+      if (isInEB) BdtHZZPtBarrel[kHzzWP70x80] ->Fill(etFake);
+      if (isInEE) BdtHZZPtEndcap[kHzzWP70x80] ->Fill(etFake);
+      if (etaRegion==1) {
+	BdtHZZPtBarrel1[kHzzWP70x80] -> Fill(etFake);   //, theWeight);      
+	BdtHZZPUBarrel1[kHzzWP70x80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==2) {
+	BdtHZZPtBarrel2[kHzzWP70x80] -> Fill(etFake);   //, theWeight);      
+	BdtHZZPUBarrel2[kHzzWP70x80] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==3) {
+	BdtHZZPtEndcap1[kHzzWP70x80] -> Fill(etFake);   //, theWeight);      
+	BdtHZZPUEndcap1[kHzzWP70x80] -> Fill(vertices); //, theWeight); 
+      }
+      if (etaRegion==4) {
+	BdtHZZPtEndcap2[kHzzWP70x80] -> Fill(etFake);   //, theWeight);     
+	BdtHZZPUEndcap2[kHzzWP70x80] -> Fill(vertices); //, theWeight);
+      }
+    }
+
+    // === WP70 (pt<20 GeV) && WP80 (pt>20 GeV) HZZ reoptimized cut (charged isolation) ===
+    if((etFake<20 && aSel.output(etFake,etaFake,bdthzz,combPFIsoHZZ/etFake,HZZEleIDSelector::kWP70ChIso)) ||
+       (etFake>=20 && aSel.output(etFake,etaFake,bdthzz,combPFIsoHZZ/etFake,HZZEleIDSelector::kWP80ChIso))) {
+      BdtHZZEta[kHzzWP70x80ch]->Fill(etaFake);
+      BdtHZZPt[kHzzWP70x80ch] ->Fill(etFake);
+      BdtHZZPU[kHzzWP70x80ch] ->Fill(vertices);
+      if (highPt) BdtHZZEtaHighPt[kHzzWP70x80ch]->Fill(etaFake);
+      if (lowPt)  BdtHZZEtaLowPt[kHzzWP70x80ch] ->Fill(etaFake);
+      if (isInEB) BdtHZZPtBarrel[kHzzWP70x80ch] ->Fill(etFake);
+      if (isInEE) BdtHZZPtEndcap[kHzzWP70x80ch] ->Fill(etFake);
+      if (etaRegion==1) {
+	BdtHZZPtBarrel1[kHzzWP70x80ch] -> Fill(etFake);   //, theWeight);      
+	BdtHZZPUBarrel1[kHzzWP70x80ch] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==2) {
+	BdtHZZPtBarrel2[kHzzWP70x80ch] -> Fill(etFake);   //, theWeight);      
+	BdtHZZPUBarrel2[kHzzWP70x80ch] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==3) {
+	BdtHZZPtEndcap1[kHzzWP70x80ch] -> Fill(etFake);   //, theWeight);      
+	BdtHZZPUEndcap1[kHzzWP70x80ch] -> Fill(vertices); //, theWeight); 
+      }
+      if (etaRegion==4) {
+	BdtHZZPtEndcap2[kHzzWP70x80ch] -> Fill(etFake);   //, theWeight);     
+	BdtHZZPUEndcap2[kHzzWP70x80ch] -> Fill(vertices); //, theWeight);
+      }
+    }
+
 
   } // loop over events
 
@@ -611,7 +685,7 @@ void estimateFakeRate::Loop(const char *outname)
 
   sprintf(filename,"%s-EleMisidEtaHighPt.root",outname);
   EfficiencyEvaluator ElectronEffEtaHighPt(filename);
-  ElectronEffEtaHighPt.AddNumerator(RecoEta);
+  ElectronEffEtaHighPt.AddNumerator(RecoEtaHighPt);
   for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
     ElectronEffEtaHighPt.AddNumerator(BdtHWWEtaHighPt[icut]);
   }
@@ -619,7 +693,7 @@ void estimateFakeRate::Loop(const char *outname)
     ElectronEffEtaHighPt.AddNumerator(BdtHZZEtaHighPt[icut]);
   }
 
-  ElectronEffEtaHighPt.SetDenominator(RecoEta);
+  ElectronEffEtaHighPt.SetDenominator(RecoEtaHighPt);
   ElectronEffEtaHighPt.ComputeEfficiencies();
   ElectronEffEtaHighPt.SetTitle("fake rate vs pT");
   ElectronEffEtaHighPt.SetXaxisTitle("electron p_{T}");
@@ -629,7 +703,7 @@ void estimateFakeRate::Loop(const char *outname)
 
   sprintf(filename,"%s-EleMisidEtaLowPt.root",outname);
   EfficiencyEvaluator ElectronEffEtaLowPt(filename);
-  ElectronEffEtaLowPt.AddNumerator(RecoEta);
+  ElectronEffEtaLowPt.AddNumerator(RecoEtaLowPt);
   for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
     ElectronEffEtaLowPt.AddNumerator(BdtHWWEtaLowPt[icut]);
   }
@@ -637,7 +711,7 @@ void estimateFakeRate::Loop(const char *outname)
     ElectronEffEtaLowPt.AddNumerator(BdtHZZEtaLowPt[icut]);
   }
 
-  ElectronEffEtaLowPt.SetDenominator(RecoEta);
+  ElectronEffEtaLowPt.SetDenominator(RecoEtaLowPt);
   ElectronEffEtaLowPt.ComputeEfficiencies();
   ElectronEffEtaLowPt.SetTitle("fake rate vs eta");
   ElectronEffEtaLowPt.SetXaxisTitle("electron #eta");
@@ -666,7 +740,7 @@ void estimateFakeRate::Loop(const char *outname)
 
   sprintf(filename,"%s-EleMisidPtBarrel1.root",outname);
   EfficiencyEvaluator ElectronEffPtBarrel1(filename);
-  ElectronEffPtBarrel1.AddNumerator(RecoPt);
+  ElectronEffPtBarrel1.AddNumerator(RecoPtBarrel1);
   for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
     ElectronEffPtBarrel1.AddNumerator(BdtHWWPtBarrel1[icut]);
   }
@@ -674,7 +748,7 @@ void estimateFakeRate::Loop(const char *outname)
     ElectronEffPtBarrel1.AddNumerator(BdtHZZPtBarrel1[icut]);
   }
 
-  ElectronEffPtBarrel1.SetDenominator(RecoPt);
+  ElectronEffPtBarrel1.SetDenominator(RecoPtBarrel1);
   ElectronEffPtBarrel1.ComputeEfficiencies();
   ElectronEffPtBarrel1.SetTitle("fake rate vs pT");
   ElectronEffPtBarrel1.SetXaxisTitle("electron pT");
@@ -684,7 +758,7 @@ void estimateFakeRate::Loop(const char *outname)
 
   sprintf(filename,"%s-EleMisidPtBarrel2.root",outname);
   EfficiencyEvaluator ElectronEffPtBarrel2(filename);
-  ElectronEffPtBarrel2.AddNumerator(RecoPt);
+  ElectronEffPtBarrel2.AddNumerator(RecoPtBarrel2);
   for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
     ElectronEffPtBarrel2.AddNumerator(BdtHWWPtBarrel2[icut]);
   }
@@ -692,7 +766,7 @@ void estimateFakeRate::Loop(const char *outname)
     ElectronEffPtBarrel2.AddNumerator(BdtHZZPtBarrel2[icut]);
   }
 
-  ElectronEffPtBarrel2.SetDenominator(RecoPt);
+  ElectronEffPtBarrel2.SetDenominator(RecoPtBarrel2);
   ElectronEffPtBarrel2.ComputeEfficiencies();
   ElectronEffPtBarrel2.SetTitle("fake rate vs pT");
   ElectronEffPtBarrel2.SetXaxisTitle("electron pT");
@@ -702,7 +776,7 @@ void estimateFakeRate::Loop(const char *outname)
 
   sprintf(filename,"%s-EleMisidPtEndcap1.root",outname);
   EfficiencyEvaluator ElectronEffPtEndcap1(filename);
-  ElectronEffPtEndcap1.AddNumerator(RecoPt);
+  ElectronEffPtEndcap1.AddNumerator(RecoPtEndcap1);
   for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
     ElectronEffPtEndcap1.AddNumerator(BdtHWWPtEndcap1[icut]);
   }
@@ -710,7 +784,7 @@ void estimateFakeRate::Loop(const char *outname)
     ElectronEffPtEndcap1.AddNumerator(BdtHZZPtEndcap1[icut]);
   }
 
-  ElectronEffPtEndcap1.SetDenominator(RecoPt);
+  ElectronEffPtEndcap1.SetDenominator(RecoPtEndcap1);
   ElectronEffPtEndcap1.ComputeEfficiencies();
   ElectronEffPtEndcap1.SetTitle("fake rate vs pT");
   ElectronEffPtEndcap1.SetXaxisTitle("electron pT");
@@ -720,7 +794,7 @@ void estimateFakeRate::Loop(const char *outname)
 
   sprintf(filename,"%s-EleMisidPtEndcap2.root",outname);
   EfficiencyEvaluator ElectronEffPtEndcap2(filename);
-  ElectronEffPtEndcap2.AddNumerator(RecoPt);
+  ElectronEffPtEndcap2.AddNumerator(RecoPtEndcap2);
   for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
     ElectronEffPtEndcap2.AddNumerator(BdtHWWPtEndcap2[icut]);
   }
@@ -728,7 +802,7 @@ void estimateFakeRate::Loop(const char *outname)
     ElectronEffPtEndcap2.AddNumerator(BdtHZZPtEndcap2[icut]);
   }
 
-  ElectronEffPtEndcap2.SetDenominator(RecoPt);
+  ElectronEffPtEndcap2.SetDenominator(RecoPtEndcap2);
   ElectronEffPtEndcap2.ComputeEfficiencies();
   ElectronEffPtEndcap2.SetTitle("fake rate vs pT");
   ElectronEffPtEndcap2.SetXaxisTitle("electron pT");
@@ -757,7 +831,7 @@ void estimateFakeRate::Loop(const char *outname)
 
   sprintf(filename,"%s-EleMisidPUBarrel1.root",outname);
   EfficiencyEvaluator ElectronEffPUBarrel1(filename);
-  ElectronEffPUBarrel1.AddNumerator(RecoPU);
+  ElectronEffPUBarrel1.AddNumerator(RecoPUBarrel1);
   for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
     ElectronEffPUBarrel1.AddNumerator(BdtHWWPUBarrel1[icut]);
   }
@@ -765,7 +839,7 @@ void estimateFakeRate::Loop(const char *outname)
     ElectronEffPUBarrel1.AddNumerator(BdtHZZPUBarrel1[icut]);
   }
 
-  ElectronEffPUBarrel1.SetDenominator(RecoPU);
+  ElectronEffPUBarrel1.SetDenominator(RecoPUBarrel1);
   ElectronEffPUBarrel1.ComputeEfficiencies();
   ElectronEffPUBarrel1.SetTitle("fake rate vs vertices");
   ElectronEffPUBarrel1.SetXaxisTitle("# vertices");
@@ -775,7 +849,7 @@ void estimateFakeRate::Loop(const char *outname)
 
   sprintf(filename,"%s-EleMisidPUBarrel2.root",outname);
   EfficiencyEvaluator ElectronEffPUBarrel2(filename);
-  ElectronEffPUBarrel2.AddNumerator(RecoPU);
+  ElectronEffPUBarrel2.AddNumerator(RecoPUBarrel2);
   for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
     ElectronEffPUBarrel2.AddNumerator(BdtHWWPUBarrel2[icut]);
   }
@@ -783,7 +857,7 @@ void estimateFakeRate::Loop(const char *outname)
     ElectronEffPUBarrel2.AddNumerator(BdtHZZPUBarrel2[icut]);
   }
 
-  ElectronEffPUBarrel2.SetDenominator(RecoPU);
+  ElectronEffPUBarrel2.SetDenominator(RecoPUBarrel2);
   ElectronEffPUBarrel2.ComputeEfficiencies();
   ElectronEffPUBarrel2.SetTitle("fake rate vs vertices");
   ElectronEffPUBarrel2.SetXaxisTitle("# vertices");
@@ -793,7 +867,7 @@ void estimateFakeRate::Loop(const char *outname)
 
   sprintf(filename,"%s-EleMisidPUEndcap1.root",outname);
   EfficiencyEvaluator ElectronEffPUEndcap1(filename);
-  ElectronEffPUEndcap1.AddNumerator(RecoPU);
+  ElectronEffPUEndcap1.AddNumerator(RecoPUEndcap1);
   for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
     ElectronEffPUEndcap1.AddNumerator(BdtHWWPUEndcap1[icut]);
   }
@@ -801,7 +875,7 @@ void estimateFakeRate::Loop(const char *outname)
     ElectronEffPUEndcap1.AddNumerator(BdtHZZPUEndcap1[icut]);
   }
 
-  ElectronEffPUEndcap1.SetDenominator(RecoPU);
+  ElectronEffPUEndcap1.SetDenominator(RecoPUEndcap1);
   ElectronEffPUEndcap1.ComputeEfficiencies();
   ElectronEffPUEndcap1.SetTitle("fake rate vs vertices");
   ElectronEffPUEndcap1.SetXaxisTitle("# vertices");
@@ -811,7 +885,7 @@ void estimateFakeRate::Loop(const char *outname)
 
   sprintf(filename,"%s-EleMisidPUEndcap2.root",outname);
   EfficiencyEvaluator ElectronEffPUEndcap2(filename);
-  ElectronEffPUEndcap2.AddNumerator(RecoPU);
+  ElectronEffPUEndcap2.AddNumerator(RecoPUEndcap2);
   for (int icut=0;icut<(int)EgammaBdtHWWBasedID.size();++icut){
     ElectronEffPUEndcap2.AddNumerator(BdtHWWPUEndcap2[icut]);
   }
@@ -819,7 +893,7 @@ void estimateFakeRate::Loop(const char *outname)
     ElectronEffPUEndcap2.AddNumerator(BdtHZZPUEndcap2[icut]);
   }
 
-  ElectronEffPUEndcap2.SetDenominator(RecoPU);
+  ElectronEffPUEndcap2.SetDenominator(RecoPUEndcap2);
   ElectronEffPUEndcap2.ComputeEfficiencies();
   ElectronEffPUEndcap2.SetTitle("fake rate vs vertices");
   ElectronEffPUEndcap2.SetXaxisTitle("# vertices");

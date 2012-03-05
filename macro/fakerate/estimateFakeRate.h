@@ -42,7 +42,9 @@ public :
     kHzzWP80,
     kHzzWP80ch,
     kHzzWP95,
-    kHzzWP95ch
+    kHzzWP95ch,
+    kHzzWP70x80,
+    kHzzWP70x80ch
   };
 
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
