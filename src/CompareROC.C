@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
 
   vector<TString> cutBackground;
   for(int i=0;i<(int)cutBase.size();++i)
-    cutBackground.push_back(cutBase[i]+TString("&& DenomFakeSmurf"));
+    cutBackground.push_back(cutBase[i]+TString("&& DenomFakeSmurf && event%2!=0")); // HWW used the even events to train
 
   vector<TString> id;
   id.push_back(TString("ROC_IdOnly_Data_inEB_LowPt.pdf"));
