@@ -294,7 +294,7 @@ void estimateFakeRate::Loop(const char *outname)
     if(pt>35) continue;
 
     // fill the denominator: take only the highest pT denominator candidate
-    float etaFake = eta;
+    float etaFake = fabs(eta);
     float etFake  = pt;
     bool isInEB   = fabs(eta)<1.479;
     bool isInEE   = !isInEB;
@@ -372,20 +372,20 @@ void estimateFakeRate::Loop(const char *outname)
       if (isInEB) BdtHWWPtBarrel[kWP80EA] ->Fill(etFake);
       if (isInEE) BdtHWWPtEndcap[kWP80EA] ->Fill(etFake);
       if (etaRegion==1) {
-	BdtHWWPtBarrel1[kWP80] -> Fill(etFake);   //, theWeight);      
-	BdtHWWPUBarrel1[kWP80] -> Fill(vertices); //, theWeight);
+	BdtHWWPtBarrel1[kWP80EA] -> Fill(etFake);   //, theWeight);      
+	BdtHWWPUBarrel1[kWP80EA] -> Fill(vertices); //, theWeight);
       }
       if (etaRegion==2) {
-	BdtHWWPtBarrel2[kWP80] -> Fill(etFake);   //, theWeight);      
-	BdtHWWPUBarrel2[kWP80] -> Fill(vertices); //, theWeight);
+	BdtHWWPtBarrel2[kWP80EA] -> Fill(etFake);   //, theWeight);      
+	BdtHWWPUBarrel2[kWP80EA] -> Fill(vertices); //, theWeight);
       }
       if (etaRegion==3) { 
-	BdtHWWPtEndcap1[kWP80] -> Fill(etFake);   //, theWeight);      
-	BdtHWWPUEndcap1[kWP80] -> Fill(vertices); //, theWeight);      
+	BdtHWWPtEndcap1[kWP80EA] -> Fill(etFake);   //, theWeight);      
+	BdtHWWPUEndcap1[kWP80EA] -> Fill(vertices); //, theWeight);      
       }
       if (etaRegion==4) {
-	BdtHWWPtEndcap2[kWP80] -> Fill(etFake);   //, theWeight);     
-	BdtHWWPUEndcap2[kWP80] -> Fill(vertices); //, theWeight);     
+	BdtHWWPtEndcap2[kWP80EA] -> Fill(etFake);   //, theWeight);     
+	BdtHWWPUEndcap2[kWP80EA] -> Fill(vertices); //, theWeight);     
       }
     }
     // === HWW 2011 Iso ===
@@ -922,21 +922,21 @@ bool estimateFakeRate::passID(estimateFakeRate::idType type) {
     if(fabs(eta) >=  2.4) combIso -= 0.78 * rho;
 
     if(pt>20) {
-      if(fabs(eta) <  1.0) return (combIso/pt < 0.23); 
-      if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) return (combIso/pt < 0.20);
+      if(fabs(eta) <  1.0) return (combIso/pt < 0.22); 
+      if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) return (combIso/pt < 0.21);
       if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) return (combIso/pt < 0.12);
       if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) return (combIso/pt < 0.11);
-      if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) return (combIso/pt < 0.049);
-      if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < 0.070);
+      if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) return (combIso/pt < 0.074);
+      if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < 0.053);
       if(fabs(eta) >=  2.4) return (combIso/pt < 0.010);
     } else {
       if(fabs(eta) <  1.0) return (combIso/pt < 0.20); 
-      if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) return (combIso/pt < 0.21);
+      if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) return (combIso/pt < 0.24);
       if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) return (combIso/pt < 0.13);
-      if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) return (combIso/pt < 0.10);
-      if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) return(combIso/pt < -0.04);
-      if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < -0.03);
-      if(fabs(eta) >=  2.4) return (combIso/pt < -0.03);
+      if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) return (combIso/pt < 0.083);
+      if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) return(combIso/pt < -0.01);
+      if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < -0.027);
+      if(fabs(eta) >=  2.4) return (combIso/pt < -0.035);
     }
   }
 
@@ -961,12 +961,12 @@ bool estimateFakeRate::passID(estimateFakeRate::idType type) {
 
   if(type == kBDTHZZ_withIP) {
     // WP with same fake rate as HWW with IP
-    if(pt < 20 && fabs(eta) < 1.0) return (bdthzz > 0.075);
-    if(pt < 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthzz > 0.075);
-    if(pt < 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthzz > 0.091);
-    if(pt >= 20 && fabs(eta) < 1.0) return (bdthzz > 0.064);
-    if(pt >= 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthzz > 0.071);
-    if(pt >= 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthzz > 0.067);
+    if(pt < 20 && fabs(eta) < 1.0) return (bdthzz > 0.099);
+    if(pt < 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthzz > 0.105);
+    if(pt < 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthzz > 0.12);
+    if(pt >= 20 && fabs(eta) < 1.0) return (bdthzz > 0.08);
+    if(pt >= 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthzz > 0.091);
+    if(pt >= 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthzz > 0.086);
   }
 
   if(type == kBDTHZZ_noIP) {
