@@ -17,7 +17,7 @@ using namespace std;
 FakeElectronSelector::FakeElectronSelector(TTree *tree)
   : Egamma(tree) {
   
-  _isData = false;       // chiara
+  _isData = true;       // chiara
   
   // configuring electron likelihood
   TFile *fileLH = TFile::Open("pdfs_MC.root");
@@ -153,6 +153,28 @@ void FakeElectronSelector::Loop(const char *outname) {
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v7");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v8");
   requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v9");
+  // 
+  requiredTriggers.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v1");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v2");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v3");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v4");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v5");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v6");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v7");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v8");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v9");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v10");
+  // 
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v1");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v2");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v3");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v4");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v5");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v6");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v7");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v8");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v9");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v10");
 
   // loop on events
   unsigned int lastLumi = 0;
@@ -255,7 +277,8 @@ void FakeElectronSelector::Loop(const char *outname) {
     if (theInvMass>60. && theInvMass<120.) continue;  
     if (theInvMass>0.1 && theInvMass<12.)  continue;  
     myCounter.IncrVar("Zmass",1);    
-    
+
+    /* remove the jet pt cuts 
     // need at least one reco jet
     if ( leadingJet < 0 ) continue;
     myCounter.IncrVar("leadingExist",1);    
@@ -271,6 +294,7 @@ void FakeElectronSelector::Loop(const char *outname) {
     if (p3LeadingCut.Pt()<35) continue;   
     // if (p3LeadingCut.Pt()<50) continue;   
     myCounter.IncrVar("leadingPT",1);    
+    */
         
     // consider as denominator all the reco electrons matching the HLT candidate 
     // passing some requirements on the following variables:
