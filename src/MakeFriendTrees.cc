@@ -115,7 +115,7 @@ void makeFriendHZZIdBits(const char* file) {
   fF->mkdir("eleIDdir");
   TTree *fT = new TTree("T1","tree with hzz isolation");
   // the new WPs with full isolation
-  Int_t WP95, WP90, WP85, WP80, WP70;
+  Int_t WP95, WP90, WP85, WP80, WP70, WP80x70;
   // the new WPs with charged only isolation
   Int_t chWP95, chWP90, chWP85, chWP80, chWP70;
   // the hww2011 WP
@@ -130,6 +130,7 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("wp85", &WP85, "wp85/I");
   fT->Branch("wp80", &WP80, "wp80/I");
   fT->Branch("wp70", &WP70, "wp70/I");
+  fT->Branch("wp70x80", &WP80x70, "wp80x70/I");
   fT->Branch("chwp95", &chWP95, "chwp95/I");
   fT->Branch("chwp90", &chWP90, "chwp90/I");
   fT->Branch("chwp85", &chWP85, "chwp85/I");
@@ -149,12 +150,15 @@ void makeFriendHZZIdBits(const char* file) {
      if(passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kBDTHWW2011_withIP) && 
 	passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kIsoHWW2011)) hwwWP = 1;
 
-     WP95=WP90=WP85=WP80=WP70=0;
+     WP95=WP90=WP85=WP80=WP70=WP80x70=0;
      if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP95)) WP95=1;
      if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP90)) WP90=1;
      if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP85)) WP85=1;
      if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP80)) WP80=1;
      if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP70)) WP70=1;
+     // mixed 70 x 80
+     if(pt<20 && aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP70)) WP80x70=1;
+     if(pt>=20 && aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP80)) WP80x70=1;
 
      chWP95=chWP90=chWP85=0;
      if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP95ChIso)) chWP95=1;
