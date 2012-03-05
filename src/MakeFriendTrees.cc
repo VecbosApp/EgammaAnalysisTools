@@ -117,7 +117,7 @@ void makeFriendHZZIdBits(const char* file) {
   // the new WPs with full isolation
   Int_t WP95, WP90, WP85, WP80, WP70;
   // the new WPs with charged only isolation
-  Int_t chWP95, chWP90, chWP85;
+  Int_t chWP95, chWP90, chWP85, chWP80, chWP70;
   // the hww2011 WP
   Int_t hwwWP;
   // first 4 variables needed for TP
@@ -133,6 +133,8 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("chwp95", &chWP95, "chwp95/I");
   fT->Branch("chwp90", &chWP90, "chwp90/I");
   fT->Branch("chwp85", &chWP85, "chwp85/I");
+  fT->Branch("chwp80", &chWP80, "chwp80/I");
+  fT->Branch("chwp70", &chWP70, "chwp70/I");
   fT->Branch("bdthww", &hwwWP, "bdthww/I");
 
   HZZEleIDSelector aSel;
@@ -158,6 +160,8 @@ void makeFriendHZZIdBits(const char* file) {
      if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP95ChIso)) chWP95=1;
      if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP90ChIso)) chWP90=1;
      if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP85ChIso)) chWP85=1;
+     if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP80ChIso)) chWP80=1;
+     if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP70ChIso)) chWP70=1;
      
      fT->Fill();
   }
