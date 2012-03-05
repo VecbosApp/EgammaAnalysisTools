@@ -20,13 +20,44 @@ using namespace std;
 
 enum idType {
   kIsoHWW2011 = 0, // HWW cuts 2011
-  kBDTHWW2011_withIP // HWW cuts 2011
+  kBDTHWW2011_withIP, // HWW cuts 2011
+  kIsoEACorr,
+  kBDTHZZ_withIP
 };
 
 bool passHWWID(Float_t eta, Float_t pt, Float_t bdthww, Float_t bdthzz, Float_t rho, Float_t combIso, Float_t combPFIsoHWW, idType type) {
   if(type == kIsoHWW2011) {
     if(fabs(eta)<1.479) return (combPFIsoHWW/pt < 0.13);
     else return (combPFIsoHWW/pt < 0.09);
+  }
+
+  if(type == kIsoEACorr) {
+    // WP with same fake rate as HWW with IP
+    if(fabs(eta) <  1.0) combIso -= 0.18 * rho;
+    if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) combIso -= 0.19 * rho;
+    if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) combIso -= 0.21 * rho;
+    if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) combIso -= 0.38 * rho;
+    if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) combIso -= 0.61 * rho;
+    if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) combIso -= 0.73 * rho;
+    if(fabs(eta) >=  2.4) combIso -= 0.78 * rho;
+
+    if(pt>20) {
+      if(fabs(eta) <  1.0) return (combIso/pt < 0.23); 
+      if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) return (combIso/pt < 0.20);
+      if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) return (combIso/pt < 0.12);
+      if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) return (combIso/pt < 0.11);
+      if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) return (combIso/pt < 0.049);
+      if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < 0.070);
+      if(fabs(eta) >=  2.4) return (combIso/pt < 0.010);
+    } else {
+      if(fabs(eta) <  1.0) return (combIso/pt < 0.20); 
+      if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) return (combIso/pt < 0.21);
+      if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) return (combIso/pt < 0.13);
+      if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) return (combIso/pt < 0.10);
+      if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) return(combIso/pt < -0.04);
+      if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < -0.03);
+      if(fabs(eta) >=  2.4) return (combIso/pt < -0.03);
+    }
   }
 
   if(type == kBDTHWW2011_withIP) {
@@ -36,6 +67,16 @@ bool passHWWID(Float_t eta, Float_t pt, Float_t bdthww, Float_t bdthzz, Float_t 
     if(pt >= 20 && fabs(eta) < 1.0) return (bdthww > 0.947);
     if(pt >= 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthww > 0.950);
     if(pt >= 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthww > 0.884);
+  }
+
+  if(type == kBDTHZZ_withIP) {
+    // WP with same fake rate as HWW with IP
+    if(pt < 20 && fabs(eta) < 1.0) return (bdthzz > 0.075);
+    if(pt < 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthzz > 0.075);
+    if(pt < 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthzz > 0.091);
+    if(pt >= 20 && fabs(eta) < 1.0) return (bdthzz > 0.064);
+    if(pt >= 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthzz > 0.071);
+    if(pt >= 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthzz > 0.067);
   }
 
   return false;
@@ -118,8 +159,8 @@ void makeFriendHZZIdBits(const char* file) {
   Int_t WP95, WP90, WP85, WP80, WP70, WP80x70;
   // the new WPs with charged only isolation
   Int_t chWP95, chWP90, chWP85, chWP80, chWP70;
-  // the hww2011 WP
-  Int_t hwwWP;
+  // the hww2011 WP and the one with the same fake rate
+  Int_t hwwWP, hzzwphww;
   // first 4 variables needed for TP
   fT->Branch("mass", &mass, "mass/F");
   fT->Branch("pt", &pt, "pt/F");
@@ -137,6 +178,7 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("chwp80", &chWP80, "chwp80/I");
   fT->Branch("chwp70", &chWP70, "chwp70/I");
   fT->Branch("bdthww", &hwwWP, "bdthww/I");
+  fT->Branch("hzzwphww", &hzzwphww, "hzzwphww/I");
 
   HZZEleIDSelector aSel;
 
@@ -166,7 +208,10 @@ void makeFriendHZZIdBits(const char* file) {
      if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP85ChIso)) chWP85=1;
      if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP80ChIso)) chWP80=1;
      if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP70ChIso)) chWP70=1;
-     
+    
+     hzzwphww=0;
+     if(passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kBDTHZZ_withIP) && 
+        passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kIsoEACorr)) hzzwphww = 1;
      fT->Fill();
   }
   fF->cd("eleIDdir");
