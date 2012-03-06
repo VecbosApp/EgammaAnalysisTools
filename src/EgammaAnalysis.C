@@ -53,6 +53,9 @@
 #if Application == 10
 #include "EgammaAnalysisTools/include/FakeElectronSelector.hh"
 #endif
+#if Application == 11
+#include "EgammaAnalysisTools/include/FakeElectronSelectorWenuPlusOneJet.hh"
+#endif
 
 int main(int argc, char* argv[]) {
 
@@ -244,6 +247,13 @@ int main(int argc, char* argv[]) {
 #if Application == 10
 
   FakeElectronSelector analysis(theChain);
+  analysis.Loop(outputFileName);
+
+#endif
+
+#if Application == 11
+
+  FakeElectronSelectorWenuPlusOneJet analysis(theChain);
   analysis.Loop(outputFileName);
 
 #endif
