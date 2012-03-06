@@ -39,9 +39,6 @@ private:
   int isDenomFake_smurfs(int theEle);
   int isDenomFake_HwwEgamma(int theEle);
   
-  float SigmaiEiE(int electron);
-  float SigmaiPiP(int electron);
-  
   bool _isData;
 
   // the tag and the probe
