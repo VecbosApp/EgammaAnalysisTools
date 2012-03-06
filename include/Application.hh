@@ -8,5 +8,7 @@
 //   6 = PF electron seeding efficiency study
 //   7 = PF electron seeding efficiency study (on general tracks)
 //   8 = Z->ee tag and probe
+//   9 = measure turn on curve
+//  10 = do the selection for the Fake Electron
 
-#define Application 5
+#define Application 10
