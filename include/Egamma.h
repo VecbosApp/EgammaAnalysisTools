@@ -66,6 +66,9 @@ public:
   bool passEleBDT(float pt, float eta, float bdtoutput);
   /// calculate EA corrected PF isolation
   float combPFIsoEACorr(int iele);
+  //! for the prompt rate for fake rate
+  int isDenomFake_smurfs(int theEle);
+  int isDenomFake_HwwEgamma(int theEle);
 
 protected:
   ///goodRUN/LS list

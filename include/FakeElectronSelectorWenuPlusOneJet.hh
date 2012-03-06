@@ -29,10 +29,6 @@ public:
   
 private:
 
-  //! for the prompt rate for fake rate
-  int isDenomFake_smurfs(int theEle);
-  int isDenomFake_HwwEgamma(int theEle);
-  
   bool _isData;
 
   // the tag and the probe

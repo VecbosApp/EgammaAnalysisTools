@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <math.h>
 
 #include "CommonTools/include/Utils.hh"
 #include "CommonTools/include/LeptonIdBits.h"
@@ -10,6 +11,7 @@
 #include "EgammaAnalysisTools/include/Egamma.h"
 
 using namespace bits;
+using namespace std;
 
 Egamma::Egamma(TTree *tree) : EgammaBase(tree)
 {
@@ -110,9 +112,8 @@ bool Egamma::reloadTriggerMask(bool newVersion)
       {   
         for(unsigned int i=0; i<nameHLT->size(); i++)
           {
-            //if( !strcmp ((*fIter).c_str(), nameHLT->at(i).c_str() ) )
-            // nameHLT[i] has ..._vXXX
-            if(nameHLT->at(i).find(*fIter) != std::string::npos)
+            if( !strcmp ((*fIter).c_str(), nameHLT->at(i).c_str() ) )
+	      // if(nameHLT->at(i).find(*fIter) != std::string::npos)
               {
                 triggerMask.push_back( indexHLT[i] ) ;
                 break;
@@ -512,4 +513,137 @@ float Egamma::combPFIsoEACorr(int iele) {
   if(pt <  20 && fabs(eta) >= 1.479) return combIso - 0.210 * rhoFastjet;
   if(pt >= 20 && fabs(eta) >= 1.479) return combIso - 0.333 * rhoFastjet;
   return 0.0;
+}
+
+// denominator for fake rate: for HtoWW, egamma triggers
+int Egamma::isDenomFake_HwwEgamma(int theEle) {
+  
+  Utils anaUtils;
+  bool isGoodDenom = true;
+  
+  TVector3 p3Ele(pxEle[theEle], pyEle[theEle], pzEle[theEle]);
+
+  // acceptance for the fake electron
+  if( fabs(p3Ele.Eta()) > 2.5 ) isGoodDenom = false;
+  if( p3Ele.Pt() < 10. )        isGoodDenom = false;
+
+  // barrel or endcap
+  bool isEleEB = anaUtils.fiducialFlagECAL(fiducialFlagsEle[theEle], isEB);    
+
+  // taking shower shape                                                                                                             
+  int sc;
+  bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[theEle], bits::isEcalDriven);
+  float thisSigmaIeIe = -1.;
+  if (ecalDriven) {
+    sc = superClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaSC[sc]);
+  }
+  if (!ecalDriven) {
+    sc = PFsuperClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaPFSC[sc]);
+  }
+  if ( sc<0 ) { isGoodDenom = false; }
+
+  // sigmaIetaIeta                                                                                                                   
+  if ( isEleEB && thisSigmaIeIe>0.01) { isGoodDenom = false; }
+  if (!isEleEB && thisSigmaIeIe>0.03) { isGoodDenom = false; }
+
+  // H/E
+  if ( isEleEB && hOverEEle[theEle]>0.12) isGoodDenom = false;   
+  if (!isEleEB && hOverEEle[theEle]>0.10) isGoodDenom = false;
+  
+  // deltaEta
+  if ( isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.007) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.009) ) isGoodDenom = false;
+  
+  // deltaPhi
+  if ( isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.15) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.10) ) isGoodDenom = false;
+
+  // isolation 
+  float ecalIsol    = (dr03EcalRecHitSumEtEle[theEle])/p3Ele.Pt();
+  float hcalIsol    = (dr03HcalTowerSumEtEle[theEle])/p3Ele.Pt();
+  float trackerIsol = (dr03TkSumPtEle[theEle])/p3Ele.Pt();                
+  if(ecalIsol>0.2)    isGoodDenom = false;
+  if(hcalIsol>0.2)    isGoodDenom = false;
+  if(trackerIsol>0.2) isGoodDenom = false;                                
+
+  if(isGoodDenom) return 1;
+  else return 0;
+}
+
+// denominator for fake rate: for HtoWW, egamma triggers, same as smurfs
+int Egamma::isDenomFake_smurfs(int theEle) {
+  
+  Utils anaUtils;
+  bool isGoodDenom = true;
+  
+  TVector3 p3Ele(pxEle[theEle], pyEle[theEle], pzEle[theEle]);
+  
+  // acceptance for the fake electron
+  if( fabs(p3Ele.Eta()) > 2.5 ) isGoodDenom = false;
+  if( p3Ele.Pt() < 10. )        isGoodDenom = false;
+
+  // taking shower shape                                                                                                             
+  int sc;
+  bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[theEle], bits::isEcalDriven);
+  float thisSigmaIeIe = -1.;
+  float scEta = -1.;                                                               
+  if (ecalDriven) {
+    sc = superClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaSC[sc]);
+    scEta = etaSC[sc];
+  }
+  if (!ecalDriven) {
+    sc = PFsuperClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaPFSC[sc]);
+    scEta = etaPFSC[sc];
+  }
+  if ( sc<0 ) { isGoodDenom = false; }
+
+  // barrel or endcap
+  bool isEleEB = false;
+  if (fabs(scEta)<1.479) isEleEB = true;   
+  
+  // sigmaIetaIeta                                                                                                                   
+  if ( isEleEB && thisSigmaIeIe>0.01) { isGoodDenom = false; }
+  if (!isEleEB && thisSigmaIeIe>0.03) { isGoodDenom = false; }
+
+  // isolation
+  float ecalIsolAbs = 0.0;
+  if ( isEleEB ) ecalIsolAbs = max(0.0,dr03EcalRecHitSumEtEle[theEle]-1.0);
+  else ecalIsolAbs = dr03EcalRecHitSumEtEle[theEle];
+  float ecalIsol = ecalIsolAbs/p3Ele.Pt(); 
+  float hcalIsol    = (dr03HcalTowerSumEtEle[theEle])/p3Ele.Pt();
+  float trackerIsol = (dr03TkSumPtEle[theEle])/p3Ele.Pt();                
+  if(ecalIsol>0.2)    isGoodDenom = false;
+  if(hcalIsol>0.2)    isGoodDenom = false;
+  if(trackerIsol>0.2) isGoodDenom = false;                                
+
+  // H/E
+  if ( isEleEB && hOverEEle[theEle]>0.12) isGoodDenom = false;   
+  if (!isEleEB && hOverEEle[theEle]>0.10) isGoodDenom = false;
+  
+  // deltaEta
+  if ( isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.007) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.009) ) isGoodDenom = false;
+  
+  // deltaPhi
+  if ( isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.15) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.10) ) isGoodDenom = false;
+  
+  // full conversion rejection 
+  int gsf = gsfTrackIndexEle[theEle];
+  int missHits = expInnerLayersGsfTrack[gsf];
+  bool matchConv = hasMatchedConversionEle[theEle];
+  if (missHits>0 || matchConv) isGoodDenom = false;
+
+  // impact parameter cuts 
+  float dxyEle = transvImpactParGsfTrack[gsf];
+  float dzEle  = eleDzPV(theEle,0);
+  if (fabs(dxyEle)>0.02) isGoodDenom = false;
+  if (fabs(dzEle)>0.10)  isGoodDenom = false;
+
+  if(isGoodDenom) return 1;
+  else return 0;
 }
