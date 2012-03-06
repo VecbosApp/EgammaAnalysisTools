@@ -100,6 +100,8 @@ $(OUTLIB)ElectronIDMVAHZZ.o: $(INCLUDEDIR)/src/ElectronIDMVAHZZ.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ElectronIDMVAHZZ.o $<
 $(OUTLIB)HZZEleIDSelector.o: $(INCLUDEDIR)/src/HZZEleIDSelector.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)HZZEleIDSelector.o $<
+$(OUTLIB)SimpleCutsIDSelector.o: $(INCLUDEDIR)/src/SimpleCutsIDSelector.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)SimpleCutsIDSelector.o $<
 $(OUTLIB)RedEleIDTree.o: $(INCLUDEDIR)/src/RedEleIDTree.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RedEleIDTree.o $<
 $(OUTLIB)FakeTree.o: $(INCLUDEDIR)/src/FakeTree.cc
@@ -108,6 +110,8 @@ $(OUTLIB)LikelihoodAnalysis.o: $(INCLUDEDIR)/src/LikelihoodAnalysis.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LikelihoodAnalysis.o $<
 $(OUTLIB)FakeElectronSelector.o: $(INCLUDEDIR)/src/FakeElectronSelector.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FakeElectronSelector.o $<
+$(OUTLIB)FakeElectronSelectorWenuPlusOneJet.o: $(INCLUDEDIR)/src/FakeElectronSelectorWenuPlusOneJet.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FakeElectronSelectorWenuPlusOneJet.o $<
 $(OUTLIB)ZeeTagAndProbe.o: $(INCLUDEDIR)/src/ZeeTagAndProbe.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ZeeTagAndProbe.o $<
 $(OUTLIB)LHPdfsProducer.o: $(INCLUDEDIR)/src/LHPdfsProducer.cc
@@ -154,6 +158,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)ElectronIDMVA.o \
 	$(OUTLIB)ElectronIDMVAHZZ.o \
 	$(OUTLIB)HZZEleIDSelector.o \
+	$(OUTLIB)SimpleCutsIDSelector.o \
 	$(OUTLIB)RedEleIDTree.o \
 	$(OUTLIB)FakeTree.o \
 	$(OUTLIB)sPlotsPdfsComparison.o \
@@ -165,6 +170,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)ElectronLikelihood.o \
 	$(OUTLIB)LikelihoodAnalysis.o \
 	$(OUTLIB)FakeElectronSelector.o \
+	$(OUTLIB)FakeElectronSelectorWenuPlusOneJet.o \
 	$(OUTLIB)ZeeTagAndProbe.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
@@ -191,7 +197,8 @@ produceMCSubtractedFake: $(INCLUDEDIR)/src/produceMCSubtractedFake.cxx \
 	$(CXX) $(CXXFLAGS) -o produceMCSubtractedFake $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
 makeFriendTrees: $(INCLUDEDIR)/src/MakeFriendTrees.cc \
-	$(OUTLIB)HZZEleIDSelector.o
+	$(OUTLIB)HZZEleIDSelector.o \
+	$(OUTLIB)SimpleCutsIDSelector.o
 	$(CXX) $(CXXFLAGS) -o makeFriendTrees $(OUTLIB)/*o $(GLIBS) $ $<
 
 CompareClasses: $(INCLUDEDIR)/src/CompareClasses.C \
