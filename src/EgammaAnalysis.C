@@ -55,6 +55,7 @@
 #endif
 #if Application == 11
 #include "EgammaAnalysisTools/include/FakeElectronSelectorWenuPlusOneJet.hh"
+#include "EgammaAnalysisTools/include/FakeElectronSelectorWmunuPlusOneJet.hh"
 #endif
 
 int main(int argc, char* argv[]) {
@@ -253,8 +254,17 @@ int main(int argc, char* argv[]) {
 
 #if Application == 11
 
-  FakeElectronSelectorWenuPlusOneJet analysis(theChain);
-  analysis.Loop(outputFileName);
+  TString basename(outputFileName);
+
+  std::cout << "Selecting W->enu + fake electrons..." << std::endl;
+  FakeElectronSelectorWenuPlusOneJet wenuanalysis(theChain);
+  TString wenuj = basename + TString("-Wenu-");
+  wenuanalysis.Loop(wenuj.Data());
+
+  std::cout << "Selecting W->munu + fake electrons..." << std::endl;
+  FakeElectronSelectorWmunuPlusOneJet wmunuanalysis(theChain);
+  TString wmunuj = basename + TString("-Wmunu-");
+  wmunuanalysis.Loop(wmunuj);
 
 #endif
 
