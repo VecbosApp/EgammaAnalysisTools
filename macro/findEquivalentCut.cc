@@ -123,6 +123,17 @@ void lookForCutsIso() {
 }
 
 
+void lookForCutsNoEAIso() {
+  
+  // barrel (pt<35 GeV is to keep EWK contamination engligible)
+  getCut("DenomFakeSmurf && abs(eta) < 1.479 && pt<35","combPFIsoHWW/pt<0.13",
+	 "(chaPFIso+neuPFIso+phoPFIso)/pt",0.0,2.0,"<");
+  // endcap (pt<35 GeV is to keep EWK contamination engligible)
+  getCut("DenomFakeSmurf && abs(eta) >= 1.479 && pt<35","combPFIsoHWW/pt<0.09",
+	 "(chaPFIso+neuPFIso+phoPFIso)/pt",0.0,2.0,"<");
+
+}
+
 void lookForCutsHZZId() {
 
   getCut("DenomFakeSmurf && pt<35 && pt < 20 && abs(eta)<1.0","bdthww>0.139","bdthzz",-0.3,0.3,">");
