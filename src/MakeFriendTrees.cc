@@ -21,6 +21,7 @@ using namespace std;
 enum idType {
   kIsoHWW2011 = 0, // HWW cuts 2011
   kBDTHWW2011_withIP, // HWW cuts 2011
+  kIso,
   kIsoEACorr,
   kBDTHZZ_withIP
 };
@@ -58,6 +59,11 @@ bool passHWWID(Float_t eta, Float_t pt, Float_t bdthww, Float_t bdthzz, Float_t 
       if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < -0.03);
       if(fabs(eta) >=  2.4) return (combIso/pt < -0.03);
     }
+  }
+
+  if(type == kIso) {
+    if(fabs(eta) < 1.479) return (combIso/pt < 0.29);
+    else return (combIso/pt < 0.21);
   }
 
   if(type == kBDTHWW2011_withIP) {
@@ -100,14 +106,16 @@ void makeFriendHZZIsolation(const char* file) {
 
   fF->mkdir("eleIDdir");
   TTree *fT = new TTree("T1","tree with hzz isolation");
-  Float_t combIso;
+  Float_t combIso, combIsoNoEA;
   fT->Branch("combPFIsoHZZ",&combIso,"combPFIsoHZZ/F");
+  fT->Branch("combPFIsoHZZNoEA",&combIsoNoEA,"combPFIsoHZZNoEA/F");
   
   for(int i=0; i<pT->GetEntries(); i++) {
     if (i%10000 == 0) std::cout << ">>> Analyzing event # " << i << " / " << pT->GetEntries() << " entries" << std::endl;
      pT->GetEntry(i);
 
-     combIso = chaPFIso+neuPFIso+phoPFIso;
+     combIsoNoEA = chaPFIso+neuPFIso+phoPFIso;
+     combIso = combIsoNoEA;
      if(fabs(eta) <  1.0) combIso -= 0.18 * rho;
      if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) combIso -= 0.19 * rho;
      if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) combIso -= 0.21 * rho;
@@ -161,6 +169,8 @@ void makeFriendHZZIdBits(const char* file) {
   Int_t chWP95, chWP90, chWP85, chWP80, chWP70;
   // the hww2011 WP and the one with the same fake rate
   Int_t hwwWP, hzzwphww;
+  // isolation only, three bits
+  Int_t pfisohww, pfisohzz, pfisohzzEA; 
   // first 4 variables needed for TP
   fT->Branch("mass", &mass, "mass/F");
   fT->Branch("pt", &pt, "pt/F");
@@ -179,6 +189,9 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("chwp70", &chWP70, "chwp70/I");
   fT->Branch("bdthww", &hwwWP, "bdthww/I");
   fT->Branch("hzzwphww", &hzzwphww, "hzzwphww/I");
+  fT->Branch("pfisohww", &pfisohww, "pfisohww/I");
+  fT->Branch("pfisohzz", &pfisohzz, "pfisohzz/I");
+  fT->Branch("pfisohzzEA", &pfisohzzEA, "pfisohzzEA/I");
 
   HZZEleIDSelector aSel;
 
@@ -212,6 +225,12 @@ void makeFriendHZZIdBits(const char* file) {
      hzzwphww=0;
      if(passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kBDTHZZ_withIP) && 
         passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kIsoEACorr)) hzzwphww = 1;
+
+     pfisohww=pfisohzz=pfisohzzEA=0;
+     if(passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kIsoHWW2011)) pfisohww = 1;
+     if(passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kIso)) pfisohzz = 1;
+     if(passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kIsoEACorr)) pfisohzzEA = 1;
+
      fT->Fill();
   }
   fF->cd("eleIDdir");
