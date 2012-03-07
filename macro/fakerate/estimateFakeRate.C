@@ -48,6 +48,7 @@ void estimateFakeRate::Loop(const char *outname)
   EgammaBdtHWWBasedID.push_back("WP80EA");
   EgammaBdtHWWBasedID.push_back("IsoWP80");
   EgammaBdtHWWBasedID.push_back("IsoWP80EA");
+  EgammaBdtHWWBasedID.push_back("IsoWP80ZZNoEA");
   EgammaBdtHWWBasedID.push_back("IdWP80");
 
   // no need to repeat the iso only
@@ -438,6 +439,32 @@ void estimateFakeRate::Loop(const char *outname)
       if (etaRegion==4) {
 	BdtHWWPtEndcap2[kIsoWP80EA] -> Fill(etFake);   //, theWeight);     
 	BdtHWWPUEndcap2[kIsoWP80EA] -> Fill(vertices); //, theWeight);     
+      }
+    }
+    // === HZZ, but _not EA corr_ Iso ===
+    if(passID(kIso)) {
+      BdtHWWEta[kIsoWP80HZZNoEA]->Fill(etaFake);
+      BdtHWWPt[kIsoWP80HZZNoEA] ->Fill(etFake);
+      BdtHWWPU[kIsoWP80HZZNoEA] ->Fill(vertices);
+      if (highPt) BdtHWWEtaHighPt[kIsoWP80HZZNoEA]->Fill(etaFake);
+      if (lowPt)  BdtHWWEtaLowPt[kIsoWP80HZZNoEA] ->Fill(etaFake);
+      if (isInEB) BdtHWWPtBarrel[kIsoWP80HZZNoEA] ->Fill(etFake);
+      if (isInEE) BdtHWWPtEndcap[kIsoWP80HZZNoEA] ->Fill(etFake);
+      if (etaRegion==1) {
+	BdtHWWPtBarrel1[kIsoWP80HZZNoEA] -> Fill(etFake);   //, theWeight);      
+	BdtHWWPUBarrel1[kIsoWP80HZZNoEA] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==2) {
+	BdtHWWPtBarrel2[kIsoWP80HZZNoEA] -> Fill(etFake);   //, theWeight);      
+	BdtHWWPUBarrel2[kIsoWP80HZZNoEA] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==3) { 
+	BdtHWWPtEndcap1[kIsoWP80HZZNoEA] -> Fill(etFake);   //, theWeight);      
+	BdtHWWPUEndcap1[kIsoWP80HZZNoEA] -> Fill(vertices); //, theWeight);      
+      }
+      if (etaRegion==4) {
+	BdtHWWPtEndcap2[kIsoWP80HZZNoEA] -> Fill(etFake);   //, theWeight);     
+	BdtHWWPUEndcap2[kIsoWP80HZZNoEA] -> Fill(vertices); //, theWeight);     
       }
     }
     // === HWW 2011 BDT ===
@@ -938,6 +965,12 @@ bool estimateFakeRate::passID(estimateFakeRate::idType type) {
       if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < -0.027);
       if(fabs(eta) >=  2.4) return (combIso/pt < -0.035);
     }
+  }
+
+  if(type == kIso) {
+    float combIso=chaPFIso+neuPFIso+phoPFIso;
+    if(fabs(eta) < 1.479) return (combIso/pt < 0.29);
+    else return (combIso/pt < 0.21);
   }
 
   if(type == kBDTHWW2011_withIP) {

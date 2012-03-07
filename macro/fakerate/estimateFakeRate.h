@@ -23,6 +23,7 @@ public :
   enum idType {
     kIsoHWW2011 = 0, // HWW cuts 2011
     kIsoEACorr, // EA corrected isolation HZZ with WP equal to kIsoHWW2011
+    kIso, // HZZ with WP equal to kIsoHWW2011
     kBDTHWW2011_withIP, // HWW cuts 2011
     kBDTHWW2011_noIP, // HWW BDT w/o IP (not optimized cuts)
     kBDTHZZ_withIP, // HZZ BDT with IP
@@ -34,6 +35,7 @@ public :
     kWP80EA,
     kIsoWP80,
     kIsoWP80EA,
+    kIsoWP80HZZNoEA,
     kIdWP80
   };
 

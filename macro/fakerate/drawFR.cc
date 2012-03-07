@@ -42,7 +42,7 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
   for(int i=0;i<(int)histos.size();++i) {
     
     histos[i]->SetMinimum(0);
-    histos[i]->SetMaximum(0.5);
+    histos[i]->SetMaximum(1.0);
     histos[i]->SetMarkerSize(2);
     histos[i]->SetMarkerStyle(20);
     histos[i]->SetMarkerColor(colors[i]);
@@ -90,6 +90,29 @@ void drawOneToOne(vector<TH1F*> set1, vector<TH1F*> set2, const char* desc1, con
 
 }
 
+void drawOneToTwo(vector<TH1F*> set1, vector<TH1F*> set2, vector<TH1F*> set3, const char* desc1, const char* desc2, const char* desc3, const char* xaxislabel) {
+  if(set1.size()!=set2.size() || set1.size()!=set3.size()) {
+    cout << "first set and second/third set of histos have different sizes! ERROR! " << endl;
+    return;
+  }
+  for(int i=0;i<(int)set1.size();++i) {
+    vector<TH1F*> histos;
+    vector<TString> desc;
+    histos.push_back(set1[i]);
+    histos.push_back(set2[i]);
+    histos.push_back(set3[i]);
+    desc.push_back(TString(desc1));
+    desc.push_back(TString(desc2));
+    desc.push_back(TString(desc3));
+    if(set1[i]==0 || set2[i]==0 || set3[i]==0) {
+      cout << "histogram not found!" << endl;
+      continue;
+    }
+    drawOneComparison(histos,desc,TString(xaxislabel),set1[i]->GetName());
+  }
+
+}
+
 void drawIsolations() {
   
   // here isolation only, WP80. Corrected and not
@@ -101,14 +124,19 @@ void drawIsolations() {
   // ---> EA corrected
   TH1F *BdtHWWIsoWP80EAEtaHighPt = (TH1F*)file->Get("BdtHWWIsoWP80EAEtaHighPt_Eff");
   TH1F *BdtHWWIsoWP80EAEtaLowPt = (TH1F*)file->Get("BdtHWWIsoWP80EAEtaLowPt_Eff");
+  // ---> not EA corrected
+  TH1F *BdtHWWIsoWP80ZZNoEAEtaHighPt = (TH1F*)file->Get("BdtHWWIsoWP80ZZNoEAEtaHighPt_Eff");
+  TH1F *BdtHWWIsoWP80ZZNoEAEtaLowPt = (TH1F*)file->Get("BdtHWWIsoWP80ZZNoEAEtaLowPt_Eff");
 
-  vector<TH1F*> etaSet1, etaSet2;
+  vector<TH1F*> etaSet1, etaSet2, etaSet3;
   etaSet1.push_back(BdtHWWIsoWP80EtaHighPt);
   etaSet1.push_back(BdtHWWIsoWP80EtaLowPt);
   etaSet2.push_back(BdtHWWIsoWP80EAEtaHighPt);
   etaSet2.push_back(BdtHWWIsoWP80EAEtaLowPt);
+  etaSet3.push_back(BdtHWWIsoWP80ZZNoEAEtaHighPt);
+  etaSet3.push_back(BdtHWWIsoWP80ZZNoEAEtaLowPt);
   
-  drawOneToOne(etaSet1,etaSet2,"PF isolation","PF isolation, EA corr","#eta");
+  drawOneToTwo(etaSet1,etaSet3,etaSet2,"PF iso","PF iso, new vetoes","PF iso, new vetoes, EA","#eta");
 
   // pt
   TH1F *BdtHWWIsoWP80PtBarrel1 = (TH1F*)file->Get("BdtHWWIsoWP80PtBarrel1_Eff");
@@ -120,8 +148,13 @@ void drawIsolations() {
   TH1F *BdtHWWIsoWP80EAPtBarrel2 = (TH1F*)file->Get("BdtHWWIsoWP80EAPtBarrel2_Eff");
   TH1F *BdtHWWIsoWP80EAPtEndcap1 = (TH1F*)file->Get("BdtHWWIsoWP80EAPtEndcap1_Eff");
   TH1F *BdtHWWIsoWP80EAPtEndcap2 = (TH1F*)file->Get("BdtHWWIsoWP80EAPtEndcap2_Eff");
+  // ---> not EA corrected
+  TH1F *BdtHWWIsoWP80ZZNoEAPtBarrel1 = (TH1F*)file->Get("BdtHWWIsoWP80ZZNoEAPtBarrel1_Eff");
+  TH1F *BdtHWWIsoWP80ZZNoEAPtBarrel2 = (TH1F*)file->Get("BdtHWWIsoWP80ZZNoEAPtBarrel2_Eff");
+  TH1F *BdtHWWIsoWP80ZZNoEAPtEndcap1 = (TH1F*)file->Get("BdtHWWIsoWP80ZZNoEAPtEndcap1_Eff");
+  TH1F *BdtHWWIsoWP80ZZNoEAPtEndcap2 = (TH1F*)file->Get("BdtHWWIsoWP80ZZNoEAPtEndcap2_Eff");
 
-  vector<TH1F*> ptSet1, ptSet2;
+  vector<TH1F*> ptSet1, ptSet2, ptSet3;
   ptSet1.push_back(BdtHWWIsoWP80PtBarrel1);
   ptSet1.push_back(BdtHWWIsoWP80PtBarrel2);
   ptSet1.push_back(BdtHWWIsoWP80PtEndcap1);
@@ -130,18 +163,44 @@ void drawIsolations() {
   ptSet2.push_back(BdtHWWIsoWP80EAPtBarrel2);
   ptSet2.push_back(BdtHWWIsoWP80EAPtEndcap1);
   ptSet2.push_back(BdtHWWIsoWP80EAPtEndcap2);
+  ptSet3.push_back(BdtHWWIsoWP80ZZNoEAPtBarrel1);
+  ptSet3.push_back(BdtHWWIsoWP80ZZNoEAPtBarrel2);
+  ptSet3.push_back(BdtHWWIsoWP80ZZNoEAPtEndcap1);
+  ptSet3.push_back(BdtHWWIsoWP80ZZNoEAPtEndcap2);
 
-  drawOneToOne(ptSet1,ptSet2,"PF isolation","PF isolation, EA corr","p_{T} [GeV]");
+  drawOneToTwo(ptSet1,ptSet3,ptSet2,"PF iso","PF iso, new vetoes","PF iso, new vetoes, EA","p_{T} [GeV]");
 
   // PU
-  TH1F *BdtHWWIsoWP80PU = (TH1F*)file->Get("BdtHWWIsoWP80PU_Eff");
+  TH1F *BdtHWWIsoWP80PUBarrel1 = (TH1F*)file->Get("BdtHWWIsoWP80PUBarrel1_Eff");
+  TH1F *BdtHWWIsoWP80PUBarrel2 = (TH1F*)file->Get("BdtHWWIsoWP80PUBarrel2_Eff");
+  TH1F *BdtHWWIsoWP80PUEndcap1 = (TH1F*)file->Get("BdtHWWIsoWP80PUEndcap1_Eff");
+  TH1F *BdtHWWIsoWP80PUEndcap2 = (TH1F*)file->Get("BdtHWWIsoWP80PUEndcap2_Eff");
   // ---> EA corrected
-  TH1F *BdtHWWIsoWP80EAPU = (TH1F*)file->Get("BdtHWWIsoWP80EAPU_Eff");
-  vector<TH1F*> puSet1, puSet2;
-  puSet1.push_back(BdtHWWIsoWP80PU);
-  puSet2.push_back(BdtHWWIsoWP80EAPU);
+  TH1F *BdtHWWIsoWP80EAPUBarrel1 = (TH1F*)file->Get("BdtHWWIsoWP80EAPUBarrel1_Eff");
+  TH1F *BdtHWWIsoWP80EAPUBarrel2 = (TH1F*)file->Get("BdtHWWIsoWP80EAPUBarrel2_Eff");
+  TH1F *BdtHWWIsoWP80EAPUEndcap1 = (TH1F*)file->Get("BdtHWWIsoWP80EAPUEndcap1_Eff");
+  TH1F *BdtHWWIsoWP80EAPUEndcap2 = (TH1F*)file->Get("BdtHWWIsoWP80EAPUEndcap2_Eff");
+  // ---> not EA corrected
+  TH1F *BdtHWWIsoWP80ZZNoEAPUBarrel1 = (TH1F*)file->Get("BdtHWWIsoWP80ZZNoEAPUBarrel1_Eff");
+  TH1F *BdtHWWIsoWP80ZZNoEAPUBarrel2 = (TH1F*)file->Get("BdtHWWIsoWP80ZZNoEAPUBarrel2_Eff");
+  TH1F *BdtHWWIsoWP80ZZNoEAPUEndcap1 = (TH1F*)file->Get("BdtHWWIsoWP80ZZNoEAPUEndcap1_Eff");
+  TH1F *BdtHWWIsoWP80ZZNoEAPUEndcap2 = (TH1F*)file->Get("BdtHWWIsoWP80ZZNoEAPUEndcap2_Eff");
 
-  drawOneToOne(puSet1,puSet2,"PF isolation","PF isolation, EA corr","# vertices");
+  vector<TH1F*> puSet1, puSet2, puSet3;
+  puSet1.push_back(BdtHWWIsoWP80PUBarrel1);
+  puSet1.push_back(BdtHWWIsoWP80PUBarrel2);
+  puSet1.push_back(BdtHWWIsoWP80PUEndcap1);
+  puSet1.push_back(BdtHWWIsoWP80PUEndcap2);
+  puSet2.push_back(BdtHWWIsoWP80EAPUBarrel1);
+  puSet2.push_back(BdtHWWIsoWP80EAPUBarrel2);
+  puSet2.push_back(BdtHWWIsoWP80EAPUEndcap1);
+  puSet2.push_back(BdtHWWIsoWP80EAPUEndcap2);
+  puSet3.push_back(BdtHWWIsoWP80ZZNoEAPUBarrel1);
+  puSet3.push_back(BdtHWWIsoWP80ZZNoEAPUBarrel2);
+  puSet3.push_back(BdtHWWIsoWP80ZZNoEAPUEndcap1);
+  puSet3.push_back(BdtHWWIsoWP80ZZNoEAPUEndcap2);
+
+  drawOneToTwo(puSet1,puSet3,puSet2,"PF iso","PF iso, new vetoes","PF iso, new vetoes, EA","# vertices");
 
 }
 
