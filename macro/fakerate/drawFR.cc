@@ -29,7 +29,7 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
   colors.push_back(kTeal+3);
 
   gStyle->SetOptStat(0);
-  gStyle->SetOptFit(1111);
+  gStyle->SetOptFit(0);
 
   TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
   TLegend* legend = new TLegend(0.20, 0.70, 0.43, 0.86);
