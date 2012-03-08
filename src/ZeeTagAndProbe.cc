@@ -481,7 +481,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
             phiwidth = phiWidthSC[sc];
             etawidth = etaWidthSC[sc];
             see = sqrt(covIEtaIEtaSC[sc]);
-            sep = sqrt(covIEtaIPhiSC[sc]);
+            sep = covIEtaIPhiSC[sc]/(sqrt(covIEtaIEtaSC[sc])*sqrt(covIPhiIPhiSC[sc]));
             spp = sqrt(covIPhiIPhiSC[sc]);
             oneoveremoneoverp = 1./energySC[sc]  - 1./probeP4.Vect().Mag();
             emaxovere = eMaxSC[sc]/seedEnergy;
@@ -517,7 +517,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
               phiwidth = phiWidthPFSC[sc];
               etawidth = etaWidthPFSC[sc];
               see = sqrt(covIEtaIEtaPFSC[sc]);
-              sep = sqrt(covIEtaIPhiPFSC[sc]);
+              sep = covIEtaIPhiPFSC[sc]/(sqrt(covIEtaIEtaPFSC[sc])*sqrt(covIPhiIPhiPFSC[sc]));
               spp = sqrt(covIPhiIPhiPFSC[sc]);
               oneoveremoneoverp = 1./energyPFSC[sc]  - 1./probeP4.Vect().Mag();
               emaxovere = eMaxPFSC[sc]/seedEnergy;
