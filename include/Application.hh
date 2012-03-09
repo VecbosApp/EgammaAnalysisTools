@@ -10,5 +10,6 @@
 //   8 = Z->ee tag and probe
 //   9 = measure turn on curve
 //  10 = do the selection for the Fake Electron
+//  11 = do the selection for the Wenu/Wmunu + Fake Electron
 
-#define Application 10
+#define Application 8
