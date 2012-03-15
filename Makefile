@@ -114,6 +114,8 @@ $(OUTLIB)FakeElectronSelectorWenuPlusOneJet.o: $(INCLUDEDIR)/src/FakeElectronSel
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FakeElectronSelectorWenuPlusOneJet.o $<
 $(OUTLIB)FakeElectronSelectorWmunuPlusOneJet.o: $(INCLUDEDIR)/src/FakeElectronSelectorWmunuPlusOneJet.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FakeElectronSelectorWmunuPlusOneJet.o $<
+$(OUTLIB)FakeElectronSelectorZllPlusOneFake.o: $(INCLUDEDIR)/src/FakeElectronSelectorZllPlusOneFake.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FakeElectronSelectorZllPlusOneFake.o $<
 $(OUTLIB)ZeeTagAndProbe.o: $(INCLUDEDIR)/src/ZeeTagAndProbe.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ZeeTagAndProbe.o $<
 $(OUTLIB)LHPdfsProducer.o: $(INCLUDEDIR)/src/LHPdfsProducer.cc
@@ -174,6 +176,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)FakeElectronSelector.o \
 	$(OUTLIB)FakeElectronSelectorWenuPlusOneJet.o \
 	$(OUTLIB)FakeElectronSelectorWmunuPlusOneJet.o \
+	$(OUTLIB)FakeElectronSelectorZllPlusOneFake.o \
 	$(OUTLIB)ZeeTagAndProbe.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 

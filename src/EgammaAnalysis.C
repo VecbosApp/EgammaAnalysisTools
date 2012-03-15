@@ -57,6 +57,9 @@
 #include "EgammaAnalysisTools/include/FakeElectronSelectorWenuPlusOneJet.hh"
 #include "EgammaAnalysisTools/include/FakeElectronSelectorWmunuPlusOneJet.hh"
 #endif
+#if Application == 12
+#include "EgammaAnalysisTools/include/FakeElectronSelectorZllPlusOneFake.hh"
+#endif
 
 int main(int argc, char* argv[]) {
 
@@ -267,6 +270,14 @@ int main(int argc, char* argv[]) {
   wmunuanalysis.Loop(wmunuj);
 
 #endif
+
+#if Application == 12
+
+  FakeElectronSelectorZllPlusOneFake analysis(theChain);
+  analysis.Loop(outputFileName);
+
+#endif
+
 
   return 0;
 
