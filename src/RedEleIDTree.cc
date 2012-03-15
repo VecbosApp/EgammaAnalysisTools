@@ -70,6 +70,7 @@ RedEleIDTree::~RedEleIDTree() {
 void RedEleIDTree::addAttributesSignal() {
 
   myTree->Branch("mass",       &myZmass,       "mass/F");
+  myTree->Branch("zdec",       &myZDec,        "zdec/I");
 }
 
 void RedEleIDTree::addElectronIdBits() {
@@ -268,9 +269,10 @@ void RedEleIDTree::fillIsolations(float trkIso, float ecalIso, float hcalIso,
   myPFCandPhotonIso=phoPFiso;
 }
 
-void RedEleIDTree::fillAttributesSignal(float zmass) {
+void RedEleIDTree::fillAttributesSignal(float zmass, int zdec) {
 
   myZmass=zmass;
+  myZDec=zdec;
 }
 
 void RedEleIDTree::fillAttributesBackground(float deltaphi, float invmass, float met, float pth) {

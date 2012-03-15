@@ -566,7 +566,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
                                      e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
                                      e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,
                                      EleSCPhi, scenergy, scrawenergy, scesenergy);
-          reducedTree.fillAttributesSignal(okmass);
+          reducedTree.fillAttributesSignal(okmass,1);
           reducedTree.fillIsolations(dr03TkSumPtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                      dr03EcalRecHitSumEtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                      dr03HcalTowerSumEtFullConeEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,

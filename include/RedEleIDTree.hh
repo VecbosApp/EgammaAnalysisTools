@@ -51,7 +51,7 @@ public:
 
   //! fill electron attributes + z mass for the tag and probe
   //! note: when both electrons from Z are probes, the same Z mass is repeated
-  void fillAttributesSignal(float zmass);
+  void fillAttributesSignal(float zmass, int zeeDec);
   //! fill electron attributes + other quantities for background tag and probe
   void fillAttributesBackground(float dphi, float invmass, float met, float pth);
   //! fill the splitting categories of the PDFs
@@ -80,6 +80,7 @@ private:
   int myRun, myLS, myEvent, myMCMatch;
 
   float myZmass;
+  int myZDec;
 
   int myCutBasedId[6], myCutBasedIdOnlyID[6], myCutBasedIdOnlyIso[6], myCutBasedIdOnlyConv[6];
   int myLHBasedId[5], myLHBasedIdOnlyID[5], myLHBasedIdOnlyIso[5], myLHBasedIdOnlyConv[5];

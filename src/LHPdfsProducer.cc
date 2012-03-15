@@ -272,7 +272,7 @@ void LHPdfsProducer::LoopZTagAndProbe(const char *treefilesuffix) {
           // fill the reduced tree
           // changed: to be adapted
 	  // reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
-          reducedTree.fillAttributesSignal(okmass);
+          reducedTree.fillAttributesSignal(okmass,1);
           reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
           reducedTree.store();
 
@@ -448,7 +448,7 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
       // fill the reduced tree     
       if( isolated1 && iclass>-1 ) {
         //	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
-	reducedTree.fillAttributesSignal(9999.);
+	reducedTree.fillAttributesSignal(9999.,1);
 	reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
 	reducedTree.store();
       } // fill tree
@@ -508,7 +508,7 @@ void LHPdfsProducer::LoopZ(const char *treefilesuffix) {
       // fill the reduced tree     
       if( isolated2 && iclass>-1 ) {
         //	reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
-	reducedTree.fillAttributesSignal(9999.);
+	reducedTree.fillAttributesSignal(9999.,1);
 	reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
 	reducedTree.store();
       } // fill tree
@@ -718,7 +718,7 @@ void LHPdfsProducer::LoopZTagAndProbeForMcTruth(const char *treefilesuffix) {
 	  // only if it matches with MC fill the reduced tree
 	  if (matchMc) { 
             //	    reducedTree.fillVariables(EoPout,EoP,HoE,dEtaVtx,dPhiVtx,s9s25,sigmaIEtaIEta,sigmaIPhiIPhi,fbrem,nbrem,pt,eta,charge);
-	    reducedTree.fillAttributesSignal(okmass);
+	    reducedTree.fillAttributesSignal(okmass,1);
 	    reducedTree.fillCategories(iecal,iptbin,iclass,nbrem);
 	    reducedTree.store();
 
@@ -949,10 +949,10 @@ void LHPdfsProducer::LoopZwithMass(const char *treefilesuffix) {
 	// fill the reduced tree     
 	if( isolated1 && isolated2 && iclass1>-1 && iclass2>-1 ) {
           //	  reducedTree.fillVariables(EoPout1,EoP1,HoE1,dEtaVtx1,dPhiVtx1,s9s251,sigmaIEtaIEta1,sigmaIPhiIPhi1,fbrem1,nbrem1,pt1,eta1,charge1);
-	  reducedTree.fillAttributesSignal(mass);
+	  reducedTree.fillAttributesSignal(mass,1);
 	  reducedTree.fillCategories(iecal1,iptbin1,iclass1,nbrem1);
           //	  reducedTree.fillVariables(EoPout2,EoP2,HoE2,dEtaVtx2,dPhiVtx2,s9s252,sigmaIEtaIEta2,sigmaIPhiIPhi2,fbrem2,nbrem2,pt2,eta2,charge2);
-	  reducedTree.fillAttributesSignal(mass);
+	  reducedTree.fillAttributesSignal(mass,1);
 	  reducedTree.fillCategories(iecal2,iptbin2,iclass2,nbrem2);
 	  
 	  reducedTree.store();
