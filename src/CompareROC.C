@@ -104,6 +104,36 @@ void makeIsolationCurve(TTree *treeSig, TTree* treeBkg,
   roc.drawResults(namefile.Data());
 }
 
+void make3IsolationCurves(TTree *treeSig, TTree* treeBkg, 
+			  TString cutSig, TString cutBkg, TString namefile) {
+
+  TH1F *isohww_sig = new TH1F("isohww_sig","",100,0.0,2.0);
+  TH1F *isohww_bkg = new TH1F("isohww_bkg","",100,0.0,2.0);
+  TH1F *isohzz_sig = new TH1F("isohzz_sig","",100,-1.0,2.0);
+  TH1F *isohzz_bkg = new TH1F("isohzz_bkg","",100,-1.0,2.0);
+  TH1F *isohzznoEA_sig = new TH1F("isohzznoEA_sig","",100,-1.0,2.0);
+  TH1F *isohzznoEA_bkg = new TH1F("isohzznoEA_bkg","",100,-1.0,2.0);
+  
+  treeSig->Project("isohww_sig","combPFIsoHWW/pt",cutSig);
+  treeBkg->Project("isohww_bkg","combPFIsoHWW/pt",cutBkg);
+  treeSig->Project("isohzz_sig","combPFIsoHZZ/pt",cutSig);
+  treeBkg->Project("isohzz_bkg","combPFIsoHZZ/pt",cutBkg);
+  treeSig->Project("isohzznoEA_sig","combPFIsoHZZNoEA/pt",cutSig);
+  treeBkg->Project("isohzznoEA_bkg","combPFIsoHZZNoEA/pt",cutBkg);
+
+  FiguresOfMeritEvaluator roc;
+  roc.addSignal("PF iso", isohww_sig);
+  roc.addBackgrounds(isohww_bkg);
+  roc.setCutDirection("<");
+  roc.addSignal("PF iso, new vetoes", isohzznoEA_sig);
+  roc.addBackgrounds(isohzznoEA_bkg);
+  roc.setCutDirection("<");
+  roc.addSignal("PF iso, new vetoes, EA", isohzz_sig);
+  roc.addBackgrounds(isohzz_bkg);
+  roc.setCutDirection("<");
+  roc.drawResults(namefile.Data());
+}
+
 
 int main(int argc, char* argv[]) {
 
@@ -166,7 +196,7 @@ int main(int argc, char* argv[]) {
 
   for(int i=0;i<(int)cutBase.size();++i) {
     id[i].ReplaceAll("IdOnly","IsoOnly");
-    makeIsolationCurve(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
+    make3IsolationCurves(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
   }
 
   // and now in 2 big bins in nvtx
@@ -176,7 +206,7 @@ int main(int argc, char* argv[]) {
     cutSignalLoPU.push_back(cutSignal[i]+TString(" && vertices<8"));
     cutBackgroundLoPU.push_back(cutBackground[i]+TString(" && vertices<8"));
     id[i].ReplaceAll("IsoOnly","IsoOnlyVtx1To7");
-    makeIsolationCurve(treeSig,treeBkg,cutSignalLoPU[i],cutBackgroundLoPU[i],id[i]);
+    make3IsolationCurves(treeSig,treeBkg,cutSignalLoPU[i],cutBackgroundLoPU[i],id[i]);
     id[i].ReplaceAll("IsoOnlyVtx1To7","IdOnlyVtx1To7");
     makeIdCurve(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
   }
@@ -185,7 +215,7 @@ int main(int argc, char* argv[]) {
     cutSignalHiPU.push_back(cutSignal[i]+TString(" && vertices>=8"));
     cutBackgroundHiPU.push_back(cutBackground[i]+TString(" && vertices>=8"));
     id[i].ReplaceAll("IdOnlyVtx1To7","IsoOnlyVtx8ToInf");
-    makeIsolationCurve(treeSig,treeBkg,cutSignalHiPU[i],cutBackgroundHiPU[i],id[i]);
+    make3IsolationCurves(treeSig,treeBkg,cutSignalHiPU[i],cutBackgroundHiPU[i],id[i]);
     id[i].ReplaceAll("IsoOnlyVtx8ToInf","IdOnlyVtx8ToInf");
     makeIdCurve(treeSig,treeBkg,cutSignalHiPU[i],cutBackgroundHiPU[i],id[i]);
   }
