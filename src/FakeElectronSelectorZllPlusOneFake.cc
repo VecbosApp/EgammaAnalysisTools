@@ -192,7 +192,7 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
 	aCutSel.outputid(eta,see,dphi,deta,hoe,SimpleCutsIDSelector::kWP90) &&
 	aCutSel.outputiso(eta,tkiso,ecaliso,hcaliso,SimpleCutsIDSelector::kWP90);
       
-      bool isLooseEle = pt>10. && 
+      bool isLooseEle = pt>20. && 
       	aCutSel.outputid(eta,see,dphi,deta,hoe,SimpleCutsIDSelector::kWP95) &&
       	aCutSel.outputiso(eta,tkiso,ecaliso,hcaliso,SimpleCutsIDSelector::kWP95);
 
@@ -216,7 +216,7 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
       bool isGoodWMu = pt>20. && 
 	aCutSel.outputiso(eta,tkiso,ecaliso,hcaliso,SimpleCutsIDSelector::kWP90);
       
-      bool isLooseMu = pt>10. && 
+      bool isLooseMu = pt>20. && 
 	aCutSel.outputiso(eta,tkiso,ecaliso,hcaliso,SimpleCutsIDSelector::kWP95);
 
       if (isGoodWMu) tightMuons.push_back(imu);
@@ -277,8 +277,8 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
       if ( p3Jet.Pt()>15 && fabs(p3Jet.Eta())<3.0 && trackCountingHighEffBJetTagsAK5Jet[jet]>maxTCHE ) maxTCHE= trackCountingHighEffBJetTagsAK5Jet[jet];
     }
 
-    // veto on max btag in jets with pt > 15 GeV
-    if(maxTCHE>2.1) continue;
+    // veto on max btag in jets with pt > 15 GeV (not applied for Z)
+    // if(maxTCHE>2.1) continue; 
     myCounter.IncrVar("bveto",1);  
 
     // look for probes among the reco electrons different from non Z
