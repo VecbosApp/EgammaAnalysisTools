@@ -95,6 +95,7 @@ FakeElectronSelectorZllPlusOneFake::FakeElectronSelectorZllPlusOneFake(TTree *tr
   myCounter.AddVar("zmass");
   myCounter.AddVar("bveto");
   myCounter.AddVar("denom");
+  myCounter.AddVar("onefake");
 }
 
 FakeElectronSelectorZllPlusOneFake::~FakeElectronSelectorZllPlusOneFake() { }
@@ -302,6 +303,10 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
     // at least one probe candidate
     if(probe<0) continue;
     myCounter.IncrVar("denom",1);
+
+    // to not overlap with the ZZ->4l, choose events with only and only 1 probe
+    if(probes.size()>1) continue;
+    myCounter.IncrVar("onefake");
     
     TVector3 p3Met(pxPFMet[0],pyPFMet[0],0.0);
     // fill the kine tree - after HLT and denominator
