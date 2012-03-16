@@ -159,6 +159,13 @@ void RedEleIDTree::addMore() {
   myTree->Branch("rho",      &myRho,  "rho/F");
 }
 
+void RedEleIDTree::addTrackMomenta() {
+  myTree->Branch("pcomb",    &myPComb,    "pcomb/F");
+  myTree->Branch("pmodegsf", &myPModeGsf, "pmodegsf/F");
+  myTree->Branch("pmeangsf", &myPMeanGsf, "pmeangsf/F");
+  myTree->Branch("pmeankf",  &myPKf,      "pmeankf/F");
+}
+
 void RedEleIDTree::addGamma() {
 
   myTree->Branch("absTrackerIsolGammaCand",&myAbsTrackerIsolGammaCand,"absTrackerIsolGammaCand/F");
@@ -304,6 +311,13 @@ void RedEleIDTree::fillMore2(float bdthwwnoip, float bdthzznoip, float bdthzzmc,
   myBdtHzzMC=bdthzzmc;
   myPFMVA=pfmva;
   myLike=like;
+}
+
+void RedEleIDTree::fillTrackMomenta(float pcomb, float pmodegsf, float pmeangsf, float pkf) {
+  myPComb=pcomb;
+  myPModeGsf=pmodegsf;
+  myPMeanGsf=pmeangsf;
+  myPKf=pkf;
 }
 
 void RedEleIDTree::fillGamma(float atg, float aeg, float ahg, int ig) {

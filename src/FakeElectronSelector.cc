@@ -119,6 +119,7 @@ void FakeElectronSelector::Loop(const char *outname) {
   myOutIDTree->addIsolations();
   myOutIDTree->addRunInfos();
   myOutIDTree->addMore();
+  myOutIDTree->addTrackMomenta();
 
   // trigger: electrons - chiara
   cout << "using electrons triggers" << endl;
@@ -343,6 +344,16 @@ void FakeElectronSelector::Loop(const char *outname) {
       EleSCPhi, scenergy, scrawenergy, scesenergy;
 
     int kfTrack = trackIndexEle[theDenom1];
+
+    // different p estimations
+    float pcomb=tv3Denom1.Mag();
+    TVector3 p3ModeGsf(pxModeGsfTrack[gsfTrack],pyModeGsfTrack[gsfTrack],pzModeGsfTrack[gsfTrack]);
+    float pmodegsf=p3ModeGsf.Mag();
+    TVector3 p3MeanGsf(pxGsfTrack[gsfTrack],pyGsfTrack[gsfTrack],pzGsfTrack[gsfTrack]);
+    float pmeangsf=p3MeanGsf.Mag();
+    TVector3 p3MeanKf(pxTrack[kfTrack],pyTrack[kfTrack],pzTrack[kfTrack]);
+    float pmeankf=p3MeanKf.Mag();
+
     double gsfsign   = (-eleDxyPV(theDenom1,0) >=0 ) ? 1. : -1.;
     int matchConv = (hasMatchedConversionEle[theDenom1]) ? 1 : 0;
 
@@ -474,6 +485,8 @@ void FakeElectronSelector::Loop(const char *outname) {
                                pfCandChargedIsoEle[theDenom1],pfCandNeutralIsoEle[theDenom1],pfCandPhotonIsoEle[theDenom1]);
     myOutIDTree->fillFakeRateDenomBits(isDenomFake_HwwEgamma(theDenom1),isDenomFake_smurfs(theDenom1));
     myOutIDTree->fillMore(nPV,rhoFastjet,bdthww,bdthzz);
+    myOutIDTree->fillMore2(bdthwwnoip,bdthzznoip,bdthzzmc,pfmva,lh);
+    myOutIDTree->fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
     myOutIDTree->fillRunInfos(runNumber, lumiBlock, eventNumber, nPU, -1);
     myOutIDTree->store();
     

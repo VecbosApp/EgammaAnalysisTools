@@ -16,6 +16,7 @@ public:
   //! add the splitting categories (see below)
   void addCategories();
   void addMore();
+  void addTrackMomenta();
   void addElectronIdBits();
   void addDenominatorFakeBits();
   void addIsolations();
@@ -58,6 +59,7 @@ public:
   void fillCategories(int iecal, int iptbin, int iclass, int nbr);
   void fillMore(float nVtx, float rho, float bdthww, float bdthzz);
   void fillMore2(float bdthwwnoip, float bdthzznoip, float bdthzzmc, float pfmva, float like);
+  void fillTrackMomenta(float pcomb, float pmodegsf, float pmeangsf, float pkf);
   void fillGamma(float atg, float aeg, float ahg, int ig);
   //! fill the run,lumi, event number, mc match
   void fillRunInfos(int run, int lumi, int event, int npu[3], int mcmatch);   
@@ -76,6 +78,7 @@ private:
   float myDist, myDcot;
   int myCharge;
   float myEta, myPhi, myPt, mySCEnergy, mySCRawEnergy, mySCESEnergy;
+  float myPComb, myPModeGsf, myPMeanGsf, myPKf;
   int myNpu[3];
   int myRun, myLS, myEvent, myMCMatch;
 

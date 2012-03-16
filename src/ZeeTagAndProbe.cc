@@ -253,7 +253,8 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
   reducedTree.addIsolations();
   reducedTree.addRunInfos();
   reducedTree.addMore();
-  
+  reducedTree.addTrackMomenta();
+
   // counters
   int allevents   = 0;
   int trigger     = 0;
@@ -434,7 +435,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
               LHBasedPFIsoIdOnlyConv[icut] = (isConvRejLHBasedPFIso) ? 1 : 0;
               LHBasedPFIsoId[icut] = (isEleIDLHBasedPFIso && isIsolLHBasedPFIso && isConvRejLHBasedPFIso) ? 1 : 0;
             }
-              
+	  
           // some eleID variables
           float HoE, s1s9, s9s25, phiwidth, etawidth, deta, dphi, fbrem, see, spp, eleopout, eopout, eop, nbrems, recoFlag, EleSCEta;
           float oneoveremoneoverp, eledeta, d0, ip3d, ip3ds, kfhits, kfchi2, e1x5e5x5, dcot, dist;
@@ -445,6 +446,16 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
 
           int gsfTrack = gsfTrackIndexEle[probe];   
           int kfTrack = trackIndexEle[probe];
+
+	  // different p estimations
+	  float pcomb=probeP4.Vect().Mag();
+	  TVector3 p3ModeGsf(pxModeGsfTrack[gsfTrack],pyModeGsfTrack[gsfTrack],pzModeGsfTrack[gsfTrack]);
+          float pmodegsf=p3ModeGsf.Mag();
+	  TVector3 p3MeanGsf(pxGsfTrack[gsfTrack],pyGsfTrack[gsfTrack],pzGsfTrack[gsfTrack]);
+	  float pmeangsf=p3MeanGsf.Mag();
+	  TVector3 p3MeanKf(pxTrack[kfTrack],pyTrack[kfTrack],pzTrack[kfTrack]);
+	  float pmeankf=p3MeanKf.Mag();
+
           double gsfsign   = (-eleDxyPV(probe,0) >=0 ) ? 1. : -1.;
           int matchConv = (hasMatchedConversionEle[probe]) ? 1 : 0;
 
@@ -574,6 +585,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
                                      pfCandChargedIsoEle[probe],pfCandNeutralIsoEle[probe],pfCandPhotonIsoEle[probe]);
           reducedTree.fillMore(nPV,rhoFastjet,bdthww,bdthzz);
           reducedTree.fillMore2(bdthwwnoip,bdthzznoip,bdthzzmc,pfmva,lh);
+	  reducedTree.fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
           reducedTree.fillCutBasedIDBits(CutBasedId,CutBasedIdOnlyID,CutBasedIdOnlyIso,CutBasedIdOnlyConv);
           reducedTree.fillLHBasedIDBits(LHBasedId,LHBasedIdOnlyID,LHBasedIdOnlyIso,LHBasedIdOnlyConv);
           reducedTree.fillLHBasedPFIsoIDBits(LHBasedPFIsoId,LHBasedPFIsoIdOnlyID,LHBasedPFIsoIdOnlyIso,LHBasedPFIsoIdOnlyConv);
