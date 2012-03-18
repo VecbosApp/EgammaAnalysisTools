@@ -142,8 +142,8 @@ int main(int argc, char* argv[]) {
   fileSig = fileBkg = 0;
   treeSig = treeBkg = 0;
 
-  fileSig = TFile::Open("macro/results_data/merged.root");
-  fileBkg = TFile::Open("macro/results_data_fakes/merged.root");
+  fileSig = TFile::Open("macro/results_data/electrons.root");
+  fileBkg = TFile::Open("macro/results_data/fakes.root");
   if( fileSig && fileBkg) {
     fileSig->cd();
     treeSig = (TTree*)fileSig->Get("eleIDdir/T1");
@@ -191,8 +191,8 @@ int main(int argc, char* argv[]) {
   // make3Curves(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
 
   // HZZ isolations are in friend trees
-  treeSig->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/merged_hzzisoFriend.root");
-  treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data_fakes/merged_hzzisoFriend.root");
+  treeSig->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/electrons_hzzisoFriend.root");
+  treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/fakes_hzzisoFriend.root");
 
   for(int i=0;i<(int)cutBase.size();++i) {
     id[i].ReplaceAll("IdOnly","IsoOnly");

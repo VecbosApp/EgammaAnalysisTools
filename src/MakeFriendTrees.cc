@@ -247,8 +247,8 @@ int main(int argc, char* argv[]) {
   fileSig = fileBkg = 0;
 
   char files[500], fileb[500];
-  sprintf(files,"macro/results_data/merged.root");
-  sprintf(fileb,"macro/results_data_fakes/merged.root");
+  sprintf(files,"macro/results_data/electrons.root");
+  sprintf(fileb,"macro/results_data/fakes.root");
 
   cout << "\t===> DOING ISOLATION FRIEND TREES <===" << endl;
   // isolation
