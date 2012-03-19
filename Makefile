@@ -118,6 +118,8 @@ $(OUTLIB)FakeElectronSelectorZllPlusOneFake.o: $(INCLUDEDIR)/src/FakeElectronSel
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FakeElectronSelectorZllPlusOneFake.o $<
 $(OUTLIB)ZeeTagAndProbe.o: $(INCLUDEDIR)/src/ZeeTagAndProbe.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ZeeTagAndProbe.o $<
+$(OUTLIB)HZZ4LElectronSelector.o: $(INCLUDEDIR)/src/HZZ4LElectronSelector.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)HZZ4LElectronSelector.o $<
 $(OUTLIB)LHPdfsProducer.o: $(INCLUDEDIR)/src/LHPdfsProducer.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LHPdfsProducer.o $<
 $(OUTLIB)sPlotsPdfsComparison.o: $(INCLUDEDIR)/src/sPlotsPdfsComparison.cc
@@ -177,7 +179,8 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)FakeElectronSelectorWenuPlusOneJet.o \
 	$(OUTLIB)FakeElectronSelectorWmunuPlusOneJet.o \
 	$(OUTLIB)FakeElectronSelectorZllPlusOneFake.o \
-	$(OUTLIB)ZeeTagAndProbe.o
+	$(OUTLIB)ZeeTagAndProbe.o \
+	$(OUTLIB)HZZ4LElectronSelector.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 
 # ======= likelihood libs

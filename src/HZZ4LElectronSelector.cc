@@ -1,0 +1,496 @@
+#include <iostream>
+#include <string> 
+#include <math.h>
+
+#include "TLorentzVector.h"
+
+#include "CommonTools/include/Utils.hh"
+#include "CommonTools/include/EfficiencyEvaluator.hh"
+#include "CommonTools/include/LeptonIdBits.h"
+#include "EgammaAnalysisTools/include/CutBasedEleIDSelector.hh"
+#include "EgammaAnalysisTools/include/RedEleIDTree.hh"
+#include "EgammaAnalysisTools/include/HZZ4LElectronSelector.hh"
+
+#include "cajun/json/reader.h"
+#include "cajun/json/elements.h"
+#include <CommonTools/include/TriggerMask.hh>
+
+using namespace bits;
+using namespace std;
+
+HZZ4LElectronSelector::HZZ4LElectronSelector(TTree *tree)
+  : Egamma(tree) {
+
+  // configuring electron likelihood
+  TFile *fileLH = TFile::Open("pdfs_MC.root");
+  TDirectory *EB0lt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB1lt15dir = fileLH->GetDirectory("/");
+  TDirectory *EElt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB0gt15dir = fileLH->GetDirectory("/");
+  TDirectory *EB1gt15dir = fileLH->GetDirectory("/");
+  TDirectory *EEgt15dir = fileLH->GetDirectory("/");
+  LikelihoodSwitches defaultSwitches;
+
+  defaultSwitches.m_useFBrem = true;
+  defaultSwitches.m_useEoverP = false;
+  defaultSwitches.m_useSigmaPhiPhi = true;
+  defaultSwitches.m_useHoverE = false;        
+  defaultSwitches.m_useOneOverEMinusOneOverP = true;
+
+  LH = new ElectronLikelihood(&(*EB0lt15dir), &(*EB1lt15dir), &(*EElt15dir), &(*EB0gt15dir), &(*EB1gt15dir), &(*EEgt15dir),
+                              defaultSwitches, std::string("class"),std::string("class"),true,true);
+
+  // configuring the electron BDT
+  fMVAHWW = new ElectronIDMVA();
+  fMVAHWWNoIP = new ElectronIDMVA();
+  fMVAHWW->Initialize("BDTG method",
+                      "elebdtweights/Subdet0LowPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet1LowPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet2LowPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet0HighPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet1HighPt_WithIPInfo_BDTG.weights.xml",
+                      "elebdtweights/Subdet2HighPt_WithIPInfo_BDTG.weights.xml" ,                
+                      ElectronIDMVA::kWithIPInfo);
+
+  fMVAHWWNoIP->Initialize("BDTG method",
+                          "elebdtweights/Subdet0LowPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet1LowPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet2LowPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet0HighPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet1HighPt_NoIPInfo_BDTG.weights.xml",
+                          "elebdtweights/Subdet2HighPt_NoIPInfo_BDTG.weights.xml" ,                
+                      ElectronIDMVA::kNoIPInfo);
+  
+  // configuring the electron BDT for H->ZZ
+  fMVAHZZMC = new ElectronIDMVAHZZ();
+  fMVAHZZ = new ElectronIDMVAHZZ();
+  fMVAHZZNoIP = new ElectronIDMVAHZZ();
+  // Default H->ZZ MC training
+  fMVAHZZMC->Initialize("BDTSimpleCat",
+                        "elebdtweights/HZZBDT_BDTSimpleCat.weights.xml",
+                        ElectronIDMVAHZZ::kBDTSimpleCat);
+
+  // New H->ZZ DATA training, with IP
+  fMVAHZZ->Initialize("BDTSimpleCat",
+                      "elebdtweights/HZZBDT_BDTSimpleCat_EBSplit_Data.weights.xml",
+                      ElectronIDMVAHZZ::kBDTSimpleCatData);
+
+  // New H->ZZ DATA training, no IP
+  fMVAHZZNoIP->Initialize("BDTSimpleCat",
+                          "elebdtweights/HZZBDT_BDTSimpleCatNoIP_EBSplit_Data.weights.xml",
+                          ElectronIDMVAHZZ::kBDTSimpleCatNoIPData);
+
+}
+
+HZZ4LElectronSelector::~HZZ4LElectronSelector() { 
+  
+}
+
+
+// PDF for probe electrons within the acceptance and loose isolated in the tracker
+// the tag is the one with the best match to the Z
+// the tag must be within the acceptance, tracker isolated and loose identified
+void HZZ4LElectronSelector::Loop(const char *treefilesuffix) {
+  
+  if(fChain == 0) return;
+
+  Utils anaUtils;
+  
+  char treename[200];
+  sprintf(treename,"%s.root",treefilesuffix);
+  RedEleIDTree reducedTree(treename);
+  reducedTree.addIsolations();
+  reducedTree.addRunInfos();
+  reducedTree.addMore();
+  reducedTree.addTrackMomenta();
+
+  // counters
+  int allevents   = 0;
+  int etaprobes   = 0;
+  int ptprobes    = 0;
+  int matchprobes = 0;
+  int goodevents  = 0;
+
+  // loop over entries
+  Long64_t nbytes = 0, nb = 0;
+  Long64_t nentries = fChain->GetEntries();
+
+  std::cout << "Number of entries = " << nentries << std::endl;
+  for (Long64_t jentry=0; jentry<nentries;jentry++) {
+    Long64_t ientry = LoadTree(jentry);
+    if (ientry < 0) break;
+    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
+
+    allevents++;
+    
+    electrons.clear();
+    for(int iele=0; iele<nEle; iele++) {
+      TLorentzVector electron(pxEle[iele],pyEle[iele],pzEle[iele],energyEle[iele]);
+
+      if( fabs(etaEle[iele])>2.5 ) continue;
+      etaprobes++;
+      
+      if( electron.Pt()<5 ) continue;
+      ptprobes++;
+
+      if( !mcMatches(iele) ) continue;
+      matchprobes++;
+
+      electrons.push_back(iele);
+    }
+
+    if(electrons.size()==0) continue;
+    goodevents++;
+
+    for(int i=0; i<(int)electrons.size(); ++i) {
+      
+      int probe = electrons[i];
+      TLorentzVector probeP4(pxEle[probe],pyEle[probe],pzEle[probe],energyEle[probe]);
+
+      // various about probe
+      int charge = chargeEle[probe];
+      float pt   = probeP4.Pt();
+      float eta  = etaEle[probe];
+      
+      // some eleID variables
+      float HoE, s1s9, s9s25, phiwidth, etawidth, deta, dphi, fbrem, see, spp, eleopout, eopout, eop, nbrems, recoFlag, EleSCEta;
+      float oneoveremoneoverp, eledeta, d0, ip3d, ip3ds, kfhits, kfchi2, e1x5e5x5, dcot, dist;
+      float detacalo, dphicalo, sep, dz, gsfchi2, emaxovere, etopovere, ebottomovere, eleftovere, erightovere,
+	e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
+	e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,
+	EleSCPhi, scenergy, scrawenergy, scesenergy;
+      
+      int gsfTrack = gsfTrackIndexEle[probe];   
+      int kfTrack = trackIndexEle[probe];
+
+      // different p estimations
+      float pcomb=probeP4.Vect().Mag();
+      TVector3 p3ModeGsf(pxModeGsfTrack[gsfTrack],pyModeGsfTrack[gsfTrack],pzModeGsfTrack[gsfTrack]);
+      float pmodegsf=p3ModeGsf.Mag();
+      TVector3 p3MeanGsf(pxGsfTrack[gsfTrack],pyGsfTrack[gsfTrack],pzGsfTrack[gsfTrack]);
+      float pmeangsf=p3MeanGsf.Mag();
+      TVector3 p3MeanKf(pxTrack[kfTrack],pyTrack[kfTrack],pzTrack[kfTrack]);
+      float pmeankf=p3MeanKf.Mag();
+      
+      double gsfsign   = (-eleDxyPV(probe,0) >=0 ) ? 1. : -1.;
+      int matchConv = (hasMatchedConversionEle[probe]) ? 1 : 0;
+      
+      d0 = gsfsign * transvImpactParGsfTrack[gsfTrack];
+      dz = eleDzPV(probe,0);
+      ip3d = gsfsign * impactPar3DGsfTrack[gsfTrack];
+      ip3ds = ip3d/impactPar3DErrorGsfTrack[gsfTrack];
+      kfchi2 = (kfTrack>-1) ? trackNormalizedChi2Track[kfTrack] : 0.0;
+      kfhits = (kfTrack>-1) ? trackerLayersWithMeasurementTrack[kfTrack] : -1.0;
+      gsfchi2 = trackNormalizedChi2GsfTrack[gsfTrack];
+      int misshits = expInnerLayersGsfTrack[gsfTrack];
+      dcot = convDistEle[probe];
+      dist = convDcotEle[probe];      
+      bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[probe], isEcalDriven);
+      int ecalseed;
+      HoE = hOverEEle[probe];
+      eledeta = deltaEtaEleClusterTrackAtCaloEle[probe];
+      deta = deltaEtaAtVtxEle[probe];
+      dphi = deltaPhiAtVtxEle[probe];
+      detacalo = deltaEtaAtCaloEle[probe];
+      dphicalo = deltaPhiAtCaloEle[probe];
+      fbrem = fbremEle[probe];
+      nbrems = nbremsEle[probe];
+      eleopout = eEleClusterOverPoutEle[probe];
+      eopout = eSeedOverPoutEle[probe];
+      eop = eSuperClusterOverPEle[probe];
+      if(ecaldriven) {
+	ecalseed = 1;
+	int sc = superClusterIndexEle[probe];
+	float seedEnergy = seedEnergySC[sc];
+	s1s9 = eMaxSC[sc]/eMaxSC[sc];
+	s9s25 = e3x3SC[sc]/e5x5SC[sc];
+	e1x5e5x5 = (e5x5SC[sc] - e1x5SC[sc])/e5x5SC[sc];
+	phiwidth = phiWidthSC[sc];
+	etawidth = etaWidthSC[sc];
+	see = sqrt(covIEtaIEtaSC[sc]);
+	sep = covIEtaIPhiSC[sc]/(sqrt(covIEtaIEtaSC[sc])*sqrt(covIPhiIPhiSC[sc]));
+	spp = sqrt(covIPhiIPhiSC[sc]);
+	oneoveremoneoverp = 1./energySC[sc]  - 1./probeP4.Vect().Mag();
+	emaxovere = eMaxSC[sc]/seedEnergy;
+	etopovere = eTopSC[sc]/seedEnergy;
+	ebottomovere = eBottomSC[sc]/seedEnergy;
+	eleftovere = eLeftSC[sc]/seedEnergy;
+	erightovere = eRightSC[sc]/seedEnergy;
+	e2ndovere = e2ndSC[sc]/seedEnergy;
+	e2x5rightovere = e2x5RightSC[sc]/seedEnergy;
+	e2x5leftovere = e2x5LeftSC[sc]/seedEnergy;
+	e2x5topovere = e2x5TopSC[sc]/seedEnergy;
+	e2x5bottomovere = e2x5BottomSC[sc]/seedEnergy;
+	e2x5maxovere = e2x5MaxSC[sc]/seedEnergy;
+	e1x5overe = e1x5SC[sc]/seedEnergy;
+	e2x2overe = e2x2SC[sc]/seedEnergy;
+	e3x3overe = e3x3SC[sc]/seedEnergy;
+	e5x5overe = e5x5SC[sc]/seedEnergy;
+	r9 = e3x3SC[sc]/rawEnergySC[sc];
+	recoFlag = recoFlagSC[sc];
+	EleSCEta = etaSC[sc];
+	EleSCPhi = phiSC[sc];            
+	scenergy = energySC[sc];
+	scrawenergy = rawEnergySC[sc];
+	scesenergy = esEnergySC[sc];
+      } else {
+	ecalseed = 0;
+	int sc = PFsuperClusterIndexEle[probe];
+	if(sc>-1) {
+	  float seedEnergy = seedEnergyPFSC[sc];
+	  s9s25 = e3x3PFSC[sc]/e5x5PFSC[sc];
+	  s1s9 = eMaxPFSC[sc]/eMaxPFSC[sc];
+	  e1x5e5x5 = (e5x5PFSC[sc] - e1x5PFSC[sc])/e5x5PFSC[sc];
+	  phiwidth = phiWidthPFSC[sc];
+	  etawidth = etaWidthPFSC[sc];
+	  see = sqrt(covIEtaIEtaPFSC[sc]);
+	  sep = covIEtaIPhiPFSC[sc]/(sqrt(covIEtaIEtaPFSC[sc])*sqrt(covIPhiIPhiPFSC[sc]));
+	  spp = sqrt(covIPhiIPhiPFSC[sc]);
+	  oneoveremoneoverp = 1./energyPFSC[sc]  - 1./probeP4.Vect().Mag();
+	  emaxovere = eMaxPFSC[sc]/seedEnergy;
+	  etopovere = eTopPFSC[sc]/seedEnergy;
+	  ebottomovere = eBottomPFSC[sc]/seedEnergy;
+	  eleftovere = eLeftPFSC[sc]/seedEnergy;
+	  erightovere = eRightPFSC[sc]/seedEnergy;
+	  e2ndovere = e2ndPFSC[sc]/seedEnergy;
+	  e2x5rightovere = e2x5RightPFSC[sc]/seedEnergy;
+	  e2x5leftovere = e2x5LeftPFSC[sc]/seedEnergy;
+	  e2x5topovere = e2x5TopPFSC[sc]/seedEnergy;
+	  e2x5bottomovere = e2x5BottomPFSC[sc]/seedEnergy;
+	  e2x5maxovere = e2x5MaxPFSC[sc]/seedEnergy;
+	  e1x5overe = e1x5PFSC[sc]/seedEnergy;
+	  e2x2overe = e2x2PFSC[sc]/seedEnergy;
+	  e3x3overe = e3x3PFSC[sc]/seedEnergy;
+	  e5x5overe = e5x5PFSC[sc]/seedEnergy;
+	  r9 = e3x3PFSC[sc]/rawEnergyPFSC[sc];
+	  recoFlag = recoFlagPFSC[sc];
+	  EleSCEta = etaPFSC[sc];
+	  EleSCPhi = phiPFSC[sc];     
+	  scenergy = energyPFSC[sc];
+	  scrawenergy = rawEnergyPFSC[sc];
+	  scesenergy = esEnergyPFSC[sc];
+	} else {
+	  s9s25 = 999.;
+	  see = 999.;
+	  spp = 999.;
+	}
+      }
+
+      // some MVAs...
+      float pfmva = pflowMVAEle[probe];
+      float lh=likelihoodRatio(probe,*LH);
+      float bdthww = eleBDT(fMVAHWW,probe);
+      float bdthwwnoip = eleBDT(fMVAHWWNoIP,probe);
+      float bdthzz = eleBDT(fMVAHZZ,probe);
+      float bdthzznoip = eleBDT(fMVAHZZNoIP,probe);
+      float bdthzzmc = eleBDT(fMVAHZZMC,probe);
+      
+      // fill the reduced tree
+      reducedTree.fillVariables(eleopout,eopout,eop,HoE,deta,dphi,s9s25,s1s9,see,spp,fbrem,
+				nbrems,misshits,dcot,dist,pt,eta,charge,phiwidth,etawidth,
+				oneoveremoneoverp,eledeta,d0,ip3d,ip3ds,kfhits,kfchi2,e1x5e5x5,ecalseed,matchConv);
+      reducedTree.fillVariables2(detacalo, dphicalo, sep, dz, gsfchi2, emaxovere, etopovere, ebottomovere, eleftovere, erightovere,
+				 e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
+				 e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,
+				 EleSCPhi, scenergy, scrawenergy, scesenergy);
+      reducedTree.fillIsolations(dr03TkSumPtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
+				 dr03EcalRecHitSumEtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
+				 dr03HcalTowerSumEtFullConeEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
+				 pfCombinedIsoEle[probe],
+				 pfCandChargedIsoEle[probe],pfCandNeutralIsoEle[probe],pfCandPhotonIsoEle[probe]);
+      reducedTree.fillMore(nPV,rhoFastjet,bdthww,bdthzz);
+      reducedTree.fillMore2(bdthwwnoip,bdthzznoip,bdthzzmc,pfmva,lh);
+      reducedTree.fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
+      reducedTree.fillFakeRateDenomBits(isDenomFake(probe),isDenomFake_smurfs(probe));
+      reducedTree.fillBDTBasedIDBits(passEleBDT(pt,EleSCEta,bdthww));
+      reducedTree.fillRunInfos(runNumber, lumiBlock, eventNumber, nPU, 1);
+      reducedTree.store();
+    } // possible probes
+    
+  } // loop over events
+  
+  cout << "statistics from Tag and Probe: " << endl;
+  cout << "allevents   = " << allevents << endl;
+  cout << "etaprobes   = " << etaprobes << endl;
+  cout << "ptprobes    = " << ptprobes << endl;
+  cout << "matchprobes = " << matchprobes << endl;
+  cout << "goodevents  = " << goodevents << endl;
+
+  reducedTree.save();
+}
+
+
+// denominator for fake rate: for HtoWW, egamma triggers
+int HZZ4LElectronSelector::isDenomFake(int theEle) {
+  
+  Utils anaUtils;
+  bool isGoodDenom = true;
+  
+  TVector3 p3Ele(pxEle[theEle], pyEle[theEle], pzEle[theEle]);
+
+  // match with the HLT firing candidates
+  //  bool HLTmatch = triggerMatch(p3Ele.Eta(),p3Ele.Phi(),0.2);
+  //  if (!HLTmatch) isGoodDenom = false;
+  
+  // acceptance for the fake electron
+  if( fabs(p3Ele.Eta()) > 2.5 ) isGoodDenom = false;
+  if( p3Ele.Pt() < 10. )        isGoodDenom = false;
+
+  // barrel or endcap
+  bool isEleEB = anaUtils.fiducialFlagECAL(fiducialFlagsEle[theEle], isEB);    
+
+  // taking shower shape                                                                                                             
+  int sc;
+  bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[theEle], bits::isEcalDriven);
+  float thisSigmaIeIe = -1.;
+  if (ecalDriven) {
+    sc = superClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaSC[sc]);
+  }
+  if (!ecalDriven) {
+    sc = PFsuperClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaPFSC[sc]);
+  }
+  if ( sc<0 ) { isGoodDenom = false; }
+
+  // sigmaIetaIeta                                                                                                                   
+  if ( isEleEB && thisSigmaIeIe>0.01) { isGoodDenom = false; }
+  if (!isEleEB && thisSigmaIeIe>0.03) { isGoodDenom = false; }
+
+  // H/E
+  if ( isEleEB && hOverEEle[theEle]>0.12) isGoodDenom = false;   
+  if (!isEleEB && hOverEEle[theEle]>0.10) isGoodDenom = false;
+  
+  // deltaEta
+  if ( isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.007) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.009) ) isGoodDenom = false;
+  
+  // deltaPhi
+  if ( isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.15) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.10) ) isGoodDenom = false;
+
+  // isolation 
+  float ecalIsol    = (dr03EcalRecHitSumEtEle[theEle])/p3Ele.Pt();
+  float hcalIsol    = (dr03HcalTowerSumEtEle[theEle])/p3Ele.Pt();
+  float trackerIsol = (dr03TkSumPtEle[theEle])/p3Ele.Pt();                
+  if(ecalIsol>0.2)    isGoodDenom = false;
+  if(hcalIsol>0.2)    isGoodDenom = false;
+  if(trackerIsol>0.2) isGoodDenom = false;                                
+   
+  if(isGoodDenom) return 1;
+  return 0;
+}
+
+// denominator for fake rate: for HtoWW, egamma triggers, same as smurfs
+int HZZ4LElectronSelector::isDenomFake_smurfs(int theEle) {
+  
+  Utils anaUtils;
+  bool isGoodDenom = true;
+  
+  TVector3 p3Ele(pxEle[theEle], pyEle[theEle], pzEle[theEle]);
+  
+  // match with the HLT firing candidates
+  // bool HLTmatch = triggerMatch(p3Ele.Eta(),p3Ele.Phi(),0.2);
+  // if (!HLTmatch) isGoodDenom = false;
+  
+  // acceptance for the fake electron
+  if( fabs(p3Ele.Eta()) > 2.5 ) isGoodDenom = false;
+  if( p3Ele.Pt() < 10. )        isGoodDenom = false;
+
+  // taking shower shape                                                                                                             
+  int sc;
+  bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[theEle], bits::isEcalDriven);
+  float thisSigmaIeIe = -1.;
+  float scEta = -1.;                                                               
+  if (ecalDriven) {
+    sc = superClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaSC[sc]);
+    scEta = etaSC[sc];
+  }
+  if (!ecalDriven) {
+    sc = PFsuperClusterIndexEle[theEle];
+    thisSigmaIeIe = sqrt(covIEtaIEtaPFSC[sc]);
+    scEta = etaPFSC[sc];
+  }
+  if ( sc<0 ) { isGoodDenom = false; }
+
+  // barrel or endcap
+  bool isEleEB = false;
+  if (fabs(scEta)<1.479) isEleEB = true;   
+  
+  // sigmaIetaIeta                                                                                                                   
+  if ( isEleEB && thisSigmaIeIe>0.01) { isGoodDenom = false; }
+  if (!isEleEB && thisSigmaIeIe>0.03) { isGoodDenom = false; }
+
+  // isolation
+  float ecalIsolAbs = 0.0;
+  if ( isEleEB ) ecalIsolAbs = max(0.0,dr03EcalRecHitSumEtEle[theEle]-1.0);
+  else ecalIsolAbs = dr03EcalRecHitSumEtEle[theEle];
+  float ecalIsol = ecalIsolAbs/p3Ele.Pt(); 
+  float hcalIsol    = (dr03HcalTowerSumEtEle[theEle])/p3Ele.Pt();
+  float trackerIsol = (dr03TkSumPtEle[theEle])/p3Ele.Pt();                
+  if(ecalIsol>0.2)    isGoodDenom = false;
+  if(hcalIsol>0.2)    isGoodDenom = false;
+  if(trackerIsol>0.2) isGoodDenom = false;                                
+
+  // H/E
+  if ( isEleEB && hOverEEle[theEle]>0.12) isGoodDenom = false;   
+  if (!isEleEB && hOverEEle[theEle]>0.10) isGoodDenom = false;
+  
+  // deltaEta
+  if ( isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.007) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaEtaAtVtxEle[theEle])>0.009) ) isGoodDenom = false;
+  
+  // deltaPhi
+  if ( isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.15) ) isGoodDenom = false;
+  if (!isEleEB && (fabs(deltaPhiAtVtxEle[theEle])>0.10) ) isGoodDenom = false;
+  
+  // full conversion rejection 
+  int gsf = gsfTrackIndexEle[theEle];
+  int missHits = expInnerLayersGsfTrack[gsf];
+  bool matchConv = hasMatchedConversionEle[theEle];
+  if (missHits>0 || matchConv) isGoodDenom = false;
+
+  // impact parameter cuts 
+  float dxyEle = transvImpactParGsfTrack[gsf];
+  float dzEle  = PVzPV[0] - trackVzGsfTrack[gsf];
+  if (fabs(dxyEle)>0.02) isGoodDenom = false;
+  if (fabs(dzEle)>0.10)  isGoodDenom = false;
+
+  if(isGoodDenom) return 1;
+  return 0;
+}
+
+
+bool HZZ4LElectronSelector::mcMatches(int probe) {
+  
+  bool probematch=true;
+  bool tagmatch=true;
+
+  std::vector<int> ep,em;
+  
+  for(int imc=0; imc<20; ++imc) {
+    if(idMc[imc]==11 && abs(idMc[mothMc[imc]])==23 && abs(idMc[mothMc[mothMc[imc]]])==25 && em.size()<2) em.push_back(imc);
+    else if(idMc[imc]==-11 && abs(idMc[mothMc[imc]])==23 && abs(idMc[mothMc[mothMc[imc]]])==25 && ep.size()<2) ep.push_back(imc);
+  }
+  
+  TVector3 probeP(pxEle[probe],pyEle[probe],pzEle[probe]);
+  bool matches=false;
+  if(chargeEle[probe]>0) {
+    for(int imc=0;imc<(int)ep.size();++imc) {
+      int probemc=ep[imc];
+      TVector3 probemcP;
+      probemcP.SetMagThetaPhi(pMc[probemc],thetaMc[probemc],phiMc[probemc]);
+      if(probemcP.DeltaR(probeP)<0.1) matches=true;
+    }
+  } else {
+    for(int imc=0;imc<(int)em.size();++imc) {
+      int probemc=em[imc];
+      TVector3 probemcP;
+      probemcP.SetMagThetaPhi(pMc[probemc],thetaMc[probemc],phiMc[probemc]);
+      if(probemcP.DeltaR(probeP)<0.1) matches=true;
+    }
+  }
+  return matches;
+}

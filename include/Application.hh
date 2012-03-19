@@ -12,5 +12,6 @@
 //  10 = do the selection for the Fake Electron
 //  11 = do the selection for the Wenu/Wmunu + Fake Electron
 //  12 = do the selection for the Zll + fake electron
+//  13 = MC only: take electrons from HZZ->4l
 
-#define Application 12
+#define Application 13

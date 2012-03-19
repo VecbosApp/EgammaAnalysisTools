@@ -60,6 +60,9 @@
 #if Application == 12
 #include "EgammaAnalysisTools/include/FakeElectronSelectorZllPlusOneFake.hh"
 #endif
+#if Application == 13
+#include "EgammaAnalysisTools/include/HZZ4LElectronSelector.hh"
+#endif
 
 int main(int argc, char* argv[]) {
 
@@ -274,6 +277,13 @@ int main(int argc, char* argv[]) {
 #if Application == 12
 
   FakeElectronSelectorZllPlusOneFake analysis(theChain);
+  analysis.Loop(outputFileName);
+
+#endif
+
+#if Application == 13
+
+  HZZ4LElectronSelector analysis(theChain);
   analysis.Loop(outputFileName);
 
 #endif
