@@ -22,7 +22,11 @@ class ElectronIDMVAHZZ {
     enum MVAType {
       kBDTSimpleCat = 0,      // the BDT used in H->ZZ
       kBDTSimpleCatNoIPData, // the BDT used in H->ZZ, trained on DATA 
-      kBDTSimpleCatData      // the BDT used in H->ZZ, including IP, trained on DATA
+      kBDTSimpleCatData,     // the BDT used in H->ZZ, including IP, trained on DATA
+      kBDTDanV0,             // the new data training, with Daniele's variables 
+      kBDTSiV0,              // the new data training, with Si's HWW variables 
+      kBDTSiV1,              // the new data training, with Si's HWW 2012 variables
+      kBDTSiDanV0            // the new data training, with Si's HWW 2012 + Daniele's variables
     };
 
     void   Initialize(std::string methodName,
@@ -32,19 +36,30 @@ class ElectronIDMVAHZZ {
     
     double MVAValue(double ElePt , double EleSCEta,
                     double EleFBrem,
+                    double EleNBrems,
                     double EleDEtaIn,
                     double EleDPhiIn,
+                    double EleDPhiCalo,
+                    double EleDEtaCalo,
                     double EleDEtaEleOut,
                     double EleSigmaIEtaIEta,
+                    double EleSigmaIPhiIPhi,
+                    double EleSigmaIEtaIPhi,
                     double EleHoverE,
                     double EleSuperClusterEOverP,
                     double EleE1x5E5x5,
-                    double EleEOverPout,
+                    double EleR9,
+                    double EleESoRaw,
+                    double EleEseedOverPout,
+                    double EleEeleOverPout,
+                    double Ele1oEm1oP,
                     double EleKFChi2,
                     double EleKFHits,
+                    double EleGSFChi2,
                     double EleMissHits,
                     double EleDistConv,
                     double EleDcotConv,
+                    double EleMatchConv,
                     double NVtx,
                     double EleEcalSeeded,
                     double EleEtaWidth,
@@ -64,19 +79,30 @@ class ElectronIDMVAHZZ {
     Float_t                   fMVAVar_EleSCEta;
     Float_t                   fMVAVar_ElePt;
     Float_t                   fMVAVar_EleFBrem;     
+    Float_t                   fMVAVar_EleNBrems;
     Float_t                   fMVAVar_EleDEtaIn; 
     Float_t                   fMVAVar_EleDPhiIn; 
+    Float_t                   fMVAVar_EleDPhiCalo; 
+    Float_t                   fMVAVar_EleDEtaCalo; 
     Float_t                   fMVAVar_EleDEtaEleOut;
     Float_t                   fMVAVar_EleSigmaIEtaIEta; 
+    Float_t                   fMVAVar_EleSigmaIPhiIPhi; 
+    Float_t                   fMVAVar_EleSigmaIEtaIPhi; 
     Float_t                   fMVAVar_EleHoverE; 
     Float_t                   fMVAVar_EleSuperClusterEOverP;
     Float_t                   fMVAVar_EleE1x5E5x5;
-    Float_t                   fMVAVar_EleEOverPout;
+    Float_t                   fMVAVar_EleR9;
+    Float_t                   fMVAVar_EleESoRaw;
+    Float_t                   fMVAVar_EleEseedOverPout;
+    Float_t                   fMVAVar_EleEeleOverPout;
+    Float_t                   fMVAVar_Ele1oEm1oP;
     Float_t                   fMVAVar_EleKFChi2;
+    Float_t                   fMVAVar_EleGSFChi2;
     Float_t                   fMVAVar_EleKFHits;
     Float_t                   fMVAVar_EleMissHits;
     Float_t                   fMVAVar_EleDistConv;
     Float_t                   fMVAVar_EleDcotConv;
+    Float_t                   fMVAVar_EleMatchConv;
     Float_t                   fMVAVar_NVtx;
     Float_t                   fMVAVar_EleEcalSeeded;
     Float_t                   fMVAVar_EleEtaWidth;

@@ -61,23 +61,30 @@ FakeElectronSelectorZllPlusOneFake::FakeElectronSelectorZllPlusOneFake(TTree *tr
                       ElectronIDMVA::kNoIPInfo);
   
   // configuring the electron BDT for H->ZZ
-  fMVAHZZMC = new ElectronIDMVAHZZ();
-  fMVAHZZ = new ElectronIDMVAHZZ();
-  fMVAHZZNoIP = new ElectronIDMVAHZZ();
-  // Default H->ZZ MC training
-  fMVAHZZMC->Initialize("BDTSimpleCat",
-                        "elebdtweights/HZZBDT_BDTSimpleCat.weights.xml",
-                        ElectronIDMVAHZZ::kBDTSimpleCat);
+  fMVAHZZDanV0 = new ElectronIDMVAHZZ();
+  fMVAHZZSiV0 = new ElectronIDMVAHZZ();
+  fMVAHZZSiV1 = new ElectronIDMVAHZZ();
+  fMVAHZZSiDanV0 = new ElectronIDMVAHZZ();
 
-  // New H->ZZ DATA training, with IP
-  fMVAHZZ->Initialize("BDTSimpleCat",
-                      "elebdtweights/HZZBDT_BDTSimpleCat_EBSplit_Data.weights.xml",
-                      ElectronIDMVAHZZ::kBDTSimpleCatData);
+  // New H->ZZ unbiased DATA training, Daniele's variables
+  fMVAHZZDanV0->Initialize("BDTSimpleCat",
+                           "elebdtweights/DanieleMVA_BDTCat_BDTG_DanV0.weights.xml",
+                           ElectronIDMVAHZZ::kBDTDanV0);
 
-  // New H->ZZ DATA training, no IP
-  fMVAHZZNoIP->Initialize("BDTSimpleCat",
-                          "elebdtweights/HZZBDT_BDTSimpleCatNoIP_EBSplit_Data.weights.xml",
-                          ElectronIDMVAHZZ::kBDTSimpleCatNoIPData);
+  // New H->ZZ unbiased DATA training, Si's HWW 2011 variables
+  fMVAHZZSiV0->Initialize("BDTSimpleCat",
+                          "elebdtweights/DanieleMVA_BDTCat_BDTG_SiV0.weights.xml",
+                          ElectronIDMVAHZZ::kBDTSiV0);
+
+  // New H->ZZ unbiased DATA training, Si's HWW 2012 variables
+  fMVAHZZSiV1->Initialize("BDTSimpleCat",
+                          "elebdtweights/DanieleMVA_BDTCat_BDTG_SiV1.weights.xml",
+                          ElectronIDMVAHZZ::kBDTSiV1);
+
+  // New H->ZZ unbiased DATA training, Daniele's + Si's variables 
+  fMVAHZZSiDanV0->Initialize("BDTSimpleCat",
+                             "elebdtweights/DanieleMVA_BDTCat_BDTG_SiDanV0.weights.xml",
+                             ElectronIDMVAHZZ::kBDTSiDanV0);
 
   // chiara
   // to read good run list
@@ -446,11 +453,14 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
     // some MVAs...
     float pfmva = pflowMVAEle[probe];
     float lh=likelihoodRatio(probe,*LH);
-    float bdthww = eleBDT(fMVAHWW,probe);
-    float bdthwwnoip = eleBDT(fMVAHWWNoIP,probe);
-    float bdthzz = eleBDT(fMVAHZZ,probe);
-    float bdthzznoip = eleBDT(fMVAHZZNoIP,probe);
-    float bdthzzmc = eleBDT(fMVAHZZMC,probe);
+    float hwwbdts[2];
+    hwwbdts[0] = eleBDT(fMVAHWW,probe);
+    hwwbdts[1] = eleBDT(fMVAHWWNoIP,probe);
+    float hzzbdts[4];
+    hzzbdts[0] = eleBDT(fMVAHZZDanV0,probe);
+    hzzbdts[1] = eleBDT(fMVAHZZSiV0,probe);
+    hzzbdts[2] = eleBDT(fMVAHZZSiV1,probe);
+    hzzbdts[3] = eleBDT(fMVAHZZSiDanV0,probe);
 
     // fill the reduced tree
     float pt = probeP4.Pt();
@@ -470,8 +480,7 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
                                pfCombinedIsoEle[probe],
                                pfCandChargedIsoEle[probe],pfCandNeutralIsoEle[probe],pfCandPhotonIsoEle[probe]);
     myOutIDTree->fillFakeRateDenomBits(isDenomFake_HwwEgamma(probe),isDenomFake_smurfs(probe));
-    myOutIDTree->fillMore(nPV,rhoFastjet,bdthww,bdthzz);
-    myOutIDTree->fillMore2(bdthwwnoip,bdthzznoip,bdthzzmc,pfmva,lh);
+    myOutIDTree->fillMore(nPV,rhoFastjet,hwwbdts,hzzbdts,pfmva,lh);
     myOutIDTree->fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
     myOutIDTree->fillRunInfos(runNumber, lumiBlock, eventNumber, nPU, -1);
     myOutIDTree->store();

@@ -202,27 +202,35 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
                       ElectronIDMVA::kNoIPInfo);
   
   // configuring the electron BDT for H->ZZ
-  fMVAHZZMC = new ElectronIDMVAHZZ();
-  fMVAHZZ = new ElectronIDMVAHZZ();
-  fMVAHZZNoIP = new ElectronIDMVAHZZ();
-  // Default H->ZZ MC training
-  fMVAHZZMC->Initialize("BDTSimpleCat",
-                        "elebdtweights/HZZBDT_BDTSimpleCat.weights.xml",
-                        ElectronIDMVAHZZ::kBDTSimpleCat);
+  fMVAHZZDanV0 = new ElectronIDMVAHZZ();
+  fMVAHZZSiV0 = new ElectronIDMVAHZZ();
+  fMVAHZZSiV1 = new ElectronIDMVAHZZ();
+  fMVAHZZSiDanV0 = new ElectronIDMVAHZZ();
 
-  // New H->ZZ DATA training, with IP
-  fMVAHZZ->Initialize("BDTSimpleCat",
-                      "elebdtweights/HZZBDT_BDTSimpleCat_EBSplit_Data.weights.xml",
-                      ElectronIDMVAHZZ::kBDTSimpleCatData);
+  // New H->ZZ unbiased DATA training, Daniele's variables
+  fMVAHZZDanV0->Initialize("BDTSimpleCat",
+                           "elebdtweights/DanieleMVA_BDTCat_BDTG_DanV0.weights.xml",
+                           ElectronIDMVAHZZ::kBDTDanV0);
 
-  // New H->ZZ DATA training, no IP
-  fMVAHZZNoIP->Initialize("BDTSimpleCat",
-                          "elebdtweights/HZZBDT_BDTSimpleCatNoIP_EBSplit_Data.weights.xml",
-                          ElectronIDMVAHZZ::kBDTSimpleCatNoIPData);
+  // New H->ZZ unbiased DATA training, Si's HWW 2011 variables
+  fMVAHZZSiV0->Initialize("BDTSimpleCat",
+                          "elebdtweights/DanieleMVA_BDTCat_BDTG_SiV0.weights.xml",
+                          ElectronIDMVAHZZ::kBDTSiV0);
+
+  // New H->ZZ unbiased DATA training, Si's HWW 2012 variables
+  fMVAHZZSiV1->Initialize("BDTSimpleCat",
+                          "elebdtweights/DanieleMVA_BDTCat_BDTG_SiV1.weights.xml",
+                          ElectronIDMVAHZZ::kBDTSiV1);
+
+  // New H->ZZ unbiased DATA training, Daniele's + Si's variables 
+  fMVAHZZSiDanV0->Initialize("BDTSimpleCat",
+                             "elebdtweights/DanieleMVA_BDTCat_BDTG_SiDanV0.weights.xml",
+                             ElectronIDMVAHZZ::kBDTSiDanV0);
+
 
   // Reading GoodRUN LS
   std::cout << "[GoodRunLS]::goodRunLS is " << m_selection->getSwitch("goodRunLS") << " isData is " <<  m_selection->getSwitch("isData") << std::endl;
-  
+   
   // To read good run list!
   if (m_selection->getSwitch("goodRunLS") && m_selection->getSwitch("isData")) {
     std::string goodRunJsonFile       = "config/json/goodCollisions2011.json";
@@ -563,11 +571,14 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           // some MVAs...
           float pfmva = pflowMVAEle[probe];
           float lh=likelihoodRatio(probe,*LH);
-          float bdthww = eleBDT(fMVAHWW,probe);
-          float bdthwwnoip = eleBDT(fMVAHWWNoIP,probe);
-          float bdthzz = eleBDT(fMVAHZZ,probe);
-          float bdthzznoip = eleBDT(fMVAHZZNoIP,probe);
-          float bdthzzmc = eleBDT(fMVAHZZMC,probe);
+          float hwwbdts[2];
+          hwwbdts[0] = eleBDT(fMVAHWW,probe);
+          hwwbdts[1] = eleBDT(fMVAHWWNoIP,probe);
+          float hzzbdts[4];
+          hzzbdts[0] = eleBDT(fMVAHZZDanV0,probe);
+          hzzbdts[1] = eleBDT(fMVAHZZSiV0,probe);
+          hzzbdts[2] = eleBDT(fMVAHZZSiV1,probe);
+          hzzbdts[3] = eleBDT(fMVAHZZSiDanV0,probe);
 
           // fill the reduced tree
 	  reducedTree.fillVariables(eleopout,eopout,eop,HoE,deta,dphi,s9s25,s1s9,see,spp,fbrem,
@@ -583,14 +594,13 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
                                      dr03HcalTowerSumEtFullConeEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                      pfCombinedIsoEle[probe],
                                      pfCandChargedIsoEle[probe],pfCandNeutralIsoEle[probe],pfCandPhotonIsoEle[probe]);
-          reducedTree.fillMore(nPV,rhoFastjet,bdthww,bdthzz);
-          reducedTree.fillMore2(bdthwwnoip,bdthzznoip,bdthzzmc,pfmva,lh);
+          reducedTree.fillMore(nPV,rhoFastjet,hwwbdts,hzzbdts,pfmva,lh);
 	  reducedTree.fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
           reducedTree.fillCutBasedIDBits(CutBasedId,CutBasedIdOnlyID,CutBasedIdOnlyIso,CutBasedIdOnlyConv);
           reducedTree.fillLHBasedIDBits(LHBasedId,LHBasedIdOnlyID,LHBasedIdOnlyIso,LHBasedIdOnlyConv);
           reducedTree.fillLHBasedPFIsoIDBits(LHBasedPFIsoId,LHBasedPFIsoIdOnlyID,LHBasedPFIsoIdOnlyIso,LHBasedPFIsoIdOnlyConv);
           reducedTree.fillFakeRateDenomBits(isDenomFake(probe),isDenomFake_smurfs(probe));
-          reducedTree.fillBDTBasedIDBits(passEleBDT(pt,EleSCEta,bdthww));
+          reducedTree.fillBDTBasedIDBits(passEleBDT(pt,EleSCEta,hwwbdts[0]));
           reducedTree.fillRunInfos(runNumber, lumiBlock, eventNumber, nPU, mcmatch);
           reducedTree.store();
         } // tag identified

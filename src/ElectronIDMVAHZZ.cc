@@ -50,7 +50,7 @@ void ElectronIDMVAHZZ::Initialize( std::string methodName,
       fTMVAReader[i]->AddVariable("hoe",         &fMVAVar_EleHoverE);
       fTMVAReader[i]->AddVariable("eop",         &fMVAVar_EleSuperClusterEOverP);
       fTMVAReader[i]->AddVariable("e1x5e5x5",    &fMVAVar_EleE1x5E5x5);
-      fTMVAReader[i]->AddVariable("eleopout",    &fMVAVar_EleEOverPout);
+      fTMVAReader[i]->AddVariable("eleopout",    &fMVAVar_EleEeleOverPout);
       fTMVAReader[i]->AddVariable("detaeleout",  &fMVAVar_EleDEtaEleOut);
       fTMVAReader[i]->AddVariable("kfchi2",      &fMVAVar_EleKFChi2);
       fTMVAReader[i]->AddVariable("kfhits",      &fMVAVar_EleKFHits);
@@ -72,7 +72,7 @@ void ElectronIDMVAHZZ::Initialize( std::string methodName,
       fTMVAReader[i]->AddVariable("hoe",         &fMVAVar_EleHoverE);
       fTMVAReader[i]->AddVariable("eop",         &fMVAVar_EleSuperClusterEOverP);
       fTMVAReader[i]->AddVariable("e1x5e5x5",    &fMVAVar_EleE1x5E5x5);
-      fTMVAReader[i]->AddVariable("eleopout",    &fMVAVar_EleEOverPout);
+      fTMVAReader[i]->AddVariable("eleopout",    &fMVAVar_EleEeleOverPout);
       fTMVAReader[i]->AddVariable("detaeleout",  &fMVAVar_EleDEtaEleOut);
       fTMVAReader[i]->AddVariable("kfchi2",      &fMVAVar_EleKFChi2);
       fTMVAReader[i]->AddVariable("kfhits",      &fMVAVar_EleKFHits);
@@ -94,7 +94,7 @@ void ElectronIDMVAHZZ::Initialize( std::string methodName,
       fTMVAReader[i]->AddVariable("hoe",         &fMVAVar_EleHoverE);
       fTMVAReader[i]->AddVariable("eop",         &fMVAVar_EleSuperClusterEOverP);
       fTMVAReader[i]->AddVariable("e1x5e5x5",    &fMVAVar_EleE1x5E5x5);
-      fTMVAReader[i]->AddVariable("eleopout",    &fMVAVar_EleEOverPout);
+      fTMVAReader[i]->AddVariable("eleopout",    &fMVAVar_EleEeleOverPout);
       fTMVAReader[i]->AddVariable("detaeleout",  &fMVAVar_EleDEtaEleOut);
       fTMVAReader[i]->AddVariable("kfchi2",      &fMVAVar_EleKFChi2);
       fTMVAReader[i]->AddVariable("kfhits",      &fMVAVar_EleKFHits);
@@ -109,6 +109,34 @@ void ElectronIDMVAHZZ::Initialize( std::string methodName,
       fTMVAReader[i]->AddSpectator("ecalseed",   &fMVAVar_EleEcalSeeded);
     }
 
+    if(type >= kBDTDanV0 && type <= kBDTSiDanV0) {
+      fTMVAReader[i]->AddVariable("fbrem",            &fMVAVar_EleFBrem);
+      fTMVAReader[i]->AddVariable("deta",             &fMVAVar_EleDEtaIn);
+      fTMVAReader[i]->AddVariable("dphi",             &fMVAVar_EleDPhiIn);
+      fTMVAReader[i]->AddVariable("see",              &fMVAVar_EleSigmaIEtaIEta);
+      fTMVAReader[i]->AddVariable("etawidth",         &fMVAVar_EleEtaWidth);
+      fTMVAReader[i]->AddVariable("phiwidth",         &fMVAVar_ElePhiWidth);
+      fTMVAReader[i]->AddVariable("HoE",              &fMVAVar_EleHoverE);
+      fTMVAReader[i]->AddVariable("EoP",              &fMVAVar_EleSuperClusterEOverP);
+      fTMVAReader[i]->AddVariable("e1x5e5x5",         &fMVAVar_EleE1x5E5x5);
+      fTMVAReader[i]->AddVariable("EoPout",           &fMVAVar_EleEseedOverPout);
+      fTMVAReader[i]->AddVariable("eleEoPout",        &fMVAVar_EleEeleOverPout); 
+      fTMVAReader[i]->AddVariable("detacalo",         &fMVAVar_EleDEtaCalo);
+      fTMVAReader[i]->AddVariable("kfchi2",           &fMVAVar_EleKFChi2);
+      fTMVAReader[i]->AddVariable("kfhits",           &fMVAVar_EleKFHits);
+      fTMVAReader[i]->AddVariable("spp",              &fMVAVar_EleSigmaIPhiIPhi);
+      fTMVAReader[i]->AddVariable("IoEmIoP",          &fMVAVar_Ele1oEm1oP);
+      fTMVAReader[i]->AddVariable("nbrems",           &fMVAVar_EleNBrems);
+      fTMVAReader[i]->AddVariable("R9",               &fMVAVar_EleR9);
+      fTMVAReader[i]->AddVariable("dphicalo",         &fMVAVar_EleDPhiCalo);
+      fTMVAReader[i]->AddVariable("gsfchi2",          &fMVAVar_EleGSFChi2);
+      fTMVAReader[i]->AddVariable("PreShowerOverRaw", &fMVAVar_EleESoRaw);
+
+      fTMVAReader[i]->AddSpectator("eta",             &fMVAVar_EleSCEta);
+      fTMVAReader[i]->AddSpectator("pt",              &fMVAVar_ElePt);
+      fTMVAReader[i]->AddSpectator("matchConv",       &fMVAVar_EleMatchConv);
+    }
+
     if (i==0) fTMVAReader[i]->BookMVA(fMethodname , weights );
 
   }
@@ -121,30 +149,41 @@ void ElectronIDMVAHZZ::Initialize( std::string methodName,
 
 
 //--------------------------------------------------------------------------------------------------
-Double_t ElectronIDMVAHZZ::MVAValue(Double_t ElePt , Double_t EleSCEta,
-                                    Double_t EleFBrem,
-                                    Double_t EleDEtaIn,
-                                    Double_t EleDPhiIn,
-                                    Double_t EleDEtaEleOut,
-                                    Double_t EleSigmaIEtaIEta,
-                                    Double_t EleHoverE,
+Double_t ElectronIDMVAHZZ::MVAValue(double ElePt , double EleSCEta,
+                                    double EleFBrem,
+                                    double EleNBrems,
+                                    double EleDEtaIn,
+                                    double EleDPhiIn,
+                                    double EleDPhiCalo,
+                                    double EleDEtaCalo,
+                                    double EleDEtaEleOut,
+                                    double EleSigmaIEtaIEta,
+                                    double EleSigmaIPhiIPhi,
+                                    double EleSigmaIEtaIPhi,
+                                    double EleHoverE,
                                     double EleSuperClusterEOverP,
-                                    Double_t EleE1x5E5x5,
-                                    Double_t EleEOverPout,
-                                    Double_t EleKFChi2,
-                                    Double_t EleKFHits,
-                                    Double_t EleMissHits,
-                                    Double_t EleDistConv,
-                                    Double_t EleDcotConv,
-                                    Double_t NVtx,
-                                    Double_t EleEcalSeeded,
-                                    Double_t EleEtaWidth,
-                                    Double_t ElePhiWidth,
-                                    Double_t EleD0,
-                                    Double_t EleIP3d,
-                                    Double_t EleIP3dSig
-                                    ) {
-  
+                                    double EleE1x5E5x5,
+                                    double EleR9,
+                                    double EleESoRaw,
+                                    double EleEseedOverPout,
+                                    double EleEeleOverPout,
+                                    double Ele1oEm1oP,
+                                    double EleKFChi2,
+                                    double EleKFHits,
+                                    double EleGSFChi2,
+                                    double EleMissHits,
+                                    double EleDistConv,
+                                    double EleDcotConv,
+                                    double EleMatchConv,
+                                    double NVtx,
+                                    double EleEcalSeeded,
+                                    double EleEtaWidth,
+                                    double ElePhiWidth,
+                                    double EleD0,
+                                    double EleIP3d,
+                                    double EleIP3dSig) {
+
+
   if (!fIsInitialized) { 
     std::cout << "Error: ElectronIDMVAHZZ not properly initialized.\n"; 
     return -9999;
@@ -154,19 +193,30 @@ Double_t ElectronIDMVAHZZ::MVAValue(Double_t ElePt , Double_t EleSCEta,
   fMVAVar_EleSCEta = EleSCEta;
   fMVAVar_ElePt = ElePt;
   fMVAVar_EleFBrem = EleFBrem;     
+  fMVAVar_EleNBrems = EleNBrems;
   fMVAVar_EleDEtaIn = EleDEtaIn; 
   fMVAVar_EleDPhiIn = EleDPhiIn; 
+  fMVAVar_EleDPhiCalo = EleDPhiCalo; 
+  fMVAVar_EleDEtaCalo = EleDEtaCalo; 
   fMVAVar_EleDEtaEleOut = EleDEtaEleOut;
   fMVAVar_EleSigmaIEtaIEta = EleSigmaIEtaIEta; 
+  fMVAVar_EleSigmaIPhiIPhi = EleSigmaIPhiIPhi; 
+  fMVAVar_EleSigmaIEtaIPhi = EleSigmaIEtaIPhi; 
   fMVAVar_EleHoverE = EleHoverE;
   fMVAVar_EleSuperClusterEOverP = EleSuperClusterEOverP;
   fMVAVar_EleE1x5E5x5 = EleE1x5E5x5;
-  fMVAVar_EleEOverPout = EleEOverPout;
+  fMVAVar_EleR9 = EleR9;
+  fMVAVar_EleESoRaw = EleESoRaw;
+  fMVAVar_EleEseedOverPout = EleEseedOverPout;
+  fMVAVar_EleEeleOverPout = EleEeleOverPout;
+  fMVAVar_Ele1oEm1oP = Ele1oEm1oP;
   fMVAVar_EleKFChi2 = EleKFChi2;
+  fMVAVar_EleGSFChi2 = EleGSFChi2;
   fMVAVar_EleKFHits = EleKFHits;
   fMVAVar_EleMissHits = EleMissHits;
   fMVAVar_EleDistConv = EleDistConv;
   fMVAVar_EleDcotConv = EleDcotConv;
+  fMVAVar_EleMatchConv = EleMatchConv;
   fMVAVar_NVtx = NVtx;
   fMVAVar_EleEcalSeeded = EleEcalSeeded;
   fMVAVar_EleEtaWidth = EleEtaWidth;
@@ -187,8 +237,19 @@ Double_t ElectronIDMVAHZZ::MVAValue(Double_t ElePt , Double_t EleSCEta,
   if(fMVAVar_EleDPhiIn > 0.6)
     fMVAVar_EleDPhiIn = 0.6;
 
-  if(fMVAVar_EleEOverPout > 20.)
-    fMVAVar_EleEOverPout = 20;
+  fMVAVar_EleDEtaCalo = fabs(fMVAVar_EleDEtaCalo);
+  if(fMVAVar_EleDEtaCalo > 0.2)
+    fMVAVar_EleDEtaCalo = 0.2;
+
+  fMVAVar_EleDPhiCalo = fabs(fMVAVar_EleDPhiCalo);
+  if(fMVAVar_EleDPhiCalo > 0.4)
+    fMVAVar_EleDPhiCalo = 0.4;
+
+  if(fMVAVar_EleEeleOverPout > 20.)
+    fMVAVar_EleEeleOverPout = 20;
+
+  if(fMVAVar_EleEseedOverPout > 20.)
+    fMVAVar_EleEseedOverPout = 20;
 
   if(fMVAVar_EleSuperClusterEOverP > 20.)
     fMVAVar_EleSuperClusterEOverP = 20.;
@@ -200,15 +261,20 @@ Double_t ElectronIDMVAHZZ::MVAValue(Double_t ElePt , Double_t EleSCEta,
   if(fMVAVar_EleKFChi2 < 0.)
     fMVAVar_EleKFChi2 = 0.;
 
-  if(fMVAVar_EleKFChi2 > 15.)
-    fMVAVar_EleKFChi2 = 15.;
+  if(fMVAVar_EleKFChi2 > 10.)
+    fMVAVar_EleKFChi2 = 10.;
 
+  if(fMVAVar_EleGSFChi2 > 200.)
+    fMVAVar_EleGSFChi2 = 200.;
 
   if(fMVAVar_EleE1x5E5x5 < -1.)
     fMVAVar_EleE1x5E5x5 = -1;
 
   if(fMVAVar_EleE1x5E5x5 > 2.)
     fMVAVar_EleE1x5E5x5 = 2.;
+
+  if(fMVAVar_EleR9 > 5.)
+    fMVAVar_EleR9 = 5.;
 
   if(fMVAVar_EleDistConv > 15.)
     fMVAVar_EleDistConv = 15.;

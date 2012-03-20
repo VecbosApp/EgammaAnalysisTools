@@ -112,8 +112,8 @@ bool Egamma::reloadTriggerMask(bool newVersion)
       {   
         for(unsigned int i=0; i<nameHLT->size(); i++)
           {
-            if( !strcmp ((*fIter).c_str(), nameHLT->at(i).c_str() ) )
-	      // if(nameHLT->at(i).find(*fIter) != std::string::npos)
+            // if( !strcmp ((*fIter).c_str(), nameHLT->at(i).c_str() ) )
+            if(nameHLT->at(i).find(*fIter) != std::string::npos)
               {
                 triggerMask.push_back( indexHLT[i] ) ;
                 break;
@@ -407,18 +407,26 @@ float Egamma::eleBDT(ElectronIDMVAHZZ *mva, int eleIndex) {
     return -999.;
   }
   
+  TLorentzVector probeP4;
+  probeP4.SetXYZT(pxEle[eleIndex],pyEle[eleIndex],pzEle[eleIndex],energyEle[eleIndex]);
+
   int gsfTrack = gsfTrackIndexEle[eleIndex]; 
   int kfTrack = trackIndexEle[eleIndex];
   float ElePt = GetPt(pxEle[eleIndex],pyEle[eleIndex]);
 
   float EleFBrem = fbremEle[eleIndex];
+  float EleNBrems = nbremsEle[eleIndex];
   float EleDEtaIn = deltaEtaAtVtxEle[eleIndex];
   float EleDPhiIn = deltaPhiAtVtxEle[eleIndex];
+  float EleDEtaCalo = deltaEtaAtCaloEle[eleIndex];
+  float EleDPhiCalo = deltaPhiAtCaloEle[eleIndex];
   float EleHoverE = hOverEEle[eleIndex];
   float EleSuperClusterEOverP = eSuperClusterOverPEle[eleIndex];
-  float EleEOverPout = eEleClusterOverPoutEle[eleIndex];
+  float EleEeleOverPout = eEleClusterOverPoutEle[eleIndex];
+  float EleEseedOverPout = eSeedOverPoutEle[eleIndex];
   float EleDEtaEleOut = deltaEtaEleClusterTrackAtCaloEle[eleIndex];
   float EleKFChi2 = (kfTrack>-1) ? trackNormalizedChi2Track[kfTrack] : 0.0;
+  float EleGSFChi2 = trackNormalizedChi2GsfTrack[gsfTrack];
   float EleKFHits = (kfTrack>-1) ? trackerLayersWithMeasurementTrack[kfTrack] : -1.0;
   float EleMissHits = expInnerLayersGsfTrack[gsfTrack];
   float EleDistConv = convDistEle[eleIndex];
@@ -427,6 +435,7 @@ float Egamma::eleBDT(ElectronIDMVAHZZ *mva, int eleIndex) {
   Utils anaUtils;
   bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[eleIndex], isEcalDriven);
   float EleEcalSeeded = (ecaldriven) ? 1. : 0.;
+  float EleMatchConv = (hasMatchedConversionEle[eleIndex]) ? 1. : 0.;
 
   // IP variables
   double gsfsign   = (-eleDxyPV(eleIndex,0) >=0 ) ? 1. : -1.;
@@ -434,47 +443,73 @@ float Egamma::eleBDT(ElectronIDMVAHZZ *mva, int eleIndex) {
   float EleIP3d = gsfsign * impactPar3DGsfTrack[gsfTrack];
   float EleIP3dSig = EleIP3d/impactPar3DErrorGsfTrack[gsfTrack];
 
-  float EleSigmaIEtaIEta, EleE1x5E5x5, EleSCEta, EleEtaWidth, ElePhiWidth;
+  float EleSigmaIEtaIEta, EleSigmaIPhiIPhi, EleSigmaIEtaIPhi, EleE1x5E5x5, EleSCEta, EleEtaWidth, ElePhiWidth,
+    EleR9, Ele1oEm1oP, EleESoRaw;
 
   if(ecaldriven) {
     int sc = superClusterIndexEle[eleIndex];
     EleSigmaIEtaIEta = sqrt(covIEtaIEtaSC[sc]);
+    EleSigmaIPhiIPhi = sqrt(covIPhiIPhiSC[sc]);
+    EleSigmaIEtaIPhi = covIEtaIPhiSC[sc]/(sqrt(covIEtaIEtaSC[sc])*sqrt(covIPhiIPhiSC[sc]));
     EleE1x5E5x5 = (e5x5SC[sc] - e1x5SC[sc])/e5x5SC[sc];
     EleEtaWidth = etaWidthSC[sc];
     ElePhiWidth = phiWidthSC[sc];
+    EleR9 = e3x3SC[sc]/rawEnergySC[sc];
+    Ele1oEm1oP = 1./energySC[sc]  - 1./probeP4.Vect().Mag();
+    EleESoRaw = esEnergySC[sc]/rawEnergySC[sc];
     EleSCEta = etaSC[sc];
   } else {
     int sc = PFsuperClusterIndexEle[eleIndex];
     if(sc>-1) {
       EleSigmaIEtaIEta = sqrt(covIEtaIEtaPFSC[sc]);
+      EleSigmaIPhiIPhi = sqrt(covIPhiIPhiPFSC[sc]);
+      EleSigmaIEtaIPhi = covIEtaIPhiPFSC[sc]/(sqrt(covIEtaIEtaPFSC[sc])*sqrt(covIPhiIPhiPFSC[sc]));
       EleE1x5E5x5 = (e5x5PFSC[sc] - e1x5PFSC[sc])/e5x5PFSC[sc];
       EleEtaWidth = etaWidthPFSC[sc];
       ElePhiWidth = phiWidthPFSC[sc];
+      EleR9 = e3x3PFSC[sc]/rawEnergyPFSC[sc];
+      Ele1oEm1oP = 1./energyPFSC[sc]  - 1./probeP4.Vect().Mag();
       EleSCEta = etaPFSC[sc];
     } else {
       EleSigmaIEtaIEta = 999.;
+      EleSigmaIPhiIPhi = 999.;
+      EleSigmaIEtaIPhi = 999.;
       EleE1x5E5x5 = 999.;
       EleEtaWidth = 999.;
       ElePhiWidth = 999.;  
+      EleR9 = 999.;
+      Ele1oEm1oP = 999.;
+      EleESoRaw = esEnergyPFSC[sc]/rawEnergyPFSC[sc];
       EleSCEta = 0.;
     }
   }
 
   return mva->MVAValue(ElePt, EleSCEta,
                        EleFBrem,
+                       EleNBrems,
                        EleDEtaIn,
                        EleDPhiIn,
+                       EleDPhiCalo,
+                       EleDEtaCalo,
                        EleDEtaEleOut,
                        EleSigmaIEtaIEta,
+                       EleSigmaIPhiIPhi,
+                       EleSigmaIEtaIPhi,
                        EleHoverE,
                        EleSuperClusterEOverP,
                        EleE1x5E5x5,
-                       EleEOverPout,
+                       EleR9,
+                       EleESoRaw,
+                       EleEseedOverPout,
+                       EleEeleOverPout,
+                       Ele1oEm1oP,
                        EleKFChi2,
                        EleKFHits,
+                       EleGSFChi2,
                        EleMissHits,
                        EleDistConv,
                        EleDcotConv,
+                       EleMatchConv,
                        NVtx,
                        EleEcalSeeded,
                        EleEtaWidth,
