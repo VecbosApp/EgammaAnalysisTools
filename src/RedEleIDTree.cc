@@ -238,7 +238,7 @@ void RedEleIDTree::fillVariables(float eleEoPout, float EoPout, float EoP, float
 }
 
 void RedEleIDTree::fillVariables2(float detacalo, float dphicalo, float sep, float dz, float gsfchi2, float emaxovere, float etopovere, float ebottomovere, float eleftovere, float erightovere,
-                                  float e2ndovere, float e2x5rightovere, float e2x5leftovere, float e2x5topevere, float e2x5bottomovere, 
+                                  float e2ndovere, float e2x5rightovere, float e2x5leftovere, float e2x5topovere, float e2x5bottomovere, 
                                   float e2x5maxovere, float e1x5overe, float e2x2overe, float e3x3overe, float e5x5overe, float r9,
                                   float phi, float scenergy, float scrawenergy, float scesenergy) {
   myDetaCalo=detacalo;
@@ -253,6 +253,10 @@ void RedEleIDTree::fillVariables2(float detacalo, float dphicalo, float sep, flo
   mySeedERightOverE=erightovere;
   mySeedE2ndOverE=e2ndovere;
   mySeedE2x5RightOverE=e2x5rightovere;
+  mySeedE2x5LeftOverE=e2x5leftovere;
+  mySeedE2x5TopOverE=e2x5topovere;
+  mySeedE2x5BottomOverE=e2x5bottomovere;
+  mySeedE2x5MaxOverE=e2x5maxovere;
   mySeedE1x5OverE=e1x5overe;
   mySeedE2x2OverE=e2x2overe;
   mySeedE3x3OverE=e3x3overe;
