@@ -148,8 +148,9 @@ void RedEleIDTree::addIsolations() {
 }
 
 void RedEleIDTree::addMore() {
-  myTree->Branch("bdthww",     myBdtHww, "bdthww[2]/F");
-  myTree->Branch("bdthzz",     myBdtHzz, "bdthzz[4]/F");
+  myTree->Branch("bdthww",     myBdtHww,    "bdthww[2]/F");
+  myTree->Branch("newbdthww",  myNewBdtHww, "newbdthww[4]/F");
+  myTree->Branch("bdthzz",     myBdtHzz,    "bdthzz[4]/F");
   myTree->Branch("lh",       &myLike,   "lh/F");
   myTree->Branch("pfmva",    &myPFMVA,  "pfmva/F");
   myTree->Branch("vertices", &myNVtx, "vertices/F");
@@ -299,10 +300,11 @@ void RedEleIDTree::fillCategories(int iecal, int iptbin, int iclass, int nbr) {
   mynbrem=nbr;
 }
 
-void RedEleIDTree::fillMore(float nVtx, float rho, float bdthww[2], float bdthzz[4], float pfmva, float like) {
+void RedEleIDTree::fillMore(float nVtx, float rho, float bdthww[2], float newbdthww[4], float bdthzz[4], float pfmva, float like) {
   myNVtx=nVtx;
   myRho=rho;
   for(int i=0; i<2; i++) myBdtHww[i]=bdthww[i];
+  for(int i=0; i<4; i++) myNewBdtHww[i]=newbdthww[i];
   for(int i=0; i<4; i++) myBdtHzz[i]=bdthzz[i];
   myPFMVA=pfmva;
   myLike=like;

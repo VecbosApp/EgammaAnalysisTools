@@ -87,6 +87,32 @@ HZZ4LElectronSelector::HZZ4LElectronSelector(TTree *tree)
                              "elebdtweights/DanieleMVA_BDTCat_BDTG_SiDanV0.weights.xml",
                              ElectronIDMVAHZZ::kBDTSiDanV0);
 
+  // configuring the electron BDT for H->WW
+  fMVAHWWDanV0 = new ElectronIDMVAHZZ();
+  fMVAHWWSiV0 = new ElectronIDMVAHZZ();
+  fMVAHWWSiV1 = new ElectronIDMVAHZZ();
+  fMVAHWWSiDanV0 = new ElectronIDMVAHZZ();
+
+  // New H->WW unbiased DATA training, Daniele's variables
+  fMVAHWWDanV0->Initialize("BDTSimpleCat",
+                           "elebdtweights/DanieleMVA_DenomHWW_BDTCat_BDTG_DanV0.weights.xml",
+                           ElectronIDMVAHZZ::kBDTHWWDanV0);
+
+  // New H->WW unbiased DATA training, Si's HWW 2011 variables
+  fMVAHWWSiV0->Initialize("BDTSimpleCat",
+                          "elebdtweights/DanieleMVA_DenomHWW_BDTCat_BDTG_SiV0.weights.xml",
+                          ElectronIDMVAHZZ::kBDTHWWSiV0);
+
+  // New H->WW unbiased DATA training, Si's HWW 2012 variables
+  fMVAHWWSiV1->Initialize("BDTSimpleCat",
+                          "elebdtweights/DanieleMVA_DenomHWW_BDTCat_BDTG_SiV1.weights.xml",
+                          ElectronIDMVAHZZ::kBDTHWWSiV1);
+
+  // New H->WW unbiased DATA training, Daniele's + Si's variables 
+  fMVAHWWSiDanV0->Initialize("BDTSimpleCat",
+                             "elebdtweights/DanieleMVA_DenomHWW_BDTCat_BDTG_SiDanV0.weights.xml",
+                             ElectronIDMVAHZZ::kBDTHWWSiDanV0);
+
 }
 
 HZZ4LElectronSelector::~HZZ4LElectronSelector() { 
@@ -295,6 +321,11 @@ void HZZ4LElectronSelector::Loop(const char *treefilesuffix) {
       hzzbdts[1] = eleBDT(fMVAHZZSiV0,probe);
       hzzbdts[2] = eleBDT(fMVAHZZSiV1,probe);
       hzzbdts[3] = eleBDT(fMVAHZZSiDanV0,probe);
+      float newhwwbdts[4];
+      newhwwbdts[0] = eleBDT(fMVAHWWDanV0,probe);
+      newhwwbdts[1] = eleBDT(fMVAHWWSiV0,probe);
+      newhwwbdts[2] = eleBDT(fMVAHWWSiV1,probe);
+      newhwwbdts[3] = eleBDT(fMVAHWWSiDanV0,probe);
 
       // fill the reduced tree
       reducedTree.fillVariables(eleopout,eopout,eop,HoE,deta,dphi,s9s25,s1s9,see,spp,fbrem,
@@ -309,7 +340,7 @@ void HZZ4LElectronSelector::Loop(const char *treefilesuffix) {
 				 dr03HcalTowerSumEtFullConeEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
 				 pfCombinedIsoEle[probe],
 				 pfCandChargedIsoEle[probe],pfCandNeutralIsoEle[probe],pfCandPhotonIsoEle[probe]);
-      reducedTree.fillMore(nPV,rhoFastjet,hwwbdts,hzzbdts,pfmva,lh);
+      reducedTree.fillMore(nPV,rhoFastjet,hwwbdts,newhwwbdts,hzzbdts,pfmva,lh);
       reducedTree.fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
       reducedTree.fillFakeRateDenomBits(isDenomFake(probe),isDenomFake_smurfs(probe));
       reducedTree.fillBDTBasedIDBits(passEleBDT(pt,EleSCEta,hwwbdts[0]));
