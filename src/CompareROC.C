@@ -28,55 +28,57 @@ void makeIdCurve(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg,
 
   TH1F *bdthww_sig = new TH1F("bdthww_sig","",100,-1.0,1.0);
   TH1F *bdthww_bkg = new TH1F("bdthww_bkg","",100,-1.0,1.0);
-  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",100,-0.4,0.3);
-  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",100,-0.4,0.3);
+  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",100,-1.0,1.0);
+  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",100,-1.0,1.0);
   
-  treeSig->Project("bdthww_sig","bdthww",cutSig);
-  treeBkg->Project("bdthww_bkg","bdthww",cutBkg);
-  treeSig->Project("bdthzz_sig","bdthzz",cutSig);
-  treeBkg->Project("bdthzz_bkg","bdthzz",cutBkg);
+  treeSig->Project("bdthww_sig","bdthww[0]",cutSig);
+  treeBkg->Project("bdthww_bkg","bdthww[0]",cutBkg);
+  treeSig->Project("bdthzz_sig","bdthzz[3]",cutSig);
+  treeBkg->Project("bdthzz_bkg","bdthzz[3]",cutBkg);
 
   FiguresOfMeritEvaluator roc;
+  roc.setRange(0.6,1,0,1.0);
   roc.addSignal("H #rightarrow WW BDT", bdthww_sig);
   roc.addBackgrounds(bdthww_bkg);
   roc.setCutDirection(">");
-  roc.addSignal("H #rightarrow ZZ BDT", bdthzz_sig);
+  roc.addSignal("H #rightarrow ZZ BDT (DanSiV0)", bdthzz_sig);
   roc.addBackgrounds(bdthzz_bkg);
   roc.setCutDirection(">");
 
-  roc.drawResults(namefile.Data());
+  roc.drawResults(namefile.Data(),1);
 }
 
 void make3IdCurves(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile) {
 
   TH1F *bdthww_sig = new TH1F("bdthww_sig","",100,-1.0,1.0);
   TH1F *bdthww_bkg = new TH1F("bdthww_bkg","",100,-1.0,1.0);
-  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",100,-0.4,0.3);
-  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",100,-0.4,0.3);
-  TH1F *bdthzznoip_sig = new TH1F("bdthzznoip_sig","",100,-0.4,0.3);
-  TH1F *bdthzznoip_bkg = new TH1F("bdthzznoip_bkg","",100,-0.4,0.3);
+  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",100,-1.0,1.0);
+  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",100,-1.0,1.0);
+  TH1F *bdthzznoip_sig = new TH1F("bdthzznoip_sig","",100,-1.0,1.0);
+  TH1F *bdthzznoip_bkg = new TH1F("bdthzznoip_bkg","",100,-1.0,1.0);
 
   cout << "cut sig = " << cutSig << " bkg = " << cutBkg << endl;
   
-  treeSig->Project("bdthww_sig","bdthww",cutSig);
-  treeBkg->Project("bdthww_bkg","bdthww",cutBkg);
-  treeSig->Project("bdthzz_sig","bdthzz",cutSig);
-  treeBkg->Project("bdthzz_bkg","bdthzz",cutBkg);
-  treeSig->Project("bdthzznoip_sig","bdthzznoip",cutSig);
-  treeBkg->Project("bdthzznoip_bkg","bdthzznoip",cutBkg);
+  treeSig->Project("bdthww_sig","bdthww[0]",cutSig);
+  treeBkg->Project("bdthww_bkg","bdthww[0]",cutBkg);
+  treeSig->Project("bdthzz_sig","bdthzz[3]",cutSig);
+  treeBkg->Project("bdthzz_bkg","bdthzz[3]",cutBkg);
+  treeSig->Project("bdthzznoip_sig","bdthzz[2]",cutSig);
+  treeBkg->Project("bdthzznoip_bkg","bdthzz[2]",cutBkg);
 
   FiguresOfMeritEvaluator roc;
+  roc.setRange(0.6,1,0,1.0);
   roc.addSignal("H #rightarrow WW BDT", bdthww_sig);
   roc.addBackgrounds(bdthww_bkg);
   roc.setCutDirection(">");
-  roc.addSignal("H #rightarrow ZZ BDT", bdthzz_sig);
+  roc.addSignal("H #rightarrow ZZ BDT (DanSiV0)", bdthzz_sig);
   roc.addBackgrounds(bdthzz_bkg);
   roc.setCutDirection(">");
-  roc.addSignal("H #rightarrow ZZ BDT (no IP)", bdthzznoip_sig);
+  roc.addSignal("H #rightarrow ZZ BDT (SiV1)", bdthzznoip_sig);
   roc.addBackgrounds(bdthzznoip_bkg);
   roc.setCutDirection(">");
 
-  roc.drawResults(namefile.Data());
+  roc.drawResults(namefile.Data(),1);
 }
 
 
@@ -94,6 +96,7 @@ void makeIsolationCurve(TTree *treeSig, TTree* treeBkg,
   treeBkg->Project("isohzz_bkg","combPFIsoHZZ/pt",cutBkg);
 
   FiguresOfMeritEvaluator roc;
+  roc.setRange(0.6,1,0,1.0);
   roc.addSignal("H #rightarrow WW iso", isohww_sig);
   roc.addBackgrounds(isohww_bkg);
   roc.setCutDirection("<");
@@ -101,7 +104,7 @@ void makeIsolationCurve(TTree *treeSig, TTree* treeBkg,
   roc.addBackgrounds(isohzz_bkg);
   roc.setCutDirection("<");
 
-  roc.drawResults(namefile.Data());
+  roc.drawResults(namefile.Data(),1);
 }
 
 void make3IsolationCurves(TTree *treeSig, TTree* treeBkg, 
@@ -122,6 +125,7 @@ void make3IsolationCurves(TTree *treeSig, TTree* treeBkg,
   treeBkg->Project("isohzznoEA_bkg","combPFIsoHZZNoEA/pt",cutBkg);
 
   FiguresOfMeritEvaluator roc;
+  roc.setRange(0.6,1,0,1.0);
   roc.addSignal("PF iso", isohww_sig);
   roc.addBackgrounds(isohww_bkg);
   roc.setCutDirection("<");
@@ -131,7 +135,7 @@ void make3IsolationCurves(TTree *treeSig, TTree* treeBkg,
   roc.addSignal("PF iso, new vetoes, EA", isohzz_sig);
   roc.addBackgrounds(isohzz_bkg);
   roc.setCutDirection("<");
-  roc.drawResults(namefile.Data());
+  roc.drawResults(namefile.Data(),1);
 }
 
 
@@ -142,8 +146,8 @@ int main(int argc, char* argv[]) {
   fileSig = fileBkg = 0;
   treeSig = treeBkg = 0;
 
-  fileSig = TFile::Open("macro/results_data/electrons.root");
-  fileBkg = TFile::Open("macro/results_data/fakes.root");
+  fileSig = TFile::Open("macro/results_data/electrons_zeemc.root");
+  fileBkg = TFile::Open("macro/results_data/fakes-zeeOneFake.root");
   if( fileSig && fileBkg) {
     fileSig->cd();
     treeSig = (TTree*)fileSig->Get("eleIDdir/T1");
@@ -163,22 +167,28 @@ int main(int argc, char* argv[]) {
   cout << "All files OK!" << endl;
 
   vector<TString> cutBase;
-  cutBase.push_back(TString("abs(eta)<1.0                   && pt<20"));
-  cutBase.push_back(TString("abs(eta)>1.0 && abs(eta)<1.479 && pt<20"));
-  cutBase.push_back(TString("abs(eta)>1.479                 && pt<20"));
+  cutBase.push_back(TString("abs(eta)<1.0                   && pt<10"));
+  cutBase.push_back(TString("abs(eta)>1.0 && abs(eta)<1.479 && pt<10"));
+  cutBase.push_back(TString("abs(eta)>1.479                 && pt<10"));
+  cutBase.push_back(TString("abs(eta)<1.0                   && pt>10 && pt<20"));
+  cutBase.push_back(TString("abs(eta)>1.0 && abs(eta)<1.479 && pt>10 && pt<20"));
+  cutBase.push_back(TString("abs(eta)>1.479                 && pt>10 && pt<20"));
   cutBase.push_back(TString("abs(eta)<1.0                   && pt>20"));
   cutBase.push_back(TString("abs(eta)>1.0 && abs(eta)<1.479 && pt>20"));
   cutBase.push_back(TString("abs(eta)>1.479                 && pt>20"));
 
   vector<TString> cutSignal;
   for(int i=0;i<(int)cutBase.size();++i) 
-    cutSignal.push_back(cutBase[i]+TString("&& DenomFakeSmurf && abs(mass-91.1876)<7.5"));
+    cutSignal.push_back(cutBase[i]+TString("&& mcmatch && pt<30"));
 
   vector<TString> cutBackground;
   for(int i=0;i<(int)cutBase.size();++i)
-    cutBackground.push_back(cutBase[i]+TString("&& DenomFakeSmurf && event%2!=0")); // HWW used the even events to train
+    cutBackground.push_back(cutBase[i]+TString("&& pt<30")); // HWW used the even events to train
 
   vector<TString> id;
+  id.push_back(TString("ROC_IdOnly_Data_inEB_VeryLowPt.pdf"));
+  id.push_back(TString("ROC_IdOnly_Data_outEB_VeryLowPt.pdf"));
+  id.push_back(TString("ROC_IdOnly_Data_EE_VeryLowPt.pdf"));
   id.push_back(TString("ROC_IdOnly_Data_inEB_LowPt.pdf"));
   id.push_back(TString("ROC_IdOnly_Data_outEB_LowPt.pdf"));
   id.push_back(TString("ROC_IdOnly_Data_EE_LowPt.pdf"));
@@ -186,13 +196,14 @@ int main(int argc, char* argv[]) {
   id.push_back(TString("ROC_IdOnly_Data_outEB_HighPt.pdf"));
   id.push_back(TString("ROC_IdOnly_Data_EE_HighPt.pdf"));
 
-  for(int i=0;i<(int)cutBase.size();++i) 
-    makeIdCurve(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
-  // make3Curves(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
+  for(int i=0;i<(int)cutBase.size();++i) {
+    // makeIdCurve(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
+    make3IdCurves(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
+  }
 
   // HZZ isolations are in friend trees
-  treeSig->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/electrons_hzzisoFriend.root");
-  treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/fakes_hzzisoFriend.root");
+  treeSig->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/electrons_zeemc_hzzisoFriend.root");
+  treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/fakes-zeeOneFake_hzzisoFriend.root");
 
   for(int i=0;i<(int)cutBase.size();++i) {
     id[i].ReplaceAll("IdOnly","IsoOnly");
@@ -208,7 +219,7 @@ int main(int argc, char* argv[]) {
     id[i].ReplaceAll("IsoOnly","IsoOnlyVtx1To7");
     make3IsolationCurves(treeSig,treeBkg,cutSignalLoPU[i],cutBackgroundLoPU[i],id[i]);
     id[i].ReplaceAll("IsoOnlyVtx1To7","IdOnlyVtx1To7");
-    makeIdCurve(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
+    make3IdCurves(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
   }
 
   for(int i=0;i<(int)cutBase.size();++i) {
@@ -217,7 +228,7 @@ int main(int argc, char* argv[]) {
     id[i].ReplaceAll("IdOnlyVtx1To7","IsoOnlyVtx8ToInf");
     make3IsolationCurves(treeSig,treeBkg,cutSignalHiPU[i],cutBackgroundHiPU[i],id[i]);
     id[i].ReplaceAll("IsoOnlyVtx8ToInf","IdOnlyVtx8ToInf");
-    makeIdCurve(treeSig,treeBkg,cutSignalHiPU[i],cutBackgroundHiPU[i],id[i]);
+    make3IdCurves(treeSig,treeBkg,cutSignalHiPU[i],cutBackgroundHiPU[i],id[i]);
   }
 
 
