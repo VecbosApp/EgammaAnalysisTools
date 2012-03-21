@@ -26,7 +26,11 @@ class ElectronIDMVAHZZ {
       kBDTDanV0,             // the new data training, with Daniele's variables 
       kBDTSiV0,              // the new data training, with Si's HWW variables 
       kBDTSiV1,              // the new data training, with Si's HWW 2012 variables
-      kBDTSiDanV0            // the new data training, with Si's HWW 2012 + Daniele's variables
+      kBDTSiDanV0,           // the new data training, with Si's HWW 2012 + Daniele's variables
+      kBDTHWWDanV0,          // the new data training for triggering electrons, with Daniele's variables 
+      kBDTHWWSiV0,           // the new data training for triggering electrons, with Si's HWW variables 
+      kBDTHWWSiV1,           // the new data training for triggering electrons, with Si's HWW 2012 variables
+      kBDTHWWSiDanV0         // the new data training for triggering electrons, with Si's HWW 2012 + Daniele's variables
     };
 
     void   Initialize(std::string methodName,
@@ -66,7 +70,8 @@ class ElectronIDMVAHZZ {
                     double ElePhiWidth,
                     double EleD0,
                     double EleIP3d,
-                    double EleIP3dSig);
+                    double EleIP3dSig,
+                    double EleHWWPresel);
 
 
 
@@ -110,7 +115,7 @@ class ElectronIDMVAHZZ {
     Float_t                   fMVAVar_EleD0;
     Float_t                   fMVAVar_EleIP3d;
     Float_t                   fMVAVar_EleIP3dSig;
-    
+    Float_t                   fMVAVar_EleDenomFakeSmurf;    
 };
 
 #endif

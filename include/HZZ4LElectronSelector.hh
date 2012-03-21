@@ -52,6 +52,7 @@ private:
   /// MVA for electron ID. To be created and initialized from the children classes
   ElectronIDMVA *fMVAHWW, *fMVAHWWNoIP;
   ElectronIDMVAHZZ *fMVAHZZDanV0, *fMVAHZZSiV0, *fMVAHZZSiV1, *fMVAHZZSiDanV0;
+  ElectronIDMVAHZZ *fMVAHWWDanV0, *fMVAHWWSiV0, *fMVAHWWSiV1, *fMVAHWWSiDanV0;
 
 };
 

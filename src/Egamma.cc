@@ -446,6 +446,9 @@ float Egamma::eleBDT(ElectronIDMVAHZZ *mva, int eleIndex) {
   float EleSigmaIEtaIEta, EleSigmaIPhiIPhi, EleSigmaIEtaIPhi, EleE1x5E5x5, EleSCEta, EleEtaWidth, ElePhiWidth,
     EleR9, Ele1oEm1oP, EleESoRaw;
 
+  // used only in the case of triggering electrons
+  float EleHWWPresel = (float)isDenomFake_smurfs(eleIndex);
+
   if(ecaldriven) {
     int sc = superClusterIndexEle[eleIndex];
     EleSigmaIEtaIEta = sqrt(covIEtaIEtaSC[sc]);
@@ -516,7 +519,8 @@ float Egamma::eleBDT(ElectronIDMVAHZZ *mva, int eleIndex) {
                        ElePhiWidth,
                        EleD0,
                        EleIP3d,
-                       EleIP3dSig);
+                       EleIP3dSig,
+                       EleHWWPresel);
 
 }
 

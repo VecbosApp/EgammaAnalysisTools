@@ -57,7 +57,7 @@ public:
   void fillAttributesBackground(float dphi, float invmass, float met, float pth);
   //! fill the splitting categories of the PDFs
   void fillCategories(int iecal, int iptbin, int iclass, int nbr);
-  void fillMore(float nVtx, float rho, float bdthww[2], float bdthzz[4], float pfmva, float like);
+  void fillMore(float nVtx, float rho, float bdthww[2], float newbdthww[4], float bdthzz[4], float pfmva, float like);
   void fillTrackMomenta(float pcomb, float pmodegsf, float pmeangsf, float pkf);
   void fillGamma(float atg, float aeg, float ahg, int ig);
   //! fill the run,lumi, event number, mc match
@@ -109,7 +109,7 @@ private:
 
   float myNVtx;
   float myRho;
-  float myBdtHww[2], myBdtHzz[4], myPFMVA, myLike;
+  float myBdtHww[2], myBdtHzz[4], myNewBdtHww[4], myPFMVA, myLike;
 
   float myAbsTrackerIsolGammaCand;
   float myAbsEcalIsolGammaCand;

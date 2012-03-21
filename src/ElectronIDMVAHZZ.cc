@@ -137,6 +137,34 @@ void ElectronIDMVAHZZ::Initialize( std::string methodName,
       fTMVAReader[i]->AddSpectator("matchConv",       &fMVAVar_EleMatchConv);
     }
 
+    if(type >= kBDTHWWDanV0 && type <= kBDTHWWSiDanV0) {
+      fTMVAReader[i]->AddVariable("fbrem",            &fMVAVar_EleFBrem);
+      fTMVAReader[i]->AddVariable("deta",             &fMVAVar_EleDEtaIn);
+      fTMVAReader[i]->AddVariable("dphi",             &fMVAVar_EleDPhiIn);
+      fTMVAReader[i]->AddVariable("see",              &fMVAVar_EleSigmaIEtaIEta);
+      fTMVAReader[i]->AddVariable("etawidth",         &fMVAVar_EleEtaWidth);
+      fTMVAReader[i]->AddVariable("phiwidth",         &fMVAVar_ElePhiWidth);
+      fTMVAReader[i]->AddVariable("HoE",              &fMVAVar_EleHoverE);
+      fTMVAReader[i]->AddVariable("EoP",              &fMVAVar_EleSuperClusterEOverP);
+      fTMVAReader[i]->AddVariable("e1x5e5x5",         &fMVAVar_EleE1x5E5x5);
+      fTMVAReader[i]->AddVariable("EoPout",           &fMVAVar_EleEseedOverPout);
+      fTMVAReader[i]->AddVariable("eleEoPout",        &fMVAVar_EleEeleOverPout); 
+      fTMVAReader[i]->AddVariable("detacalo",         &fMVAVar_EleDEtaCalo);
+      fTMVAReader[i]->AddVariable("kfchi2",           &fMVAVar_EleKFChi2);
+      fTMVAReader[i]->AddVariable("kfhits",           &fMVAVar_EleKFHits);
+      fTMVAReader[i]->AddVariable("spp",              &fMVAVar_EleSigmaIPhiIPhi);
+      fTMVAReader[i]->AddVariable("IoEmIoP",          &fMVAVar_Ele1oEm1oP);
+      fTMVAReader[i]->AddVariable("nbrems",           &fMVAVar_EleNBrems);
+      fTMVAReader[i]->AddVariable("R9",               &fMVAVar_EleR9);
+      fTMVAReader[i]->AddVariable("dphicalo",         &fMVAVar_EleDPhiCalo);
+      fTMVAReader[i]->AddVariable("gsfchi2",          &fMVAVar_EleGSFChi2);
+      fTMVAReader[i]->AddVariable("PreShowerOverRaw", &fMVAVar_EleESoRaw);
+
+      fTMVAReader[i]->AddSpectator("eta",             &fMVAVar_EleSCEta);
+      fTMVAReader[i]->AddSpectator("pt",              &fMVAVar_ElePt);
+      fTMVAReader[i]->AddSpectator("DenomFakeSmurf",  &fMVAVar_EleDenomFakeSmurf);
+    }
+
     if (i==0) fTMVAReader[i]->BookMVA(fMethodname , weights );
 
   }
@@ -181,7 +209,8 @@ Double_t ElectronIDMVAHZZ::MVAValue(double ElePt , double EleSCEta,
                                     double ElePhiWidth,
                                     double EleD0,
                                     double EleIP3d,
-                                    double EleIP3dSig) {
+                                    double EleIP3dSig,
+                                    double EleHWWPresel) {
 
 
   if (!fIsInitialized) { 
@@ -224,6 +253,7 @@ Double_t ElectronIDMVAHZZ::MVAValue(double ElePt , double EleSCEta,
   fMVAVar_EleD0 = EleD0;
   fMVAVar_EleIP3d = EleIP3d;
   fMVAVar_EleIP3dSig = EleIP3dSig;
+  fMVAVar_EleDenomFakeSmurf = EleHWWPresel;
 
   // apply the boundaries used in the training
   if(fMVAVar_EleFBrem < -1.)

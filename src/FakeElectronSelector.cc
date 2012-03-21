@@ -86,6 +86,33 @@ FakeElectronSelector::FakeElectronSelector(TTree *tree)
                              ElectronIDMVAHZZ::kBDTSiDanV0);
 
 
+  // configuring the electron BDT for H->WW
+  fMVAHWWDanV0 = new ElectronIDMVAHZZ();
+  fMVAHWWSiV0 = new ElectronIDMVAHZZ();
+  fMVAHWWSiV1 = new ElectronIDMVAHZZ();
+  fMVAHWWSiDanV0 = new ElectronIDMVAHZZ();
+
+  // New H->WW unbiased DATA training, Daniele's variables
+  fMVAHWWDanV0->Initialize("BDTSimpleCat",
+                           "elebdtweights/DanieleMVA_DenomHWW_BDTCat_BDTG_DanV0.weights.xml",
+                           ElectronIDMVAHZZ::kBDTHWWDanV0);
+
+  // New H->WW unbiased DATA training, Si's HWW 2011 variables
+  fMVAHWWSiV0->Initialize("BDTSimpleCat",
+                          "elebdtweights/DanieleMVA_DenomHWW_BDTCat_BDTG_SiV0.weights.xml",
+                          ElectronIDMVAHZZ::kBDTHWWSiV0);
+
+  // New H->WW unbiased DATA training, Si's HWW 2012 variables
+  fMVAHWWSiV1->Initialize("BDTSimpleCat",
+                          "elebdtweights/DanieleMVA_DenomHWW_BDTCat_BDTG_SiV1.weights.xml",
+                          ElectronIDMVAHZZ::kBDTHWWSiV1);
+
+  // New H->WW unbiased DATA training, Daniele's + Si's variables 
+  fMVAHWWSiDanV0->Initialize("BDTSimpleCat",
+                             "elebdtweights/DanieleMVA_DenomHWW_BDTCat_BDTG_SiDanV0.weights.xml",
+                             ElectronIDMVAHZZ::kBDTHWWSiDanV0);
+
+
   // chiara
   // to read good run list
   if (_isData) {
@@ -477,6 +504,11 @@ void FakeElectronSelector::Loop(const char *outname) {
     hzzbdts[1] = eleBDT(fMVAHZZSiV0,theDenom1);
     hzzbdts[2] = eleBDT(fMVAHZZSiV1,theDenom1);
     hzzbdts[3] = eleBDT(fMVAHZZSiDanV0,theDenom1);
+    float newhwwbdts[4];
+    newhwwbdts[0] = eleBDT(fMVAHWWDanV0,theDenom1);
+    newhwwbdts[1] = eleBDT(fMVAHWWSiV0,theDenom1);
+    newhwwbdts[2] = eleBDT(fMVAHWWSiV1,theDenom1);
+    newhwwbdts[3] = eleBDT(fMVAHWWSiDanV0,theDenom1);
 
     // fill the reduced tree
     float pt = tlvDenom1.Pt();
@@ -495,7 +527,7 @@ void FakeElectronSelector::Loop(const char *outname) {
                                pfCombinedIsoEle[theDenom1],
                                pfCandChargedIsoEle[theDenom1],pfCandNeutralIsoEle[theDenom1],pfCandPhotonIsoEle[theDenom1]);
     myOutIDTree->fillFakeRateDenomBits(isDenomFake_HwwEgamma(theDenom1),isDenomFake_smurfs(theDenom1));
-    myOutIDTree->fillMore(nPV,rhoFastjet,hwwbdts,hzzbdts,pfmva,lh);
+    myOutIDTree->fillMore(nPV,rhoFastjet,hwwbdts,newhwwbdts,hzzbdts,pfmva,lh);
     myOutIDTree->fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
     myOutIDTree->fillRunInfos(runNumber, lumiBlock, eventNumber, nPU, -1);
     myOutIDTree->store();
