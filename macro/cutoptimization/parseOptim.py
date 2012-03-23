@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 def getid(line):
     parts=line.split("\"")
     return eval(parts[1])
@@ -12,16 +14,16 @@ def main():
     wplines = [251,281,293,311,323]
     wp = [70,80,85,90,95]
     
-    files = ['weights/unbiased_OptimizedCuts_chaIsoOnly_weights_eta10_Pt10To20.xml',
-             'weights/unbiased_OptimizedCuts_chaIsoOnly_weights_eta14442_Pt10To20.xml',
-             'weights/unbiased_OptimizedCuts_chaIsoOnly_weights_eta1566_Pt10To20.xml',
-             'weights/unbiased_OptimizedCuts_chaIsoOnly_weights_eta20_Pt10To20.xml',
-             'weights/unbiased_OptimizedCuts_chaIsoOnly_weights_eta25_Pt10To20.xml',
-             'weights/unbiased_OptimizedCuts_chaIsoOnly_weights_eta10_Pt20.xml',
-             'weights/unbiased_OptimizedCuts_chaIsoOnly_weights_eta14442_Pt20.xml',
-             'weights/unbiased_OptimizedCuts_chaIsoOnly_weights_eta1566_Pt20.xml',
-             'weights/unbiased_OptimizedCuts_chaIsoOnly_weights_eta20_Pt20.xml',
-             'weights/unbiased_OptimizedCuts_chaIsoOnly_weights_eta25_Pt20.xml']
+    files = ['weights/unbiased_OptimizedCuts_weights_eta10_Pt10To20.xml',
+             'weights/unbiased_OptimizedCuts_weights_eta14442_Pt10To20.xml',
+             'weights/unbiased_OptimizedCuts_weights_eta1566_Pt10To20.xml',
+             'weights/unbiased_OptimizedCuts_weights_eta20_Pt10To20.xml',
+             'weights/unbiased_OptimizedCuts_weights_eta25_Pt10To20.xml',
+             'weights/unbiased_OptimizedCuts_weights_eta10_Pt20.xml',
+             'weights/unbiased_OptimizedCuts_weights_eta14442_Pt20.xml',
+             'weights/unbiased_OptimizedCuts_weights_eta1566_Pt20.xml',
+             'weights/unbiased_OptimizedCuts_weights_eta20_Pt20.xml',
+             'weights/unbiased_OptimizedCuts_weights_eta25_Pt20.xml']
 
 
     etabins = [0,1,2,3,4,0,1,2,3,4]
