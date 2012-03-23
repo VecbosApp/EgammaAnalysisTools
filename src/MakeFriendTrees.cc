@@ -147,12 +147,13 @@ void makeFriendHZZIdBits(const char* file) {
   nF.ReplaceAll(".root","_hzzidbitsFriend.root");
   TFile *fF = TFile::Open(nF,"recreate");
 
-  Float_t bdthww, combPFIsoHWW;
-  Float_t iso, bdt, eta, abseta, pt, rho, vertices;
+  Float_t bdthww[2], newbdthww[4], combPFIsoHWW;
+  Float_t iso, bdthzz[4], eta, abseta, pt, rho, vertices;
   Float_t mass; // not dummy only for TP trees
-  pT->SetBranchAddress("bdthww", &bdthww);
+  pT->SetBranchAddress("bdthww", bdthww);
+  pT->SetBranchAddress("newbdthww", newbdthww);
+  pT->SetBranchAddress("bdthzz",bdthzz);
   pT->SetBranchAddress("combPFIsoHWW", &combPFIsoHWW);
-  pT->SetBranchAddress("bdthzz",&bdt);
   pT->SetBranchAddress("combPFIsoHZZ",&iso);
   pT->SetBranchAddress("eta", &eta);
   pT->SetBranchAddress("pt", &pt);
@@ -167,8 +168,9 @@ void makeFriendHZZIdBits(const char* file) {
   Int_t WP95, WP90, WP85, WP80, WP70, WP80x70;
   // the new WPs with charged only isolation
   Int_t chWP95, chWP90, chWP85, chWP80, chWP70;
-  // the hww2011 WP and the one with the same fake rate
-  Int_t hwwWP, hzzwphww;
+  // the hww2011 WP and the one with the same efficiency
+  // hzz WP is using the MVA for the unbiased electrons
+  Int_t hwwWP, newhwwWP;
   // isolation only, three bits
   Int_t pfisohww, pfisohzz, pfisohzzEA; 
   // first 4 variables needed for TP
@@ -176,19 +178,21 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("pt", &pt, "pt/F");
   fT->Branch("abseta", &abseta, "abseta/F");
   fT->Branch("vertices", &vertices, "vertices/F");
+  // for triggering eles
   fT->Branch("wp95", &WP95, "wp95/I");
   fT->Branch("wp90", &WP90, "wp90/I");
   fT->Branch("wp85", &WP85, "wp85/I");
   fT->Branch("wp80", &WP80, "wp80/I");
   fT->Branch("wp70", &WP70, "wp70/I");
-  fT->Branch("wp70x80", &WP80x70, "wp80x70/I");
+  fT->Branch("wp80x80", &WP80x70, "wp80x70/I"); // 2012 WP?
+  fT->Branch("hwwWP", &hwwWP, "hwwWP/I");  // 2011 WP
+  // for non triggering eles
   fT->Branch("chwp95", &chWP95, "chwp95/I");
   fT->Branch("chwp90", &chWP90, "chwp90/I");
   fT->Branch("chwp85", &chWP85, "chwp85/I");
   fT->Branch("chwp80", &chWP80, "chwp80/I");
   fT->Branch("chwp70", &chWP70, "chwp70/I");
-  fT->Branch("bdthww", &hwwWP, "bdthww/I");
-  fT->Branch("hzzwphww", &hzzwphww, "hzzwphww/I");
+
   fT->Branch("pfisohww", &pfisohww, "pfisohww/I");
   fT->Branch("pfisohzz", &pfisohzz, "pfisohzz/I");
   fT->Branch("pfisohzzEA", &pfisohzzEA, "pfisohzzEA/I");
@@ -202,34 +206,30 @@ void makeFriendHZZIdBits(const char* file) {
      abseta = fabs(eta);
 
      hwwWP=0;
-     if(passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kBDTHWW2011_withIP) && 
-	passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kIsoHWW2011)) hwwWP = 1;
+     if(passHWWID(eta,pt,bdthww[0],newbdthww[3],rho,iso,combPFIsoHWW,kBDTHWW2011_withIP) && 
+	passHWWID(eta,pt,bdthww[0],newbdthww[3],rho,iso,combPFIsoHWW,kIsoHWW2011)) hwwWP = 1;
 
      WP95=WP90=WP85=WP80=WP70=WP80x70=0;
-     if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP95)) WP95=1;
-     if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP90)) WP90=1;
-     if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP85)) WP85=1;
-     if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP80)) WP80=1;
-     if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP70)) WP70=1;
+     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP95)) WP95=1;
+     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP90)) WP90=1;
+     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP85)) WP85=1;
+     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP80)) WP80=1;
+     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP70)) WP70=1;
      // mixed 70 x 80
-     if(pt<20 && aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP70)) WP80x70=1;
-     if(pt>=20 && aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP80)) WP80x70=1;
+     if(pt<20 && aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP70)) WP80x70=1;
+     if(pt>=20 && aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP80)) WP80x70=1;
 
-     chWP95=chWP90=chWP85=0;
-     if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP95ChIso)) chWP95=1;
-     if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP90ChIso)) chWP90=1;
-     if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP85ChIso)) chWP85=1;
-     if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP80ChIso)) chWP80=1;
-     if(aSel.output(pt,eta,bdt,iso,HZZEleIDSelector::kWP70ChIso)) chWP70=1;
-    
-     hzzwphww=0;
-     if(passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kBDTHZZ_withIP) && 
-        passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kIsoEACorr)) hzzwphww = 1;
+     chWP95=chWP90=chWP85=chWP80=chWP70=0;
+     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP95ChIso)) chWP95=1;
+     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP90ChIso)) chWP90=1;
+     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP85ChIso)) chWP85=1;
+     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP80ChIso)) chWP80=1;
+     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP70ChIso)) chWP70=1;
 
      pfisohww=pfisohzz=pfisohzzEA=0;
-     if(passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kIsoHWW2011)) pfisohww = 1;
-     if(passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kIso)) pfisohzz = 1;
-     if(passHWWID(eta,pt,bdthww,bdt,rho,iso,combPFIsoHWW,kIsoEACorr)) pfisohzzEA = 1;
+     if(passHWWID(eta,pt,bdthww[0],bdthzz[3],rho,iso,combPFIsoHWW,kIsoHWW2011)) pfisohww = 1;
+     if(passHWWID(eta,pt,bdthww[0],bdthzz[3],rho,iso,combPFIsoHWW,kIso)) pfisohzz = 1;
+     if(passHWWID(eta,pt,bdthww[0],bdthzz[3],rho,iso,combPFIsoHWW,kIsoEACorr)) pfisohzzEA = 1;
 
      fT->Fill();
   }
