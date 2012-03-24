@@ -16,10 +16,15 @@ public:
     kWP90ChIso, kWP85ChIso, kWP80ChIso, kWP70ChIso
   };
 
+  enum mvatype {
+    kMVABiased = 0,
+    kMVAUnbiased
+  };
+
   bool output(float pt, float eta, float bdt, float iso, 
-	      HZZEleIDSelector::wpfulliso WP);
+	      HZZEleIDSelector::wpfulliso WP, HZZEleIDSelector::mvatype type);
   bool output(float pt, float eta, float bdt, float chiso, 
-	      HZZEleIDSelector::wpchiso WP);
+	      HZZEleIDSelector::wpchiso WP, HZZEleIDSelector::mvatype type);
 
 private:
   int etabin(float eta);

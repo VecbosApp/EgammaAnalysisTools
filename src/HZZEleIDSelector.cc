@@ -7,11 +7,9 @@
 using namespace std;
 
 int HZZEleIDSelector::etabin(float eta) {
-  if(fabs(eta)<1.0) return 0;
-  else if(fabs(eta)<1.4442) return 1;
-  else if(fabs(eta)<1.566) return 2;
-  else if(fabs(eta)<2.0) return 3;
-  else return 4;
+  if(fabs(eta)<1.4442) return 0;
+  else if(fabs(eta)<1.566) return 1;
+  else return 2;
 }
 
 int HZZEleIDSelector::ptbin(float pt) {
@@ -20,11 +18,20 @@ int HZZEleIDSelector::ptbin(float pt) {
 }
 
 bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso, 
-			      HZZEleIDSelector::wpfulliso WP) {
+			      HZZEleIDSelector::wpfulliso WP, HZZEleIDSelector::mvatype type) {
   int etab=etabin(eta);
   int ptb=ptbin(pt);
-  float bdtcut=cutbdtfulliso[ptb][etab][WP];
-  float isocut=cutfulliso[ptb][etab][WP];
+  float bdtcut=999.;
+  float isocut=-999.;
+  if(type==kMVABiased) {
+    bdtcut=cutbdtfulliso_biased[ptb][etab][WP];
+    isocut=cutfulliso_biased[ptb][etab][WP];
+  } else if(type==kMVAUnbiased) {
+    bdtcut=cutbdtfulliso_unbiased[ptb][etab][WP];
+    isocut=cutfulliso_unbiased[ptb][etab][WP];    
+  } else {
+    cout << " WARNING! type of MVA unset! " << endl;
+  }
   // cout << "   eta = " << eta << " pt = " << pt 
   //      << "   bdt = " << bdt << " (cut is: " << bdtcut << ")" 
   //      << "   iso = " << iso << " (cut is: " << isocut << ")"
@@ -33,10 +40,19 @@ bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso,
 }
 
 bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso, 
-			      HZZEleIDSelector::wpchiso WP) {
+			      HZZEleIDSelector::wpchiso WP, HZZEleIDSelector::mvatype type) {
   int etab=etabin(eta);
   int ptb=ptbin(pt);
-  float bdtcut=cutbdtchiso[ptb][etab][WP];
-  float isocut=cutchiso[ptb][etab][WP];
+  float bdtcut=999.;
+  float isocut=-999.;
+  if(type==kMVABiased) {
+    bdtcut=cutbdtchiso_biased[ptb][etab][WP];
+    isocut=cutchiso_biased[ptb][etab][WP];
+  } else if(type==kMVAUnbiased) {
+    bdtcut=cutbdtchiso_unbiased[ptb][etab][WP];
+    isocut=cutchiso_unbiased[ptb][etab][WP];    
+  } else {
+    cout << " WARNING! type of MVA unset! " << endl;
+  }
   return (bdt>bdtcut && iso/pt<isocut);
 }

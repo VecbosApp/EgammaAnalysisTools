@@ -210,21 +210,21 @@ void makeFriendHZZIdBits(const char* file) {
 	passHWWID(eta,pt,bdthww[0],newbdthww[3],rho,iso,combPFIsoHWW,kIsoHWW2011)) hwwWP = 1;
 
      WP95=WP90=WP85=WP80=WP70=WP80x70=0;
-     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP95)) WP95=1;
-     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP90)) WP90=1;
-     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP85)) WP85=1;
-     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP80)) WP80=1;
-     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP70)) WP70=1;
+     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP95,HZZEleIDSelector::kMVABiased)) WP95=1;
+     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP90,HZZEleIDSelector::kMVABiased)) WP90=1;
+     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP85,HZZEleIDSelector::kMVABiased)) WP85=1;
+     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVABiased)) WP80=1;
+     if(aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP70,HZZEleIDSelector::kMVABiased)) WP70=1;
      // mixed 70 x 80
-     if(pt<20 && aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP70)) WP80x70=1;
-     if(pt>=20 && aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP80)) WP80x70=1;
+     if(pt<20 && aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP70,HZZEleIDSelector::kMVABiased)) WP80x70=1;
+     if(pt>=20 && aSel.output(pt,eta,newbdthww[3],iso,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVABiased)) WP80x70=1;
 
      chWP95=chWP90=chWP85=chWP80=chWP70=0;
-     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP95ChIso)) chWP95=1;
-     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP90ChIso)) chWP90=1;
-     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP85ChIso)) chWP85=1;
-     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP80ChIso)) chWP80=1;
-     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP70ChIso)) chWP70=1;
+     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP95ChIso,HZZEleIDSelector::kMVAUnbiased)) chWP95=1;
+     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP90ChIso,HZZEleIDSelector::kMVAUnbiased)) chWP90=1;
+     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP85ChIso,HZZEleIDSelector::kMVAUnbiased)) chWP85=1;
+     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP80ChIso,HZZEleIDSelector::kMVAUnbiased)) chWP80=1;
+     if(aSel.output(pt,eta,bdthzz[3],iso,HZZEleIDSelector::kWP70ChIso,HZZEleIDSelector::kMVAUnbiased)) chWP70=1;
 
      pfisohww=pfisohzz=pfisohzzEA=0;
      if(passHWWID(eta,pt,bdthww[0],bdthzz[3],rho,iso,combPFIsoHWW,kIsoHWW2011)) pfisohww = 1;
