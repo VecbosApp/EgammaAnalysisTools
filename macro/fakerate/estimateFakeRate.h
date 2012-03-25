@@ -25,9 +25,7 @@ public :
     kIsoEACorr, // EA corrected isolation HZZ with WP equal to kIsoHWW2011
     kIso, // HZZ with WP equal to kIsoHWW2011
     kBDTHWW2011_withIP, // HWW cuts 2011
-    kBDTHWW2011_noIP, // HWW BDT w/o IP (not optimized cuts)
-    kBDTHZZ_withIP, // HZZ BDT with IP
-    kBDTHZZ_noIP 
+    kBDTHWW2011_noIP // HWW BDT w/o IP (not optimized cuts)
   };
 
   enum wphww {
@@ -36,17 +34,16 @@ public :
     kIsoWP80,
     kIsoWP80EA,
     kIsoWP80HZZNoEA,
-    kIdWP80
+    kIdWP80,
+    knewWP80,
+    knewWP70x80
   };
 
   enum wphzz {
-    kHzzWP80HWWFR = 0,
     kHzzWP80,
     kHzzWP80ch,
     kHzzWP95,
     kHzzWP95ch,
-    kHzzWP70x80,
-    kHzzWP70x80ch
   };
 
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
@@ -121,11 +118,9 @@ public :
    Int_t           event;
    Int_t           npu[3];
    Int_t           mcmatch;
-   Float_t         bdthww;
-   Float_t         bdthwwnoip;
-   Float_t         bdthzz;
-   Float_t         bdthzznoip;
-   Float_t         bdthzzmc;
+   Float_t         bdthww[2];
+   Float_t         newbdthww[4];
+   Float_t         bdthzz[4];
    Float_t         lh;
    Float_t         pfmva;
    Float_t         vertices;
@@ -201,14 +196,14 @@ public :
    TBranch        *b_npu;   //!
    TBranch        *b_mcmatch;   //!
    TBranch        *b_bdthww;   //!
-   TBranch        *b_bdthwwnoip;   //!
+   TBranch        *b_newbdthww;   //!
    TBranch        *b_bdthzz;   //!
-   TBranch        *b_bdthzznoip;   //!
-   TBranch        *b_bdthzzmc;   //!
    TBranch        *b_lh;   //!
    TBranch        *b_pfmva;   //!
    TBranch        *b_vertices;   //!
    TBranch        *b_rho;   //!
+
+   const char *_isofriend;
 
    estimateFakeRate(TTree *tree=0);
    virtual ~estimateFakeRate();
@@ -220,6 +215,7 @@ public :
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
    virtual Bool_t   passID(estimateFakeRate::idType type);
+   virtual void     addIsoFriend(const char *filename) { _isofriend = filename;};
 };
 
 #endif
@@ -350,11 +346,9 @@ void estimateFakeRate::Init(TTree *tree)
    fChain->SetBranchAddress("event", &event, &b_event);
    fChain->SetBranchAddress("npu", npu, &b_npu);
    fChain->SetBranchAddress("mcmatch", &mcmatch, &b_mcmatch);
-   fChain->SetBranchAddress("bdthww", &bdthww, &b_bdthww);
-   fChain->SetBranchAddress("bdthwwnoip", &bdthwwnoip, &b_bdthwwnoip);
-   fChain->SetBranchAddress("bdthzz", &bdthzz, &b_bdthzz);
-   fChain->SetBranchAddress("bdthzznoip", &bdthzznoip, &b_bdthzznoip);
-   fChain->SetBranchAddress("bdthzzmc", &bdthzzmc, &b_bdthzzmc);
+   fChain->SetBranchAddress("bdthww", bdthww, &b_bdthww);
+   fChain->SetBranchAddress("newbdthww", newbdthww, &b_newbdthww);
+   fChain->SetBranchAddress("bdthzz", bdthzz, &b_bdthzz);
    fChain->SetBranchAddress("lh", &lh, &b_lh);
    fChain->SetBranchAddress("pfmva", &pfmva, &b_pfmva);
    fChain->SetBranchAddress("vertices", &vertices, &b_vertices);

@@ -3,6 +3,7 @@
 #include <iostream>
 #include "TFile.h"
 #include "TTree.h"
+#include "TString.h"
 
 using namespace std;
 
@@ -16,11 +17,26 @@ int main(int argc, char* argv[]) {
   }
   strcpy(outname,argv[1]);
 
-  TFile *file = TFile::Open("../results_data_fakes/merged.root");
+  cout << "run the FR for triggering electrons..." << endl;
+  TFile *file = TFile::Open("../results_data/fakes.root");
   TTree *tree = (TTree*)file->Get("eleIDdir/T1");
-
   estimateFakeRate analyzer(tree);
-  analyzer.Loop(outname);
+  analyzer.addIsoFriend("../results_data/fakes_hzzisoFriend.root");
+  TString outfileBias(outname);
+  outfileBias += TString("_trigger");
+  analyzer.Loop(outfileBias);
+  cout << "DONE triggering electrons." << endl;
+  file->Close();
+
+  cout << "run the FR for non triggering electrons..." << endl;
+  TFile *file2 = TFile::Open("../results_data/fakes-zeeOneFake.root");
+  TTree *tree2 = (TTree*)file2->Get("eleIDdir/T1");
+  estimateFakeRate analyzer2(tree2);
+  analyzer2.addIsoFriend("../results_data/fakes-zeeOneFake_hzzisoFriend.root");
+  TString outfileUnbias(outname);
+  outfileUnbias += TString("_zee1fake");
+  analyzer2.Loop(outfileUnbias);
+  cout << "DONE unbiased electrons." << endl;
 
   return 0;
 }

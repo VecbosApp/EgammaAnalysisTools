@@ -17,11 +17,12 @@ if(options.recompile):
     print 'done complining.'
 
 os.system('./fakerate fr')
-os.system('hadd -f fakerates.root fr-EleMisid*')
+os.system('hadd -f fakerates_trigger.root fr_trigger-EleMisid*')
+os.system('hadd -f fakerates_zee1fake.root fr_zee1fake-EleMisid*')
 
 from ROOT import gROOT
 gROOT.LoadMacro('drawFR.cc+')
-from ROOT import drawIds
-drawIds()
+from ROOT import drawIdsBiased
+drawIdsBiased()
 
 
