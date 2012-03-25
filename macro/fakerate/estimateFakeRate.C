@@ -520,9 +520,8 @@ void estimateFakeRate::Loop(const char *outname)
       }
     }
 
-    // === HWW 2012 WP70x80 BDT ===
-    if((etFake<20 && aSel.output(etFake,etaFake,newbdthww[3],combPFIsoHZZ/etFake,HZZEleIDSelector::kWP70,HZZEleIDSelector::kMVABiased)) ||
-       (etFake>=20 && aSel.output(etFake,etaFake,newbdthww[3],combPFIsoHZZ/etFake,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVABiased))) {
+    // === HWW 2012 ~WP70x80 BDT ===
+    if(passID(kBDTHWW2012_noIP) && passID(kIsoEACorr)) {
       BdtHWWEta[knewWP70x80]->Fill(etaFake);
       BdtHWWPt[knewWP70x80] ->Fill(etFake);
       BdtHWWPU[knewWP70x80] ->Fill(vertices);
@@ -907,6 +906,38 @@ bool estimateFakeRate::passID(estimateFakeRate::idType type) {
     else return (combPFIsoHWW/pt < 0.09);
   }
 
+  // THIS GIVES THE SAME FR AS 2011
+  // if(type == kIsoEACorr) {
+  //   float combIso=chaPFIso+neuPFIso+phoPFIso;
+
+  //   if(fabs(eta) <  1.0) combIso -= 0.18 * rho;
+  //   if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) combIso -= 0.19 * rho;
+  //   if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) combIso -= 0.21 * rho;
+  //   if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) combIso -= 0.38 * rho;
+  //   if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) combIso -= 0.61 * rho;
+  //   if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) combIso -= 0.73 * rho;
+  //   if(fabs(eta) >=  2.4) combIso -= 0.78 * rho;
+
+  //   if(pt>20) {
+  //     if(fabs(eta) <  1.0) return (combIso/pt < 0.22); 
+  //     if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) return (combIso/pt < 0.21);
+  //     if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) return (combIso/pt < 0.12);
+  //     if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) return (combIso/pt < 0.11);
+  //     if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) return (combIso/pt < 0.074);
+  //     if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < 0.053);
+  //     if(fabs(eta) >=  2.4) return (combIso/pt < 0.010);
+  //   } else {
+  //     if(fabs(eta) <  1.0) return (combIso/pt < 0.20); 
+  //     if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) return (combIso/pt < 0.24);
+  //     if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) return (combIso/pt < 0.13);
+  //     if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) return (combIso/pt < 0.083);
+  //     if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) return(combIso/pt < -0.01);
+  //     if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < -0.027);
+  //     if(fabs(eta) >=  2.4) return (combIso/pt < -0.035);
+  //   }
+  // }
+
+  // THIS GIVES THE SAME EFFICIENCY AS 2011
   if(type == kIsoEACorr) {
     float combIso=chaPFIso+neuPFIso+phoPFIso;
 
@@ -919,21 +950,21 @@ bool estimateFakeRate::passID(estimateFakeRate::idType type) {
     if(fabs(eta) >=  2.4) combIso -= 0.78 * rho;
 
     if(pt>20) {
-      if(fabs(eta) <  1.0) return (combIso/pt < 0.22); 
-      if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) return (combIso/pt < 0.21);
-      if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) return (combIso/pt < 0.12);
-      if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) return (combIso/pt < 0.11);
-      if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) return (combIso/pt < 0.074);
-      if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < 0.053);
-      if(fabs(eta) >=  2.4) return (combIso/pt < 0.010);
+      if(fabs(eta) <  1.0) return (combIso/pt < 0.14); 
+      if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) return (combIso/pt < 0.15);
+      if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) return (combIso/pt < 0.09);
+      if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) return (combIso/pt < 0.058);
+      if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) return (combIso/pt < 0.016);
+      if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < 0.0071);
+      if(fabs(eta) >=  2.4) return (combIso/pt < -0.01);
     } else {
-      if(fabs(eta) <  1.0) return (combIso/pt < 0.20); 
-      if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) return (combIso/pt < 0.24);
-      if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) return (combIso/pt < 0.13);
-      if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) return (combIso/pt < 0.083);
-      if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) return(combIso/pt < -0.01);
-      if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < -0.027);
-      if(fabs(eta) >=  2.4) return (combIso/pt < -0.035);
+      if(fabs(eta) <  1.0) return (combIso/pt < 0.13); 
+      if(fabs(eta) >=  1.0 && fabs(eta) < 1.479) return (combIso/pt < 0.14);
+      if(fabs(eta) >=  1.479 && fabs(eta) < 2.0) return (combIso/pt < 0.079);
+      if(fabs(eta) >=  2.0 && fabs(eta) < 2.2) return (combIso/pt < 0.028);
+      if(fabs(eta) >=  2.2 && fabs(eta) < 2.3) return(combIso/pt < -0.031);
+      if(fabs(eta) >=  2.3 && fabs(eta) < 2.4) return (combIso/pt < -0.059);
+      if(fabs(eta) >=  2.4) return (combIso/pt < -0.069);
     }
   }
 
@@ -960,6 +991,16 @@ bool estimateFakeRate::passID(estimateFakeRate::idType type) {
     if(pt >= 20 && fabs(eta) < 1.0) return (bdthww[1] > 0.947);
     if(pt >= 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (bdthww[1] > 0.950);
     if(pt >= 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (bdthww[1] > 0.884);
+  }
+
+  if(type == kBDTHWW2012_noIP) {
+    // same EFFICIENCY as 2011
+    if(pt < 20 && fabs(eta) < 1.0) return (newbdthww[3] > -0.578);
+    if(pt < 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (newbdthww[3] > -0.146);
+    if(pt < 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (newbdthww[3] > -0.182);
+    if(pt >= 20 && fabs(eta) < 1.0) return (newbdthww[3] > 0.806);
+    if(pt >= 20 && fabs(eta) >= 1.0 && fabs(eta) < 1.479) return (newbdthww[3] > 0.890);
+    if(pt >= 20 && fabs(eta) >= 1.479 && fabs(eta) < 2.500) return (newbdthww[3] > 0.814);
   }
 
   return false;

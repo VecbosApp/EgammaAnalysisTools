@@ -42,7 +42,7 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
   for(int i=0;i<(int)histos.size();++i) {
     
     histos[i]->SetMinimum(0);
-    histos[i]->SetMaximum(1.0);
+    histos[i]->SetMaximum(0.3);
     histos[i]->SetMarkerSize(2);
     histos[i]->SetMarkerStyle(20);
     histos[i]->SetMarkerColor(colors[i]);
@@ -221,7 +221,7 @@ void drawIdsBiased() {
   etaSet2.push_back(BdtHWWnewWP70x80EtaHighPt);
   etaSet2.push_back(BdtHWWnewWP70x80EtaLowPt);
   
-  drawOneToOne(etaSet1,etaSet2,"H #rightarrow WW 2011","H #rightarrow ZZ 2012(opt)","#eta");
+  drawOneToOne(etaSet1,etaSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-eff)","#eta");
 
   // pt
   TH1F *BdtHWWWP80PtBarrel1 = (TH1F*)file->Get("BdtHWWWP80PtBarrel1_Eff");
@@ -244,7 +244,7 @@ void drawIdsBiased() {
   ptSet2.push_back(BdtHWWnewWP70x80PtEndcap1);
   ptSet2.push_back(BdtHWWnewWP70x80PtEndcap2);
 
-  drawOneToOne(ptSet1,ptSet2,"H #rightarrow WW 2011","H #rightarrow ZZ 2012(opt)","p_{T} [GeV]");
+  drawOneToOne(ptSet1,ptSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-eff)","p_{T} [GeV]");
 
   // PU
   TH1F *BdtHWWWP80PUBarrel1 = (TH1F*)file->Get("BdtHWWWP80PUBarrel1_Eff");
@@ -267,7 +267,7 @@ void drawIdsBiased() {
   puSet2.push_back(BdtHWWnewWP70x80PUEndcap1);
   puSet2.push_back(BdtHWWnewWP70x80PUEndcap2);
 
-  drawOneToOne(puSet1,puSet2,"H #rightarrow WW 2011","H #rightarrow ZZ 2012","# vertices");
+  drawOneToOne(puSet1,puSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-eff)","# vertices");
 
 
 }

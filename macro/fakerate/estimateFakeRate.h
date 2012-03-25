@@ -25,7 +25,8 @@ public :
     kIsoEACorr, // EA corrected isolation HZZ with WP equal to kIsoHWW2011
     kIso, // HZZ with WP equal to kIsoHWW2011
     kBDTHWW2011_withIP, // HWW cuts 2011
-    kBDTHWW2011_noIP // HWW BDT w/o IP (not optimized cuts)
+    kBDTHWW2011_noIP, // HWW BDT w/o IP (not optimized cuts)
+    kBDTHWW2012_noIP // HWW BDT w/o IP (same FR as BDT 2011)
   };
 
   enum wphww {
