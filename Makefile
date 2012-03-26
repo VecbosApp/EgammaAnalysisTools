@@ -82,6 +82,8 @@ $(OUTLIB)CutBasedEleIDSelector.o: $(INCLUDEDIR)/src/CutBasedEleIDSelector.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CutBasedEleIDSelector.o $<
 $(OUTLIB)CiCBasedEleSelector.o: $(INCLUDEDIR)/src/CiCBasedEleSelector.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CiCBasedEleSelector.o $<
+$(OUTLIB)eIDCiChzzSelector.o: $(INCLUDEDIR)/src/eIDCiChzzSelector.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)eIDCiChzzSelector.o $<
 $(OUTLIB)EcalCleaner.o: $(INCLUDEDIR)/src/EcalCleaner.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)EcalCleaner.o $<
 $(OUTLIBCOMMON)EfficiencyEvaluator.o: $(INCLUDEDIRCOMMON)/CommonTools/src/EfficiencyEvaluator.cc
@@ -152,6 +154,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIBCOMMON)Conditions.o \
 	$(OUTLIBCOMMON)Selection.o \
 	$(OUTLIB)CiCBasedEleSelector.o \
+	$(OUTLIB)eIDCiChzzSelector.o \
 	$(OUTLIB)CutBasedEleIDSelector.o \
 	$(OUTLIB)EcalCleaner.o \
 	$(OUTLIBCOMMON)EfficiencyEvaluator.o \
