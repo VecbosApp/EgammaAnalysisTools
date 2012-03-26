@@ -32,6 +32,8 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
   gStyle->SetOptFit(0);
 
   TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
+  c1->SetGridx();
+  c1->SetGridy();  
   TLegend* legend = new TLegend(0.20, 0.70, 0.43, 0.86);
   legend->SetBorderSize(   0);
   legend->SetFillColor (   0);
@@ -42,7 +44,7 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
   for(int i=0;i<(int)histos.size();++i) {
     
     histos[i]->SetMinimum(0);
-    histos[i]->SetMaximum(0.3);
+    histos[i]->SetMaximum(0.4);
     histos[i]->SetMarkerSize(2);
     histos[i]->SetMarkerStyle(20);
     histos[i]->SetMarkerColor(colors[i]);
@@ -268,6 +270,59 @@ void drawIdsBiased() {
   puSet2.push_back(BdtHWWnewWP70x80PUEndcap2);
 
   drawOneToOne(puSet1,puSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-eff)","# vertices");
+
+
+}
+
+
+void drawIdsUnbiased() {
+
+  TFile *file = TFile::Open("fakerates_zee1fake.root");
+
+  // eta
+  TH1F *BdtHZZWP80EtaHighPt = (TH1F*)file->Get("BdtHZZWP80EtaHighPt_Eff");
+  TH1F *BdtHZZWP80EtaLowPt = (TH1F*)file->Get("BdtHZZWP80EtaLowPt_Eff");
+  // ---> HZZ id + EA corrected isolation
+  TH1F *BdtHZZWP80chEtaHighPt = (TH1F*)file->Get("BdtHZZWP80chEtaHighPt_Eff");
+  TH1F *BdtHZZWP80chEtaLowPt = (TH1F*)file->Get("BdtHZZWP80chEtaLowPt_Eff");
+
+  vector<TH1F*> etaSet1, etaSet2;
+  etaSet1.push_back(BdtHZZWP80EtaHighPt);
+  etaSet1.push_back(BdtHZZWP80EtaLowPt);
+  etaSet2.push_back(BdtHZZWP80chEtaHighPt);
+  etaSet2.push_back(BdtHZZWP80chEtaLowPt);
+  
+  drawOneToOne(etaSet1,etaSet2,"non-trigger WP80 full iso","non-trigger WP80 ch.iso","#eta");
+
+  // pt
+  TH1F *BdtHZZWP80PtBarrel = (TH1F*)file->Get("BdtHZZWP80PtBarrel_Eff");
+  TH1F *BdtHZZWP80PtEndcap = (TH1F*)file->Get("BdtHZZWP80PtEndcap_Eff");
+  // ---> HZZ id + EA corrected isolation
+  TH1F *BdtHZZWP80chPtBarrel = (TH1F*)file->Get("BdtHZZWP80chPtBarrel_Eff");
+  TH1F *BdtHZZWP80chPtEndcap = (TH1F*)file->Get("BdtHZZWP80chPtEndcap_Eff");
+
+  vector<TH1F*> ptSet1, ptSet2;
+  ptSet1.push_back(BdtHZZWP80PtBarrel);
+  ptSet1.push_back(BdtHZZWP80PtEndcap);
+  ptSet2.push_back(BdtHZZWP80chPtBarrel);
+  ptSet2.push_back(BdtHZZWP80chPtEndcap);
+
+  drawOneToOne(ptSet1,ptSet2,"non-trigger WP80 full iso","non-trigger WP80 ch.iso","p_{T} [GeV]");
+
+  // PU
+  TH1F *BdtHZZWP80PUBarrel = (TH1F*)file->Get("BdtHZZWP80PUBarrel_Eff");
+  TH1F *BdtHZZWP80PUEndcap = (TH1F*)file->Get("BdtHZZWP80PUEndcap_Eff");
+  // ---> HZZ id + EA corrected isolation
+  TH1F *BdtHZZWP80chPUBarrel = (TH1F*)file->Get("BdtHZZWP80chPUBarrel_Eff");
+  TH1F *BdtHZZWP80chPUEndcap = (TH1F*)file->Get("BdtHZZWP80chPUEndcap_Eff");
+
+  vector<TH1F*> puSet1, puSet2;
+  puSet1.push_back(BdtHZZWP80PUBarrel);
+  puSet1.push_back(BdtHZZWP80PUEndcap);
+  puSet2.push_back(BdtHZZWP80chPUBarrel);
+  puSet2.push_back(BdtHZZWP80chPUEndcap);
+
+  drawOneToOne(puSet1,puSet2,"non-trigger WP80 full iso","non-trigger WP80 ch.iso","# vertices");
 
 
 }
