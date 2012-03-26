@@ -30,7 +30,7 @@ public:
   //! needed for HZZ BDT
   void fillVariables(float eleEoPout, float EoPout, float EoP, float HoE, float Deta, float Dphi, float s9s25, float s1s9, float See, float Spp, float fbrem, 
                      int nbrems, int nHits, float dcot, float dist, float pt, float eta, int charge, float phiwidth, float etawidth,
-                     float IoEmIoP, float eledeta, float d0, float ip3d, float ip3ds, int kfhits, float kfchi2, float e1x5e5x5, int ecaldriven, int matchConv);
+                     float IoEmIoP, float eledeta, float d0, float ip3d, float ip3ds, int kfhits, int kfhitsall, float kfchi2, float e1x5e5x5, int ecaldriven, int matchConv);
   //! additional needed for HWW BDT
   void fillVariables2(float detacalo, float dphicalo, float sep, float dz, float gsfchi2, float emaxovere, float etopovere, float ebottomovere, float eleftovere, float erightovere,
                       float e2ndovere, float e2x5rightovere, float e2x5leftovere, float e2x5topevere, float e2x5bottomovere, 
@@ -46,7 +46,7 @@ public:
   void fillCutBasedIDBits(int CutBasedId[6], int CutBasedIdOnlyID[6], int CutBasedIdOnlyIso[6], int CutBasedIdOnlyConv[6]);
   void fillLHBasedIDBits(int LHBasedId[5], int LHBasedIdOnlyID[5], int LHBasedIdOnlyIso[5], int LHBasedIdOnlyConv[5]);
   void fillLHBasedPFIsoIDBits(int LHBasedPFIsoId[5], int LHBasedPFIsoIdOnlyID[5], int LHBasedPFIsoIdOnlyIso[5], int LHBasedPFIsoIdOnlyConv[5]);
-  void fillCiCBasedIDBits(int CiCBasedId[9], int CiCBasedIdOnlyID[9], int CiCBasedIdOnlyIso[9], int CiCBasedIdOnlyConv[9]);
+  void fillCiCBasedIDBits(int cic[5]);
   void fillFakeRateDenomBits(int isDenom, int isDenomSmurf);
   void fillBDTBasedIDBits(int isBDTOnlyId);
 
@@ -70,7 +70,7 @@ private:
 
   float myEleEoPout, myEoPout, myEoP,myHoE,myDeta,myDphi,mys9s25,mys1s9,mySee,mySpp,myFbrem, myPhiWidth, myEtaWidth;
   float myIoEoIoP, myEleDeta, myD0, myIP3d, myIP3dSig, myKFChi2, myE1x5E5x5;
-  int myNbrems, myKFHits, myEcalDriven, myMissHits, myMatchConv;
+  int myNbrems, myKFHits, myKFHitsAll, myEcalDriven, myMissHits, myMatchConv;
   float myDetaCalo, myDphiCalo, mySep, myDZ, myGSFChi2;
   float mySeedEMaxOverE,mySeedETopOverE,mySeedEBottomOverE,mySeedELeftOverE,mySeedERightOverE,mySeedE2ndOverE,mySeedE2x5RightOverE,mySeedE2x5LeftOverE,mySeedE2x5TopOverE,mySeedE2x5BottomOverE;
   float mySeedE2x5MaxOverE,mySeedE1x5OverE,mySeedE2x2OverE,mySeedE3x3OverE,mySeedE5x5OverE,myR9;
@@ -87,8 +87,8 @@ private:
   int myCutBasedId[6], myCutBasedIdOnlyID[6], myCutBasedIdOnlyIso[6], myCutBasedIdOnlyConv[6];
   int myLHBasedId[5], myLHBasedIdOnlyID[5], myLHBasedIdOnlyIso[5], myLHBasedIdOnlyConv[5];
   int myLHBasedPFIsoId[5], myLHBasedPFIsoIdOnlyID[5], myLHBasedPFIsoIdOnlyIso[5], myLHBasedPFIsoIdOnlyConv[5];
-  int myCiCBasedId[9], myCiCBasedIdOnlyID[9], myCiCBasedIdOnlyIso[9], myCiCBasedIdOnlyConv[9];
   int myDenomFake, myDenomFakeSmurf;
+  int myCiC[5];
   int myBDTIdOnlyId;
 
   float myQCDDeltaphi;
