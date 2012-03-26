@@ -10,6 +10,7 @@
 #include "CommonTools/include/LeptonIdBits.h"
 #include "EgammaAnalysisTools/include/FakeElectronSelector.hh"
 #include "CommonTools/include/Counters.hh"
+#include "EgammaAnalysisTools/include/eIDCiChzzSelector.hh"
 
 using namespace bits;
 using namespace std;
@@ -371,8 +372,8 @@ void FakeElectronSelector::Loop(const char *outname) {
     // does this denominator pass the IP cut as for H->WW ?  
 
     // some eleID variables
-    float HoE, s1s9, s9s25, phiwidth, etawidth, deta, dphi, fbrem, see, spp, eleopout, eopout, eop, nbrems, recoFlag, EleSCEta;
-    float oneoveremoneoverp, eledeta, d0, ip3d, ip3ds, kfhits, kfchi2, e1x5e5x5, dcot, dist;
+    float HoE, s1s9, s9s25, phiwidth, etawidth, deta, dphi, fbrem, see, spp, eleopout, eopout, eop, eseedopin, nbrems, recoFlag, EleSCEta;
+    float oneoveremoneoverp, eledeta, d0, ip3d, ip3ds, kfhits, kfhitsall, kfchi2, e1x5e5x5, dcot, dist;
     float detacalo, dphicalo, sep, dz, gsfchi2, emaxovere, etopovere, ebottomovere, eleftovere, erightovere,
       e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
       e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,
@@ -398,6 +399,7 @@ void FakeElectronSelector::Loop(const char *outname) {
     ip3ds = ip3d/impactPar3DErrorGsfTrack[gsfTrack];
     kfchi2 = (kfTrack>-1) ? trackNormalizedChi2Track[kfTrack] : 0.0;
     kfhits = (kfTrack>-1) ? trackerLayersWithMeasurementTrack[kfTrack] : -1.0;
+    kfhitsall = (kfTrack>-1) ? trackValidHitsTrack[kfTrack] : -1.0;
     gsfchi2 = trackNormalizedChi2GsfTrack[gsfTrack];
     int misshits = expInnerLayersGsfTrack[gsfTrack];
     dcot = convDistEle[theDenom1];
@@ -418,7 +420,7 @@ void FakeElectronSelector::Loop(const char *outname) {
     if(ecaldriven) {
       ecalseed = 1;
       int sc = superClusterIndexEle[theDenom1];
-      float seedEnergy = seedEnergySC[sc];
+      float seedEnergy = seedClusterEnergySC[sc];
       s1s9 = eMaxSC[sc]/eMaxSC[sc];
       s9s25 = e3x3SC[sc]/e5x5SC[sc];
       e1x5e5x5 = (e5x5SC[sc] - e1x5SC[sc])/e5x5SC[sc];
@@ -428,6 +430,7 @@ void FakeElectronSelector::Loop(const char *outname) {
       sep = covIEtaIPhiSC[sc]/(sqrt(covIEtaIEtaSC[sc])*sqrt(covIPhiIPhiSC[sc]));
       spp = sqrt(covIPhiIPhiSC[sc]);
       oneoveremoneoverp = 1./energySC[sc]  - 1./tv3Denom1.Mag();
+      eseedopin = seedEnergy/tv3Denom1.Mag();
       emaxovere = eMaxSC[sc]/seedEnergy;
       etopovere = eTopSC[sc]/seedEnergy;
       ebottomovere = eBottomSC[sc]/seedEnergy;
@@ -454,7 +457,7 @@ void FakeElectronSelector::Loop(const char *outname) {
       ecalseed = 0;
       int sc = PFsuperClusterIndexEle[theDenom1];
       if(sc>-1) {
-        float seedEnergy = seedEnergyPFSC[sc];
+	float seedEnergy = seedEnergyPFSC[sc];
         s9s25 = e3x3PFSC[sc]/e5x5PFSC[sc];
         s1s9 = eMaxPFSC[sc]/eMaxPFSC[sc];
         e1x5e5x5 = (e5x5PFSC[sc] - e1x5PFSC[sc])/e5x5PFSC[sc];
@@ -464,6 +467,7 @@ void FakeElectronSelector::Loop(const char *outname) {
         sep = covIEtaIPhiPFSC[sc]/(sqrt(covIEtaIEtaPFSC[sc])*sqrt(covIPhiIPhiPFSC[sc]));
         spp = sqrt(covIPhiIPhiPFSC[sc]);
         oneoveremoneoverp = 1./energyPFSC[sc]  - 1./tv3Denom1.Mag();
+	eseedopin = seedEnergy/tv3Denom1.Mag();
         emaxovere = eMaxPFSC[sc]/seedEnergy;
         etopovere = eTopPFSC[sc]/seedEnergy;
         ebottomovere = eBottomPFSC[sc]/seedEnergy;
@@ -493,6 +497,18 @@ void FakeElectronSelector::Loop(const char *outname) {
       }
     }
 
+    float pt = tlvDenom1.Pt();
+    float eta = tlvDenom1.Eta();
+    int charge = chargeEle[theDenom1];
+
+    // CiC...
+    eIDCiChzzSelector cicsel;
+    int cic[5];
+    for(int i=0; i<5; i++) cic[i] = cicsel.ElectronId_V03(pt,EleSCEta,see,eop,eseedopin,fbrem,
+							  dr03TkSumPtEle[theDenom1],dr03EcalRecHitSumEtEle[theDenom1],dr03HcalTowerSumEtEle[theDenom1],d0,
+							  misshits,deta,dphi,HoE,dcot,
+							  dist,!ecalseed,i,false);
+
     // some MVAs...
     float pfmva = pflowMVAEle[theDenom1];
     float lh=likelihoodRatio(theDenom1,*LH);
@@ -511,12 +527,9 @@ void FakeElectronSelector::Loop(const char *outname) {
     newhwwbdts[3] = eleBDT(fMVAHWWSiDanV0,theDenom1);
 
     // fill the reduced tree
-    float pt = tlvDenom1.Pt();
-    float eta = tlvDenom1.Eta();
-    int charge = chargeEle[theDenom1];
     myOutIDTree->fillVariables(eleopout,eopout,eop,HoE,deta,dphi,s9s25,s1s9,see,spp,fbrem,
-                              nbrems,misshits,dcot,dist,pt,eta,charge,phiwidth,etawidth,
-                              oneoveremoneoverp,eledeta,d0,ip3d,ip3ds,kfhits,kfchi2,e1x5e5x5,ecalseed,matchConv);
+			       nbrems,misshits,dcot,dist,pt,eta,charge,phiwidth,etawidth,
+			       oneoveremoneoverp,eledeta,d0,ip3d,ip3ds,kfhits,kfhitsall,kfchi2,e1x5e5x5,ecalseed,matchConv);
     myOutIDTree->fillVariables2(detacalo, dphicalo, sep, dz, gsfchi2, emaxovere, etopovere, ebottomovere, eleftovere, erightovere,
                                e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
                                e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,
@@ -529,6 +542,7 @@ void FakeElectronSelector::Loop(const char *outname) {
     myOutIDTree->fillFakeRateDenomBits(isDenomFake_HwwEgamma(theDenom1),isDenomFake_smurfs(theDenom1));
     myOutIDTree->fillMore(nPV,rhoFastjet,hwwbdts,newhwwbdts,hzzbdts,pfmva,lh);
     myOutIDTree->fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
+    myOutIDTree->fillCiCBasedIDBits(cic);
     myOutIDTree->fillRunInfos(runNumber, lumiBlock, eventNumber, nPU, -1);
     myOutIDTree->store();
     

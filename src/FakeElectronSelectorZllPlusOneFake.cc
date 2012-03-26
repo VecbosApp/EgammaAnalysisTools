@@ -11,6 +11,7 @@
 #include "EgammaAnalysisTools/include/FakeElectronSelectorZllPlusOneFake.hh"
 #include "CommonTools/include/Counters.hh"
 #include "EgammaAnalysisTools/include/SimpleCutsIDSelector.hh"
+#include "EgammaAnalysisTools/include/eIDCiChzzSelector.hh"
 
 using namespace bits;
 using namespace std;
@@ -353,8 +354,8 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
     float etFake  = probeP4.Pt();
 
     // some eleID variables
-    float HoE, s1s9, s9s25, phiwidth, etawidth, deta, dphi, fbrem, see, spp, eleopout, eopout, eop, nbrems, recoFlag, EleSCEta;
-    float oneoveremoneoverp, eledeta, d0, ip3d, ip3ds, kfhits, kfchi2, e1x5e5x5, dcot, dist;
+    float HoE, s1s9, s9s25, phiwidth, etawidth, deta, dphi, fbrem, see, spp, eleopout, eopout, eop, eseedopin, nbrems, recoFlag, EleSCEta;
+    float oneoveremoneoverp, eledeta, d0, ip3d, ip3ds, kfhits, kfhitsall, kfchi2, e1x5e5x5, dcot, dist;
     float detacalo, dphicalo, sep, dz, gsfchi2, emaxovere, etopovere, ebottomovere, eleftovere, erightovere,
       e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
       e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,
@@ -381,6 +382,7 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
     ip3ds = ip3d/impactPar3DErrorGsfTrack[gsfTrack];
     kfchi2 = (kfTrack>-1) ? trackNormalizedChi2Track[kfTrack] : 0.0;
     kfhits = (kfTrack>-1) ? trackerLayersWithMeasurementTrack[kfTrack] : -1.0;
+    kfhitsall = (kfTrack>-1) ? trackValidHitsTrack[kfTrack] : -1.0;
     gsfchi2 = trackNormalizedChi2GsfTrack[gsfTrack];
     int misshits = expInnerLayersGsfTrack[gsfTrack];
     dcot = convDistEle[probe];
@@ -401,7 +403,7 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
     if(ecaldriven) {
       ecalseed = 1;
       int sc = superClusterIndexEle[probe];
-      float seedEnergy = seedEnergySC[sc];
+      float seedEnergy = seedClusterEnergySC[sc];
       s1s9 = eMaxSC[sc]/eMaxSC[sc];
       s9s25 = e3x3SC[sc]/e5x5SC[sc];
       e1x5e5x5 = (e5x5SC[sc] - e1x5SC[sc])/e5x5SC[sc];
@@ -411,6 +413,7 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
       sep = covIEtaIPhiSC[sc]/(sqrt(covIEtaIEtaSC[sc])*sqrt(covIPhiIPhiSC[sc]));
       spp = sqrt(covIPhiIPhiSC[sc]);
       oneoveremoneoverp = 1./energySC[sc]  - 1./probeP4.Vect().Mag();
+      eseedopin = seedEnergy/probeP4.Vect().Mag();
       emaxovere = eMaxSC[sc]/seedEnergy;
       etopovere = eTopSC[sc]/seedEnergy;
       ebottomovere = eBottomSC[sc]/seedEnergy;
@@ -437,7 +440,7 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
       ecalseed = 0;
       int sc = PFsuperClusterIndexEle[probe];
       if(sc>-1) {
-        float seedEnergy = seedEnergyPFSC[sc];
+	float seedEnergy = seedClusterEnergyPFSC[sc];
         s9s25 = e3x3PFSC[sc]/e5x5PFSC[sc];
         s1s9 = eMaxPFSC[sc]/eMaxPFSC[sc];
         e1x5e5x5 = (e5x5PFSC[sc] - e1x5PFSC[sc])/e5x5PFSC[sc];
@@ -447,6 +450,7 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
         sep = covIEtaIPhiPFSC[sc]/(sqrt(covIEtaIEtaPFSC[sc])*sqrt(covIPhiIPhiPFSC[sc]));
         spp = sqrt(covIPhiIPhiPFSC[sc]);
         oneoveremoneoverp = 1./energyPFSC[sc]  - 1./probeP4.Vect().Mag();
+	eseedopin = seedEnergy/probeP4.Vect().Mag();
         emaxovere = eMaxPFSC[sc]/seedEnergy;
         etopovere = eTopPFSC[sc]/seedEnergy;
         ebottomovere = eBottomPFSC[sc]/seedEnergy;
@@ -476,6 +480,18 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
       }
     }
 
+    float pt = probeP4.Pt();
+    float eta = probeP4.Eta();
+    int charge = chargeEle[probe];
+
+    // CiC...
+    eIDCiChzzSelector cicsel;
+    int cic[5];
+    for(int i=0; i<5; i++) cic[i] = cicsel.ElectronId_V03(pt,EleSCEta,see,eop,eseedopin,fbrem,
+							  dr03TkSumPtEle[probe],dr03EcalRecHitSumEtEle[probe],dr03HcalTowerSumEtEle[probe],d0,
+							  misshits,deta,dphi,HoE,dcot,
+							  dist,!ecalseed,i,false);
+
     // some MVAs...
     float pfmva = pflowMVAEle[probe];
     float lh=likelihoodRatio(probe,*LH);
@@ -494,12 +510,9 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
     newhwwbdts[3] = eleBDT(fMVAHWWSiDanV0,probe);
 
     // fill the reduced tree
-    float pt = probeP4.Pt();
-    float eta = probeP4.Eta();
-    int charge = chargeEle[probe];
     myOutIDTree->fillVariables(eleopout,eopout,eop,HoE,deta,dphi,s9s25,s1s9,see,spp,fbrem,
-                              nbrems,misshits,dcot,dist,pt,eta,charge,phiwidth,etawidth,
-                              oneoveremoneoverp,eledeta,d0,ip3d,ip3ds,kfhits,kfchi2,e1x5e5x5,ecalseed,matchConv);
+			       nbrems,misshits,dcot,dist,pt,eta,charge,phiwidth,etawidth,
+			       oneoveremoneoverp,eledeta,d0,ip3d,ip3ds,kfhits,kfhitsall,kfchi2,e1x5e5x5,ecalseed,matchConv);
     myOutIDTree->fillVariables2(detacalo, dphicalo, sep, dz, gsfchi2, emaxovere, etopovere, ebottomovere, eleftovere, erightovere,
                                e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
                                e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,

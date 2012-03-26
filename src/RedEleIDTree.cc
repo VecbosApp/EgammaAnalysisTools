@@ -32,6 +32,7 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myTree->Branch("ip3d",            &myIP3d,            "ip3d/F");
   myTree->Branch("ip3ds",           &myIP3dSig,         "ip3ds/F");
   myTree->Branch("kfhits",          &myKFHits,          "kfhits/I");
+  myTree->Branch("kfhitsall",       &myKFHitsAll,       "kfhitsall/I");
   myTree->Branch("kfchi2",          &myKFChi2,          "kfchi2/F");
   myTree->Branch("gsfchi2",         &myGSFChi2,         "gsfchi2/F");
   myTree->Branch("e1x5e5x5",        &myE1x5E5x5,        "e1x5e5x5/F");
@@ -84,6 +85,8 @@ void RedEleIDTree::addElectronIdBits() {
   myTree->Branch("CutBasedIdOlyID",    myCutBasedIdOnlyID,   "CutBasedIdOnlyID[6]/I");
   myTree->Branch("CutBasedIdOnlyIso",  myCutBasedIdOnlyIso,  "CutBasedIdOnlyIso[6]/I");
   myTree->Branch("CutBasedIdOnlyConv", myCutBasedIdOnlyConv, "CutBasedIdOnlyConv[6]/I");
+
+  myTree->Branch("cic", myCiC, "cic[5]/I");
 
   myTree->Branch("LHVeryLoose",  &myLHBasedId[0],            "LHVeryLoose/I");
   myTree->Branch("LHLoose",      &myLHBasedId[1],            "LHLoose/I");
@@ -202,7 +205,7 @@ void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float DEta,
 
 void RedEleIDTree::fillVariables(float eleEoPout, float EoPout, float EoP, float HoE, float Deta, float Dphi, float s9s25, float s1s9, float See, float Spp, float fbrem, 
                                  int nbrems, int nHits, float dcot, float dist, float pt, float eta, int charge, float phiwidth, float etawidth,
-                                 float IoEmIoP, float eledeta, float d0, float ip3d, float ip3ds, int kfhits, float kfchi2, float e1x5e5x5, int ecaldriven, int matchConv) {
+                                 float IoEmIoP, float eledeta, float d0, float ip3d, float ip3ds, int kfhits, int kfhitsall, float kfchi2, float e1x5e5x5, int ecaldriven, int matchConv) {
   myEleEoPout=eleEoPout;
   myEoPout=EoPout;
   myEoP=EoP;
@@ -229,6 +232,7 @@ void RedEleIDTree::fillVariables(float eleEoPout, float EoPout, float EoP, float
   myIP3d=ip3d;
   myIP3dSig=ip3ds;
   myKFHits=kfhits;
+  myKFHitsAll=kfhitsall;
   myKFChi2=kfchi2;
   myE1x5E5x5=e1x5e5x5;
   myEcalDriven=ecaldriven;
@@ -352,13 +356,8 @@ void RedEleIDTree::fillLHBasedPFIsoIDBits(int LHBasedPFIsoId[5], int LHBasedPFIs
   }
 }
 
-void RedEleIDTree::fillCiCBasedIDBits(int CiCBasedId[9], int CiCBasedIdOnlyID[9], int CiCBasedIdOnlyIso[9], int CiCBasedIdOnlyConv[9]) {
-  for(int i=0; i<9; i++) {
-    myCiCBasedId[i] = CiCBasedId[i];
-    myCiCBasedIdOnlyID[i] = CiCBasedIdOnlyID[i];
-    myCiCBasedIdOnlyIso[i] = CiCBasedIdOnlyIso[i];
-    myCiCBasedIdOnlyConv[i] = CiCBasedIdOnlyConv[i];
-  }
+void RedEleIDTree::fillCiCBasedIDBits(int cic[5]) {
+  for(int i=0;i<5;i++) myCiC[i]=cic[i];
 }
 
 void RedEleIDTree::fillFakeRateDenomBits(int isDenom, int isDenomSmurf) {

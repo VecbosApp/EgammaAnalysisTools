@@ -63,18 +63,18 @@ void make3IdCurves(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBk
   treeBkg->Project("bdthww_bkg","bdthww[0]",cutBkg);
   treeSig->Project("bdthzz_sig","bdthzz[3]",cutSig);
   treeBkg->Project("bdthzz_bkg","bdthzz[3]",cutBkg);
-  treeSig->Project("bdthzznoip_sig","bdthzz[2]",cutSig);
-  treeBkg->Project("bdthzznoip_bkg","bdthzz[2]",cutBkg);
+  treeSig->Project("bdthzznoip_sig","newbdthww[3]",cutSig);
+  treeBkg->Project("bdthzznoip_bkg","newbdthww[3]",cutBkg);
 
   FiguresOfMeritEvaluator roc;
-  roc.setRange(0.6,1,0,1.0);
-  roc.addSignal("H #rightarrow WW BDT", bdthww_sig);
+  roc.setRange(0.6,1,0,0.5);
+  roc.addSignal("H #rightarrow WW BDT (2011)", bdthww_sig);
   roc.addBackgrounds(bdthww_bkg);
   roc.setCutDirection(">");
   roc.addSignal("H #rightarrow ZZ BDT (DanSiV0)", bdthzz_sig);
   roc.addBackgrounds(bdthzz_bkg);
   roc.setCutDirection(">");
-  roc.addSignal("H #rightarrow ZZ BDT (SiV1)", bdthzznoip_sig);
+  roc.addSignal("H #rightarrow WW BDT (DanSiV0)", bdthzznoip_sig);
   roc.addBackgrounds(bdthzznoip_bkg);
   roc.setCutDirection(">");
 
@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
   treeSig = treeBkg = 0;
 
   fileSig = TFile::Open("macro/results_data/electrons_zeemc.root");
-  fileBkg = TFile::Open("macro/results_data/fakes-zeeOneFake.root");
+  fileBkg = TFile::Open("macro/results_data/fakes.root");
   if( fileSig && fileBkg) {
     fileSig->cd();
     treeSig = (TTree*)fileSig->Get("eleIDdir/T1");
@@ -167,9 +167,9 @@ int main(int argc, char* argv[]) {
   cout << "All files OK!" << endl;
 
   vector<TString> cutBase;
-  cutBase.push_back(TString("abs(eta)<1.0                   && pt<10"));
-  cutBase.push_back(TString("abs(eta)>1.0 && abs(eta)<1.479 && pt<10"));
-  cutBase.push_back(TString("abs(eta)>1.479                 && pt<10"));
+  // cutBase.push_back(TString("abs(eta)<1.0                   && pt<10"));
+  // cutBase.push_back(TString("abs(eta)>1.0 && abs(eta)<1.479 && pt<10"));
+  // cutBase.push_back(TString("abs(eta)>1.479                 && pt<10"));
   cutBase.push_back(TString("abs(eta)<1.0                   && pt>10 && pt<20"));
   cutBase.push_back(TString("abs(eta)>1.0 && abs(eta)<1.479 && pt>10 && pt<20"));
   cutBase.push_back(TString("abs(eta)>1.479                 && pt>10 && pt<20"));
@@ -179,16 +179,16 @@ int main(int argc, char* argv[]) {
 
   vector<TString> cutSignal;
   for(int i=0;i<(int)cutBase.size();++i) 
-    cutSignal.push_back(cutBase[i]+TString("&& mcmatch && pt<30"));
+    cutSignal.push_back(cutBase[i]+TString("&& DenomFakeSmurf && mcmatch && pt<35"));
 
   vector<TString> cutBackground;
   for(int i=0;i<(int)cutBase.size();++i)
-    cutBackground.push_back(cutBase[i]+TString("&& pt<30")); // HWW used the even events to train
+    cutBackground.push_back(cutBase[i]+TString("&& DenomFakeSmurf && pt<35 && !(run<=173692 && event%2==0)")); // HWW used the even events to train
 
   vector<TString> id;
-  id.push_back(TString("ROC_IdOnly_Data_inEB_VeryLowPt.pdf"));
-  id.push_back(TString("ROC_IdOnly_Data_outEB_VeryLowPt.pdf"));
-  id.push_back(TString("ROC_IdOnly_Data_EE_VeryLowPt.pdf"));
+  // id.push_back(TString("ROC_IdOnly_Data_inEB_VeryLowPt.pdf"));
+  // id.push_back(TString("ROC_IdOnly_Data_outEB_VeryLowPt.pdf"));
+  // id.push_back(TString("ROC_IdOnly_Data_EE_VeryLowPt.pdf"));
   id.push_back(TString("ROC_IdOnly_Data_inEB_LowPt.pdf"));
   id.push_back(TString("ROC_IdOnly_Data_outEB_LowPt.pdf"));
   id.push_back(TString("ROC_IdOnly_Data_EE_LowPt.pdf"));
@@ -203,7 +203,7 @@ int main(int argc, char* argv[]) {
 
   // HZZ isolations are in friend trees
   treeSig->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/electrons_zeemc_hzzisoFriend.root");
-  treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/fakes-zeeOneFake_hzzisoFriend.root");
+  treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/fakes_hzzisoFriend.root");
 
   for(int i=0;i<(int)cutBase.size();++i) {
     id[i].ReplaceAll("IdOnly","IsoOnly");

@@ -200,11 +200,11 @@ bool CiCBasedEleSelector::outputEleId() {
    else
      if (
 	 m_version == 2 && 
-	 compute_eid_cut(m_HOverE, m_SCEt, cuthoelv03[0][m_eIDLevel][m_cat], cuthoev03[0][m_eIDLevel][m_cat], false) &&
-	 compute_eid_cut(m_SigmaEtaEta, m_SCEt, cutseelv03[0][m_eIDLevel][m_cat], cutseev03[0][m_eIDLevel][m_cat], false) &&
-	 compute_eid_cut(fabs(m_DPhiIn), m_SCEt, cutdphiinlv03[0][m_eIDLevel][m_cat], cutdphiinv03[0][m_eIDLevel][m_cat], false) &&
-	 compute_eid_cut(fabs(m_DEta), m_SCEt, cutdetainlv03[0][m_eIDLevel][m_cat], cutdetainv03[0][m_eIDLevel][m_cat], false) &&
-	 eseedopincor > cuteseedopcorv03[0][m_eIDLevel][m_cat] 
+	 compute_eid_cut(m_HOverE, m_SCEt, cuthoelv03_old[0][m_eIDLevel][m_cat], cuthoev03_old[0][m_eIDLevel][m_cat], false) &&
+	 compute_eid_cut(m_SigmaEtaEta, m_SCEt, cutseelv03_old[0][m_eIDLevel][m_cat], cutseev03_old[0][m_eIDLevel][m_cat], false) &&
+	 compute_eid_cut(fabs(m_DPhiIn), m_SCEt, cutdphiinlv03_old[0][m_eIDLevel][m_cat], cutdphiinv03_old[0][m_eIDLevel][m_cat], false) &&
+	 compute_eid_cut(fabs(m_DEta), m_SCEt, cutdetainlv03_old[0][m_eIDLevel][m_cat], cutdetainv03_old[0][m_eIDLevel][m_cat], false) &&
+	 eseedopincor > cuteseedopcorv03_old[0][m_eIDLevel][m_cat] 
 	 )
        {
 	 m_electronCounter.IncrVar("finalCustomEleIDOnlyID");  
@@ -255,8 +255,8 @@ bool CiCBasedEleSelector::outputIso()
       return true;
     }
   else if ( m_version == 2 && 
-	    compute_eid_cut(iso_sumoet, m_SCEt, cutiso_sumoetlv03[0][m_eIDLevel][m_cat], cutiso_sumoetv03[0][m_eIDLevel][m_cat], false) &&
-	    (iso_sum < cutiso_sumv03[0][m_eIDLevel][m_cat])
+	    compute_eid_cut(iso_sumoet, m_SCEt, cutiso_sumoetlv03_old[0][m_eIDLevel][m_cat], cutiso_sumoetv03_old[0][m_eIDLevel][m_cat], false) &&
+	    (iso_sum < cutiso_sumv03_old[0][m_eIDLevel][m_cat])
 	    )
     {
       m_electronCounter.IncrVar("finalCustomEleIDOnlyIso");  
@@ -291,7 +291,7 @@ bool CiCBasedEleSelector::outputConv()
     }
   else
     if ( m_version == 2 &&
-	 float(m_missingHits) < cutfmishitsv03[0][m_eIDLevel][m_cat]
+	 float(m_missingHits) < cutfmishitsv03_old[0][m_eIDLevel][m_cat]
 	 )
       {
 	m_electronCounter.IncrVar("finalCustomEleIDOnlyConv");  
