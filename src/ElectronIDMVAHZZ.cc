@@ -109,7 +109,7 @@ void ElectronIDMVAHZZ::Initialize( std::string methodName,
       fTMVAReader[i]->AddSpectator("ecalseed",   &fMVAVar_EleEcalSeeded);
     }
 
-    if(type >= kBDTDanV0 && type <= kBDTSiDanV0) {
+    if(type >= kBDTDanV0 && type <= kBDTSiDanV2) {
       fTMVAReader[i]->AddVariable("fbrem",            &fMVAVar_EleFBrem);
       fTMVAReader[i]->AddVariable("deta",             &fMVAVar_EleDEtaIn);
       fTMVAReader[i]->AddVariable("dphi",             &fMVAVar_EleDPhiIn);
@@ -137,7 +137,7 @@ void ElectronIDMVAHZZ::Initialize( std::string methodName,
       fTMVAReader[i]->AddSpectator("matchConv",       &fMVAVar_EleMatchConv);
     }
 
-    if(type >= kBDTHWWDanV0 && type <= kBDTHWWSiDanV0) {
+    if(type >= kBDTHWWDanV0 && type <= kBDTHWWSiDanV2) {
       fTMVAReader[i]->AddVariable("fbrem",            &fMVAVar_EleFBrem);
       fTMVAReader[i]->AddVariable("deta",             &fMVAVar_EleDEtaIn);
       fTMVAReader[i]->AddVariable("dphi",             &fMVAVar_EleDPhiIn);
@@ -159,10 +159,14 @@ void ElectronIDMVAHZZ::Initialize( std::string methodName,
       fTMVAReader[i]->AddVariable("dphicalo",         &fMVAVar_EleDPhiCalo);
       fTMVAReader[i]->AddVariable("gsfchi2",          &fMVAVar_EleGSFChi2);
       fTMVAReader[i]->AddVariable("PreShowerOverRaw", &fMVAVar_EleESoRaw);
+      if(type == kBDTHWWSiDanV2) {
+        fTMVAReader[i]->AddVariable("d0",             &fMVAVar_EleD0); 
+        fTMVAReader[i]->AddVariable("ip3d",           &fMVAVar_EleIP3d); 
+      }
 
       fTMVAReader[i]->AddSpectator("eta",             &fMVAVar_EleSCEta);
       fTMVAReader[i]->AddSpectator("pt",              &fMVAVar_ElePt);
-      fTMVAReader[i]->AddSpectator("DenomFakeSmurf",  &fMVAVar_EleDenomFakeSmurf);
+      if(type != kBDTHWWSiDanV2) fTMVAReader[i]->AddSpectator("DenomFakeSmurf",  &fMVAVar_EleDenomFakeSmurf);
     }
 
     if (i==0) fTMVAReader[i]->BookMVA(fMethodname , weights );

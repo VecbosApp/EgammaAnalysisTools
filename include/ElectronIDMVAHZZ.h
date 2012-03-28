@@ -27,10 +27,12 @@ class ElectronIDMVAHZZ {
       kBDTSiV0,              // the new data training, with Si's HWW variables 
       kBDTSiV1,              // the new data training, with Si's HWW 2012 variables
       kBDTSiDanV0,           // the new data training, with Si's HWW 2012 + Daniele's variables
+      kBDTSiDanV2,           // the new data training, with Si's HWW 2012 + Daniele's variables, with pruning
       kBDTHWWDanV0,          // the new data training for triggering electrons, with Daniele's variables 
       kBDTHWWSiV0,           // the new data training for triggering electrons, with Si's HWW variables 
       kBDTHWWSiV1,           // the new data training for triggering electrons, with Si's HWW 2012 variables
-      kBDTHWWSiDanV0         // the new data training for triggering electrons, with Si's HWW 2012 + Daniele's variables
+      kBDTHWWSiDanV0,        // the new data training for triggering electrons, with Si's HWW 2012 + Daniele's variables
+      kBDTHWWSiDanV2         // the new data training for triggering electrons, with Si's HWW 2012 + Daniele's variables, with pruning and relaxed preselection for triggering
     };
 
     void   Initialize(std::string methodName,
