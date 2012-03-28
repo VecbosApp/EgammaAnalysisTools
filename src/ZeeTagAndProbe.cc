@@ -206,7 +206,7 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
   fMVAHZZDanV0 = new ElectronIDMVAHZZ();
   fMVAHZZSiV0 = new ElectronIDMVAHZZ();
   fMVAHZZSiV1 = new ElectronIDMVAHZZ();
-  fMVAHZZSiDanV0 = new ElectronIDMVAHZZ();
+  fMVAHZZSiDanV2 = new ElectronIDMVAHZZ();
 
   // New H->ZZ unbiased DATA training, Daniele's variables
   fMVAHZZDanV0->Initialize("BDTSimpleCat",
@@ -224,15 +224,15 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
                           ElectronIDMVAHZZ::kBDTSiV1);
 
   // New H->ZZ unbiased DATA training, Daniele's + Si's variables 
-  fMVAHZZSiDanV0->Initialize("BDTSimpleCat",
-                             "elebdtweights/DanieleMVA_BDTCat_BDTG_SiDanV0.weights.xml",
-                             ElectronIDMVAHZZ::kBDTSiDanV0);
+  fMVAHZZSiDanV2->Initialize("BDTSimpleCat",
+                             "elebdtweights/DanieleMVA_BDTCat_BDTG_SiDanV2.weights.xml",
+                             ElectronIDMVAHZZ::kBDTSiDanV2);
 
   // configuring the electron BDT for H->WW
   fMVAHWWDanV0 = new ElectronIDMVAHZZ();
   fMVAHWWSiV0 = new ElectronIDMVAHZZ();
   fMVAHWWSiV1 = new ElectronIDMVAHZZ();
-  fMVAHWWSiDanV0 = new ElectronIDMVAHZZ();
+  fMVAHWWSiDanV2 = new ElectronIDMVAHZZ();
 
   // New H->WW unbiased DATA training, Daniele's variables
   fMVAHWWDanV0->Initialize("BDTSimpleCat",
@@ -250,9 +250,9 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
                           ElectronIDMVAHZZ::kBDTHWWSiV1);
 
   // New H->WW unbiased DATA training, Daniele's + Si's variables 
-  fMVAHWWSiDanV0->Initialize("BDTSimpleCat",
-                             "elebdtweights/DanieleMVA_DenomHWW_BDTCat_BDTG_SiDanV0.weights.xml",
-                             ElectronIDMVAHZZ::kBDTHWWSiDanV0);
+  fMVAHWWSiDanV2->Initialize("BDTSimpleCat",
+                             "elebdtweights/DanieleMVA_DenomHWW_BDTCat_BDTG_SiDanV2.weights.xml",
+                             ElectronIDMVAHZZ::kBDTHWWSiDanV2);
 
   // Reading GoodRUN LS
   std::cout << "[GoodRunLS]::goodRunLS is " << m_selection->getSwitch("goodRunLS") << " isData is " <<  m_selection->getSwitch("isData") << std::endl;
@@ -615,12 +615,46 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           hzzbdts[0] = eleBDT(fMVAHZZDanV0,probe);
           hzzbdts[1] = eleBDT(fMVAHZZSiV0,probe);
           hzzbdts[2] = eleBDT(fMVAHZZSiV1,probe);
-          hzzbdts[3] = eleBDT(fMVAHZZSiDanV0,probe);
+          hzzbdts[3] = eleBDT(fMVAHZZSiDanV2,probe);
           float newhwwbdts[4];
           newhwwbdts[0] = eleBDT(fMVAHWWDanV0,probe);
           newhwwbdts[1] = eleBDT(fMVAHWWSiV0,probe);
           newhwwbdts[2] = eleBDT(fMVAHWWSiV1,probe);
-          newhwwbdts[3] = eleBDT(fMVAHWWSiDanV0,probe);
+          newhwwbdts[3] = eleBDT(fMVAHWWSiDanV2,probe);
+
+          // isolations
+          float chaPfIso[8], phoPfIso[8], neuPfIso[8];
+          chaPfIso[0]=pfCandChargedIso01Ele[probe];
+          phoPfIso[0]=pfCandPhotonIso01Ele[probe];
+          neuPfIso[0]=pfCandNeutralIso01Ele[probe];
+
+          chaPfIso[1]=pfCandChargedIso02Ele[probe];
+          phoPfIso[1]=pfCandPhotonIso02Ele[probe];
+          neuPfIso[1]=pfCandNeutralIso02Ele[probe];
+
+          chaPfIso[2]=pfCandChargedIso03Ele[probe];
+          phoPfIso[2]=pfCandPhotonIso03Ele[probe];
+          neuPfIso[2]=pfCandNeutralIso03Ele[probe];
+
+          chaPfIso[3]=pfCandChargedIso04Ele[probe];
+          phoPfIso[3]=pfCandPhotonIso04Ele[probe];
+          neuPfIso[3]=pfCandNeutralIso04Ele[probe];
+
+          chaPfIso[4]=pfCandChargedIso05Ele[probe];
+          phoPfIso[4]=pfCandPhotonIso05Ele[probe];
+          neuPfIso[4]=pfCandNeutralIso05Ele[probe];
+
+          chaPfIso[5]=pfCandChargedIso06Ele[probe];
+          phoPfIso[5]=pfCandPhotonIso06Ele[probe];
+          neuPfIso[5]=pfCandNeutralIso06Ele[probe];
+
+          chaPfIso[6]=pfCandChargedIso07Ele[probe];
+          phoPfIso[6]=pfCandPhotonIso07Ele[probe];
+          neuPfIso[6]=pfCandNeutralIso07Ele[probe];
+
+          chaPfIso[7]=pfCandChargedDirIso04Ele[probe];
+          phoPfIso[7]=pfCandPhotonDirIso04Ele[probe];
+          neuPfIso[7]=pfCandNeutralDirIso04Ele[probe];
 
           // fill the reduced tree
 	  reducedTree.fillVariables(eleopout,eopout,eop,HoE,deta,dphi,s9s25,s1s9,see,spp,fbrem,
@@ -635,7 +669,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
                                      dr03EcalRecHitSumEtEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                      dr03HcalTowerSumEtFullConeEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                      pfCombinedIsoEle[probe],
-                                     pfCandChargedIsoEle[probe],pfCandNeutralIsoEle[probe],pfCandPhotonIsoEle[probe]);
+                                     chaPfIso, neuPfIso, phoPfIso);
           reducedTree.fillMore(nPV,rhoFastjet,hwwbdts,newhwwbdts,hzzbdts,pfmva,lh);
 	  reducedTree.fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
           reducedTree.fillCutBasedIDBits(CutBasedId,CutBasedIdOnlyID,CutBasedIdOnlyIso,CutBasedIdOnlyConv);

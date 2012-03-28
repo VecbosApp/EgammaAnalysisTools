@@ -544,7 +544,7 @@ float Egamma::combPFIsoEACorr(int iele) {
   bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[iele], isEcalDriven);
   float eta = (ecaldriven) ? etaSC[superClusterIndexEle[iele]] : etaPFSC[PFsuperClusterIndexEle[iele]];
 
-  float combIso = pfCandChargedIsoEle[iele] + pfCandNeutralIsoEle[iele] + pfCandPhotonIsoEle[iele];
+  float combIso = pfCandChargedIso04Ele[iele] + pfCandNeutralIso04Ele[iele] + pfCandPhotonIso04Ele[iele];
 
   // EA correction is calculated for NH+PHO only (charged Had is computed with PFnoPU): cha + (neu - EA*rho)
   if(pt <  20 && fabs(eta) <  1.479) return combIso - 0.164 * rhoFastjet;

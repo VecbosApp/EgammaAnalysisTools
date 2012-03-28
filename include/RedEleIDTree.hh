@@ -40,7 +40,7 @@ public:
   //! fill the tree with isolation variables
   void fillIsolations(float tkIso, float ecalIso, float hcalIso,
                       float combPFiso,
-                      float chaPFiso, float neuPFiso, float phoPFiso);
+                      float chaPFiso[8], float neuPFiso[8], float phoPFiso[8]);
 
   //! fill the electron ID bits
   void fillCutBasedIDBits(int CutBasedId[6], int CutBasedIdOnlyID[6], int CutBasedIdOnlyIso[6], int CutBasedIdOnlyConv[6]);
@@ -105,7 +105,7 @@ private:
   float myEcalIso;
   float myHcalIso;
   float myPFCandCombinedIsoHWW;
-  float myPFCandChargedIso, myPFCandNeutralIso, myPFCandPhotonIso;
+  float myPFCandChargedIso[8], myPFCandNeutralIso[8], myPFCandPhotonIso[8];
 
   float myNVtx;
   float myRho;

@@ -120,9 +120,30 @@ public :
    Float_t         pfGenericNoOverNeutralIsoEle[100];   //[nEle]
    Float_t         pfGenericNoOverPhotonIsoEle[100];   //[nEle]
    Float_t         pfCombinedIsoEle[100];   //[nEle]
-   Float_t         pfCandChargedIsoEle[100];   //[nEle]
-   Float_t         pfCandNeutralIsoEle[100];   //[nEle]
-   Float_t         pfCandPhotonIsoEle[100];   //[nEle]
+   Float_t         pfCandChargedIso01Ele[100];   //[nEle]
+   Float_t         pfCandNeutralIso01Ele[100];   //[nEle]
+   Float_t         pfCandPhotonIso01Ele[100];   //[nEle]
+   Float_t         pfCandChargedIso02Ele[100];   //[nEle]
+   Float_t         pfCandNeutralIso02Ele[100];   //[nEle]
+   Float_t         pfCandPhotonIso02Ele[100];   //[nEle]
+   Float_t         pfCandChargedIso03Ele[100];   //[nEle]
+   Float_t         pfCandNeutralIso03Ele[100];   //[nEle]
+   Float_t         pfCandPhotonIso03Ele[100];   //[nEle]
+   Float_t         pfCandChargedIso04Ele[100];   //[nEle]
+   Float_t         pfCandNeutralIso04Ele[100];   //[nEle]
+   Float_t         pfCandPhotonIso04Ele[100];   //[nEle]
+   Float_t         pfCandChargedIso05Ele[100];   //[nEle]
+   Float_t         pfCandNeutralIso05Ele[100];   //[nEle]
+   Float_t         pfCandPhotonIso05Ele[100];   //[nEle]
+   Float_t         pfCandChargedIso06Ele[100];   //[nEle]
+   Float_t         pfCandNeutralIso06Ele[100];   //[nEle]
+   Float_t         pfCandPhotonIso06Ele[100];   //[nEle]
+   Float_t         pfCandChargedIso07Ele[100];   //[nEle]
+   Float_t         pfCandNeutralIso07Ele[100];   //[nEle]
+   Float_t         pfCandPhotonIso07Ele[100];   //[nEle]
+   Float_t         pfCandChargedDirIso04Ele[100];   //[nEle]
+   Float_t         pfCandNeutralDirIso04Ele[100];   //[nEle]
+   Float_t         pfCandPhotonDirIso04Ele[100];   //[nEle]
    Float_t         kinkMuon[100];   //[nMuon]
    Int_t           nPho;
    Int_t           chargePho[100];   //[nPho]
@@ -438,9 +459,30 @@ public :
    Float_t         pfGenericNoOverNeutralIsoMuon[100];   //[nMuon]
    Float_t         pfGenericNoOverPhotonIsoMuon[100];   //[nMuon]
    Float_t         pfCombinedIsoMuon[100];   //[nMuon]
-   Float_t         pfCandChargedIsoMuon[100];   //[nMuon]
-   Float_t         pfCandNeutralIsoMuon[100];   //[nMuon]
-   Float_t         pfCandPhotonIsoMuon[100];   //[nMuon]
+   Float_t         pfCandChargedIso01Muon[100];   //[nMuon]
+   Float_t         pfCandNeutralIso01Muon[100];   //[nMuon]
+   Float_t         pfCandPhotonIso01Muon[100];   //[nMuon]
+   Float_t         pfCandChargedIso02Muon[100];   //[nMuon]
+   Float_t         pfCandNeutralIso02Muon[100];   //[nMuon]
+   Float_t         pfCandPhotonIso02Muon[100];   //[nMuon]
+   Float_t         pfCandChargedIso03Muon[100];   //[nMuon]
+   Float_t         pfCandNeutralIso03Muon[100];   //[nMuon]
+   Float_t         pfCandPhotonIso03Muon[100];   //[nMuon]
+   Float_t         pfCandChargedIso04Muon[100];   //[nMuon]
+   Float_t         pfCandNeutralIso04Muon[100];   //[nMuon]
+   Float_t         pfCandPhotonIso04Muon[100];   //[nMuon]
+   Float_t         pfCandChargedIso05Muon[100];   //[nMuon]
+   Float_t         pfCandNeutralIso05Muon[100];   //[nMuon]
+   Float_t         pfCandPhotonIso05Muon[100];   //[nMuon]
+   Float_t         pfCandChargedIso06Muon[100];   //[nMuon]
+   Float_t         pfCandNeutralIso06Muon[100];   //[nMuon]
+   Float_t         pfCandPhotonIso06Muon[100];   //[nMuon]
+   Float_t         pfCandChargedIso07Muon[100];   //[nMuon]
+   Float_t         pfCandNeutralIso07Muon[100];   //[nMuon]
+   Float_t         pfCandPhotonIso07Muon[100];   //[nMuon]
+   Float_t         pfCandChargedDirIso04Muon[100];   //[nMuon]
+   Float_t         pfCandNeutralDirIso04Muon[100];   //[nMuon]
+   Float_t         pfCandPhotonDirIso04Muon[100];   //[nMuon]
    Float_t         EcalExpDepoMuon[100];   //[nMuon]
    Float_t         HcalExpDepoMuon[100];   //[nMuon]
    Float_t         HoExpDepoMuon[100];   //[nMuon]
@@ -863,19 +905,31 @@ public :
    TBranch        *b_dr04HcalTowerSumEtFullConeEle;   //!
    TBranch        *b_eleIdLikelihoodEle;   //!
    TBranch        *b_pflowMVAEle;   //!
-   TBranch        *b_pfChargedIsoEle;   //!
-   TBranch        *b_pfNeutralIsoEle;   //!
-   TBranch        *b_pfPhotonIsoEle;   //!
-   TBranch        *b_pfGenericChargedIsoEle;   //!
-   TBranch        *b_pfGenericNeutralIsoEle;   //!
-   TBranch        *b_pfGenericPhotonIsoEle;   //!
-   TBranch        *b_pfGenericNoOverChargedIsoEle;   //!
-   TBranch        *b_pfGenericNoOverNeutralIsoEle;   //!
-   TBranch        *b_pfGenericNoOverPhotonIsoEle;   //!
    TBranch        *b_pfCombinedIsoEle;   //!
-   TBranch        *b_pfCandChargedIsoEle;   //!
-   TBranch        *b_pfCandNeutralIsoEle;   //!
-   TBranch        *b_pfCandPhotonIsoEle;   //!
+   TBranch        *b_pfCandChargedIso01Ele;   //!
+   TBranch        *b_pfCandNeutralIso01Ele;   //!
+   TBranch        *b_pfCandPhotonIso01Ele;   //!
+   TBranch        *b_pfCandChargedIso02Ele;   //!
+   TBranch        *b_pfCandNeutralIso02Ele;   //!
+   TBranch        *b_pfCandPhotonIso02Ele;   //!
+   TBranch        *b_pfCandChargedIso03Ele;   //!
+   TBranch        *b_pfCandNeutralIso03Ele;   //!
+   TBranch        *b_pfCandPhotonIso03Ele;   //!
+   TBranch        *b_pfCandChargedIso04Ele;   //!
+   TBranch        *b_pfCandNeutralIso04Ele;   //!
+   TBranch        *b_pfCandPhotonIso04Ele;   //!
+   TBranch        *b_pfCandChargedIso05Ele;   //!
+   TBranch        *b_pfCandNeutralIso05Ele;   //!
+   TBranch        *b_pfCandPhotonIso05Ele;   //!
+   TBranch        *b_pfCandChargedIso06Ele;   //!
+   TBranch        *b_pfCandNeutralIso06Ele;   //!
+   TBranch        *b_pfCandPhotonIso06Ele;   //!
+   TBranch        *b_pfCandChargedIso07Ele;   //!
+   TBranch        *b_pfCandNeutralIso07Ele;   //!
+   TBranch        *b_pfCandPhotonIso07Ele;   //!
+   TBranch        *b_pfCandChargedDirIso04Ele;   //!
+   TBranch        *b_pfCandNeutralDirIso04Ele;   //!
+   TBranch        *b_pfCandPhotonDirIso04Ele;   //!
    TBranch        *b_nPho;   //!
    TBranch        *b_chargePho;   //!
    TBranch        *b_energyPho;   //!
@@ -1179,19 +1233,31 @@ public :
    TBranch        *b_hoEt05Muon;   //!
    TBranch        *b_nTrk05Muon;   //!
    TBranch        *b_nJets05Muon;   //!
-   TBranch        *b_pfChargedIsoMuon;   //!
-   TBranch        *b_pfNeutralIsoMuon;   //!
-   TBranch        *b_pfPhotonIsoMuon;   //!
-   TBranch        *b_pfGenericChargedIsoMuon;   //!
-   TBranch        *b_pfGenericNeutralIsoMuon;   //!
-   TBranch        *b_pfGenericPhotonIsoMuon;   //!
-   TBranch        *b_pfGenericNoOverChargedIsoMuon;   //!
-   TBranch        *b_pfGenericNoOverNeutralIsoMuon;   //!
-   TBranch        *b_pfGenericNoOverPhotonIsoMuon;   //!
+   TBranch        *b_pfCandChargedIso01Muon;   //!
+   TBranch        *b_pfCandNeutralIso01Muon;   //!
+   TBranch        *b_pfCandPhotonIso01Muon;   //!
+   TBranch        *b_pfCandChargedIso02Muon;   //!
+   TBranch        *b_pfCandNeutralIso02Muon;   //!
+   TBranch        *b_pfCandPhotonIso02Muon;   //!
+   TBranch        *b_pfCandChargedIso03Muon;   //!
+   TBranch        *b_pfCandNeutralIso03Muon;   //!
+   TBranch        *b_pfCandPhotonIso03Muon;   //!
+   TBranch        *b_pfCandChargedIso04Muon;   //!
+   TBranch        *b_pfCandNeutralIso04Muon;   //!
+   TBranch        *b_pfCandPhotonIso04Muon;   //!
+   TBranch        *b_pfCandChargedIso05Muon;   //!
+   TBranch        *b_pfCandNeutralIso05Muon;   //!
+   TBranch        *b_pfCandPhotonIso05Muon;   //!
+   TBranch        *b_pfCandChargedIso06Muon;   //!
+   TBranch        *b_pfCandNeutralIso06Muon;   //!
+   TBranch        *b_pfCandPhotonIso06Muon;   //!
+   TBranch        *b_pfCandChargedIso07Muon;   //!
+   TBranch        *b_pfCandNeutralIso07Muon;   //!
+   TBranch        *b_pfCandPhotonIso07Muon;   //!
+   TBranch        *b_pfCandChargedDirIso04Muon;   //!
+   TBranch        *b_pfCandNeutralDirIso04Muon;   //!
+   TBranch        *b_pfCandPhotonDirIso04Muon;   //!
    TBranch        *b_pfCombinedIsoMuon;   //!
-   TBranch        *b_pfCandChargedIsoMuon;   //!
-   TBranch        *b_pfCandNeutralIsoMuon;   //!
-   TBranch        *b_pfCandPhotonIsoMuon;   //!
    TBranch        *b_kinkMuon;   //!
    TBranch        *b_EcalExpDepoMuon;   //!
    TBranch        *b_HcalExpDepoMuon;   //!
@@ -1673,19 +1739,31 @@ void EgammaBase::Init(TTree *tree)
    fChain->SetBranchAddress("dr04HcalTowerSumEtFullConeEle", dr04HcalTowerSumEtFullConeEle, &b_dr04HcalTowerSumEtFullConeEle);
    fChain->SetBranchAddress("eleIdLikelihoodEle", eleIdLikelihoodEle, &b_eleIdLikelihoodEle);
    fChain->SetBranchAddress("pflowMVAEle", pflowMVAEle, &b_pflowMVAEle);
-   fChain->SetBranchAddress("pfChargedIsoEle", pfChargedIsoEle, &b_pfChargedIsoEle);
-   fChain->SetBranchAddress("pfNeutralIsoEle", pfNeutralIsoEle, &b_pfNeutralIsoEle);
-   fChain->SetBranchAddress("pfPhotonIsoEle", pfPhotonIsoEle, &b_pfPhotonIsoEle);
-   fChain->SetBranchAddress("pfGenericChargedIsoEle", pfGenericChargedIsoEle, &b_pfGenericChargedIsoEle);
-   fChain->SetBranchAddress("pfGenericNeutralIsoEle", pfGenericNeutralIsoEle, &b_pfGenericNeutralIsoEle);
-   fChain->SetBranchAddress("pfGenericPhotonIsoEle", pfGenericPhotonIsoEle, &b_pfGenericPhotonIsoEle);
-   fChain->SetBranchAddress("pfGenericNoOverChargedIsoEle", pfGenericNoOverChargedIsoEle, &b_pfGenericNoOverChargedIsoEle);
-   fChain->SetBranchAddress("pfGenericNoOverNeutralIsoEle", pfGenericNoOverNeutralIsoEle, &b_pfGenericNoOverNeutralIsoEle);
-   fChain->SetBranchAddress("pfGenericNoOverPhotonIsoEle", pfGenericNoOverPhotonIsoEle, &b_pfGenericNoOverPhotonIsoEle);
    fChain->SetBranchAddress("pfCombinedIsoEle", pfCombinedIsoEle, &b_pfCombinedIsoEle);
-   fChain->SetBranchAddress("pfCandChargedIsoEle", pfCandChargedIsoEle, &b_pfCandChargedIsoEle);
-   fChain->SetBranchAddress("pfCandNeutralIsoEle", pfCandNeutralIsoEle, &b_pfCandNeutralIsoEle);
-   fChain->SetBranchAddress("pfCandPhotonIsoEle", pfCandPhotonIsoEle, &b_pfCandPhotonIsoEle);
+   fChain->SetBranchAddress("pfCandChargedIso01Ele", pfCandChargedIso01Ele, &b_pfCandChargedIso01Ele);
+   fChain->SetBranchAddress("pfCandNeutralIso01Ele", pfCandNeutralIso01Ele, &b_pfCandNeutralIso01Ele);
+   fChain->SetBranchAddress("pfCandPhotonIso01Ele", pfCandPhotonIso01Ele, &b_pfCandPhotonIso01Ele);
+   fChain->SetBranchAddress("pfCandChargedIso02Ele", pfCandChargedIso02Ele, &b_pfCandChargedIso02Ele);
+   fChain->SetBranchAddress("pfCandNeutralIso02Ele", pfCandNeutralIso02Ele, &b_pfCandNeutralIso02Ele);
+   fChain->SetBranchAddress("pfCandPhotonIso02Ele", pfCandPhotonIso02Ele, &b_pfCandPhotonIso02Ele);
+   fChain->SetBranchAddress("pfCandChargedIso03Ele", pfCandChargedIso03Ele, &b_pfCandChargedIso03Ele);
+   fChain->SetBranchAddress("pfCandNeutralIso03Ele", pfCandNeutralIso03Ele, &b_pfCandNeutralIso03Ele);
+   fChain->SetBranchAddress("pfCandPhotonIso03Ele", pfCandPhotonIso03Ele, &b_pfCandPhotonIso03Ele);
+   fChain->SetBranchAddress("pfCandChargedIso04Ele", pfCandChargedIso04Ele, &b_pfCandChargedIso04Ele);
+   fChain->SetBranchAddress("pfCandNeutralIso04Ele", pfCandNeutralIso04Ele, &b_pfCandNeutralIso04Ele);
+   fChain->SetBranchAddress("pfCandPhotonIso04Ele", pfCandPhotonIso04Ele, &b_pfCandPhotonIso04Ele);
+   fChain->SetBranchAddress("pfCandChargedIso05Ele", pfCandChargedIso05Ele, &b_pfCandChargedIso05Ele);
+   fChain->SetBranchAddress("pfCandNeutralIso05Ele", pfCandNeutralIso05Ele, &b_pfCandNeutralIso05Ele);
+   fChain->SetBranchAddress("pfCandPhotonIso05Ele", pfCandPhotonIso05Ele, &b_pfCandPhotonIso05Ele);
+   fChain->SetBranchAddress("pfCandChargedIso06Ele", pfCandChargedIso06Ele, &b_pfCandChargedIso06Ele);
+   fChain->SetBranchAddress("pfCandNeutralIso06Ele", pfCandNeutralIso06Ele, &b_pfCandNeutralIso06Ele);
+   fChain->SetBranchAddress("pfCandPhotonIso06Ele", pfCandPhotonIso06Ele, &b_pfCandPhotonIso06Ele);
+   fChain->SetBranchAddress("pfCandChargedIso07Ele", pfCandChargedIso07Ele, &b_pfCandChargedIso07Ele);
+   fChain->SetBranchAddress("pfCandNeutralIso07Ele", pfCandNeutralIso07Ele, &b_pfCandNeutralIso07Ele);
+   fChain->SetBranchAddress("pfCandPhotonIso07Ele", pfCandPhotonIso07Ele, &b_pfCandPhotonIso07Ele);
+   fChain->SetBranchAddress("pfCandChargedDirIso04Ele", pfCandChargedDirIso04Ele, &b_pfCandChargedDirIso04Ele);
+   fChain->SetBranchAddress("pfCandNeutralDirIso04Ele", pfCandNeutralDirIso04Ele, &b_pfCandNeutralDirIso04Ele);
+   fChain->SetBranchAddress("pfCandPhotonDirIso04Ele", pfCandPhotonDirIso04Ele, &b_pfCandPhotonDirIso04Ele);
    fChain->SetBranchAddress("nPho", &nPho, &b_nPho);
    fChain->SetBranchAddress("chargePho", chargePho, &b_chargePho);
    fChain->SetBranchAddress("energyPho", energyPho, &b_energyPho);
@@ -1989,19 +2067,31 @@ void EgammaBase::Init(TTree *tree)
    fChain->SetBranchAddress("hoEt05Muon", hoEt05Muon, &b_hoEt05Muon);
    fChain->SetBranchAddress("nTrk05Muon", nTrk05Muon, &b_nTrk05Muon);
    fChain->SetBranchAddress("nJets05Muon", nJets05Muon, &b_nJets05Muon);
-   fChain->SetBranchAddress("pfChargedIsoMuon", pfChargedIsoMuon, &b_pfChargedIsoMuon);
-   fChain->SetBranchAddress("pfNeutralIsoMuon", pfNeutralIsoMuon, &b_pfNeutralIsoMuon);
-   fChain->SetBranchAddress("pfPhotonIsoMuon", pfPhotonIsoMuon, &b_pfPhotonIsoMuon);
-   fChain->SetBranchAddress("pfGenericChargedIsoMuon", pfGenericChargedIsoMuon, &b_pfGenericChargedIsoMuon);
-   fChain->SetBranchAddress("pfGenericNeutralIsoMuon", pfGenericNeutralIsoMuon, &b_pfGenericNeutralIsoMuon);
-   fChain->SetBranchAddress("pfGenericPhotonIsoMuon", pfGenericPhotonIsoMuon, &b_pfGenericPhotonIsoMuon);
-   fChain->SetBranchAddress("pfGenericNoOverChargedIsoMuon", pfGenericNoOverChargedIsoMuon, &b_pfGenericNoOverChargedIsoMuon);
-   fChain->SetBranchAddress("pfGenericNoOverNeutralIsoMuon", pfGenericNoOverNeutralIsoMuon, &b_pfGenericNoOverNeutralIsoMuon);
-   fChain->SetBranchAddress("pfGenericNoOverPhotonIsoMuon", pfGenericNoOverPhotonIsoMuon, &b_pfGenericNoOverPhotonIsoMuon);
    fChain->SetBranchAddress("pfCombinedIsoMuon", pfCombinedIsoMuon, &b_pfCombinedIsoMuon);
-   fChain->SetBranchAddress("pfCandChargedIsoMuon", pfCandChargedIsoMuon, &b_pfCandChargedIsoMuon);
-   fChain->SetBranchAddress("pfCandNeutralIsoMuon", pfCandNeutralIsoMuon, &b_pfCandNeutralIsoMuon);
-   fChain->SetBranchAddress("pfCandPhotonIsoMuon", pfCandPhotonIsoMuon, &b_pfCandPhotonIsoMuon);
+   fChain->SetBranchAddress("pfCandChargedIso01Muon", pfCandChargedIso01Muon, &b_pfCandChargedIso01Muon);
+   fChain->SetBranchAddress("pfCandNeutralIso01Muon", pfCandNeutralIso01Muon, &b_pfCandNeutralIso01Muon);
+   fChain->SetBranchAddress("pfCandPhotonIso01Muon", pfCandPhotonIso01Muon, &b_pfCandPhotonIso01Muon);
+   fChain->SetBranchAddress("pfCandChargedIso02Muon", pfCandChargedIso02Muon, &b_pfCandChargedIso02Muon);
+   fChain->SetBranchAddress("pfCandNeutralIso02Muon", pfCandNeutralIso02Muon, &b_pfCandNeutralIso02Muon);
+   fChain->SetBranchAddress("pfCandPhotonIso02Muon", pfCandPhotonIso02Muon, &b_pfCandPhotonIso02Muon);
+   fChain->SetBranchAddress("pfCandChargedIso03Muon", pfCandChargedIso03Muon, &b_pfCandChargedIso03Muon);
+   fChain->SetBranchAddress("pfCandNeutralIso03Muon", pfCandNeutralIso03Muon, &b_pfCandNeutralIso03Muon);
+   fChain->SetBranchAddress("pfCandPhotonIso03Muon", pfCandPhotonIso03Muon, &b_pfCandPhotonIso03Muon);
+   fChain->SetBranchAddress("pfCandChargedIso04Muon", pfCandChargedIso04Muon, &b_pfCandChargedIso04Muon);
+   fChain->SetBranchAddress("pfCandNeutralIso04Muon", pfCandNeutralIso04Muon, &b_pfCandNeutralIso04Muon);
+   fChain->SetBranchAddress("pfCandPhotonIso04Muon", pfCandPhotonIso04Muon, &b_pfCandPhotonIso04Muon);
+   fChain->SetBranchAddress("pfCandChargedIso05Muon", pfCandChargedIso05Muon, &b_pfCandChargedIso05Muon);
+   fChain->SetBranchAddress("pfCandNeutralIso05Muon", pfCandNeutralIso05Muon, &b_pfCandNeutralIso05Muon);
+   fChain->SetBranchAddress("pfCandPhotonIso05Muon", pfCandPhotonIso05Muon, &b_pfCandPhotonIso05Muon);
+   fChain->SetBranchAddress("pfCandChargedIso06Muon", pfCandChargedIso06Muon, &b_pfCandChargedIso06Muon);
+   fChain->SetBranchAddress("pfCandNeutralIso06Muon", pfCandNeutralIso06Muon, &b_pfCandNeutralIso06Muon);
+   fChain->SetBranchAddress("pfCandPhotonIso06Muon", pfCandPhotonIso06Muon, &b_pfCandPhotonIso06Muon);
+   fChain->SetBranchAddress("pfCandChargedIso07Muon", pfCandChargedIso07Muon, &b_pfCandChargedIso07Muon);
+   fChain->SetBranchAddress("pfCandNeutralIso07Muon", pfCandNeutralIso07Muon, &b_pfCandNeutralIso07Muon);
+   fChain->SetBranchAddress("pfCandPhotonIso07Muon", pfCandPhotonIso07Muon, &b_pfCandPhotonIso07Muon);
+   fChain->SetBranchAddress("pfCandChargedDirIso04Muon", pfCandChargedDirIso04Muon, &b_pfCandChargedDirIso04Muon);
+   fChain->SetBranchAddress("pfCandNeutralDirIso04Muon", pfCandNeutralDirIso04Muon, &b_pfCandNeutralDirIso04Muon);
+   fChain->SetBranchAddress("pfCandPhotonDirIso04Muon", pfCandPhotonDirIso04Muon, &b_pfCandPhotonDirIso04Muon);
    fChain->SetBranchAddress("kinkMuon", kinkMuon, &b_kinkMuon);
    fChain->SetBranchAddress("EcalExpDepoMuon", EcalExpDepoMuon, &b_EcalExpDepoMuon);
    fChain->SetBranchAddress("HcalExpDepoMuon", HcalExpDepoMuon, &b_HcalExpDepoMuon);

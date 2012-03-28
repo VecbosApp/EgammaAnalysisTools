@@ -40,8 +40,8 @@ private:
   /// MVA for electron ID. To be created and initialized from the children classes
   ElectronLikelihood *LH;
   ElectronIDMVA *fMVAHWW, *fMVAHWWNoIP;
-  ElectronIDMVAHZZ *fMVAHZZDanV0, *fMVAHZZSiV0, *fMVAHZZSiV1, *fMVAHZZSiDanV0;
-  ElectronIDMVAHZZ *fMVAHWWDanV0, *fMVAHWWSiV0, *fMVAHWWSiV1, *fMVAHWWSiDanV0;
+  ElectronIDMVAHZZ *fMVAHZZDanV0, *fMVAHZZSiV0, *fMVAHZZSiV1, *fMVAHZZSiDanV2;
+  ElectronIDMVAHZZ *fMVAHWWDanV0, *fMVAHWWSiV0, *fMVAHWWSiV1, *fMVAHWWSiDanV2;
 
   // outputs for the kinematics and the id
   FakeTree *myOutKineTree;

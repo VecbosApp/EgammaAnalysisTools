@@ -145,9 +145,9 @@ void RedEleIDTree::addIsolations() {
   myTree->Branch("ecalIso", &myEcalIso,   "ecalIso/F");
   myTree->Branch("hcalIso", &myHcalIso,   "hcalIso/F");
   myTree->Branch("combPFIsoHWW", &myPFCandCombinedIsoHWW, "combPFIsoHWW/F");
-  myTree->Branch("chaPFIso",     &myPFCandChargedIso,     "chPFIso/F");
-  myTree->Branch("neuPFIso",     &myPFCandNeutralIso,     "neuPFIso/F");
-  myTree->Branch("phoPFIso",     &myPFCandPhotonIso,      "phoPFIso/F");
+  myTree->Branch("chaPFIso",     myPFCandChargedIso,     "chPFIso[8]/F");
+  myTree->Branch("neuPFIso",     myPFCandNeutralIso,     "neuPFIso[8]/F");
+  myTree->Branch("phoPFIso",     myPFCandPhotonIso,      "phoPFIso[8]/F");
 }
 
 void RedEleIDTree::addMore() {
@@ -272,14 +272,16 @@ void RedEleIDTree::fillVariables2(float detacalo, float dphicalo, float sep, flo
 
 void RedEleIDTree::fillIsolations(float trkIso, float ecalIso, float hcalIso,
                                   float combPFiso,
-                                  float chaPFiso, float neuPFiso, float phoPFiso) {
+                                  float chaPFiso[8], float neuPFiso[8], float phoPFiso[8]) {
   myTrkIso=trkIso;
   myEcalIso=ecalIso;
   myHcalIso=hcalIso;
   myPFCandCombinedIsoHWW=combPFiso;
-  myPFCandChargedIso=chaPFiso;
-  myPFCandNeutralIso=neuPFiso;
-  myPFCandPhotonIso=phoPFiso;
+  for(int i=0;i<8;i++) {
+    myPFCandChargedIso[i]=chaPFiso[i];
+    myPFCandNeutralIso[i]=neuPFiso[i];
+    myPFCandPhotonIso[i]=phoPFiso[i];
+  }
 }
 
 void RedEleIDTree::fillAttributesSignal(float zmass, int zdec) {
