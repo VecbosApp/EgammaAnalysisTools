@@ -12,9 +12,10 @@ using namespace std;
 // GLOBAL VARIABLES
 double rho[2]; // val[0] +/- err[1]
 double neu[2];
+double pho[2];
 
-vector<double> Aeff;
-vector<double> Aeff_err;
+vector<double> Aeff_neu, Aeff_pho;
+vector<double> Aeff_neu_err, Aeff_pho_err;
 
 Double_t polfun(Double_t *x, Double_t *par) {
   // par[0] = linear coefficient
@@ -46,23 +47,24 @@ void calibrateEA(const char* filename, const char* outfilename, const char *cut=
   TProfile *rho_prof = new TProfile("rho_prof","",30,1,30);
   TProfile *cha_prof = new TProfile("cha_prof","",30,1,30);
   TProfile *neu_prof = new TProfile("neu_prof","",30,1,30);
-  //  TProfile *pho_prof = new TProfile("pho_prof","",30,1,30);
+  TProfile *pho_prof = new TProfile("pho_prof","",30,1,30);
 
   TString fullCut("(");
   fullCut += TString(cut);
   fullCut += TString(" && CutBasedIdOlyID[3] && abs(mass-91.1876)<7.5)"); // requiring WP80 ID only
 
   tree->Project("rho_prof","rho:vertices",fullCut.Data());
-  tree->Project("cha_prof","chaPFIso:vertices",fullCut.Data());
+  tree->Project("cha_prof","chaPFIso[3]:vertices",fullCut.Data());
   // this if you want separate NH/PHO
-  //  tree->Project("neu_prof","neuPFIso:vertices",fullCut.Data());
-  //  tree->Project("pho_prof","phoPFIso:vertices",fullCut.Data());
+  tree->Project("neu_prof","neuPFIso[3]:vertices",fullCut.Data());
+  tree->Project("pho_prof","phoPFIso[3]:vertices",fullCut.Data());
   // this is combined NH+PHO
-  tree->Project("neu_prof","neuPFIso+phoPFIso:vertices",fullCut.Data());
+  // tree->Project("neu_prof","neuPFIso[3]+phoPFIso[3]:vertices",fullCut.Data());
 
   rho_prof->Rebin(rebin);
   cha_prof->Rebin(rebin);
   neu_prof->Rebin(rebin);
+  pho_prof->Rebin(rebin);
 
   TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
 
@@ -77,8 +79,8 @@ void calibrateEA(const char* filename, const char* outfilename, const char *cut=
   neu_prof->SetMarkerStyle(20);
   neu_prof->SetMarkerColor(kRed+1);
 
-  // pho_prof->SetMarkerStyle(20);
-  // pho_prof->SetMarkerColor(kTeal+3);
+  pho_prof->SetMarkerStyle(20);
+  pho_prof->SetMarkerColor(kTeal+3);
   
   // draw the legend
   TLegend* legend = new TLegend(0.20, 0.70, 0.43, 0.86);
@@ -91,24 +93,34 @@ void calibrateEA(const char* filename, const char* outfilename, const char *cut=
     
   legend->AddEntry(rho_prof, "#rho");
   legend->AddEntry(cha_prof, "charged particles");
-  legend->AddEntry(neu_prof, "neutral particles");
-  //  legend->AddEntry(pho_prof, "photons");
+  legend->AddEntry(neu_prof, "neutral hadrons");
+  legend->AddEntry(pho_prof, "photons");
 
   // =========================
   // And now apply the fit
   // =========================
 
-  // fit NH+PHO
-  TF1 *f2 = new TF1("mypol2",polfun,2.,max,2);
-  f2->SetParNames("a","b");
-  f2->SetLineWidth(2);
-  f2->SetLineColor(kRed+1);
-  neu_prof->Fit("mypol2","RB");
-  neu[0] = f2->GetParameter(0);
-  neu[1] = f2->GetParError(0);
+  // fit NH
+  TF1 *f2nh = new TF1("mypol2nh",polfun,2.,max,2);
+  f2nh->SetParNames("a","b");
+  f2nh->SetLineWidth(2);
+  f2nh->SetLineColor(kRed+1);
+  neu_prof->Fit("mypol2nh","RB");
+  neu[0] = f2nh->GetParameter(0);
+  neu[1] = f2nh->GetParError(0);
   //  float neu_ChiSqr = f2->GetChisquare();  // obtain chi^2
   //  float neu_NDF = f2->GetNDF();           // obtain ndf
-  std::cout << "===> NEU FIT: A = " << neu[0] << " +/- " << neu[1] << std::endl;
+  std::cout << "===> NEU HAD FIT: A = " << neu[0] << " +/- " << neu[1] << std::endl;
+
+  // fit GAMMAs
+  TF1 *f2pho = new TF1("mypol2pho",polfun,2.,max,2);
+  f2pho->SetParNames("a","b");
+  f2pho->SetLineWidth(2);
+  f2pho->SetLineColor(kTeal+3);
+  pho_prof->Fit("mypol2pho","RB");
+  pho[0] = f2pho->GetParameter(0);
+  pho[1] = f2pho->GetParError(0);
+  std::cout << "===> GAMMAs FIT: A = " << pho[0] << " +/- " << pho[1] << std::endl;
 
   // fit rho
   TF1 *f1 = new TF1("mypol",polfun,2,max,2);
@@ -118,14 +130,12 @@ void calibrateEA(const char* filename, const char* outfilename, const char *cut=
   rho_prof->Fit("mypol","RB");
   rho[0] = f1->GetParameter(0);
   rho[1] = f1->GetParError(0);
-  //  float rho_ChiSqr = f1->GetChisquare();  // obtain chi^2
-  //  float rho_NDF = f1->GetNDF();           // obtain ndf
   std::cout << "===> RHO FIT: A = " << rho[0] << " +/- " << rho[1] << std::endl;
   
   rho_prof->Draw("same");
   cha_prof->Draw("same pe1");
   neu_prof->Draw("same pe1");
-  //  pho_prof->Draw("same pe1");
+  pho_prof->Draw("same pe1");
   legend->Draw();
   c1->SaveAs(outfilename);
 
@@ -164,23 +174,29 @@ void calcAllAeff() {
   vector<float> rebin;
   for(int i=0; i<(int)cut.size(); i++) rebin.push_back(1);
 
-  Aeff.reserve(id.size());
-  Aeff_err.reserve(id.size());
+  Aeff_neu.reserve(id.size());
+  Aeff_neu_err.reserve(id.size());
+  Aeff_pho.reserve(id.size());
+  Aeff_pho_err.reserve(id.size());
 
   for(int i=0; i<(int)cut.size(); ++i) {
-    calibrateEA("results_data/merged.root",id[i].Data(),cut[i].Data(),max[i],rebin[i]);
-    Aeff[i] = neu[0]/rho[0];
-    Aeff_err[i] = Aeff[i] * sqrt(pow(neu[1]/neu[0],2)+pow(rho[1]/rho[0],2));
+    calibrateEA("results_data/electrons.root",id[i].Data(),cut[i].Data(),max[i],rebin[i]);
+    Aeff_neu[i] = neu[0]/rho[0];
+    Aeff_neu_err[i] = Aeff_neu[i] * sqrt(pow(neu[1]/neu[0],2)+pow(rho[1]/rho[0],2));
+    Aeff_pho[i] = pho[0]/rho[0];
+    Aeff_pho_err[i] = Aeff_pho[i] * sqrt(pow(pho[1]/pho[0],2)+pow(rho[1]/rho[0],2));
   }
 
-  cout << " ==== RESULTS ==== " << endl;
-  for(int i=0; i<(int)cut.size(); ++i) 
-    cout << "CUT = " << cut[i].Data() << "\tAeff = " << Aeff[i] << " +/- " << Aeff_err[i] << endl;
-
+  cout << " ==== RESULTS OF EFFECTIVE AREAS==== " << endl;
+  for(int i=0; i<(int)cut.size(); ++i) {
+    cout << "CUT = " << cut[i].Data();
+    cout << "\tAeff(NH) = " << Aeff_neu[i] << " +/- " << Aeff_neu_err[i] << "\t\t";
+    cout << "\tAeff(PHO) = " << Aeff_pho[i] << " +/- " << Aeff_pho_err[i] << endl;    
+  }
 }
 
 
-void rhoEASubtracted(const char* filename, const char* outfilename, float aeff, const char *cut="1", double max=24, int rebin=1) {
+void rhoEASubtracted(const char* filename, const char* outfilename, float aeffneu, float aeffpho, const char *cut="1", double max=24, int rebin=1) {
   
   gStyle->SetOptStat(0);
 
@@ -210,11 +226,11 @@ void rhoEASubtracted(const char* filename, const char* outfilename, float aeff, 
   fullCut += TString(" && CutBasedIdOlyID[3] && abs(mass-91.1876)<7.5)"); // requiring WP80 ID only
 
   tree->Project("rho_prof","rho:vertices",fullCut.Data());
-  tree->Project("iso_prof","chaPFIso+neuPFIso+phoPFIso:vertices",fullCut.Data());
+  tree->Project("iso_prof","chaPFIso[3]+neuPFIso[3]+phoPFIso[3]:vertices",fullCut.Data());
 
   // form the formula for the corrected isolation from calibrated EA
   char formula[1000];
-  sprintf(formula,"chaPFIso + (neuPFIso+phoPFIso - %f * rho):vertices",aeff);
+  sprintf(formula,"chaPFIso[3] + (neuPFIso[3] - %f * rho) + (phoPFIso[3] - %f * rho):vertices",aeffneu,aeffpho);
   tree->Project("isocorr_prof",formula,fullCut.Data());
 
   rho_prof->Rebin(rebin);
@@ -301,14 +317,14 @@ void doAll() {
   vector<float> max;
   for(int i=0; i<(int)cut.size()-3; i++) max.push_back(24);
   max[4] = 20;
-  max[5] = 15;
-  max[6] = 15;
+  max[5] = 20;
+  max[6] = 20;
 
   vector<float> rebin;
   for(int i=0; i<(int)cut.size(); i++) rebin.push_back(1);
   
   // plot the raw / corrected isolation
   for(int i=0; i<(int)cut.size(); ++i) 
-     rhoEASubtracted("results_data/merged.root",id[i].Data(),Aeff[i],cut[i].Data(),max[i],rebin[i]);
+    rhoEASubtracted("results_data/electrons.root",id[i].Data(),Aeff_neu[i],Aeff_pho[i],cut[i].Data(),max[i],rebin[i]);
 
 }
