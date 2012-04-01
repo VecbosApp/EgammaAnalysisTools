@@ -1,4 +1,12 @@
 #!/usr/bin/python
+import os
+from optparse import OptionParser
+
+parser = OptionParser()
+parser.add_option("-b", "--biased",
+                  dest="biased", default=0, type="int",
+                  help="print optimization for triggering electrons. Signal is Z->ee with MC match; background is fake rate triggers (odd events)")
+(options, args) = parser.parse_args()
 
 def getid(line):
     parts=line.split("\"")
@@ -9,31 +17,32 @@ def getiso(line):
     return eval(parts[7])
 
 def main():
-    f = open('weights/unbiased_OptimizedCuts_chaIsoOnly_weights_eta14442_Pt10To20.xml', 'r')
 
     wplines = [251,281,293,311,323]
     wp = [70,80,85,90,95]
     
-    files = ['weights/unbiased_OptimizedCuts_weights_eta10_Pt10To20.xml',
-             'weights/unbiased_OptimizedCuts_weights_eta14442_Pt10To20.xml',
-             'weights/unbiased_OptimizedCuts_weights_eta1566_Pt10To20.xml',
-             'weights/unbiased_OptimizedCuts_weights_eta20_Pt10To20.xml',
-             'weights/unbiased_OptimizedCuts_weights_eta25_Pt10To20.xml',
-             'weights/unbiased_OptimizedCuts_weights_eta10_Pt20.xml',
-             'weights/unbiased_OptimizedCuts_weights_eta14442_Pt20.xml',
-             'weights/unbiased_OptimizedCuts_weights_eta1566_Pt20.xml',
-             'weights/unbiased_OptimizedCuts_weights_eta20_Pt20.xml',
-             'weights/unbiased_OptimizedCuts_weights_eta25_Pt20.xml']
+    if(options.biased==1):
+        files = ['weights/biased_OptimizedCuts_Trg_fullIso_weights_inEB_Pt10To20.xml',
+                 'weights/biased_OptimizedCuts_Trg_fullIso_weights_outEB_Pt10To20.xml',
+                 'weights/biased_OptimizedCuts_Trg_fullIso_weights_EE_Pt10To20.xml',
+                 'weights/biased_OptimizedCuts_Trg_fullIso_weights_inEB_Pt20.xml',
+                 'weights/biased_OptimizedCuts_Trg_fullIso_weights_outEB_Pt20.xml',
+                 'weights/biased_OptimizedCuts_Trg_fullIso_weights_EE_Pt20.xml']
+    else:
+        files = ['weights/unbiased_OptimizedCuts_NoTrg_fullIso_weights_inEB_Pt10To20.xml',
+                 'weights/unbiased_OptimizedCuts_NoTrg_fullIso_weights_outEB_Pt10To20.xml',
+                 'weights/unbiased_OptimizedCuts_NoTrg_fullIso_weights_EE_Pt10To20.xml',
+                 'weights/unbiased_OptimizedCuts_NoTrg_fullIso_weights_inEB_Pt20.xml',
+                 'weights/unbiased_OptimizedCuts_NoTrg_fullIso_weights_outEB_Pt20.xml',
+                 'weights/unbiased_OptimizedCuts_NoTrg_fullIso_weights_EE_Pt20.xml']    
 
+    etabins = [0,1,2,0,1,2]
+    ptbins =  [0,0,0,1,1,1]
+    etalabels = ['/&eta;/<0.8','0.8</&eta;/<1.479','1.479</&eta;/<2.5']
 
-    etabins = [0,1,2,3,4,0,1,2,3,4]
-    ptbins =  [0,0,0,0,0,1,1,1,1,1]
-
-    etalabels = ['/&eta;/<1','1</&eta;/<1.4442','1.4442</&eta;/<1.566','1.566</&eta;/<2.0','2.0</&eta;/<2.5']
-
-    # 2 pt bins x 5 eta bins x 5 WPs
-    idtable = [ [ [ 999 for i in range(5) ] for j in range(5) ] for k in range(2) ]
-    isotable = [ [ [ 999 for i in range(5) ] for j in range(5) ] for k in range(2) ]
+    # 2 pt bins x 3 eta bins x 5 WPs
+    idtable = [ [ [ 999 for i in range(5) ] for j in range(3) ] for k in range(2) ]
+    isotable = [ [ [ 999 for i in range(5) ] for j in range(3) ] for k in range(2) ]
 
     bin=0
     for ifile in files:
@@ -61,15 +70,15 @@ def main():
     for ipt in range (2):
         print "pt bin = "+str(ipt)
         print "| *WP* | ",
-        for ieta in range(5):
+        for ieta in range(3):
             print etalabels[ieta]+" | ",
-            if(ieta==4):
+            if(ieta==2):
                 print ""
         for iwp in range(5):
             print "| *WP "+str(wp[iwp])+"* | ",
-            for ieta in range(5):
+            for ieta in range(3):
                 print "%.3f" % idtable[ipt][ieta][iwp]+" / %.3f" % isotable[ipt][ieta][iwp]+" | ",
-                if(ieta==4):
+                if(ieta==2):
                     print ""
 
 

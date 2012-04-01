@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# @(#)root/tmva $Id: TMVAClassification.py 38475 2011-03-17 10:46:00Z evt $
+# @(#)root/tmva $Id: CutsOptimization.py,v 1.1 2012/03/01 15:04:39 emanuele Exp $
 # ------------------------------------------------------------------------------ #
 # Project      : TMVA - a Root-integrated toolkit for multivariate data analysis #
 # Package      : TMVA                                                            #
@@ -55,6 +55,8 @@ def usage():
     print "  -m | --methods    : gives methods to be run (default: all methods)"
     print "  -i | --inputfilesig  : name of input signal ROOT file (default: '%s')" % DEFAULT_INFNAMESIG
     print "  -j | --inputfilebkg  : name of input background ROOT file (default: '%s')" % DEFAULT_INFNAMEBKG
+    print "  -f | --friendinputfilesig  : name of friend input signal ROOT file (default: '%s')" % DEFAULT_FRIENDNAMESIG
+    print "  -g | --friendinputfilebkg  : name of friend input background ROOT file (default: '%s')" % DEFAULT_FRIENDNAMEBKG
     print "  -o | --outputfile : name of output ROOT file containing results (default: '%s')" % DEFAULT_OUTFNAME
     print "  -t | --inputtrees : input ROOT Trees for signal and background (default: '%s %s')" \
           % (DEFAULT_TREESIG, DEFAULT_TREEBKG)
@@ -70,8 +72,8 @@ def main():
 
     try:
         # retrive command line options
-        shortopts  = "m:i:j:t:o:a:vgh?"
-        longopts   = ["methods=", "inputfilesig=", "inputfilebkg=", "inputtrees=", "outputfile=", "verbose", "gui", "help", "usage"]
+        shortopts  = "m:i:j:f:g:t:o:a:vgh?"
+        longopts   = ["methods=", "inputfilesig=", "inputfilebkg=", "friendinputfilesig=", "friendinputfilebkg=", "inputtrees=", "outputfile=", "verbose", "gui", "help", "usage"]
         opts, args = getopt.getopt( sys.argv[1:], shortopts, longopts )
 
     except getopt.GetoptError:
@@ -82,6 +84,8 @@ def main():
 
     infnameSig  = DEFAULT_INFNAMESIG
     infnameBkg  = DEFAULT_INFNAMEBKG
+    friendfnameSig  = DEFAULT_FRIENDNAMESIG
+    friendfnameBkg  = DEFAULT_FRIENDNAMEBKG
     treeNameSig = DEFAULT_TREESIG
     treeNameBkg = DEFAULT_TREEBKG
     outfname    = DEFAULT_OUTFNAME
@@ -99,6 +103,10 @@ def main():
             infnameSig = a
         elif o in ("-j", "--inputfilebkg"):
             infnameBkg = a
+        elif o in ("-f", "--friendinputfilesig"):
+            friendfnameSig = a
+        elif o in ("-g", "--friendinputfilebkg"):
+            friendfnameBkg = a
         elif o in ("-o", "--outputfile"):
             outfname = a
         elif o in ("-a", "--addedcuts"):
@@ -125,6 +133,10 @@ def main():
     for m in mlist:
         if m.strip() != '':
             print "=== - <%s>" % m.strip()
+
+    # Print the file
+    print "Using file "+infnameSig+" for signal..."
+    print "Using file "+infnameBkg+" for background..."
 
     # Import ROOT classes
     from ROOT import gSystem, gROOT, gApplication, TFile, TTree, TCut
@@ -165,8 +177,13 @@ def main():
     # Define the input variables that shall be used for the classifier training
     # note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
     # [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
-    factory.AddVariable( "bdthzz",          "id BDT",    "", 'F' )
-    factory.AddVariable( "combPFIsoHZZ/pt", "rel. iso.", "", 'F' )
+    if "DenomFakeSmurf" in addedcuts:
+        factory.AddVariable( "newbdthww[3]",          "id BDT",    "", 'F' )
+        factory.AddVariable( "combPFIsoHZZ/pt", "rel. iso.", "", 'F' )
+    else:
+        factory.AddVariable( "bdthzz[3]",          "id BDT",    "", 'F' )
+        factory.AddVariable( "combPFIsoHZZ/pt", "rel. iso.", "", 'F' )
+        #factory.AddVariable( "chaPFIso/pt", "rel. iso.", "", 'F' )
 
     # You can add so-called "Spectator variables", which are not used in the MVA training, 
     # but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the 
@@ -184,8 +201,8 @@ def main():
     signal      = inputSig.Get( treeNameSig )
     background  = inputBkg.Get( treeNameBkg )
 
-    signal.AddFriend( "eleIDdir/isoT1 = eleIDdir/T1", DEFAULT_FRIENDNAMESIG )
-    background.AddFriend( "eleIDdir/isoT1 = eleIDdir/T1", DEFAULT_FRIENDNAMEBKG )
+    signal.AddFriend( "eleIDdir/isoT1 = eleIDdir/T1", friendfnameSig )
+    background.AddFriend( "eleIDdir/isoT1 = eleIDdir/T1", friendfnameBkg )
 
     # Global event weights (see below for setting event-wise weights)
     signalWeight     = 1.0
@@ -221,8 +238,8 @@ def main():
 
     # Apply additional cuts on the signal and background sample. 
     # example for cut: mycut = TCut( "abs(var1)<0.5 && abs(var2-0.5)<1" )
-    mycutSig = TCut( "DenomFakeSmurf && pt<35" + addedcuts ) 
-    mycutBkg = TCut( "DenomFakeSmurf && pt<35" + addedcuts ) 
+    mycutSig = TCut( "mcmatch && pt<30" + addedcuts ) 
+    mycutBkg = TCut( "event%2!=0 && pt<30" + addedcuts ) 
 
     print mycutSig
 
