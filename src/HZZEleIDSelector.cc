@@ -7,20 +7,27 @@
 using namespace std;
 
 int HZZEleIDSelector::etabin(float eta) {
-  if(fabs(eta)<1.4442) return 0;
-  else if(fabs(eta)<1.566) return 1;
+  if(fabs(eta)<0.8) return 0;
+  else if(fabs(eta)<1.479) return 1;
   else return 2;
 }
 
-int HZZEleIDSelector::ptbin(float pt) {
+int HZZEleIDSelector::ptbinTrg(float pt) {
   if(pt<20) return 0;
+  else return 1;
+}
+
+int HZZEleIDSelector::ptbinNoTrg(float pt) {
+  if(pt<10) return 0;
   else return 1;
 }
 
 bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso, 
 			      HZZEleIDSelector::wpfulliso WP, HZZEleIDSelector::mvatype type) {
   int etab=etabin(eta);
-  int ptb=ptbin(pt);
+  int ptb=-1;
+  if(type==kMVABiased) ptb=ptbinTrg(pt);
+  else ptb=ptbinNoTrg(pt);
   float bdtcut=999.;
   float isocut=-999.;
   if(type==kMVABiased) {
@@ -42,7 +49,9 @@ bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso,
 bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso, 
 			      HZZEleIDSelector::wpchiso WP, HZZEleIDSelector::mvatype type) {
   int etab=etabin(eta);
-  int ptb=ptbin(pt);
+  int ptb=-1;
+  if(type==kMVABiased) ptb=ptbinTrg(pt);
+  else ptb=ptbinNoTrg(pt);
   float bdtcut=999.;
   float isocut=-999.;
   if(type==kMVABiased) {

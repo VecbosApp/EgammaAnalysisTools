@@ -28,8 +28,8 @@ public:
 
 private:
   int etabin(float eta);
-  int ptbin(float pt);
-
+  int ptbinTrg(float pt);
+  int ptbinNoTrg(float pt);
 
 };
 
