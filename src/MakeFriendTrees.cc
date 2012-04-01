@@ -229,7 +229,7 @@ void makeFriendHZZIdBits(const char* file) {
      if(passHWWID(eta,pt,bdthww[0],bdthzz[3],rho,iso,combPFIsoHWW,kIsoHWW2011)) pfisohww = 1;
      if(passHWWID(eta,pt,bdthww[0],bdthzz[3],rho,iso,combPFIsoHWW,kIso)) pfisohzz = 1;
 
-     float combIso=0;
+     Float_t combIso=0.0;
      if(fabs(eta) <  1.0) combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[0]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[0]*rho,Float_t(0.));
      else if(fabs(eta) < 1.479) combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[1]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[1]*rho,Float_t(0.));
      else if(fabs(eta) < 2.0) combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[2]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[2]*rho,Float_t(0.));
@@ -264,7 +264,7 @@ int main(int argc, char* argv[]) {
   makeFriendHZZIsolation(files1);
   makeFriendHZZIsolation(files2);
   makeFriendHZZIsolation(fileb1);
-  //  makeFriendHZZIsolation(fileb2);
+  makeFriendHZZIsolation(fileb2);
   makeFriendHZZIsolation(fileb3);
 
   cout << "\t===> DOING ID FRIEND TREES <===" << endl;
@@ -272,7 +272,7 @@ int main(int argc, char* argv[]) {
   makeFriendHZZIdBits(files1);
   makeFriendHZZIdBits(files2);
   makeFriendHZZIdBits(fileb1);
-  //  makeFriendHZZIdBits(fileb2);
+  makeFriendHZZIdBits(fileb2);
   makeFriendHZZIdBits(fileb3);
   
 }
