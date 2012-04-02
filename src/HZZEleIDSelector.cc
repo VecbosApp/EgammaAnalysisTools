@@ -30,6 +30,14 @@ bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso,
   else ptb=ptbinNoTrg(pt);
   float bdtcut=999.;
   float isocut=-999.;
+
+  // special WP that has the same eff as HWW 2011
+  if(WP==kWPHWW && type==kMVABiased) {
+    bdtcut=cutbdtfulliso_hww[ptb][etab];
+    isocut=cutfulliso_hww[ptb][etab];
+    return (bdt>bdtcut && iso/pt<isocut);
+  }
+
   if(type==kMVABiased) {
     bdtcut=cutbdtfulliso_biased[ptb][etab][WP];
     isocut=cutfulliso_biased[ptb][etab][WP];
