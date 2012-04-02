@@ -44,7 +44,7 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
   for(int i=0;i<(int)histos.size();++i) {
     
     histos[i]->SetMinimum(0);
-    histos[i]->SetMaximum(0.4);
+    histos[i]->SetMaximum(0.2);
     histos[i]->SetMarkerSize(2);
     histos[i]->SetMarkerStyle(20);
     histos[i]->SetMarkerColor(colors[i]);
@@ -214,14 +214,14 @@ void drawIdsBiased() {
   TH1F *BdtHWWWP80EtaHighPt = (TH1F*)file->Get("BdtHWWWP80EtaHighPt_Eff");
   TH1F *BdtHWWWP80EtaLowPt = (TH1F*)file->Get("BdtHWWWP80EtaLowPt_Eff");
   // ---> HZZ id + EA corrected isolation
-  TH1F *BdtHWWnewWP70x80EtaHighPt = (TH1F*)file->Get("BdtHWWnewWP70x80EtaHighPt_Eff");
-  TH1F *BdtHWWnewWP70x80EtaLowPt = (TH1F*)file->Get("BdtHWWnewWP70x80EtaLowPt_Eff");
+  TH1F *BdtHWWnewWPHWWEtaHighPt = (TH1F*)file->Get("BdtHWWnewWPHWWEtaHighPt_Eff");
+  TH1F *BdtHWWnewWPHWWEtaLowPt = (TH1F*)file->Get("BdtHWWnewWPHWWEtaLowPt_Eff");
 
   vector<TH1F*> etaSet1, etaSet2;
   etaSet1.push_back(BdtHWWWP80EtaHighPt);
   etaSet1.push_back(BdtHWWWP80EtaLowPt);
-  etaSet2.push_back(BdtHWWnewWP70x80EtaHighPt);
-  etaSet2.push_back(BdtHWWnewWP70x80EtaLowPt);
+  etaSet2.push_back(BdtHWWnewWPHWWEtaHighPt);
+  etaSet2.push_back(BdtHWWnewWPHWWEtaLowPt);
   
   drawOneToOne(etaSet1,etaSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-eff)","#eta");
 
@@ -231,20 +231,20 @@ void drawIdsBiased() {
   TH1F *BdtHWWWP80PtEndcap1 = (TH1F*)file->Get("BdtHWWWP80PtEndcap1_Eff");
   TH1F *BdtHWWWP80PtEndcap2 = (TH1F*)file->Get("BdtHWWWP80PtEndcap2_Eff");
   // ---> HZZ id + EA corrected isolation
-  TH1F *BdtHWWnewWP70x80PtBarrel1 = (TH1F*)file->Get("BdtHWWnewWP70x80PtBarrel1_Eff");
-  TH1F *BdtHWWnewWP70x80PtBarrel2 = (TH1F*)file->Get("BdtHWWnewWP70x80PtBarrel2_Eff");
-  TH1F *BdtHWWnewWP70x80PtEndcap1 = (TH1F*)file->Get("BdtHWWnewWP70x80PtEndcap1_Eff");
-  TH1F *BdtHWWnewWP70x80PtEndcap2 = (TH1F*)file->Get("BdtHWWnewWP70x80PtEndcap2_Eff");
+  TH1F *BdtHWWnewWPHWWPtBarrel1 = (TH1F*)file->Get("BdtHWWnewWPHWWPtBarrel1_Eff");
+  TH1F *BdtHWWnewWPHWWPtBarrel2 = (TH1F*)file->Get("BdtHWWnewWPHWWPtBarrel2_Eff");
+  TH1F *BdtHWWnewWPHWWPtEndcap1 = (TH1F*)file->Get("BdtHWWnewWPHWWPtEndcap1_Eff");
+  TH1F *BdtHWWnewWPHWWPtEndcap2 = (TH1F*)file->Get("BdtHWWnewWPHWWPtEndcap2_Eff");
 
   vector<TH1F*> ptSet1, ptSet2;
   ptSet1.push_back(BdtHWWWP80PtBarrel1);
   ptSet1.push_back(BdtHWWWP80PtBarrel2);
   ptSet1.push_back(BdtHWWWP80PtEndcap1);
   ptSet1.push_back(BdtHWWWP80PtEndcap2);
-  ptSet2.push_back(BdtHWWnewWP70x80PtBarrel1);
-  ptSet2.push_back(BdtHWWnewWP70x80PtBarrel2);
-  ptSet2.push_back(BdtHWWnewWP70x80PtEndcap1);
-  ptSet2.push_back(BdtHWWnewWP70x80PtEndcap2);
+  ptSet2.push_back(BdtHWWnewWPHWWPtBarrel1);
+  ptSet2.push_back(BdtHWWnewWPHWWPtBarrel2);
+  ptSet2.push_back(BdtHWWnewWPHWWPtEndcap1);
+  ptSet2.push_back(BdtHWWnewWPHWWPtEndcap2);
 
   drawOneToOne(ptSet1,ptSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-eff)","p_{T} [GeV]");
 
@@ -254,20 +254,20 @@ void drawIdsBiased() {
   TH1F *BdtHWWWP80PUEndcap1 = (TH1F*)file->Get("BdtHWWWP80PUEndcap1_Eff");
   TH1F *BdtHWWWP80PUEndcap2 = (TH1F*)file->Get("BdtHWWWP80PUEndcap2_Eff");
   // ---> HZZ id + EA corrected isolation
-  TH1F *BdtHWWnewWP70x80PUBarrel1 = (TH1F*)file->Get("BdtHWWnewWP70x80PUBarrel1_Eff");
-  TH1F *BdtHWWnewWP70x80PUBarrel2 = (TH1F*)file->Get("BdtHWWnewWP70x80PUBarrel2_Eff");
-  TH1F *BdtHWWnewWP70x80PUEndcap1 = (TH1F*)file->Get("BdtHWWnewWP70x80PUEndcap1_Eff");
-  TH1F *BdtHWWnewWP70x80PUEndcap2 = (TH1F*)file->Get("BdtHWWnewWP70x80PUEndcap2_Eff");
+  TH1F *BdtHWWnewWPHWWPUBarrel1 = (TH1F*)file->Get("BdtHWWnewWPHWWPUBarrel1_Eff");
+  TH1F *BdtHWWnewWPHWWPUBarrel2 = (TH1F*)file->Get("BdtHWWnewWPHWWPUBarrel2_Eff");
+  TH1F *BdtHWWnewWPHWWPUEndcap1 = (TH1F*)file->Get("BdtHWWnewWPHWWPUEndcap1_Eff");
+  TH1F *BdtHWWnewWPHWWPUEndcap2 = (TH1F*)file->Get("BdtHWWnewWPHWWPUEndcap2_Eff");
 
   vector<TH1F*> puSet1, puSet2;
   puSet1.push_back(BdtHWWWP80PUBarrel1);
   puSet1.push_back(BdtHWWWP80PUBarrel2);
   puSet1.push_back(BdtHWWWP80PUEndcap1);
   puSet1.push_back(BdtHWWWP80PUEndcap2);
-  puSet2.push_back(BdtHWWnewWP70x80PUBarrel1);
-  puSet2.push_back(BdtHWWnewWP70x80PUBarrel2);
-  puSet2.push_back(BdtHWWnewWP70x80PUEndcap1);
-  puSet2.push_back(BdtHWWnewWP70x80PUEndcap2);
+  puSet2.push_back(BdtHWWnewWPHWWPUBarrel1);
+  puSet2.push_back(BdtHWWnewWPHWWPUBarrel2);
+  puSet2.push_back(BdtHWWnewWPHWWPUEndcap1);
+  puSet2.push_back(BdtHWWnewWPHWWPUEndcap2);
 
   drawOneToOne(puSet1,puSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-eff)","# vertices");
 
