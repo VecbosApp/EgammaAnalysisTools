@@ -147,6 +147,7 @@ void makeFriendHZZIdBits(const char* file) {
   Float_t combPFIsoHZZ, bdthzz[4];
   Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8];
   Float_t mass; // not dummy only for TP trees
+  Int_t DenomFakeSmurf;
   pT->SetBranchAddress("bdthww", bdthww);
   pT->SetBranchAddress("newbdthww", newbdthww);
   pT->SetBranchAddress("bdthzz",bdthzz);
@@ -155,6 +156,7 @@ void makeFriendHZZIdBits(const char* file) {
   pT->SetBranchAddress("chaPFIso", chaPFIso);
   pT->SetBranchAddress("neuPFIso", neuPFIso);
   pT->SetBranchAddress("phoPFIso", phoPFIso);
+  pT->SetBranchAddress("DenomFakeSmurf", &DenomFakeSmurf);
   pT->SetBranchAddress("eta", &eta);
   pT->SetBranchAddress("pt", &pt);
   pT->SetBranchAddress("rho", &rho);
@@ -190,6 +192,8 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("wp85notrg", &WP85notrg, "chwp85notrg/I");
   fT->Branch("wp80notrg", &WP80notrg, "chwp80notrg/I");
   fT->Branch("wp70notrg", &WP70notrg, "chwp70notrg/I");
+  // same as HWW DenomFakeSmurf: change name for the friend tree
+  fT->Branch("denom", &DenomFakeSmurf, "denom/I");
 
   HZZEleIDSelector aSel;
 
