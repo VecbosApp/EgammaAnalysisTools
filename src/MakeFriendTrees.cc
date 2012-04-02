@@ -214,6 +214,7 @@ void makeFriendHZZIdBits(const char* file) {
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVABiased)) WP80trg=1;
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP70,HZZEleIDSelector::kMVABiased)) WP70trg=1;
      // same efficiency as 2011 WP
+     newhwwWP=0;
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWPHWW,HZZEleIDSelector::kMVABiased)) newhwwWP=1;
 
      WP95notrg=WP90notrg=WP85notrg=WP80notrg=WP70notrg=0;
