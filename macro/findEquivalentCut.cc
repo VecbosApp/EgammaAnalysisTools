@@ -14,18 +14,20 @@ float getCut(TString presel, TString cut1, TString var2, float min2, float max2,
   TFile *file = 0;
   TTree *tree = 0;
   
-  file = TFile::Open("results_data_fakes/merged.root");
+  file = TFile::Open("results_data/electrons_zeemc.root");
   if( file ) {
     file->cd();
     tree = (TTree*)file->Get("eleIDdir/T1");
   } else {
-    cout << "File results_data_fakes/merged.root not existing !" << endl;
+    cout << "File results_data/electrons_zeemc.root not existing !" << endl;
     return 9999.;
   }
   if(!tree) {
     cout << "Tree eleIDdir/T1 not existing inside file!" << endl;
     return 9999.;
   }
+
+  tree->AddFriend( "eleIDdir/isoT1 = eleIDdir/T1", "results_data/electrons_zeemc_hzzisoFriend.root" );
 
   // first, find the efficiency on the original variable
   TString fullCut1 = presel + TString(" && ") + cut1;
@@ -79,46 +81,16 @@ float getCut(TString presel, TString cut1, TString var2, float min2, float max2,
 void lookForCutsIso() {
   
   // pT > 20 GeV (<35 GeV is to keep EWK contamination engligible)
-  getCut("DenomFakeSmurf && abs(eta) <  1.0 && pt>20 && pt<35","combPFIsoHWW/pt<0.13",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.18 * rho))/pt",-0.1,2.0,"<");
-  getCut("DenomFakeSmurf && abs(eta)>1.0 && abs(eta)<1.479 && pt>20 && pt<35","combPFIsoHWW/pt<0.13",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.19 * rho))/pt",-0.1,2.0,"<");
-  getCut("DenomFakeSmurf && abs(eta)>1.479 && abs(eta)<2.0 && pt>20 && pt<35","combPFIsoHWW/pt<0.09",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.21 * rho))/pt",-0.1,2.0,"<");
-  getCut("DenomFakeSmurf && abs(eta)>2.0 && abs(eta)<2.2 && pt>20 && pt<35","combPFIsoHWW/pt<0.09",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.38 * rho))/pt",-0.1,2.0,"<");
-  getCut("DenomFakeSmurf && abs(eta)>2.2 && abs(eta)<2.3 && pt>20 && pt<35","combPFIsoHWW/pt<0.09",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.61 * rho))/pt",-0.1,2.0,"<");
-  getCut("DenomFakeSmurf && abs(eta)>2.3 && abs(eta)<2.4 && pt>20 && pt<35","combPFIsoHWW/pt<0.09",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.73 * rho))/pt",-0.1,2.0,"<");
-  getCut("DenomFakeSmurf && abs(eta)>2.4 && pt>20 && pt<35","combPFIsoHWW/pt<0.09",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.78 * rho))/pt",-0.1,2.0,"<");
+  getCut("DenomFakeSmurf && abs(eta) < 1.479 && pt>20 && pt<35","combPFIsoHWW/pt<0.13",
+	 "combPFIsoHZZ/pt",-0.1,2.0,"<");
+  getCut("DenomFakeSmurf && abs(eta) > 1.479 && pt>20 && pt<35","combPFIsoHWW/pt<0.09",
+	 "combPFIsoHZZ/pt",-0.1,2.0,"<");
 
   // pT < 20 GeV 
-  getCut("DenomFakeSmurf && abs(eta) <  1.0 && pt<20","combPFIsoHWW/pt<0.13",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.18 * rho))/pt",-0.1,2.0,"<");
-  getCut("DenomFakeSmurf && abs(eta)>1.0 && abs(eta)<1.479 && pt<20","combPFIsoHWW/pt<0.13",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.19 * rho))/pt",-0.1,2.0,"<");
-  getCut("DenomFakeSmurf && abs(eta)>1.479 && abs(eta)<2.0 && pt<20","combPFIsoHWW/pt<0.09",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.21 * rho))/pt",-0.1,2.0,"<");
-  getCut("DenomFakeSmurf && abs(eta)>2.0 && abs(eta)<2.2 && pt<20","combPFIsoHWW/pt<0.09",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.38 * rho))/pt",-0.1,2.0,"<");
-  getCut("DenomFakeSmurf && abs(eta)>2.2 && abs(eta)<2.3 && pt<20","combPFIsoHWW/pt<0.09",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.61 * rho))/pt",-0.1,2.0,"<");
-  getCut("DenomFakeSmurf && abs(eta)>2.3 && abs(eta)<2.4 && pt<20","combPFIsoHWW/pt<0.09",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.73 * rho))/pt",-0.1,2.0,"<");
-  getCut("DenomFakeSmurf && abs(eta)>2.4 && pt<20","combPFIsoHWW/pt<0.09",
-	 "(chaPFIso + (neuPFIso+phoPFIso - 0.78 * rho))/pt",-0.1,2.0,"<");
-
-
-  // on 2011 fake rate data:
-  // Equivalent cut for preselection: abs(eta) <  1.0 is (chaPFIso + (neuPFIso+phoPFIso - 0.18 * rho))/pt<0.20
-  // Equivalent cut for preselection: abs(eta)>1.0 && abs(eta)<1.479 is (chaPFIso + (neuPFIso+phoPFIso - 0.19 * rho))/pt<0.20
-  // Equivalent cut for preselection: abs(eta)>1.479 && abs(eta)<2.0 is (chaPFIso + (neuPFIso+phoPFIso - 0.21 * rho))/pt<0.12
-  // Equivalent cut for preselection: abs(eta)>2.0 && abs(eta)<2.2 is (chaPFIso + (neuPFIso+phoPFIso - 0.38 * rho))/pt<0.10
-  // Equivalent cut for preselection: abs(eta)>2.2 && abs(eta)<2.3 is (chaPFIso + (neuPFIso+phoPFIso - 0.61 * rho))/pt<0.031
-  // Equivalent cut for preselection: abs(eta)>2.3 && abs(eta)<2.4 is (chaPFIso + (neuPFIso+phoPFIso - 0.73 * rho))/pt<0.052
-  // Equivalent cut for preselection: abs(eta)>2.4 is (chaPFIso + (neuPFIso+phoPFIso - 0.78 * rho))/pt<0.010
+  getCut("DenomFakeSmurf && abs(eta) < 1.479 && pt<20","combPFIsoHWW/pt<0.13",
+	 "combPFIsoHZZ/pt",-0.1,2.0,"<");
+  getCut("DenomFakeSmurf && abs(eta) > 1.479 && pt<20","combPFIsoHWW/pt<0.09",
+	 "combPFIsoHZZ/pt",-0.1,2.0,"<");
 
 }
 
@@ -136,19 +108,19 @@ void lookForCutsNoEAIso() {
 
 void lookForCutsHZZId() {
 
-  getCut("DenomFakeSmurf && pt<35 && pt < 20 && abs(eta)<1.0","bdthww>0.139","bdthzz",-0.3,0.3,">");
-  getCut("DenomFakeSmurf && pt<35 && pt < 20 && abs(eta)>=1.0 && abs(eta)<1.479","bdthww>0.525","bdthzz",-0.3,0.3,">");
-  getCut("DenomFakeSmurf && pt<35 && pt < 20 && abs(eta)>=1.479 && abs(eta)<2.5","bdthww>0.543","bdthzz",-0.3,0.3,">");
+  getCut("DenomFakeSmurf && mcmatch && pt<35 && pt < 20 && abs(eta)<1.0","bdthww[0]>0.139","newbdthww[3]",-1.0,1.0,">");
+  getCut("DenomFakeSmurf && mcmatch && pt<35 && pt < 20 && abs(eta)>=1.0 && abs(eta)<1.479","bdthww[0]>0.525","newbdthww[3]",-1.0,1.0,">");
+  getCut("DenomFakeSmurf && mcmatch && pt<35 && pt < 20 && abs(eta)>=1.479 && abs(eta)<2.5","bdthww[0]>0.543","newbdthww[3]",-1.0,1.0,">");
 
-  getCut("DenomFakeSmurf && pt<35 && pt >= 20 && abs(eta)<1.0","bdthww>0.947","bdthzz",-0.3,0.3,">");
-  getCut("DenomFakeSmurf && pt<35 && pt >= 20 && abs(eta)>=1.0 && abs(eta)<1.479","bdthww>0.950","bdthzz",-0.3,0.3,">");
-  getCut("DenomFakeSmurf && pt<35 && pt >= 20 && abs(eta)>=1.479 && abs(eta)<2.5","bdthww>0.884","bdthzz",-0.3,0.3,">");
+  getCut("DenomFakeSmurf && mcmatch && pt<35 && pt >= 20 && abs(eta)<1.0","bdthww[0]>0.947","newbdthww[3]",-1.0,1.0,">");
+  getCut("DenomFakeSmurf && mcmatch && pt<35 && pt >= 20 && abs(eta)>=1.0 && abs(eta)<1.479","bdthww[0]>0.950","newbdthww[3]",-1.0,1.0,">");
+  getCut("DenomFakeSmurf && mcmatch && pt<35 && pt >= 20 && abs(eta)>=1.479 && abs(eta)<2.5","bdthww[0]>0.884","newbdthww[3]",-1.0,1.0,">");
 
   // on 2011 fake rate data
-  // Equivalent cut for preselection: DenomFakeSmurf && pt<35 && pt < 20 && abs(eta)<1.0 is bdthzz>0.075
-  // Equivalent cut for preselection: DenomFakeSmurf && pt<35 && pt < 20 && abs(eta)>=1.0 && abs(eta)<1.479 is bdthzz>0.075
-  // Equivalent cut for preselection: DenomFakeSmurf && pt<35 && pt < 20 && abs(eta)>=1.479 && abs(eta)<2.5 is bdthzz>0.0906
-  // Equivalent cut for preselection: DenomFakeSmurf && pt<35 && pt >= 20 && abs(eta)<1.0 is bdthzz>0.0642
-  // Equivalent cut for preselection: DenomFakeSmurf && pt<35 && pt >= 20 && abs(eta)>=1.0 && abs(eta)<1.479 is bdthzz>0.0714
-  // Equivalent cut for preselection: DenomFakeSmurf && pt<35 && pt >= 20 && abs(eta)>=1.479 && abs(eta)<2.5 is bdthzz>0.0666
+  // Equivalent cut for preselection: DenomFakeSmurf && mcmatch && pt<35 && pt < 20 && abs(eta)<1.0 is newbdthww[3]>0.075
+  // Equivalent cut for preselection: DenomFakeSmurf && mcmatch && pt<35 && pt < 20 && abs(eta)>=1.0 && abs(eta)<1.479 is newbdthww[3]>0.075
+  // Equivalent cut for preselection: DenomFakeSmurf && mcmatch && pt<35 && pt < 20 && abs(eta)>=1.479 && abs(eta)<2.5 is newbdthww[3]>0.0906
+  // Equivalent cut for preselection: DenomFakeSmurf && mcmatch && pt<35 && pt >= 20 && abs(eta)<1.0 is newbdthww[3]>0.0642
+  // Equivalent cut for preselection: DenomFakeSmurf && mcmatch && pt<35 && pt >= 20 && abs(eta)>=1.0 && abs(eta)<1.479 is newbdthww[3]>0.0714
+  // Equivalent cut for preselection: DenomFakeSmurf && mcmatch && pt<35 && pt >= 20 && abs(eta)>=1.479 && abs(eta)<2.5 is newbdthww[3]>0.0666
 }
