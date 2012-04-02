@@ -37,14 +37,13 @@ public :
     kIsoWP80HZZNoEA,
     kIdWP80,
     knewWP80,
-    knewWP70x80
+    knewWP70,
+    knewWPHWW
   };
 
   enum wphzz {
     kHzzWP80,
-    kHzzWP80ch,
     kHzzWP95,
-    kHzzWP95ch,
   };
 
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain

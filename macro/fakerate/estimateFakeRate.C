@@ -43,20 +43,20 @@ void estimateFakeRate::Loop(const char *outname)
   fChain->SetBranchAddress("combPFIsoHZZ",&combPFIsoHZZ);
 
   std::vector<TString> EgammaBdtHWWBasedID, EgammaBdtHZZBasedID;
-  EgammaBdtHWWBasedID.push_back("WP80");
-  EgammaBdtHWWBasedID.push_back("WP80EA");
+  // this is for triggering electrons
+  EgammaBdtHWWBasedID.push_back("WP80");   // 2011 def
+  EgammaBdtHWWBasedID.push_back("WP80EA"); // 2011 def with EAs
   EgammaBdtHWWBasedID.push_back("IsoWP80");
   EgammaBdtHWWBasedID.push_back("IsoWP80EA");
   EgammaBdtHWWBasedID.push_back("IsoWP80ZZNoEA");
   EgammaBdtHWWBasedID.push_back("IdWP80");
-  EgammaBdtHWWBasedID.push_back("newWP80");
-  EgammaBdtHWWBasedID.push_back("newWP70x80");
+  EgammaBdtHWWBasedID.push_back("newWP80"); // 2012 MVA + EAs iso
+  EgammaBdtHWWBasedID.push_back("newWP70"); // 2012 MVA + EAs iso
+  EgammaBdtHWWBasedID.push_back("newWPHWW"); // same eff as 2011 HWW WP
 
-  // no need to repeat the iso only
+  // no need to repeat the iso only: non triggering eles
   EgammaBdtHZZBasedID.push_back("WP80");
-  EgammaBdtHZZBasedID.push_back("WP80ch"); // ch is with tracker isolation only
   EgammaBdtHZZBasedID.push_back("WP95"); 
-  EgammaBdtHZZBasedID.push_back("WP95ch"); // ch is with tracker isolation only
 
   // -----------------------------------------------------------------------
   // study vs eta
@@ -298,7 +298,7 @@ void estimateFakeRate::Loop(const char *outname)
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     // NOT EWK CORRECTED: STOP AT 35 GEV!!!
-    if(!TString(outname).Contains("zee1fake") && pt>35) continue;
+    if(!TString(outname).Contains("zee1fake") && (pt>35 || !DenomFakeSmurf)) continue;
 
     // fill the denominator: take only the highest pT denominator candidate
     float etaFake = fabs(eta);
@@ -544,7 +544,7 @@ void estimateFakeRate::Loop(const char *outname)
     }
 
     // === HWW 2012 WP80 BDT ===
-    if(aSel.output(etFake,etaFake,newbdthww[3],combPFIsoHZZ/etFake,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVABiased)) {
+    if(aSel.output(etFake,etaFake,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVABiased)) {
       BdtHWWEta[knewWP80]->Fill(etaFake);
       BdtHWWPt[knewWP80] ->Fill(etFake);
       BdtHWWPU[knewWP80] ->Fill(vertices);
@@ -576,41 +576,74 @@ void estimateFakeRate::Loop(const char *outname)
       }
     }
 
-    // === HWW 2012 ~WP70x80 BDT ===
-    if(passID(kBDTHWW2012_noIP) && passID(kIsoEACorr)) {
-      BdtHWWEta[knewWP70x80]->Fill(etaFake);
-      BdtHWWPt[knewWP70x80] ->Fill(etFake);
-      BdtHWWPU[knewWP70x80] ->Fill(vertices);
-      if (highPt) BdtHWWEtaHighPt[knewWP70x80]->Fill(etaFake);
-      if (lowPt)  BdtHWWEtaLowPt[knewWP70x80] ->Fill(etaFake);
+    // === HWW 2012 WP70 BDT ===
+    if(aSel.output(etFake,etaFake,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP70,HZZEleIDSelector::kMVABiased)) {
+      BdtHWWEta[knewWP70]->Fill(etaFake);
+      BdtHWWPt[knewWP70] ->Fill(etFake);
+      BdtHWWPU[knewWP70] ->Fill(vertices);
+      if (highPt) BdtHWWEtaHighPt[knewWP70]->Fill(etaFake);
+      if (lowPt)  BdtHWWEtaLowPt[knewWP70] ->Fill(etaFake);
       if (isInEB) { 
-	BdtHWWPtBarrel[knewWP70x80] ->Fill(etFake);
-	BdtHWWPUBarrel[knewWP70x80] ->Fill(vertices);
+	BdtHWWPtBarrel[knewWP70] ->Fill(etFake);
+	BdtHWWPUBarrel[knewWP70] ->Fill(vertices);
       }
       if (isInEE) {
-	BdtHWWPtEndcap[knewWP70x80] ->Fill(etFake);
-	BdtHWWPUEndcap[knewWP70x80] ->Fill(vertices);
+	BdtHWWPtEndcap[knewWP70] ->Fill(etFake);
+	BdtHWWPUEndcap[knewWP70] ->Fill(vertices);
       }
       if (etaRegion==1) {
-	BdtHWWPtBarrel1[knewWP70x80] -> Fill(etFake);   //, theWeight);      
-	BdtHWWPUBarrel1[knewWP70x80] -> Fill(vertices); //, theWeight);
+	BdtHWWPtBarrel1[knewWP70] -> Fill(etFake);   //, theWeight);      
+	BdtHWWPUBarrel1[knewWP70] -> Fill(vertices); //, theWeight);
       }
       if (etaRegion==2) {
-	BdtHWWPtBarrel2[knewWP70x80] -> Fill(etFake);   //, theWeight);      
-	BdtHWWPUBarrel2[knewWP70x80] -> Fill(vertices); //, theWeight);
+	BdtHWWPtBarrel2[knewWP70] -> Fill(etFake);   //, theWeight);      
+	BdtHWWPUBarrel2[knewWP70] -> Fill(vertices); //, theWeight);
       }
       if (etaRegion==3) { 
-	BdtHWWPtEndcap1[knewWP70x80] -> Fill(etFake);   //, theWeight);      
-	BdtHWWPUEndcap1[knewWP70x80] -> Fill(vertices); //, theWeight);      
+	BdtHWWPtEndcap1[knewWP70] -> Fill(etFake);   //, theWeight);      
+	BdtHWWPUEndcap1[knewWP70] -> Fill(vertices); //, theWeight);      
       }
       if (etaRegion==4) {
-	BdtHWWPtEndcap2[knewWP70x80] -> Fill(etFake);   //, theWeight);     
-	BdtHWWPUEndcap2[knewWP70x80] -> Fill(vertices); //, theWeight);     
+	BdtHWWPtEndcap2[knewWP70] -> Fill(etFake);   //, theWeight);     
+	BdtHWWPUEndcap2[knewWP70] -> Fill(vertices); //, theWeight);     
+      }
+    }
+
+    // === HWW 2012 ~WP70x80 BDT ===
+    if(aSel.output(etFake,etaFake,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWPHWW,HZZEleIDSelector::kMVABiased)) {
+      BdtHWWEta[knewWPHWW]->Fill(etaFake);
+      BdtHWWPt[knewWPHWW] ->Fill(etFake);
+      BdtHWWPU[knewWPHWW] ->Fill(vertices);
+      if (highPt) BdtHWWEtaHighPt[knewWPHWW]->Fill(etaFake);
+      if (lowPt)  BdtHWWEtaLowPt[knewWPHWW] ->Fill(etaFake);
+      if (isInEB) { 
+	BdtHWWPtBarrel[knewWPHWW] ->Fill(etFake);
+	BdtHWWPUBarrel[knewWPHWW] ->Fill(vertices);
+      }
+      if (isInEE) {
+	BdtHWWPtEndcap[knewWPHWW] ->Fill(etFake);
+	BdtHWWPUEndcap[knewWPHWW] ->Fill(vertices);
+      }
+      if (etaRegion==1) {
+	BdtHWWPtBarrel1[knewWPHWW] -> Fill(etFake);   //, theWeight);      
+	BdtHWWPUBarrel1[knewWPHWW] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==2) {
+	BdtHWWPtBarrel2[knewWPHWW] -> Fill(etFake);   //, theWeight);      
+	BdtHWWPUBarrel2[knewWPHWW] -> Fill(vertices); //, theWeight);
+      }
+      if (etaRegion==3) { 
+	BdtHWWPtEndcap1[knewWPHWW] -> Fill(etFake);   //, theWeight);      
+	BdtHWWPUEndcap1[knewWPHWW] -> Fill(vertices); //, theWeight);      
+      }
+      if (etaRegion==4) {
+	BdtHWWPtEndcap2[knewWPHWW] -> Fill(etFake);   //, theWeight);     
+	BdtHWWPUEndcap2[knewWPHWW] -> Fill(vertices); //, theWeight);     
       }
     }
 
     // === WP80 HZZ reoptimized cut ===
-    if(aSel.output(etFake,etaFake,bdthzz[3],combPFIsoHZZ/etFake,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVAUnbiased)) {
+    if(aSel.output(etFake,etaFake,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVAUnbiased)) {
       BdtHZZEta[kHzzWP80]->Fill(etaFake);
       BdtHZZPt[kHzzWP80] ->Fill(etFake);
       BdtHZZPU[kHzzWP80] ->Fill(vertices);
@@ -642,41 +675,8 @@ void estimateFakeRate::Loop(const char *outname)
       }
     }
 
-    // === WP80 HZZ reoptimized cut (charged isolation) ===
-    if(aSel.output(etFake,etaFake,bdthzz[3],chaPFIso/etFake,HZZEleIDSelector::kWP80ChIso,HZZEleIDSelector::kMVAUnbiased)) {
-      BdtHZZEta[kHzzWP80ch]->Fill(etaFake);
-      BdtHZZPt[kHzzWP80ch] ->Fill(etFake);
-      BdtHZZPU[kHzzWP80ch] ->Fill(vertices);
-      if (highPt) BdtHZZEtaHighPt[kHzzWP80ch]->Fill(etaFake);
-      if (lowPt)  BdtHZZEtaLowPt[kHzzWP80ch] ->Fill(etaFake);
-      if (isInEB) { 
-	BdtHZZPtBarrel[kHzzWP80ch] ->Fill(etFake);
-	BdtHZZPUBarrel[kHzzWP80ch] ->Fill(vertices);
-      }
-      if (isInEE) {
-	BdtHZZPtEndcap[kHzzWP80ch] ->Fill(etFake);
-	BdtHZZPUEndcap[kHzzWP80ch] ->Fill(vertices);
-      }
-      if (etaRegion==1) {
-	BdtHZZPtBarrel1[kHzzWP80ch] -> Fill(etFake);   //, theWeight);      
-	BdtHZZPUBarrel1[kHzzWP80ch] -> Fill(vertices); //, theWeight);
-      }
-      if (etaRegion==2) {
-	BdtHZZPtBarrel2[kHzzWP80ch] -> Fill(etFake);   //, theWeight);      
-	BdtHZZPUBarrel2[kHzzWP80ch] -> Fill(vertices); //, theWeight);
-      }
-      if (etaRegion==3) {
-	BdtHZZPtEndcap1[kHzzWP80ch] -> Fill(etFake);   //, theWeight);      
-	BdtHZZPUEndcap1[kHzzWP80ch] -> Fill(vertices); //, theWeight); 
-      }
-      if (etaRegion==4) {
-	BdtHZZPtEndcap2[kHzzWP80ch] -> Fill(etFake);   //, theWeight);     
-	BdtHZZPUEndcap2[kHzzWP80ch] -> Fill(vertices); //, theWeight);
-      }
-    }
-
     // === WP95 HZZ reoptimized cut ===
-    if(aSel.output(etFake,etaFake,bdthzz[3],combPFIsoHZZ/etFake,HZZEleIDSelector::kWP95,HZZEleIDSelector::kMVAUnbiased)) {
+    if(aSel.output(etFake,etaFake,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWP95,HZZEleIDSelector::kMVAUnbiased)) {
       BdtHZZEta[kHzzWP95]->Fill(etaFake);
       BdtHZZPt[kHzzWP95] ->Fill(etFake);
       BdtHZZPU[kHzzWP95] ->Fill(vertices);
@@ -705,39 +705,6 @@ void estimateFakeRate::Loop(const char *outname)
       if (etaRegion==4) {
 	BdtHZZPtEndcap2[kHzzWP95] -> Fill(etFake);   //, theWeight);     
 	BdtHZZPUEndcap2[kHzzWP95] -> Fill(vertices); //, theWeight);
-      }
-    }
-
-    // === WP95 HZZ reoptimized cut (charged isolation) ===
-    if(aSel.output(etFake,etaFake,bdthzz[3],chaPFIso/etFake,HZZEleIDSelector::kWP95ChIso,HZZEleIDSelector::kMVAUnbiased)) {
-      BdtHZZEta[kHzzWP95ch]->Fill(etaFake);
-      BdtHZZPt[kHzzWP95ch] ->Fill(etFake);
-      BdtHZZPU[kHzzWP95ch] ->Fill(vertices);
-      if (highPt) BdtHZZEtaHighPt[kHzzWP95ch]->Fill(etaFake);
-      if (lowPt)  BdtHZZEtaLowPt[kHzzWP95ch] ->Fill(etaFake);
-      if (isInEB) { 
-	BdtHZZPtBarrel[kHzzWP95ch] ->Fill(etFake);
-	BdtHZZPUBarrel[kHzzWP95ch] ->Fill(vertices);
-      }
-      if (isInEE) {
-	BdtHZZPtEndcap[kHzzWP95ch] ->Fill(etFake);
-	BdtHZZPUEndcap[kHzzWP95ch] ->Fill(vertices);
-      }
-      if (etaRegion==1) {
-	BdtHZZPtBarrel1[kHzzWP95ch] -> Fill(etFake);   //, theWeight);      
-	BdtHZZPUBarrel1[kHzzWP95ch] -> Fill(vertices); //, theWeight);
-      }
-      if (etaRegion==2) {
-	BdtHZZPtBarrel2[kHzzWP95ch] -> Fill(etFake);   //, theWeight);      
-	BdtHZZPUBarrel2[kHzzWP95ch] -> Fill(vertices); //, theWeight);
-      }
-      if (etaRegion==3) {
-	BdtHZZPtEndcap1[kHzzWP95ch] -> Fill(etFake);   //, theWeight);      
-	BdtHZZPUEndcap1[kHzzWP95ch] -> Fill(vertices); //, theWeight); 
-      }
-      if (etaRegion==4) {
-	BdtHZZPtEndcap2[kHzzWP95ch] -> Fill(etFake);   //, theWeight);     
-	BdtHZZPUEndcap2[kHzzWP95ch] -> Fill(vertices); //, theWeight);
       }
     }
 
