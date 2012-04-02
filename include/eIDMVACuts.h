@@ -58,6 +58,19 @@ float cutfulliso_biased[2][3][5] =
       { 0.308, 0.244, 0.155, 0.150, 0.171 }  // 1.479 < |eta| < 2.5
     }
   };
+
+// special cuts for HWW
+float cutbdtfulliso_hww[2][3] = 
+  { 
+    { 0.294, 0.730, 0.802 }, // 10 < pt < 20 GeV
+    { 0.950, 0.970, 0.950 } // pt > 20 GeV
+  };
+
+float cutfulliso_hww[2][3] = 
+  {
+    { 0.158, 0.158, 0.108 }, // 10 < pt < 20 GeV
+    { 0.154, 0.154, 0.100 } // pt > 20 GeV
+  };
   
 // === CHARGED PF ISOLATION ONLY: DUMMY!!!! ===
 
