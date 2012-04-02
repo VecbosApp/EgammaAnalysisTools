@@ -167,7 +167,7 @@ void makeFriendHZZIdBits(const char* file) {
   fF->mkdir("eleIDdir");
   TTree *fT = new TTree("T1","tree with hzz isolation");
   // the new WPs with full isolation for triggering electrons
-  Int_t WP95trg, WP90trg, WP85trg, WP80trg, WP70trg, WP80x70trg;
+  Int_t WP95trg, WP90trg, WP85trg, WP80trg, WP70trg;
   // the new WPs with charged only isolation for non triggering electrons
   Int_t WP95notrg, WP90notrg, WP85notrg, WP80notrg, WP70notrg;
   // the hww2011 WP and the one with the same efficiency
@@ -184,7 +184,7 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("wp85trg", &WP85trg, "wp85trg/I");
   fT->Branch("wp80trg", &WP80trg, "wp80trg/I");
   fT->Branch("wp70trg", &WP70trg, "wp70trg/I");
-  fT->Branch("wp80x70trg", &WP80x70trg, "wp80x70trg/I"); // 2012 WP?
+  fT->Branch("newhwwWP", &newhwwWP, "newhwwWP/I"); // 2012 WP?
   fT->Branch("hwwWP", &hwwWP, "hwwWP/I");  // 2011 WP
   // for non triggering eles
   fT->Branch("wp95notrg", &WP95notrg, "chwp95notrg/I");
@@ -207,15 +207,14 @@ void makeFriendHZZIdBits(const char* file) {
      if(passHWWID(eta,pt,bdthww[0],newbdthww[3],rho,combPFIsoHZZ,combPFIsoHWW,kBDTHWW2011_withIP) && 
 	passHWWID(eta,pt,bdthww[0],newbdthww[3],rho,combPFIsoHZZ,combPFIsoHWW,kIsoHWW2011)) hwwWP = 1;
 
-     WP95trg=WP90trg=WP85trg=WP80trg=WP70trg=WP80x70trg=0;
+     WP95trg=WP90trg=WP85trg=WP80trg=WP70trg=0;
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP95,HZZEleIDSelector::kMVABiased)) WP95trg=1;
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP90,HZZEleIDSelector::kMVABiased)) WP90trg=1;
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP85,HZZEleIDSelector::kMVABiased)) WP85trg=1;
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVABiased)) WP80trg=1;
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP70,HZZEleIDSelector::kMVABiased)) WP70trg=1;
-     // mixed 70 x 80
-     if(pt<20 && aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP70,HZZEleIDSelector::kMVABiased)) WP80x70trg=1;
-     if(pt>=20 && aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVABiased)) WP80x70trg=1;
+     // same efficiency as 2011 WP
+     if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWPHWW,HZZEleIDSelector::kMVABiased)) newhwwWP=1;
 
      WP95notrg=WP90notrg=WP85notrg=WP80notrg=WP70notrg=0;
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWP95,HZZEleIDSelector::kMVAUnbiased)) WP95notrg=1;
