@@ -20,6 +20,22 @@
 class Egamma : public EgammaBase{
 
 public:
+
+  enum ElectronEffectiveAreaType {
+    kEleChargedIso03, 
+    kEleNeutralHadronIso03, 
+    kEleGammaIso03, 
+    kEleGammaIsoVetoEtaStrip03, 
+    kEleChargedIso04, 
+    kEleNeutralHadronIso04, 
+    kEleGammaIso04, 
+    kEleGammaIsoVetoEtaStrip04, 
+    kEleNeutralHadronIso007, 
+    kEleHoverE, 
+    kEleHcalDepth1OverEcal, 
+    kEleHcalDepth2OverEcal    
+  };
+
   typedef std::pair<unsigned int,unsigned int> aLSSegment;
   typedef std::vector< std::pair<unsigned int,unsigned int> > LSSegments;
   typedef unsigned int aRun;
@@ -60,6 +76,8 @@ public:
   float likelihoodRatio(int eleIndex, ElectronLikelihood &lh);
   /// return the value of electron BDT: HWW BDT
   float eleBDT(ElectronIDMVA *mva, int iele);
+  // Si proposal for 2012
+  float eleBDTWithIso(ElectronIDMVA *mva, int eleIndex);
   /// return the value of electron BDT: HZZ BDT
   float eleBDT(ElectronIDMVAHZZ *mva, int iele);
   /// apply the BDT cut
@@ -71,6 +89,9 @@ public:
   int isDenomFake_HwwEgamma(int theEle);
 
 protected:
+
+  double SiElectronEffectiveArea(ElectronEffectiveAreaType type, double Eta);
+
   ///goodRUN/LS list
   runsLSSegmentsMap goodRunLS; 
   std::string jsonFile;

@@ -399,6 +399,130 @@ float Egamma::eleBDT(ElectronIDMVA *mva, int eleIndex) {
 
 }
 
+// Si proposal for 2012
+float Egamma::eleBDTWithIso(ElectronIDMVA *mva, int eleIndex) {
+  
+  if(mva==0) {
+    std::cout << "electron BDT not created/initialized. BIG PROBLEM. Returning false output -999!" << std::endl; 
+    return -999.;
+  }
+  
+  int gsfTrack = gsfTrackIndexEle[eleIndex]; 
+  double gsfsign   = (-eleDxyPV(eleIndex,0) >=0 ) ? 1. : -1.;
+
+  float ElePt = GetPt(pxEle[eleIndex],pyEle[eleIndex]);
+
+  float EleDEtaIn = deltaEtaAtVtxEle[eleIndex];
+  float EleDPhiIn = deltaPhiAtVtxEle[eleIndex];
+  float EleDEtaCalo = deltaEtaAtCaloEle[eleIndex];
+  float EleDPhiCalo = deltaPhiAtCaloEle[eleIndex];
+  float EleHoverE = hOverEEle[eleIndex];
+  float EleD0 = gsfsign * transvImpactParGsfTrack[gsfTrack];
+  float EleFBrem = fbremEle[eleIndex];
+  float EleEOverP = eSuperClusterOverPEle[eleIndex];
+  float EleESeedClusterOverPout = eSeedOverPoutEle[eleIndex];
+  float EleNBrem = nbremsEle[eleIndex];
+  float EleGSFChi2 = trackNormalizedChi2GsfTrack[gsfTrack];
+
+  TVector3 pInGsf(pxGsfTrack[gsfTrack],pyGsfTrack[gsfTrack],pzGsfTrack[gsfTrack]);
+
+  float EleIP3d = gsfsign * impactPar3DGsfTrack[gsfTrack];
+  float EleIP3dSig = EleIP3d/impactPar3DErrorGsfTrack[gsfTrack];
+
+  // we have not pout and seed cluster energy in the trees. Gymnastyc...
+  float Pout = pInGsf.Mag() - fbremEle[eleIndex] * pInGsf.Mag();
+  float SCSeedEnergy = EleESeedClusterOverPout * Pout;
+  float EleESeedClusterOverPIn = SCSeedEnergy/pInGsf.Mag();      
+
+  float EleSigmaIEtaIEta, EleSigmaIPhiIPhi, EleOneOverEMinusOneOverP, EleSCEta, EleR9, 
+    EleCovIEtaIPhi, EleEtaWidth, ElePhiWidth, EleESoRaw;
+
+  Utils anaUtils;
+  bool ecaldriven = anaUtils.electronRecoType(recoFlagsEle[eleIndex], isEcalDriven);
+  if(ecaldriven) {
+    int sc = superClusterIndexEle[eleIndex];
+    EleSigmaIEtaIEta = sqrt(covIEtaIEtaSC[sc]);
+    EleSigmaIPhiIPhi = sqrt(covIPhiIPhiSC[sc]);
+    EleCovIEtaIPhi = covIEtaIPhiSC[sc];
+    EleOneOverEMinusOneOverP = 1./energySC[sc]  - 1./pInGsf.Mag();
+    EleEtaWidth = etaWidthSC[sc];
+    ElePhiWidth = phiWidthSC[sc];
+    EleR9 = e3x3SC[sc]/rawEnergySC[sc];
+    EleESoRaw = esEnergySC[sc]/rawEnergySC[sc];
+    EleSCEta = etaSC[sc];
+  } else {
+    int sc = PFsuperClusterIndexEle[eleIndex];
+    if(sc>-1) {
+      EleSigmaIEtaIEta = sqrt(covIEtaIEtaPFSC[sc]);
+      EleSigmaIPhiIPhi = sqrt(covIPhiIPhiPFSC[sc]);
+      EleCovIEtaIPhi = covIEtaIPhiPFSC[sc];
+      EleOneOverEMinusOneOverP = 1./energyPFSC[sc]  - 1./pInGsf.Mag();
+      EleEtaWidth = etaWidthPFSC[sc];
+      ElePhiWidth = phiWidthPFSC[sc];
+      EleR9 = e3x3PFSC[sc]/rawEnergyPFSC[sc];
+      EleESoRaw = esEnergyPFSC[sc]/rawEnergyPFSC[sc];
+      EleSCEta = etaPFSC[sc];
+    } else {
+      EleSigmaIEtaIEta = 999.;
+      EleSigmaIPhiIPhi = 999.;
+      EleOneOverEMinusOneOverP = 999.;
+      EleESeedClusterOverPIn = 999.;
+      EleEtaWidth = 999.;
+      ElePhiWidth = 999.;
+      EleESoRaw = esEnergyPFSC[sc]/rawEnergyPFSC[sc];
+      EleR9 = 999.;
+      EleSCEta = 0.;
+    }
+  }
+
+  float EleChargedIso03OverPt = (pfCandChargedIso03Ele[eleIndex] - rhoFastjet * SiElectronEffectiveArea(kEleChargedIso03,EleSCEta))/ElePt;
+  float EleGammaIso03OverPt = (pfCandPhotonIso03Ele[eleIndex] 
+			       - rhoFastjet * SiElectronEffectiveArea(kEleGammaIso03,EleSCEta)
+			       + rhoFastjet * SiElectronEffectiveArea(kEleGammaIsoVetoEtaStrip03,EleSCEta))/ElePt;
+  float EleNeutralHadronIso03OverPt = (pfCandNeutralIso03Ele[eleIndex] 
+				       - rhoFastjet * SiElectronEffectiveArea(kEleNeutralHadronIso03,EleSCEta)
+				       + rhoFastjet * SiElectronEffectiveArea(kEleNeutralHadronIso007,EleSCEta))/ElePt;
+
+  float EleChargedIso04OverPt = (pfCandChargedIso04Ele[eleIndex] - rhoFastjet * SiElectronEffectiveArea(kEleChargedIso04,EleSCEta))/ElePt;
+  float EleGammaIso04OverPt = (pfCandPhotonIso04Ele[eleIndex] 
+			       - rhoFastjet * SiElectronEffectiveArea(kEleGammaIso04,EleSCEta)
+			       + rhoFastjet * SiElectronEffectiveArea(kEleGammaIsoVetoEtaStrip04,EleSCEta))/ElePt;
+  float EleNeutralHadronIso04OverPt = (pfCandNeutralIso04Ele[eleIndex] 
+				       - rhoFastjet * SiElectronEffectiveArea(kEleNeutralHadronIso04,EleSCEta)
+				       + rhoFastjet * SiElectronEffectiveArea(kEleNeutralHadronIso007,EleSCEta))/ElePt;
+
+  return mva->MVAValueWithIso(ElePt, EleSCEta,
+			      EleSigmaIEtaIEta,
+			      EleDEtaIn,
+			      EleDPhiIn,
+			      EleHoverE,
+			      EleD0,
+			      EleFBrem,
+			      EleEOverP,
+			      EleESeedClusterOverPout,
+			      EleSigmaIPhiIPhi,
+			      EleNBrem,
+			      EleOneOverEMinusOneOverP,
+			      EleESeedClusterOverPIn,
+			      EleIP3d,
+			      EleIP3dSig,
+			      EleGSFChi2,
+			      EleDEtaCalo,
+			      EleDPhiCalo,
+			      EleR9,
+			      EleEtaWidth,
+			      ElePhiWidth,
+			      EleCovIEtaIPhi,
+			      EleESoRaw,
+			      EleChargedIso03OverPt,
+			      EleNeutralHadronIso03OverPt,
+			      EleGammaIso03OverPt,
+			      EleChargedIso04OverPt,
+			      EleNeutralHadronIso04OverPt,
+			      EleGammaIso04OverPt);
+
+}
+
 // using HZZ BDT
 float Egamma::eleBDT(ElectronIDMVAHZZ *mva, int eleIndex) {
   
@@ -472,6 +596,7 @@ float Egamma::eleBDT(ElectronIDMVAHZZ *mva, int eleIndex) {
       ElePhiWidth = phiWidthPFSC[sc];
       EleR9 = e3x3PFSC[sc]/rawEnergyPFSC[sc];
       Ele1oEm1oP = 1./energyPFSC[sc]  - 1./probeP4.Vect().Mag();
+      EleESoRaw = esEnergyPFSC[sc]/rawEnergyPFSC[sc];
       EleSCEta = etaPFSC[sc];
     } else {
       EleSigmaIEtaIEta = 999.;
@@ -685,4 +810,77 @@ int Egamma::isDenomFake_smurfs(int theEle) {
 
   if(isGoodDenom) return 1;
   else return 0;
+}
+
+double Egamma::SiElectronEffectiveArea(ElectronEffectiveAreaType type, double Eta) {
+
+  double EffectiveArea = 0;
+  
+  if (fabs(Eta) < 1.0) {
+    if (type == kEleChargedIso03) EffectiveArea = 0.000;
+    if (type == kEleNeutralHadronIso03) EffectiveArea = 0.017;
+    if (type == kEleGammaIso03) EffectiveArea = 0.045;
+    if (type == kEleGammaIsoVetoEtaStrip03) EffectiveArea = 0.014;
+    if (type == kEleChargedIso04) EffectiveArea = 0.000;
+    if (type == kEleNeutralHadronIso04) EffectiveArea = 0.034;
+    if (type == kEleGammaIso04) EffectiveArea = 0.079;
+    if (type == kEleGammaIsoVetoEtaStrip04) EffectiveArea = 0.014;
+    if (type == kEleNeutralHadronIso007) EffectiveArea = 0.000;
+    if (type == kEleHoverE) EffectiveArea = 0.00016;
+    if (type == kEleHcalDepth1OverEcal) EffectiveArea = 0.00016;
+    if (type == kEleHcalDepth2OverEcal) EffectiveArea = 0.00000;    
+  } else if (fabs(Eta) >= 1.0 && fabs(Eta) < 1.479 ) {
+    if (type == kEleChargedIso03) EffectiveArea = 0.000;
+    if (type == kEleNeutralHadronIso03) EffectiveArea = 0.025;
+    if (type == kEleGammaIso03) EffectiveArea = 0.052;
+    if (type == kEleGammaIsoVetoEtaStrip03) EffectiveArea = 0.030;
+    if (type == kEleChargedIso04) EffectiveArea = 0.000;
+    if (type == kEleNeutralHadronIso04) EffectiveArea = 0.050;
+    if (type == kEleGammaIso04) EffectiveArea = 0.073;
+    if (type == kEleGammaIsoVetoEtaStrip04) EffectiveArea = 0.030;
+    if (type == kEleNeutralHadronIso007) EffectiveArea = 0.000;
+    if (type == kEleHoverE) EffectiveArea = 0.00022;
+    if (type == kEleHcalDepth1OverEcal) EffectiveArea = 0.00022;
+    if (type == kEleHcalDepth2OverEcal) EffectiveArea = 0.00000;    
+  } else if (fabs(Eta) >= 1.479 && fabs(Eta) < 2.0 ) {
+    if (type == kEleChargedIso03) EffectiveArea = 0.000;
+    if (type == kEleNeutralHadronIso03) EffectiveArea = 0.030;
+    if (type == kEleGammaIso03) EffectiveArea = 0.170;
+    if (type == kEleGammaIsoVetoEtaStrip03) EffectiveArea = 0.134;
+    if (type == kEleChargedIso04) EffectiveArea = 0.000;
+    if (type == kEleNeutralHadronIso04) EffectiveArea = 0.060;
+    if (type == kEleGammaIso04) EffectiveArea = 0.187;
+    if (type == kEleGammaIsoVetoEtaStrip04) EffectiveArea = 0.134;
+    if (type == kEleNeutralHadronIso007) EffectiveArea = 0.000;
+    if (type == kEleHoverE) EffectiveArea = 0.00030;
+    if (type == kEleHcalDepth1OverEcal) EffectiveArea = 0.00026;
+    if (type == kEleHcalDepth2OverEcal) EffectiveArea = 0.00002;        
+  } else if (fabs(Eta) >= 2.0 && fabs(Eta) < 2.25 ) {
+    if (type == kEleChargedIso03) EffectiveArea = 0.000;
+    if (type == kEleNeutralHadronIso03) EffectiveArea = 0.022;
+    if (type == kEleGammaIso03) EffectiveArea = 0.623;
+    if (type == kEleGammaIsoVetoEtaStrip03) EffectiveArea = 0.516;
+    if (type == kEleChargedIso04) EffectiveArea = 0.000;
+    if (type == kEleNeutralHadronIso04) EffectiveArea = 0.055;
+    if (type == kEleGammaIso04) EffectiveArea = 0.659;
+    if (type == kEleGammaIsoVetoEtaStrip04) EffectiveArea = 0.517;
+    if (type == kEleNeutralHadronIso007) EffectiveArea = 0.000;
+    if (type == kEleHoverE) EffectiveArea = 0.00054;
+    if (type == kEleHcalDepth1OverEcal) EffectiveArea = 0.00045;
+    if (type == kEleHcalDepth2OverEcal) EffectiveArea = 0.00003;
+  } else if (fabs(Eta) >= 2.25 && fabs(Eta) < 2.5 ) {
+    if (type == kEleChargedIso03) EffectiveArea = 0.000;
+    if (type == kEleNeutralHadronIso03) EffectiveArea = 0.018;
+    if (type == kEleGammaIso03) EffectiveArea = 1.198;
+    if (type == kEleGammaIsoVetoEtaStrip03) EffectiveArea = 1.049;
+    if (type == kEleChargedIso04) EffectiveArea = 0.000;
+    if (type == kEleNeutralHadronIso04) EffectiveArea = 0.073;
+    if (type == kEleGammaIso04) EffectiveArea = 1.258;
+    if (type == kEleGammaIsoVetoEtaStrip04) EffectiveArea = 1.051;
+    if (type == kEleNeutralHadronIso007) EffectiveArea = 0.000;
+    if (type == kEleHoverE) EffectiveArea = 0.00082;
+    if (type == kEleHcalDepth1OverEcal) EffectiveArea = 0.00066;
+    if (type == kEleHcalDepth2OverEcal) EffectiveArea = 0.00004;
+  }
+  return EffectiveArea;  
 }
