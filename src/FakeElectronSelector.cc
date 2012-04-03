@@ -41,7 +41,6 @@ FakeElectronSelector::FakeElectronSelector(TTree *tree)
 
   // configuring the electron BDT
   fMVAHWW = new ElectronIDMVA();
-  fMVAHWWNoIP = new ElectronIDMVA();
   fMVAHWW->Initialize("BDTG method",
                       "elebdtweights/Subdet0LowPt_WithIPInfo_BDTG.weights.xml",
                       "elebdtweights/Subdet1LowPt_WithIPInfo_BDTG.weights.xml",
@@ -51,14 +50,15 @@ FakeElectronSelector::FakeElectronSelector(TTree *tree)
                       "elebdtweights/Subdet2HighPt_WithIPInfo_BDTG.weights.xml" ,                
                       ElectronIDMVA::kWithIPInfo);
 
-  fMVAHWWNoIP->Initialize("BDTG method",
-                          "elebdtweights/Subdet0LowPt_NoIPInfo_BDTG.weights.xml",
-                          "elebdtweights/Subdet1LowPt_NoIPInfo_BDTG.weights.xml",
-                          "elebdtweights/Subdet2LowPt_NoIPInfo_BDTG.weights.xml",
-                          "elebdtweights/Subdet0HighPt_NoIPInfo_BDTG.weights.xml",
-                          "elebdtweights/Subdet1HighPt_NoIPInfo_BDTG.weights.xml",
-                          "elebdtweights/Subdet2HighPt_NoIPInfo_BDTG.weights.xml" ,                
-                      ElectronIDMVA::kNoIPInfo);
+  fMVAHWWWithIso = new ElectronIDMVA();
+  fMVAHWWWithIso->Initialize("BDTG method",
+			     "elebdtweights/Subdet0LowPt_IDIsoCombined_BDTG.weights.xml",
+			     "elebdtweights/Subdet1LowPt_IDIsoCombined_BDTG.weights.xml",
+			     "elebdtweights/Subdet2LowPt_IDIsoCombined_BDTG.weights.xml",
+			     "elebdtweights/Subdet0HighPt_IDIsoCombined_BDTG.weights.xml",
+			     "elebdtweights/Subdet1HighPt_IDIsoCombined_BDTG.weights.xml",
+			     "elebdtweights/Subdet2HighPt_IDIsoCombined_BDTG.weights.xml" ,                
+			     ElectronIDMVA::kIDIsoCombined);
   
   // configuring the electron BDT for H->ZZ
   fMVAHZZDanV0 = new ElectronIDMVAHZZ();
@@ -515,7 +515,7 @@ void FakeElectronSelector::Loop(const char *outname) {
     float lh=likelihoodRatio(theDenom1,*LH);
     float hwwbdts[2];
     hwwbdts[0] = eleBDT(fMVAHWW,theDenom1);
-    hwwbdts[1] = eleBDT(fMVAHWWNoIP,theDenom1);
+    hwwbdts[1] = eleBDTWithIso(fMVAHWWWithIso,theDenom1);
     float hzzbdts[4];
     hzzbdts[0] = eleBDT(fMVAHZZDanV0,theDenom1);
     hzzbdts[1] = eleBDT(fMVAHZZSiV0,theDenom1);

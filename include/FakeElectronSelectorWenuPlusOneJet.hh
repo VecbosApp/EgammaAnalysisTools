@@ -39,7 +39,7 @@ private:
 
   /// MVA for electron ID. To be created and initialized from the children classes
   ElectronLikelihood *LH;
-  ElectronIDMVA *fMVAHWW, *fMVAHWWNoIP;
+  ElectronIDMVA *fMVAHWW, *fMVAHWWWithIso;
   ElectronIDMVAHZZ *fMVAHZZDanV0, *fMVAHZZSiV0, *fMVAHZZSiV1, *fMVAHZZSiDanV2;
   ElectronIDMVAHZZ *fMVAHWWDanV0, *fMVAHWWSiV0, *fMVAHWWSiV1, *fMVAHWWSiDanV2;
 
