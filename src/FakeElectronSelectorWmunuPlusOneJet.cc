@@ -377,7 +377,7 @@ void FakeElectronSelectorWmunuPlusOneJet::Loop(const char *outname) {
       sep = covIEtaIPhiSC[sc]/(sqrt(covIEtaIEtaSC[sc])*sqrt(covIPhiIPhiSC[sc]));
       spp = sqrt(covIPhiIPhiSC[sc]);
       oneoveremoneoverp = 1./energySC[sc]  - 1./probeP4.Vect().Mag();
-      eseedopin = seedEnergy/probeP4.Vect().Mag();
+      eseedopin = seedEnergy/p3ModeGsf.Mag();
       emaxovere = eMaxSC[sc]/seedEnergy;
       etopovere = eTopSC[sc]/seedEnergy;
       ebottomovere = eBottomSC[sc]/seedEnergy;
@@ -414,7 +414,7 @@ void FakeElectronSelectorWmunuPlusOneJet::Loop(const char *outname) {
         sep = covIEtaIPhiPFSC[sc]/(sqrt(covIEtaIEtaPFSC[sc])*sqrt(covIPhiIPhiPFSC[sc]));
         spp = sqrt(covIPhiIPhiPFSC[sc]);
         oneoveremoneoverp = 1./energyPFSC[sc]  - 1./probeP4.Vect().Mag();
-	eseedopin = seedEnergy/probeP4.Vect().Mag();
+	eseedopin = seedEnergy/p3ModeGsf.Mag();
 	emaxovere = eMaxPFSC[sc]/seedEnergy;
         etopovere = eTopPFSC[sc]/seedEnergy;
         ebottomovere = eBottomPFSC[sc]/seedEnergy;
