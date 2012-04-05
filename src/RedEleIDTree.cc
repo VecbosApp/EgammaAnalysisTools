@@ -85,29 +85,7 @@ void RedEleIDTree::addElectronIdBits() {
   myTree->Branch("CutBasedIdOlyID",    myCutBasedIdOnlyID,   "CutBasedIdOnlyID[6]/I");
   myTree->Branch("CutBasedIdOnlyIso",  myCutBasedIdOnlyIso,  "CutBasedIdOnlyIso[6]/I");
   myTree->Branch("CutBasedIdOnlyConv", myCutBasedIdOnlyConv, "CutBasedIdOnlyConv[6]/I");
-
   myTree->Branch("cic", myCiC, "cic[5]/I");
-
-  myTree->Branch("LHVeryLoose",  &myLHBasedId[0],            "LHVeryLoose/I");
-  myTree->Branch("LHLoose",      &myLHBasedId[1],            "LHLoose/I");
-  myTree->Branch("LHMedium",     &myLHBasedId[2],            "LHMedium/I");
-  myTree->Branch("LHTight",      &myLHBasedId[3],            "LHTight/I");
-  myTree->Branch("LHHyperTight", &myLHBasedId[4],            "LHHyperTight/I");
-  myTree->Branch("LHBasedIdOlyID",     myLHBasedIdOnlyID,    "LHBasedIdOnlyID[5]/I");
-  myTree->Branch("LHBasedIdOnlyIso",   myLHBasedIdOnlyIso,   "LHBasedIdOnlyIso[5]/I");
-  myTree->Branch("LHBasedIdOnlyConv",  myLHBasedIdOnlyConv,  "LHBasedIdOnlyConv[5]/I");
-
-  myTree->Branch("LHPFIsoVeryLoose",  &myLHBasedPFIsoId[0],            "LHPFIsoVeryLoose/I");
-  myTree->Branch("LHPFIsoLoose",      &myLHBasedPFIsoId[1],            "LHPFIsoLoose/I");
-  myTree->Branch("LHPFIsoMedium",     &myLHBasedPFIsoId[2],            "LHPFIsoMedium/I");
-  myTree->Branch("LHPFIsoTight",      &myLHBasedPFIsoId[3],            "LHPFIsoTight/I");
-  myTree->Branch("LHPFIsoHyperTight", &myLHBasedPFIsoId[4],            "LHPFIsoHyperTight/I");
-  myTree->Branch("LHPFIsoBasedIdOlyID",     myLHBasedPFIsoIdOnlyID,    "LHPFIsoBasedIdOnlyID[5]/I");
-  myTree->Branch("LHPFIsoBasedIdOnlyIso",   myLHBasedPFIsoIdOnlyIso,   "LHPFIsoBasedIdOnlyIso[5]/I");
-  myTree->Branch("LHPFIsoBasedIdOnlyConv",  myLHBasedPFIsoIdOnlyConv,  "LHPFIsoBasedIdOnlyConv[5]/I");
-
-  myTree->Branch("DenomFake",          &myDenomFake,             "DenomFake/I");
-  myTree->Branch("DenomFakeSmurf",     &myDenomFakeSmurf,        "DenomFakeSmurf/I");
   myTree->Branch("BDTIdOnlyId",        &myBDTIdOnlyId,           "BDTIdOnlyId/I");
 }
 

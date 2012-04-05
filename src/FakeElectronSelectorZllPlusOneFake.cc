@@ -148,6 +148,7 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
   myOutKineTree = new FakeTree(filename);
   sprintf(filename,"%s_FakeIDTree.root",outname);
   myOutIDTree = new RedEleIDTree(filename);
+  myOutIDTree->addElectronIdBits();
   myOutIDTree->addDenominatorFakeBits();
   myOutIDTree->addAttributesSignal();
   myOutIDTree->addIsolations();

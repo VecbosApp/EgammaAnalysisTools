@@ -133,6 +133,7 @@ void HZZ4LElectronSelector::Loop(const char *treefilesuffix) {
   char treename[200];
   sprintf(treename,"%s.root",treefilesuffix);
   RedEleIDTree reducedTree(treename);
+  reducedTree.addElectronIdBits();
   reducedTree.addIsolations();
   reducedTree.addRunInfos();
   reducedTree.addMore();
