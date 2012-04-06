@@ -167,7 +167,7 @@ void makeFriendHZZIdBits(const char* file) {
   pT->SetBranchAddress("pt", &pt);
   pT->SetBranchAddress("rho", &rho);
   pT->SetBranchAddress("vertices", &vertices);
-  pT->SetBranchAddress("misshits", &misshits);
+  pT->SetBranchAddress("missHits", &misshits);
   pT->SetBranchAddress("cic", cic);
   if(!TString(file).Contains("fake")) pT->SetBranchAddress("mass", &mass);
   else mass=-1.0;
@@ -181,7 +181,7 @@ void makeFriendHZZIdBits(const char* file) {
   // the hww2011 WP and the one with the same efficiency
   // hzz WP is using the MVA for the unbiased electrons
   Int_t hwwWP, newhwwWP;
-  Int_t cicmedium;
+  Int_t cicmedium, cicmediumid, cicmediumiso;
   // first 4 variables needed for TP
   fT->Branch("mass", &mass, "mass/F");
   fT->Branch("pt", &pt, "pt/F");
@@ -205,6 +205,8 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("denom", &DenomFakeSmurf, "denom/I");
   // the cic used for HZZ
   fT->Branch("cicmedium", &cicmedium, "cicmedium/I");
+  fT->Branch("cicmediumid", &cicmediumid, "cicmediumid/I");
+  fT->Branch("cicmediumiso", &cicmediumiso, "cicmediumiso/I");
 
   HZZEleIDSelector aSel;
 
@@ -235,8 +237,10 @@ void makeFriendHZZIdBits(const char* file) {
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVAUnbiased)) WP80notrg=1;
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWP70,HZZEleIDSelector::kMVAUnbiased)) WP70notrg=1;
 
-     cicmedium=0;
-     if(cicid(cic,3) && ciciso(cic,3) &&misshits<=1) cicmedium=1;
+     cicmedium=cicmediumid=cicmediumiso=0;
+     if(cicid(cic,3) && ciciso(cic,3) && misshits<=1) cicmedium=1;
+     if(cicid(cic,3) && misshits<=1) cicmediumid=1;
+     if(ciciso(cic,3)) cicmediumiso=1;
 
      fT->Fill();
   }
