@@ -17,6 +17,24 @@ Egamma::Egamma(TTree *tree) : EgammaBase(tree)
 {
   jsonFile = "";
   lastFile = "";
+
+  // H->ZZ/WW effective areas computed in 2012
+  float Aeff_neu_dr04_[7] = { 0.045, 0.065, 0.068, 0.057, 0.058, 0.061, 0.110 };
+  float Aeff_pho_dr04_[7] = { 0.140, 0.130, 0.079, 0.130, 0.150, 0.160, 0.180 };
+  
+  // H->ZZ 2011 detector based effective areas
+  float Aeff_ecal_dr03_[2] = { 0.078, 0.046 };
+  float Aeff_hcal_dr03_[2] = { 0.026, 0.072 };
+  
+  for(int i=0;i<7;i++) {
+    Aeff_neu_dr04[i]= Aeff_neu_dr04_[i];
+    Aeff_pho_dr04[i]= Aeff_pho_dr04_[i];
+  }
+  for(int i=0;i<2;i++) {
+    Aeff_ecal_dr03[i]= Aeff_ecal_dr03_[i];
+    Aeff_hcal_dr03[i]= Aeff_hcal_dr03_[i];
+  }
+
 }
 
 Egamma::~Egamma()

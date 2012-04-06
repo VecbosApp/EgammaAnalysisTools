@@ -488,9 +488,12 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
     // CiC...
     eIDCiChzzSelector cicsel;
     int cic[5];
+    int iecal = (fabs(eta)<1.479) ? 0 : 1;
     for(int i=0; i<5; i++) cic[i] = cicsel.ElectronId_V03(pt,EleSCEta,see,eop,eseedopin,fbrem,
-							  dr03TkSumPtEle[probe],dr03EcalRecHitSumEtEle[probe],dr03HcalTowerSumEtEle[probe],d0,
-							  misshits,deta,dphi,HoE,dcot,
+							  dr03TkSumPtEle[probe],
+							  dr03EcalRecHitSumEtEle[probe] - rhoFastjet * Aeff_ecal_dr03[iecal],
+							  dr03HcalTowerSumEtEle[probe] - rhoFastjet * Aeff_hcal_dr03[iecal],
+							  d0,misshits,deta,dphi,HoE,dcot,
 							  dist,!ecalseed,i,false);
 
     // some MVAs...
