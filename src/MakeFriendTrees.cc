@@ -30,6 +30,11 @@ enum idType {
 float Aeff_neu_dr04[7] = { 0.045, 0.062, 0.061, 0.041, 0.050, 0.051, 0.110 };
 float Aeff_pho_dr04[7] = { 0.140, 0.130, 0.080, 0.130, 0.140, 0.160, 0.180 };
 
+bool cicid(int *cic, int level) { return (cic[level]>>0)%2; }
+bool ciciso(int *cic, int level) { return (cic[level]>>1)%2; }
+bool cicconv(int *cic, int level) { return (cic[level]>>2)%2; }
+bool cicip(int *cic, int level) { return (cic[level]>>3)%2; }
+
 bool passHWWID(Float_t eta, Float_t pt, Float_t bdthww, Float_t bdthzz, Float_t rho, Float_t combIso, Float_t combPFIsoHWW, idType type) {
   if(type == kIsoHWW2011) {
     if(fabs(eta)<1.479) return (combPFIsoHWW/pt < 0.13);
@@ -145,9 +150,10 @@ void makeFriendHZZIdBits(const char* file) {
   Float_t eta, abseta, pt, rho, vertices;
   Float_t bdthww[2], newbdthww[4], combPFIsoHWW;
   Float_t combPFIsoHZZ, bdthzz[4];
+  Int_t cic[5];
   Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8];
   Float_t mass; // not dummy only for TP trees
-  Int_t DenomFakeSmurf;
+  Int_t DenomFakeSmurf, misshits;
   pT->SetBranchAddress("bdthww", bdthww);
   pT->SetBranchAddress("newbdthww", newbdthww);
   pT->SetBranchAddress("bdthzz",bdthzz);
@@ -161,6 +167,8 @@ void makeFriendHZZIdBits(const char* file) {
   pT->SetBranchAddress("pt", &pt);
   pT->SetBranchAddress("rho", &rho);
   pT->SetBranchAddress("vertices", &vertices);
+  pT->SetBranchAddress("misshits", &misshits);
+  pT->SetBranchAddress("cic", cic);
   if(!TString(file).Contains("fake")) pT->SetBranchAddress("mass", &mass);
   else mass=-1.0;
 
@@ -173,6 +181,7 @@ void makeFriendHZZIdBits(const char* file) {
   // the hww2011 WP and the one with the same efficiency
   // hzz WP is using the MVA for the unbiased electrons
   Int_t hwwWP, newhwwWP;
+  Int_t cicmedium;
   // first 4 variables needed for TP
   fT->Branch("mass", &mass, "mass/F");
   fT->Branch("pt", &pt, "pt/F");
@@ -194,6 +203,8 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("wp70notrg", &WP70notrg, "chwp70notrg/I");
   // same as HWW DenomFakeSmurf: change name for the friend tree
   fT->Branch("denom", &DenomFakeSmurf, "denom/I");
+  // the cic used for HZZ
+  fT->Branch("cicmedium", &cicmedium, "cicmedium/I");
 
   HZZEleIDSelector aSel;
 
@@ -223,6 +234,9 @@ void makeFriendHZZIdBits(const char* file) {
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWP85,HZZEleIDSelector::kMVAUnbiased)) WP85notrg=1;
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVAUnbiased)) WP80notrg=1;
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWP70,HZZEleIDSelector::kMVAUnbiased)) WP70notrg=1;
+
+     cicmedium=0;
+     if(cicid(cic,3) && ciciso(cic,3) &&misshits<=1) cicmedium=1;
 
      fT->Fill();
   }
