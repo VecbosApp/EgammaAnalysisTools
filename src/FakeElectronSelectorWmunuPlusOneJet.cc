@@ -524,6 +524,7 @@ void FakeElectronSelectorWmunuPlusOneJet::Loop(const char *outname) {
     myOutIDTree->fillFakeRateDenomBits(isDenomFake_HwwEgamma(probe),isDenomFake_smurfs(probe));
     myOutIDTree->fillMore(nPV,rhoFastjet,hwwbdts,newhwwbdts,hzzbdts,pfmva,lh);
     myOutIDTree->fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
+    myOutIDTree->fillCiCBasedIDBits(cic);
     myOutIDTree->fillRunInfos(runNumber, lumiBlock, eventNumber, nPU, -1);
     myOutIDTree->store();
     
