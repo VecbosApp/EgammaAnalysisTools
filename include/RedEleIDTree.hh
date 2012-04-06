@@ -35,7 +35,7 @@ public:
   void fillVariables2(float detacalo, float dphicalo, float sep, float dz, float gsfchi2, float emaxovere, float etopovere, float ebottomovere, float eleftovere, float erightovere,
                       float e2ndovere, float e2x5rightovere, float e2x5leftovere, float e2x5topevere, float e2x5bottomovere, 
                       float e2x5maxovere, float e1x5overe, float e2x2overe, float e3x3overe, float e5x5overe, float r9,
-                      float phi, float scenergy, float scrawenergy, float scesenergy);
+                      float phi, float scenergy, float scrawenergy, float scesenergy, float eseedopin);
 
   //! fill the tree with isolation variables
   void fillIsolations(float tkIso, float ecalIso, float hcalIso,
@@ -68,7 +68,7 @@ public:
 
 private:
 
-  float myEleEoPout, myEoPout, myEoP,myHoE,myDeta,myDphi,mys9s25,mys1s9,mySee,mySpp,myFbrem, myPhiWidth, myEtaWidth;
+  float myEleEoPout, myEoPout, myEoP,myHoE,myDeta,myDphi,mys9s25,mys1s9,mySee,mySpp,myFbrem, myPhiWidth, myEtaWidth, myEseedoPin;
   float myIoEoIoP, myEleDeta, myD0, myIP3d, myIP3dSig, myKFChi2, myE1x5E5x5;
   int myNbrems, myKFHits, myKFHitsAll, myEcalDriven, myMissHits, myMatchConv;
   float myDetaCalo, myDphiCalo, mySep, myDZ, myGSFChi2;

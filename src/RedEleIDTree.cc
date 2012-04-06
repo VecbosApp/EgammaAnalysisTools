@@ -9,6 +9,7 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myTree->Branch("eleEoPout",       &myEleEoPout,       "eleEoPout/F");
   myTree->Branch("EoPout",          &myEoPout,          "EoPout/F");
   myTree->Branch("EoP",             &myEoP,             "EoP/F");
+  myTree->Branch("EseedoPin",       &myEseedoPin,       "EseedoPin/F");
   myTree->Branch("IoEmIoP",         &myIoEoIoP,         "IoEmIoP/F");
   myTree->Branch("HoE",             &myHoE,             "HoE/F");
   myTree->Branch("eledeta",         &myEleDeta,         "eledeta/F");
@@ -220,7 +221,7 @@ void RedEleIDTree::fillVariables(float eleEoPout, float EoPout, float EoP, float
 void RedEleIDTree::fillVariables2(float detacalo, float dphicalo, float sep, float dz, float gsfchi2, float emaxovere, float etopovere, float ebottomovere, float eleftovere, float erightovere,
                                   float e2ndovere, float e2x5rightovere, float e2x5leftovere, float e2x5topovere, float e2x5bottomovere, 
                                   float e2x5maxovere, float e1x5overe, float e2x2overe, float e3x3overe, float e5x5overe, float r9,
-                                  float phi, float scenergy, float scrawenergy, float scesenergy) {
+                                  float phi, float scenergy, float scrawenergy, float scesenergy, float eseedopin) {
   myDetaCalo=detacalo;
   myDphiCalo=dphicalo;
   mySep=sep;
@@ -246,6 +247,7 @@ void RedEleIDTree::fillVariables2(float detacalo, float dphicalo, float sep, flo
   mySCEnergy=scenergy;
   mySCRawEnergy=scrawenergy;
   mySCESEnergy=scesenergy;
+  myEseedoPin=eseedopin;
 }
 
 void RedEleIDTree::fillIsolations(float trkIso, float ecalIso, float hcalIso,
