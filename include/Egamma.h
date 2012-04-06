@@ -9,6 +9,7 @@
 #include "EgammaAnalysisTools/include/EgammaBase.h"
 #include "EgammaAnalysisTools/include/ElectronIDMVA.h"
 #include "EgammaAnalysisTools/include/ElectronIDMVAHZZ.h"
+
 // ROOT includes
 #include <TLorentzVector.h>
 #include <TVector3.h>
@@ -115,6 +116,12 @@ protected:
   double eleDxyPV(int iele, int iPV);
   double eleDzPV(int iele, int iPV);
   double eleDszPV(int iele, int iPV);
+
+  // H->ZZ/WW effective areas computed in 2012
+  float Aeff_neu_dr04[7], Aeff_pho_dr04[7];
+  
+  // H->ZZ 2011 detector based effective areas
+  float Aeff_ecal_dr03[2], Aeff_hcal_dr03[2];
 
   /// some useful template  
   template <typename T>
