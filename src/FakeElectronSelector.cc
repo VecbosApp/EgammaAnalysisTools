@@ -117,7 +117,7 @@ FakeElectronSelector::FakeElectronSelector(TTree *tree)
   // chiara
   // to read good run list
   if (_isData) {
-    std::string goodRunGiasoneFile = "config/json/goodCollisions2011.json";
+    std::string goodRunGiasoneFile = "config/json/goodCollisions2012.json";
     setJsonGoodRunList(goodRunGiasoneFile); 
     fillRunLSMap();
   }
@@ -213,6 +213,16 @@ void FakeElectronSelector::Loop(const char *outname) {
   requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v8");
   requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v9");
   requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIDL_TrkIsoVL_v10");
+
+  // 2012 triggers
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_TrkIdVL_v");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_v");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdL_CaloIsoVL_v");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v");
+  requiredTriggers.push_back("HLT_Ele8_CaloIdT_TrkIdVL_Jet30_v");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_v");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v");
+  requiredTriggers.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_v");
 
   // loop on events
   unsigned int lastLumi = 0;

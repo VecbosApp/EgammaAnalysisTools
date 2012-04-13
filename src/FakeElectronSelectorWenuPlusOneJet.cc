@@ -116,7 +116,7 @@ FakeElectronSelectorWenuPlusOneJet::FakeElectronSelectorWenuPlusOneJet(TTree *tr
   // chiara
   // to read good run list
   if (_isData) {
-    std::string goodRunGiasoneFile = "config/json/goodCollisions2011.json";
+    std::string goodRunGiasoneFile = "config/json/goodCollisions2012.json";
     setJsonGoodRunList(goodRunGiasoneFile); 
     fillRunLSMap();
   }
@@ -165,6 +165,14 @@ void FakeElectronSelectorWenuPlusOneJet::Loop(const char *outname) {
   requiredTriggers.push_back("HLT_Ele27_WP80_PFMT50_v");
   requiredTriggers.push_back("HLT_Ele25_WP70_PFMT50_v");
   requiredTriggers.push_back("HLT_Ele32_WP70_PFMT50_v");
+
+  // 2012 triggers
+  requiredTriggers.push_back("HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v");
+  requiredTriggers.push_back("HLT_Ele27_WP80_v");
+  requiredTriggers.push_back("HLT_Ele27_WP80_PFMET_MT50_v");
+  requiredTriggers.push_back("HLT_Ele30_CaloIdVT_TrkIdT_v");
+  requiredTriggers.push_back("HLT_Ele32_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v");
+  requiredTriggers.push_back("HLT_Ele65_CaloIdVT_TrkIdT_v");
 
   // loop on events
   unsigned int lastLumi = 0;

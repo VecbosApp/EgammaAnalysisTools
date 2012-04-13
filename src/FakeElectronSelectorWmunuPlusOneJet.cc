@@ -116,7 +116,7 @@ FakeElectronSelectorWmunuPlusOneJet::FakeElectronSelectorWmunuPlusOneJet(TTree *
   // chiara
   // to read good run list
   if (_isData) {
-    std::string goodRunGiasoneFile = "config/json/goodCollisions2011.json";
+    std::string goodRunGiasoneFile = "config/json/goodCollisions2012.json";
     setJsonGoodRunList(goodRunGiasoneFile); 
     fillRunLSMap();
   }
