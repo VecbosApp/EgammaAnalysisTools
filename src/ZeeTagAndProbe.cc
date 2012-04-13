@@ -39,7 +39,7 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
 
   // to read good run list
   if (m_selection->getSwitch("goodRunLS") && m_selection->getSwitch("isData")) {
-    std::string goodRunGiasoneFile = "config/json/goodCollisions2011.json";
+    std::string goodRunGiasoneFile = "config/json/goodCollisions2012.json";
     setJsonGoodRunList(goodRunGiasoneFile);
     fillRunLSMap();
   }
@@ -259,7 +259,7 @@ ZeeTagAndProbe::ZeeTagAndProbe(TTree *tree)
    
   // To read good run list!
   if (m_selection->getSwitch("goodRunLS") && m_selection->getSwitch("isData")) {
-    std::string goodRunJsonFile       = "config/json/goodCollisions2011.json";
+    std::string goodRunJsonFile       = "config/json/goodCollisions2012.json";
     setJsonGoodRunList(goodRunJsonFile);
     fillRunLSMap();
   }
@@ -284,6 +284,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
   RedEleIDTree reducedTree(treename);
   reducedTree.addAttributesSignal();
   reducedTree.addElectronIdBits();
+  reducedTree.addDenominatorFakeBits();
   reducedTree.addIsolations();
   reducedTree.addRunInfos();
   reducedTree.addMore();
@@ -311,6 +312,9 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
   // do one trigger at a time because one need to match the tag with the single Trigger leg
   mask.push_back("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v");
   mask.push_back("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_v");
+  // triggers for 2012
+  mask.push_back("HLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50_v");
+  mask.push_back("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50_v");
 
   // loop over entries
   Long64_t nbytes = 0, nb = 0;
