@@ -15,6 +15,7 @@
 #include <TMath.h>
 
 #include "include/HZZEleIDSelector.hh"
+#include "include/eIDCiChzzSelector.hh"
 
 using namespace std;
 
@@ -27,8 +28,12 @@ enum idType {
   kBDTHZZ_withIP
 };
 
-float Aeff_neu_dr04[7] = { 0.045, 0.062, 0.061, 0.041, 0.050, 0.051, 0.110 };
-float Aeff_pho_dr04[7] = { 0.140, 0.130, 0.080, 0.130, 0.140, 0.160, 0.180 };
+float Aeff_neu_dr04[7] = { 0.045, 0.065, 0.068, 0.057, 0.058, 0.061, 0.110 };
+float Aeff_pho_dr04[7] = { 0.140, 0.130, 0.079, 0.130, 0.150, 0.160, 0.180 };
+
+// H->ZZ detector based effective areas
+float Aeff_ecal_dr03[2] = { 0.078, 0.046 };
+float Aeff_hcal_dr03[2] = { 0.026, 0.072 };
 
 bool cicid(int *cic, int level) { return (cic[level]>>0)%2; }
 bool ciciso(int *cic, int level) { return (cic[level]>>1)%2; }
@@ -98,15 +103,20 @@ void makeFriendHZZIsolation(const char* file) {
   TFile *fF = TFile::Open(nF,"recreate");
 
   Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8], rho, eta;
+  Float_t trkIso,ecalIso,hcalIso;
   pT->SetBranchAddress("chaPFIso", chaPFIso);
   pT->SetBranchAddress("neuPFIso", neuPFIso);
   pT->SetBranchAddress("phoPFIso", phoPFIso);
+  pT->SetBranchAddress("trkIso", &trkIso);
+  pT->SetBranchAddress("ecalIso", &ecalIso);
+  pT->SetBranchAddress("hcalIso", &hcalIso);
   pT->SetBranchAddress("rho", &rho);
   pT->SetBranchAddress("eta", &eta);
 
   fF->mkdir("eleIDdir");
   TTree *fT = new TTree("T1","tree with hzz isolation");
-  Float_t combIso, combIsoNoEA;
+  Float_t combDetIso, combIso, combIsoNoEA;
+  fT->Branch("combDetIsoHZZ",&combDetIso,"combDetIsoHZZ/F");
   fT->Branch("combPFIsoHZZ",&combIso,"combPFIsoHZZ/F");
   fT->Branch("combPFIsoHZZNoEA",&combIsoNoEA,"combPFIsoHZZNoEA/F");
   
@@ -123,6 +133,10 @@ void makeFriendHZZIsolation(const char* file) {
      else if(fabs(eta) < 2.3) combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[4]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[4]*rho,Float_t(0.));
      else if(fabs(eta) < 2.4) combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[5]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[5]*rho,Float_t(0.));
      else combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[6]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[6]*rho,Float_t(0.));
+
+     int ieta = (fabs(eta)<1.479) ? 0 : 1;
+     combDetIso = trkIso + ecalIso - rho * Aeff_ecal_dr03[ieta] + hcalIso - rho * Aeff_hcal_dr03[ieta];
+
      fT->Fill();
   }
 
@@ -150,10 +164,10 @@ void makeFriendHZZIdBits(const char* file) {
   Float_t eta, abseta, pt, rho, vertices;
   Float_t bdthww[2], newbdthww[4], combPFIsoHWW;
   Float_t combPFIsoHZZ, bdthzz[4];
-  Int_t cic[5];
   Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8];
   Float_t mass; // not dummy only for TP trees
-  Int_t DenomFakeSmurf, misshits;
+  Int_t DenomFakeSmurf, misshits, ecalseed;
+  Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,trkIso,ecalIso,hcalIso;
   pT->SetBranchAddress("bdthww", bdthww);
   pT->SetBranchAddress("newbdthww", newbdthww);
   pT->SetBranchAddress("bdthzz",bdthzz);
@@ -167,8 +181,21 @@ void makeFriendHZZIdBits(const char* file) {
   pT->SetBranchAddress("pt", &pt);
   pT->SetBranchAddress("rho", &rho);
   pT->SetBranchAddress("vertices", &vertices);
+  pT->SetBranchAddress("EoP", &eop);
+  pT->SetBranchAddress("EseedoPin", &eseedopin);
+  pT->SetBranchAddress("HoE", &HoE);
+  pT->SetBranchAddress("deta", &deta);
+  pT->SetBranchAddress("dphi", &dphi);
+  pT->SetBranchAddress("see", &see);
+  pT->SetBranchAddress("fbrem", &fbrem);
   pT->SetBranchAddress("missHits", &misshits);
-  pT->SetBranchAddress("cic", cic);
+  pT->SetBranchAddress("dist", &dist);
+  pT->SetBranchAddress("dcot", &dcot);
+  pT->SetBranchAddress("d0",&d0);
+  pT->SetBranchAddress("ecaldriven", &ecalseed);
+  pT->SetBranchAddress("trkIso", &trkIso);
+  pT->SetBranchAddress("ecalIso", &ecalIso);
+  pT->SetBranchAddress("hcalIso", &hcalIso);
   if(!TString(file).Contains("fake")) pT->SetBranchAddress("mass", &mass);
   else mass=-1.0;
 
@@ -180,7 +207,7 @@ void makeFriendHZZIdBits(const char* file) {
   Int_t WP95notrg, WP90notrg, WP85notrg, WP80notrg, WP70notrg;
   // the hww2011 WP and the one with the same efficiency
   // hzz WP is using the MVA for the unbiased electrons
-  Int_t hwwWP, newhwwWP;
+  Int_t hwwWP, newhwwWP, newhzzWP;
   Int_t cicmedium, cicmediumid, cicmediumiso;
   // first 4 variables needed for TP
   fT->Branch("mass", &mass, "mass/F");
@@ -207,6 +234,7 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("cicmedium", &cicmedium, "cicmedium/I");
   fT->Branch("cicmediumid", &cicmediumid, "cicmediumid/I");
   fT->Branch("cicmediumiso", &cicmediumiso, "cicmediumiso/I");
+  fT->Branch("newhzzWP", &newhzzWP, "newhzzWP/I"); // 2012 WP?
 
   HZZEleIDSelector aSel;
 
@@ -237,10 +265,24 @@ void makeFriendHZZIdBits(const char* file) {
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVAUnbiased)) WP80notrg=1;
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWP70,HZZEleIDSelector::kMVAUnbiased)) WP70notrg=1;
 
+     // CiC...
+     eIDCiChzzSelector cicsel;
+     int cic[5];
+     int ieta = (fabs(eta)<1.479) ? 0 : 1;
+     for(int i=0; i<5; i++) cic[i] = cicsel.ElectronId_V03(pt,eta,see,eop,eseedopin,fbrem,
+							   trkIso,
+							   ecalIso - rho * Aeff_ecal_dr03[ieta],
+							   hcalIso - rho * Aeff_hcal_dr03[ieta],
+							   d0,misshits,deta,dphi,HoE,dcot,
+							   dist,!ecalseed,i,false);
+
      cicmedium=cicmediumid=cicmediumiso=0;
      if(cicid(cic,3) && ciciso(cic,3) && misshits<=1) cicmedium=1;
      if(cicid(cic,3) && misshits<=1) cicmediumid=1;
      if(ciciso(cic,3)) cicmediumiso=1;
+     // same fake rate in Z+1 fake as 2011 CIC WP
+     newhzzWP=0;
+     if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWPHZZ,HZZEleIDSelector::kMVAUnbiased)) newhzzWP=1;
 
      fT->Fill();
   }
