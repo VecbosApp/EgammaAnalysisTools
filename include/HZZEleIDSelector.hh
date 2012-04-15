@@ -8,7 +8,7 @@ public:
   ~HZZEleIDSelector() {}
   enum wpfulliso {
     kWP95 = 0,
-    kWP90, kWP85, kWP80, kWP70, kWPHWW
+    kWP90, kWP85, kWP80, kWP70, kWPHWW, kWPHZZ
   };
 
   enum wpchiso {
@@ -22,9 +22,9 @@ public:
   };
 
   bool output(float pt, float eta, float bdt, float iso, 
-	      HZZEleIDSelector::wpfulliso WP, HZZEleIDSelector::mvatype type);
+	      HZZEleIDSelector::wpfulliso WP, HZZEleIDSelector::mvatype type, bool idonly=false);
   bool output(float pt, float eta, float bdt, float chiso, 
-	      HZZEleIDSelector::wpchiso WP, HZZEleIDSelector::mvatype type);
+	      HZZEleIDSelector::wpchiso WP, HZZEleIDSelector::mvatype type, bool idonly=false);
 
 private:
   int etabin(float eta);
