@@ -1,6 +1,10 @@
 import FWCore.ParameterSet.Config as cms
 import sys
 
+WPTOTEST = "hwwWPidonly"
+PREFIX = "promptRate_Data7TeV"
+DOKINE = 0
+
 process = cms.Process("TagProbe")
 process.source = cms.Source("EmptySource")
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
@@ -35,7 +39,11 @@ process.TagProbeFitBase = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
                                                                 wp70trg = cms.vstring("wp70trg", "dummy[pass=1,fail=0]"),
                                                                 wp80trg = cms.vstring("wp80trg", "dummy[pass=1,fail=0]"),
                                                                 hwwWP = cms.vstring("hwwWP", "dummy[pass=1,fail=0]"),
-                                                                newhwwWP = cms.vstring("newhwwWP", "dummy[pass=1,fail=0]")
+                                                                hwwWPidonly = cms.vstring("hwwWPidonly", "dummy[pass=1,fail=0]"),
+                                                                hwwWPisoonly = cms.vstring("hwwWPisoonly", "dummy[pass=1,fail=0]"),
+                                                                newhwwWP = cms.vstring("newhwwWP", "dummy[pass=1,fail=0]"),
+                                                                newhwwWPidonly = cms.vstring("newhwwWPidonly", "dummy[pass=1,fail=0]"),
+                                                                newhwwWPisoonly = cms.vstring("newhwwWPisoonly", "dummy[pass=1,fail=0]")
                                                                 ),
                                          # defines all the PDFs that will be available for the efficiency calculations; uses RooFit's "factory" syntax;
                                          # each pdf needs to define "signal", "backgroundPass", "backgroundFail" pdfs, "efficiency[0.9,0,1]" and "signalFractionInPassing[0.9]" are used for initial values  
@@ -65,7 +73,7 @@ process.TagProbeFitBase = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
                                          
                                          # defines a set of efficiency calculations, what PDF to use for fitting and how to bin the data;
                                          # there will be a separate output directory for each calculation that includes a simultaneous fit, side band subtraction and counting. 
-                                         Efficiencies = cms.PSet(etapt = cms.PSet( EfficiencyCategoryAndState = cms.vstring("hwwWP","pass"),
+                                         Efficiencies = cms.PSet(etapt = cms.PSet( EfficiencyCategoryAndState = cms.vstring(WPTOTEST,"pass"),
                                                                                    UnbinnedVariables = cms.vstring("mass"),
                                                                                    BinnedVariables = cms.PSet(abseta = cms.vdouble(0.,0.4,0.8,1.2,1.4442,1.566,1.8,2.0,2.2,2.5),
                                                                                                               pt = cms.vdouble(10,15,20,25,50,200),
@@ -85,7 +93,7 @@ process.TagProbeFitBase = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 process.TagProbeFitPt10To20 = process.TagProbeFitBase.clone()
 process.TagProbeFitPt10To20.Efficiencies.etapt.BinnedVariables.pt = (10,15,20)
 process.TagProbeFitPt10To20.Efficiencies.etapt.BinnedVariables.abseta = (0.,0.4,0.8,1.2,1.4442,1.566,1.8,2.0,2.2,2.5)
-process.TagProbeFitPt10To20.OutputFileName = "efficiencyTrg2011WP_Data2011_Pt10To20.root"
+process.TagProbeFitPt10To20.OutputFileName = WPTOTEST+"_"+PREFIX+"_Kine_Pt10To20.root"
 process.TagProbeFitPt10To20.PDFs.cruijffPlusExpo = cms.vstring("EXPR::signal('(@1<@0)*exp(-(@0-@1)*(@0-@1)/(@2*@2 + @3*(@0-@1)*(@0-@1))) + (@1>=@0)*exp(-(@0-@1)*(@0-@1)/(@4*@4 + @5*(@0-@1)*(@0-@1)))',mean[91.2, 80.0, 100.0],mass, sigmaL[2.3, 0.5, 10.0],alphaL[0.40],sigmaR[2.3, 0.5, 10.0],alphaR[0.2,0,3])",
                                                                "RooExponential::backgroundPass(mass, cPass[0,-10,10])",
                                                                "RooExponential::backgroundFail(mass, cFail[0,-10,10])",
@@ -98,21 +106,21 @@ process.TagProbeFitVerticesBarrelPt10To20 = process.TagProbeFitPt10To20.clone()
 process.TagProbeFitVerticesBarrelPt10To20.Efficiencies.etapt.BinnedVariables.pt = (10,20)
 process.TagProbeFitVerticesBarrelPt10To20.Efficiencies.etapt.BinnedVariables.abseta = (0.,1.4442)
 process.TagProbeFitVerticesBarrelPt10To20.Efficiencies.etapt.BinnedVariables.vertices = (1,3,5,7,10,15,20)
-process.TagProbeFitVerticesBarrelPt10To20.OutputFileName = "efficiencyTrg2011WP_vertices_barrel_Data2011_Pt10To20.root"
+process.TagProbeFitVerticesBarrelPt10To20.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_barrel_Data2011_Pt10To20.root"
 
 # pt<20 GeV, endcap: as a function of vertices
 process.TagProbeFitVerticesEndcapPt10To20 = process.TagProbeFitPt10To20.clone()
 process.TagProbeFitVerticesEndcapPt10To20.Efficiencies.etapt.BinnedVariables.pt = (10,20)
 process.TagProbeFitVerticesEndcapPt10To20.Efficiencies.etapt.BinnedVariables.abseta = (1.566,2.5)
 process.TagProbeFitVerticesEndcapPt10To20.Efficiencies.etapt.BinnedVariables.vertices = (1,3,5,7,10,15,20)
-process.TagProbeFitVerticesEndcapPt10To20.OutputFileName = "efficiencyTrg2011WP_vertices_endcap_Data2011_Pt10To20.root"
+process.TagProbeFitVerticesEndcapPt10To20.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_endcap_Data2011_Pt10To20.root"
 
 
 # pt>20 GeV
 process.TagProbeFitPt20To200 = process.TagProbeFitBase.clone()
 process.TagProbeFitPt20To200.Efficiencies.etapt.BinnedVariables.pt = (20,25,50,200)
 process.TagProbeFitPt20To200.Efficiencies.etapt.BinnedVariables.abseta = (0.,0.4,0.8,1.2,1.4442,1.566,1.8,2.0,2.2,2.5)
-process.TagProbeFitPt20To200.OutputFileName = "efficiencyTrg2011WP_Data2011_Pt20To200.root"
+process.TagProbeFitPt20To200.OutputFileName = WPTOTEST+"_"+PREFIX+"_Kine_Pt20To200.root"
 process.TagProbeFitPt20To200.PDFs.cruijffPlusExpo = cms.vstring("EXPR::signal('(@1<@0)*exp(-(@0-@1)*(@0-@1)/(@2*@2 + @3*(@0-@1)*(@0-@1))) + (@1>=@0)*exp(-(@0-@1)*(@0-@1)/(@4*@4 + @5*(@0-@1)*(@0-@1)))',mean[91.2, 80.0, 100.0],mass, sigmaL[2.3, 0.5, 10.0],alphaL[0.23],sigmaR[2.3, 0.5, 10.0],alphaR[0.2,0,3])",
                                                                "RooExponential::backgroundPass(mass, cPass[0,-10,10])",
                                                                "RooExponential::backgroundFail(mass, cFail[0,-10,10])",
@@ -125,19 +133,20 @@ process.TagProbeFitVerticesBarrelPt20To200 = process.TagProbeFitPt20To200.clone(
 process.TagProbeFitVerticesBarrelPt20To200.Efficiencies.etapt.BinnedVariables.pt = (20,200)
 process.TagProbeFitVerticesBarrelPt20To200.Efficiencies.etapt.BinnedVariables.abseta = (0.,1.4442)
 process.TagProbeFitVerticesBarrelPt20To200.Efficiencies.etapt.BinnedVariables.vertices = (1,3,5,7,10,15,20)
-process.TagProbeFitVerticesBarrelPt20To200.OutputFileName = "efficiencyTrg2011WP_vertices_barrel_Data2011_Pt20To200.root"
+process.TagProbeFitVerticesBarrelPt20To200.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_barrel_Data2011_Pt20To200.root"
 
 # pt>20 GeV, endcap: as a function of vertices
 process.TagProbeFitVerticesEndcapPt20To200 = process.TagProbeFitPt20To200.clone()
 process.TagProbeFitVerticesEndcapPt20To200.Efficiencies.etapt.BinnedVariables.pt = (20,200)
 process.TagProbeFitVerticesEndcapPt20To200.Efficiencies.etapt.BinnedVariables.abseta = (1.566,2.5)
 process.TagProbeFitVerticesEndcapPt20To200.Efficiencies.etapt.BinnedVariables.vertices = (1,3,5,7,10,15,20)
-process.TagProbeFitVerticesEndcapPt20To200.OutputFileName = "efficiencyTrg2011WP_vertices_endcap_Data2011_Pt20To200.root"
+process.TagProbeFitVerticesEndcapPt20To200.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_endcap_Data2011_Pt20To200.root"
 
-
-process.fit = cms.Path(process.TagProbeFitPt10To20 *
-                       process.TagProbeFitPt20To200 )
-                       #process.TagProbeFitVerticesBarrelPt10To20 * 
-                       #process.TagProbeFitVerticesEndcapPt10To20 *
-                       #process.TagProbeFitVerticesBarrelPt20To200 *
-                       #process.TagProbeFitVerticesEndcapPt20To200 )
+if DOKINE:
+    process.fit = cms.Path(process.TagProbeFitPt10To20 *
+                           process.TagProbeFitPt20To200 )
+else:
+    process.fit = cms.Path(process.TagProbeFitVerticesBarrelPt10To20 * 
+                           process.TagProbeFitVerticesEndcapPt10To20 *
+                           process.TagProbeFitVerticesBarrelPt20To200 *
+                           process.TagProbeFitVerticesEndcapPt20To200 )
