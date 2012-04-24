@@ -305,12 +305,14 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
     myCounter.IncrVar("zmass",1);    
 
     float maxTCHE = -1000.;
+    float ptLeadingJet = -1;
     std::vector<int> jets30;
     for ( int jet=0; jet<nAK5PFPUcorrJet; jet++ ) {
       TVector3 p3Jet(pxAK5PFPUcorrJet[jet],pyAK5PFPUcorrJet[jet],pzAK5PFPUcorrJet[jet]);
       if ( fabs(p3Jet.DeltaPhi(leptons[0].Vect())) < 0.3 || fabs(p3Jet.DeltaPhi(leptons[1].Vect())) < 0.3 ) continue;
       if ( p3Jet.Pt()>30 && fabs(p3Jet.Eta())<3.0 ) jets30.push_back(jet); 
       if ( p3Jet.Pt()>15 && fabs(p3Jet.Eta())<3.0 && trackCountingHighEffBJetTagsAK5Jet[jet]>maxTCHE ) maxTCHE= trackCountingHighEffBJetTagsAK5Jet[jet];
+      if ( p3Jet.Pt()>ptLeadingJet ) ptLeadingJet = p3Jet.Pt();
     }
 
     // veto on max btag in jets with pt > 15 GeV (not applied for Z)
@@ -561,7 +563,7 @@ void FakeElectronSelectorZllPlusOneFake::Loop(const char *outname) {
                                 dr03HcalTowerSumEtFullConeEle[probe] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                 pfCombinedIsoEle[probe],
                                 chaPfIso, neuPfIso, phoPfIso);
-    myOutIDTree->fillFakeRateDenomBits(isDenomFake_HwwEgamma(probe),isDenomFake_smurfs(probe));
+    myOutIDTree->fillFakeRateDenomBits(ptLeadingJet,isDenomFake_HwwEgamma(probe),isDenomFake_smurfs(probe));
     myOutIDTree->fillMore(nPV,rhoFastjet,hwwbdts,newhwwbdts,hzzbdts,pfmva,lh);
     myOutIDTree->fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
     myOutIDTree->fillCiCBasedIDBits(cic);

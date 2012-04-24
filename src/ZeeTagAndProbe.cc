@@ -682,7 +682,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
           reducedTree.fillCutBasedIDBits(CutBasedId,CutBasedIdOnlyID,CutBasedIdOnlyIso,CutBasedIdOnlyConv);
           reducedTree.fillLHBasedIDBits(LHBasedId,LHBasedIdOnlyID,LHBasedIdOnlyIso,LHBasedIdOnlyConv);
           reducedTree.fillLHBasedPFIsoIDBits(LHBasedPFIsoId,LHBasedPFIsoIdOnlyID,LHBasedPFIsoIdOnlyIso,LHBasedPFIsoIdOnlyConv);
-          reducedTree.fillFakeRateDenomBits(isDenomFake(probe),isDenomFake_smurfs(probe));
+          reducedTree.fillFakeRateDenomBits(-1.,isDenomFake(probe),isDenomFake_smurfs(probe));
           reducedTree.fillBDTBasedIDBits(passEleBDT(pt,EleSCEta,hwwbdts[0]));
 	  reducedTree.fillCiCBasedIDBits(cic);
           reducedTree.fillRunInfos(runNumber, lumiBlock, eventNumber, nPU, mcmatch);

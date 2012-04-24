@@ -344,7 +344,9 @@ void FakeElectronSelector::Loop(const char *outname) {
     // if (p3LeadingCut.Pt()<50) continue;   
     myCounter.IncrVar("leadingPT",1);    
     */
-        
+    float ptLeadingJet = -1.0;
+    if(leadingJet >= 0) ptLeadingJet = p3LeadingCut.Pt();
+
     // consider as denominator all the reco electrons matching the HLT candidate 
     // passing some requirements on the following variables:
     // Gsf Electron (Ecal or tracker driven)
@@ -588,7 +590,7 @@ void FakeElectronSelector::Loop(const char *outname) {
                                dr03HcalTowerSumEtFullConeEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,
                                pfCombinedIsoEle[theDenom1],
                                 chaPfIso, neuPfIso, phoPfIso);
-    myOutIDTree->fillFakeRateDenomBits(isDenomFake_HwwEgamma(theDenom1),isDenomFake_smurfs(theDenom1));
+    myOutIDTree->fillFakeRateDenomBits(ptLeadingJet,isDenomFake_HwwEgamma(theDenom1),isDenomFake_smurfs(theDenom1));
     myOutIDTree->fillMore(nPV,rhoFastjet,hwwbdts,newhwwbdts,hzzbdts,pfmva,lh);
     myOutIDTree->fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
     myOutIDTree->fillCiCBasedIDBits(cic);

@@ -392,7 +392,7 @@ void HZZ4LElectronSelector::Loop(const char *treefilesuffix) {
 				 chaPfIso, neuPfIso, phoPfIso);
       reducedTree.fillMore(nPV,rhoFastjet,hwwbdts,newhwwbdts,hzzbdts,pfmva,lh);
       reducedTree.fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
-      reducedTree.fillFakeRateDenomBits(isDenomFake(probe),isDenomFake_smurfs(probe));
+      reducedTree.fillFakeRateDenomBits(-1.,isDenomFake(probe),isDenomFake_smurfs(probe));
       reducedTree.fillBDTBasedIDBits(passEleBDT(pt,EleSCEta,hwwbdts[0]));
       reducedTree.fillCiCBasedIDBits(cic);
       reducedTree.fillRunInfos(runNumber, lumiBlock, eventNumber, nPU, 1);

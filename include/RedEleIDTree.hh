@@ -47,7 +47,7 @@ public:
   void fillLHBasedIDBits(int LHBasedId[5], int LHBasedIdOnlyID[5], int LHBasedIdOnlyIso[5], int LHBasedIdOnlyConv[5]);
   void fillLHBasedPFIsoIDBits(int LHBasedPFIsoId[5], int LHBasedPFIsoIdOnlyID[5], int LHBasedPFIsoIdOnlyIso[5], int LHBasedPFIsoIdOnlyConv[5]);
   void fillCiCBasedIDBits(int cic[5]);
-  void fillFakeRateDenomBits(int isDenom, int isDenomSmurf);
+  void fillFakeRateDenomBits(float leadJetPt, int isDenom, int isDenomSmurf);
   void fillBDTBasedIDBits(int isBDTOnlyId);
 
   //! fill electron attributes + z mass for the tag and probe
@@ -88,6 +88,7 @@ private:
   int myLHBasedId[5], myLHBasedIdOnlyID[5], myLHBasedIdOnlyIso[5], myLHBasedIdOnlyConv[5];
   int myLHBasedPFIsoId[5], myLHBasedPFIsoIdOnlyID[5], myLHBasedPFIsoIdOnlyIso[5], myLHBasedPFIsoIdOnlyConv[5];
   int myDenomFake, myDenomFakeSmurf;
+  float myLeadJetPt;
   int myCiC[5];
   int myBDTIdOnlyId;
 

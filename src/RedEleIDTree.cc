@@ -93,6 +93,7 @@ void RedEleIDTree::addElectronIdBits() {
 void RedEleIDTree::addDenominatorFakeBits() {
   myTree->Branch("DenomFake",          &myDenomFake,             "DenomFake/I");
   myTree->Branch("DenomFakeSmurf",     &myDenomFakeSmurf,        "DenomFakeSmurf/I");
+  myTree->Branch("leadJetPt",          &myLeadJetPt,             "leadJetPt/F");
 }
 
 void RedEleIDTree::addRunInfos() {
@@ -342,9 +343,10 @@ void RedEleIDTree::fillCiCBasedIDBits(int cic[5]) {
   for(int i=0;i<5;i++) myCiC[i]=cic[i];
 }
 
-void RedEleIDTree::fillFakeRateDenomBits(int isDenom, int isDenomSmurf) {
+void RedEleIDTree::fillFakeRateDenomBits(float leadJetPt, int isDenom, int isDenomSmurf) {
   myDenomFake = isDenom;
   myDenomFakeSmurf = isDenomSmurf;
+  myLeadJetPt = leadJetPt;
 }
 
 void RedEleIDTree::fillBDTBasedIDBits(int isBDTOnlyId) {
