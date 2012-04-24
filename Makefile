@@ -210,7 +210,8 @@ produceMCSubtractedFake: $(INCLUDEDIR)/src/produceMCSubtractedFake.cxx \
 
 makeFriendTrees: $(INCLUDEDIR)/src/MakeFriendTrees.cc \
 	$(OUTLIB)HZZEleIDSelector.o \
-	$(OUTLIB)SimpleCutsIDSelector.o
+	$(OUTLIB)SimpleCutsIDSelector.o \
+	$(OUTLIB)eIDCiChzzSelector.o
 	$(CXX) $(CXXFLAGS) -o makeFriendTrees $(OUTLIB)/*o $(GLIBS) $ $<
 
 CompareClasses: $(INCLUDEDIR)/src/CompareClasses.C \
