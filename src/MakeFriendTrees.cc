@@ -208,6 +208,8 @@ void makeFriendHZZIdBits(const char* file) {
   // the hww2011 WP and the one with the same efficiency
   // hzz WP is using the MVA for the unbiased electrons
   Int_t hwwWP, newhwwWP, newhzzWP;
+  Int_t hwwWPisoonly, newhwwWPisoonly, newhzzWPisoonly;
+  Int_t hwwWPidonly, newhwwWPidonly, newhzzWPidonly;
   Int_t cicmedium, cicmediumid, cicmediumiso;
   // first 4 variables needed for TP
   fT->Branch("mass", &mass, "mass/F");
@@ -221,7 +223,11 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("wp80trg", &WP80trg, "wp80trg/I");
   fT->Branch("wp70trg", &WP70trg, "wp70trg/I");
   fT->Branch("newhwwWP", &newhwwWP, "newhwwWP/I"); // 2012 WP?
+  fT->Branch("newhwwWPisoonly", &newhwwWPisoonly, "newhwwWPisoonly/I"); // 2012 WP?
+  fT->Branch("newhwwWPidonly", &newhwwWPidonly, "newhwwWPidonly/I"); // 2012 WP?
   fT->Branch("hwwWP", &hwwWP, "hwwWP/I");  // 2011 WP
+  fT->Branch("hwwWPisoonly", &hwwWPisoonly, "hwwWPisoonly/I");  // 2011 WP
+  fT->Branch("hwwWPidonly", &hwwWPidonly, "hwwWPidonly/I");  // 2011 WP
   // for non triggering eles
   fT->Branch("wp95notrg", &WP95notrg, "chwp95notrg/I");
   fT->Branch("wp90notrg", &WP90notrg, "chwp90notrg/I");
@@ -235,6 +241,8 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("cicmediumid", &cicmediumid, "cicmediumid/I");
   fT->Branch("cicmediumiso", &cicmediumiso, "cicmediumiso/I");
   fT->Branch("newhzzWP", &newhzzWP, "newhzzWP/I"); // 2012 WP?
+  fT->Branch("newhzzWPisoonly", &newhzzWPisoonly, "newhzzWPisoonly/I"); // 2012 WP?
+  fT->Branch("newhzzWPidonly", &newhzzWPidonly, "newhzzWPidonly/I"); // 2012 WP?
 
   HZZEleIDSelector aSel;
 
@@ -247,6 +255,10 @@ void makeFriendHZZIdBits(const char* file) {
      hwwWP=0;
      if(passHWWID(eta,pt,bdthww[0],newbdthww[3],rho,combPFIsoHZZ,combPFIsoHWW,kBDTHWW2011_withIP) && 
 	passHWWID(eta,pt,bdthww[0],newbdthww[3],rho,combPFIsoHZZ,combPFIsoHWW,kIsoHWW2011)) hwwWP = 1;
+     hwwWPisoonly=0;
+     if(passHWWID(eta,pt,bdthww[0],newbdthww[3],rho,combPFIsoHZZ,combPFIsoHWW,kIsoHWW2011)) hwwWPisoonly = 1;
+     hwwWPidonly=0;
+     if(passHWWID(eta,pt,bdthww[0],newbdthww[3],rho,combPFIsoHZZ,combPFIsoHWW,kBDTHWW2011_withIP)) hwwWPidonly = 1;
 
      WP95trg=WP90trg=WP85trg=WP80trg=WP70trg=0;
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP95,HZZEleIDSelector::kMVABiased)) WP95trg=1;
@@ -257,6 +269,10 @@ void makeFriendHZZIdBits(const char* file) {
      // same efficiency as 2011 WP
      newhwwWP=0;
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWPHWW,HZZEleIDSelector::kMVABiased)) newhwwWP=1;
+     newhwwWPisoonly=0;
+     if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWPHWW,HZZEleIDSelector::kMVABiased,HZZEleIDSelector::isoonly)) newhwwWPisoonly=1;
+     newhwwWPidonly=0;
+     if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWPHWW,HZZEleIDSelector::kMVABiased,HZZEleIDSelector::idonly)) newhwwWPidonly=1;
 
      WP95notrg=WP90notrg=WP85notrg=WP80notrg=WP70notrg=0;
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWP95,HZZEleIDSelector::kMVAUnbiased)) WP95notrg=1;
@@ -283,7 +299,11 @@ void makeFriendHZZIdBits(const char* file) {
      // same fake rate in Z+1 fake as 2011 CIC WP
      newhzzWP=0;
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWPHZZ,HZZEleIDSelector::kMVAUnbiased)) newhzzWP=1;
-
+     newhzzWPisoonly=0;
+     if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWPHZZ,HZZEleIDSelector::kMVAUnbiased,HZZEleIDSelector::isoonly)) newhzzWPisoonly=1;
+     newhzzWPidonly=0;
+     if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWPHZZ,HZZEleIDSelector::kMVAUnbiased,HZZEleIDSelector::idonly)) newhzzWPidonly=1;
+     
      fT->Fill();
   }
   fF->cd("eleIDdir");

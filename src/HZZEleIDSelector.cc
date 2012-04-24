@@ -24,7 +24,7 @@ int HZZEleIDSelector::ptbinNoTrg(float pt) {
 
 bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso, 
 			      HZZEleIDSelector::wpfulliso WP, HZZEleIDSelector::mvatype type,
-			      bool idonly) {
+                              HZZEleIDSelector::cutblock cuts) {
   int etab=etabin(eta);
   int ptb=-1;
   if(type==kMVABiased) ptb=ptbinTrg(pt);
@@ -36,7 +36,8 @@ bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso,
   if(WP==kWPHWW && type==kMVABiased) {
     bdtcut=cutbdtfulliso_hww[ptb][etab];
     isocut=cutfulliso_hww[ptb][etab];
-    if(idonly) return (bdt>bdtcut);
+    if(cuts==idonly) return (bdt>bdtcut);
+    if(cuts==isoonly) return (iso/pt<isocut);
     return (bdt>bdtcut && iso/pt<isocut);
   }
 
@@ -44,7 +45,8 @@ bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso,
   if(WP==kWPHZZ && type==kMVAUnbiased) {
     bdtcut=cutbdtfulliso_hzz[ptb][etab];
     isocut=cutfulliso_hzz[ptb][etab];
-    if(idonly) return (bdt>bdtcut);
+    if(cuts==idonly) return (bdt>bdtcut);  
+    if(cuts==isoonly) return (iso/pt<isocut);
     return (bdt>bdtcut && iso/pt<isocut);
   }
 
@@ -62,13 +64,14 @@ bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso,
   //      << "   bdt = " << bdt << " (cut is: " << bdtcut << ")" 
   //      << "   iso = " << iso << " (cut is: " << isocut << ")"
   //      << endl;
-  if(idonly) return (bdt>bdtcut);
+  if(cuts==idonly) return (bdt>bdtcut);  
+  if(cuts==isoonly) return (iso/pt<isocut);
   return (bdt>bdtcut && iso/pt<isocut);
 }
 
 bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso, 
 			      HZZEleIDSelector::wpchiso WP, HZZEleIDSelector::mvatype type,
-			      bool idonly) {
+			      HZZEleIDSelector::cutblock cuts) {
   int etab=etabin(eta);
   int ptb=-1;
   if(type==kMVABiased) ptb=ptbinTrg(pt);
@@ -84,6 +87,7 @@ bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso,
   } else {
     cout << " WARNING! type of MVA unset! " << endl;
   }
-  if(idonly) return (bdt>bdtcut);
+  if(cuts==idonly) return (bdt>bdtcut);
+  if(cuts==isoonly) return (iso/pt<isocut);
   return (bdt>bdtcut && iso/pt<isocut);
 }

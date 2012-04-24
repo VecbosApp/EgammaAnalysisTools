@@ -21,10 +21,16 @@ public:
     kMVAUnbiased
   };
 
+  enum cutblock {
+    all = 0,
+    idonly,
+    isoonly
+  };
+
   bool output(float pt, float eta, float bdt, float iso, 
-	      HZZEleIDSelector::wpfulliso WP, HZZEleIDSelector::mvatype type, bool idonly=false);
+	      HZZEleIDSelector::wpfulliso WP, HZZEleIDSelector::mvatype type, HZZEleIDSelector::cutblock cuts = all);
   bool output(float pt, float eta, float bdt, float chiso, 
-	      HZZEleIDSelector::wpchiso WP, HZZEleIDSelector::mvatype type, bool idonly=false);
+	      HZZEleIDSelector::wpchiso WP, HZZEleIDSelector::mvatype type, HZZEleIDSelector::cutblock cuts = all);
 
 private:
   int etabin(float eta);
