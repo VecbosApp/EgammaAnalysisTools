@@ -17,7 +17,7 @@
 
 using namespace std;
 
-void compareEff() {
+void compareEffPt() {
 
   vector<TString> filesHWW, filesHZZ;
   filesHWW.push_back(TString("results/isoOnly/pfisohww/efficiencyPfisohww_Data2011_Pt10To20.root"));
@@ -115,7 +115,7 @@ void compareEff() {
 
 }
 
-void compare3EffVertices() {
+void compare3EffVertices_isolation() {
 
   vector<TString> filesHWW, filesHZZ, filesHZZEA;
   filesHWW.push_back(TString("results/isoOnly/pfisohww/efficiencyPfisohww_vertices_barrel_Data2011_Pt10To20.root"));
@@ -143,6 +143,8 @@ void compare3EffVertices() {
   TString plot("vertices_PLOT_abseta_bin0_&_pt_bin0");
 
   TCanvas c1("c1","c1",600,600);
+  c1.SetGridx();
+  c1.SetGridy();
   TLegend* legend = new TLegend(0.20, 0.16, 0.43, 0.32);
   legend->SetBorderSize(   0);
   legend->SetFillColor (   0);
@@ -203,6 +205,96 @@ void compare3EffVertices() {
     plothww[i]->Draw("ape");
     plothzz[i]->Draw("pe");
     plothzzEA[i]->Draw("pe");
+    legend->Draw();
+
+    c1.SaveAs(files[i]+TString(".pdf"));
+    c1.SaveAs(files[i]+TString(".png"));
+  }
+
+
+}
+
+void compareEffVertices_idiso(bool hwwdenom, int cutset) {
+
+  TString resdir = hwwdenom ? TString("hwwdenom") : TString("recodenom");
+  TString cutsetstring;
+  if(cutset==1) cutsetstring = TString("idonly");
+  if(cutset==2) cutsetstring = TString("isoonly");
+  else cutsetstring = TString("");
+
+  vector<TString> filesNewWP80, filesOldWP80;
+  filesNewWP80.push_back(TString("results/TrgEle/")+resdir+TString("/newhwwWP")+cutsetstring+TString("_promptRate_Data7TeV_Vertices_barrel_Data2011_Pt10To20.root"));
+  filesNewWP80.push_back(TString("results/TrgEle/")+resdir+TString("/newhwwWP")+cutsetstring+TString("_promptRate_Data7TeV_Vertices_barrel_Data2011_Pt20To200.root"));
+  filesNewWP80.push_back(TString("results/TrgEle/")+resdir+TString("/newhwwWP")+cutsetstring+TString("_promptRate_Data7TeV_Vertices_endcap_Data2011_Pt10To20.root"));
+  filesNewWP80.push_back(TString("results/TrgEle/")+resdir+TString("/newhwwWP")+cutsetstring+TString("_promptRate_Data7TeV_Vertices_endcap_Data2011_Pt20To200.root"));
+  
+  filesOldWP80.push_back(TString("results/TrgEle/")+resdir+TString("/hwwWP")+cutsetstring+TString("_promptRate_Data7TeV_Vertices_barrel_Data2011_Pt10To20.root"));
+  filesOldWP80.push_back(TString("results/TrgEle/")+resdir+TString("/hwwWP")+cutsetstring+TString("_promptRate_Data7TeV_Vertices_barrel_Data2011_Pt20To200.root"));
+  filesOldWP80.push_back(TString("results/TrgEle/")+resdir+TString("/hwwWP")+cutsetstring+TString("_promptRate_Data7TeV_Vertices_endcap_Data2011_Pt10To20.root"));
+  filesOldWP80.push_back(TString("results/TrgEle/")+resdir+TString("/hwwWP")+cutsetstring+TString("_promptRate_Data7TeV_Vertices_endcap_Data2011_Pt20To200.root"));
+
+  vector<TString> files;
+  files.push_back("eff_"+cutsetstring+"_barrel_loPt");
+  files.push_back("eff_"+cutsetstring+"_barrel_hiPt");
+  files.push_back("eff_"+cutsetstring+"_endcap_loPt");
+  files.push_back("eff_"+cutsetstring+"_endcap_hiPt");
+
+  TString dir = TString("eleIDdir/etapt/fit_eff_plots/");
+  TString plot("vertices_PLOT_abseta_bin0_&_pt_bin0");
+
+  TCanvas c1("c1","c1",600,600);
+  c1.SetGridx();
+  c1.SetGridy();
+  TLegend* legend = new TLegend(0.20, 0.16, 0.43, 0.32);
+  legend->SetBorderSize(   0);
+  legend->SetFillColor (   0);
+  legend->SetTextAlign (  12);
+  legend->SetTextFont  (  42);
+  legend->SetTextSize  (0.05);
+
+  vector<RooHist*> plotold, plotnew;
+  for(int i=0;i<(int)filesOldWP80.size();++i) {
+    TFile *fileOldWP80 = TFile::Open(filesOldWP80[i]);
+    TFile *fileNewWP80 = TFile::Open(filesNewWP80[i]);
+
+    TCanvas *cold = (TCanvas*)fileOldWP80->Get(dir+plot);
+    TCanvas *cnew = (TCanvas*)fileNewWP80->Get(dir+plot);
+
+    plotold.push_back((RooHist*)cold->GetPrimitive("hxy_fit_eff"));
+    plotnew.push_back((RooHist*)cnew->GetPrimitive("hxy_fit_eff"));
+
+    c1.cd();
+    
+    plotold[i]->SetMinimum(0.0);
+    plotold[i]->SetMaximum(1.2);
+    plotold[i]->GetXaxis()->SetTitle("# vertices");
+    if(hwwdenom) plotold[i]->GetYaxis()->SetTitle("prompt rate");
+    else plotold[i]->GetYaxis()->SetTitle("efficiency");
+
+    plotold[i]->Fit("pol1","","same",0.5,24.5);
+    plotold[i]->GetFunction("pol1")->SetLineColor(kRed+1);    
+    plotnew[i]->Fit("pol1","","same",0.5,24.5);
+    plotnew[i]->GetFunction("pol1")->SetLineColor(kAzure-6);
+
+    // cosmetics
+    plotold[i]->SetMarkerSize(2);
+    plotold[i]->SetMarkerStyle(20);
+    plotnew[i]->SetMarkerSize(2);
+    plotnew[i]->SetMarkerStyle(20);
+
+    plotold[i]->SetLineColor(kRed+1);
+    plotnew[i]->SetLineColor(kAzure-6);
+
+    plotold[i]->SetMarkerColor(kRed+1);
+    plotnew[i]->SetMarkerColor(kAzure-6);
+
+    if(i==0) {
+      legend->AddEntry(plotold[i],"H #rightarrow WW 2011","pl");
+      legend->AddEntry(plotnew[i],"H #rightarrow WW 2012 (same-eff)","pl");
+    }
+
+    plotold[i]->Draw("ape");
+    plotnew[i]->Draw("pe");
     legend->Draw();
 
     c1.SaveAs(files[i]+TString(".pdf"));
