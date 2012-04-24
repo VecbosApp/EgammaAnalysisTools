@@ -29,6 +29,18 @@ float cutfulliso_unbiased[2][3][5] =
     }
   };
   
+// special cuts for HZZ
+float cutbdtfulliso_hzz[2][3] = 
+  { 
+    { 0.450, -0.074, 0.470 }, // 10 < pt < 20 GeV
+    { 0.546, 0.118, 0.802 } // pt > 20 GeV
+  };
+
+float cutfulliso_hzz[2][3] = 
+  {
+    { 0.106, 0.106, 0.100 }, // 10 < pt < 20 GeV
+    { 0.222, 0.198, 0.118 } // pt > 20 GeV
+  };
 
 // TRIGGERING ELECTRONS MVA
 float cutbdtfulliso_biased[2][3][5] = 
