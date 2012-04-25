@@ -19,7 +19,6 @@
 
 using namespace std;
 
-
 enum idType {
   kIsoHWW2011 = 0, // HWW cuts 2011
   kBDTHWW2011_withIP, // HWW cuts 2011
@@ -28,8 +27,13 @@ enum idType {
   kBDTHZZ_withIP
 };
 
-float Aeff_neu_dr04[7] = { 0.045, 0.065, 0.068, 0.057, 0.058, 0.061, 0.110 };
-float Aeff_pho_dr04[7] = { 0.140, 0.130, 0.079, 0.130, 0.150, 0.160, 0.180 };
+float Aeff_neu_dr04[7], Aeff_pho_dr04[7];
+
+float Aeff_neu_dr04_2011[7] = { 0.045, 0.065, 0.068, 0.057, 0.058, 0.061, 0.110 };
+float Aeff_pho_dr04_2011[7] = { 0.140, 0.130, 0.079, 0.130, 0.150, 0.160, 0.180 };
+
+float Aeff_neu_dr04_2012[7] = { 0.041, 0.068, 0.075, 0.068, 0.071, 0.078, 0.140 };
+float Aeff_pho_dr04_2012[7] = { 0.144, 0.138, 0.084, 0.155, 0.201, 0.223, 0.265 };
 
 // H->ZZ detector based effective areas
 float Aeff_ecal_dr03[2] = { 0.078, 0.046 };
@@ -315,6 +319,21 @@ void makeFriendHZZIdBits(const char* file) {
 
 
 int main(int argc, char* argv[]) {
+
+  int year = 2012;
+  for(int i=0; i<7; i++) {
+    if(year==2011) {
+      Aeff_neu_dr04[i] = Aeff_neu_dr04_2011[i];
+      Aeff_pho_dr04[i] = Aeff_pho_dr04_2011[i];
+    } else if(year==2012) {
+      Aeff_neu_dr04[i] = Aeff_neu_dr04_2012[i];
+      Aeff_pho_dr04[i] = Aeff_pho_dr04_2012[i];
+    } else {
+      cout << "wrong year set. Returning 0." << endl;
+      return 0;
+    }
+  }
+
 
   char files1[500], files2[500], fileb1[500], fileb2[500], fileb3[500];
   sprintf(files1,"macro/results_data/electrons.root");
