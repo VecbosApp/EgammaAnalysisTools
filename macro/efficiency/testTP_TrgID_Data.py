@@ -1,9 +1,16 @@
 import FWCore.ParameterSet.Config as cms
 import sys
 
-WPTOTEST = "hwwWPidonly"
-PREFIX = "promptRate_Data7TeV"
+WPTOTEST = "newhwwWPid"
 DOKINE = 0
+YEAR = 2011
+
+if YEAR == 2011:
+    PREFIX = "promptRate_Data7TeV"
+elif YEAR == 2012:
+    PREFIX = "promptRate_Data8TeV"
+else:
+    PREFIX = "promptRate_Data"
 
 process = cms.Process("TagProbe")
 process.source = cms.Source("EmptySource")
@@ -32,7 +39,7 @@ process.TagProbeFitBase = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
                                          Variables = cms.PSet( mass = cms.vstring("Tag-Probe Mass", "60.0", "120.0", "GeV/c^{2}"),
                                                                pt = cms.vstring("Probe p_{T}", "10", "200", "GeV/c"),
                                                                abseta = cms.vstring("Probe #eta", "0.0", "2.5", ""),
-                                                               vertices = cms.vstring("vertices","1","20", "")
+                                                               vertices = cms.vstring("vertices","1","35", "")
                                                                ),
                                          # defines all the discrete variables of the probes available in the input tree and intended for use in the efficiency calculations
                                          Categories = cms.PSet( denom = cms.vstring("denom", "dummy[pass=1,fail=0]"),
@@ -77,7 +84,7 @@ process.TagProbeFitBase = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
                                                                                    UnbinnedVariables = cms.vstring("mass"),
                                                                                    BinnedVariables = cms.PSet(abseta = cms.vdouble(0.,0.4,0.8,1.2,1.4442,1.566,1.8,2.0,2.2,2.5),
                                                                                                               pt = cms.vdouble(10,15,20,25,50,200),
-                                                                                                              vertices = cms.vdouble(1,20)
+                                                                                                              vertices = cms.vdouble(1,35)
                                                                                                               ),
                                                                                    BinToPDFmap = cms.vstring("cruijffPlusExpo")
                                                                                    ),
@@ -88,6 +95,18 @@ process.TagProbeFitBase = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 # the dedicated fits to MC to determine the signal shape. Mostly will be determined from data itself, but the low mass
 # tail has to be fixed from MC. Tail (alpha_L) is different for pt < 20 GeV / pt > 20 GeV, but the approximately the same in EB/EE (from MC fits to signal only).
 # done for EB/EE pt </> 20 GeV
+
+verticesbinshighpt = cms.vdouble(1,35)
+verticesbinslowpt = cms.vdouble(1,35)
+if YEAR == 2011:
+    verticesbinshighpt = cms.vdouble(1,3,5,7,10,15,20,35)
+    verticesbinslowpt = cms.vdouble(1,3,5,7,10,15,20,35)
+elif YEAR == 2012:
+    verticesbinshighpt = cms.vdouble(1,5,8,12,14,16,18,20,25,30,35)
+    verticesbinslowpt = cms.vdouble(1,7,12,17,22,35)
+else:
+    verticesbinshighpt = cms.vdouble(1,35)
+    verticesbinslowpt = cms.vdouble(1,35)
 
 # pt<20 GeV
 process.TagProbeFitPt10To20 = process.TagProbeFitBase.clone()
@@ -105,15 +124,15 @@ process.TagProbeFitPt10To20.PDFs.cruijffPlusExpo = cms.vstring("EXPR::signal('(@
 process.TagProbeFitVerticesBarrelPt10To20 = process.TagProbeFitPt10To20.clone()
 process.TagProbeFitVerticesBarrelPt10To20.Efficiencies.etapt.BinnedVariables.pt = (10,20)
 process.TagProbeFitVerticesBarrelPt10To20.Efficiencies.etapt.BinnedVariables.abseta = (0.,1.4442)
-process.TagProbeFitVerticesBarrelPt10To20.Efficiencies.etapt.BinnedVariables.vertices = (1,3,5,7,10,15,20)
-process.TagProbeFitVerticesBarrelPt10To20.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_barrel_Data2011_Pt10To20.root"
+process.TagProbeFitVerticesBarrelPt10To20.Efficiencies.etapt.BinnedVariables.vertices = verticesbinslowpt
+process.TagProbeFitVerticesBarrelPt10To20.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_barrel_Pt10To20.root"
 
 # pt<20 GeV, endcap: as a function of vertices
 process.TagProbeFitVerticesEndcapPt10To20 = process.TagProbeFitPt10To20.clone()
 process.TagProbeFitVerticesEndcapPt10To20.Efficiencies.etapt.BinnedVariables.pt = (10,20)
 process.TagProbeFitVerticesEndcapPt10To20.Efficiencies.etapt.BinnedVariables.abseta = (1.566,2.5)
-process.TagProbeFitVerticesEndcapPt10To20.Efficiencies.etapt.BinnedVariables.vertices = (1,3,5,7,10,15,20)
-process.TagProbeFitVerticesEndcapPt10To20.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_endcap_Data2011_Pt10To20.root"
+process.TagProbeFitVerticesEndcapPt10To20.Efficiencies.etapt.BinnedVariables.vertices = verticesbinslowpt
+process.TagProbeFitVerticesEndcapPt10To20.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_endcap_Pt10To20.root"
 
 
 # pt>20 GeV
@@ -132,21 +151,21 @@ process.TagProbeFitPt20To200.PDFs.cruijffPlusExpo = cms.vstring("EXPR::signal('(
 process.TagProbeFitVerticesBarrelPt20To200 = process.TagProbeFitPt20To200.clone()
 process.TagProbeFitVerticesBarrelPt20To200.Efficiencies.etapt.BinnedVariables.pt = (20,200)
 process.TagProbeFitVerticesBarrelPt20To200.Efficiencies.etapt.BinnedVariables.abseta = (0.,1.4442)
-process.TagProbeFitVerticesBarrelPt20To200.Efficiencies.etapt.BinnedVariables.vertices = (1,3,5,7,10,15,20)
-process.TagProbeFitVerticesBarrelPt20To200.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_barrel_Data2011_Pt20To200.root"
+process.TagProbeFitVerticesBarrelPt20To200.Efficiencies.etapt.BinnedVariables.vertices = verticesbinshighpt
+process.TagProbeFitVerticesBarrelPt20To200.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_barrel_Pt20To200.root"
 
 # pt>20 GeV, endcap: as a function of vertices
 process.TagProbeFitVerticesEndcapPt20To200 = process.TagProbeFitPt20To200.clone()
 process.TagProbeFitVerticesEndcapPt20To200.Efficiencies.etapt.BinnedVariables.pt = (20,200)
 process.TagProbeFitVerticesEndcapPt20To200.Efficiencies.etapt.BinnedVariables.abseta = (1.566,2.5)
-process.TagProbeFitVerticesEndcapPt20To200.Efficiencies.etapt.BinnedVariables.vertices = (1,3,5,7,10,15,20)
-process.TagProbeFitVerticesEndcapPt20To200.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_endcap_Data2011_Pt20To200.root"
+process.TagProbeFitVerticesEndcapPt20To200.Efficiencies.etapt.BinnedVariables.vertices = verticesbinshighpt
+process.TagProbeFitVerticesEndcapPt20To200.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_endcap_Pt20To200.root"
 
 if DOKINE:
     process.fit = cms.Path(process.TagProbeFitPt10To20 *
                            process.TagProbeFitPt20To200 )
 else:
-    process.fit = cms.Path(process.TagProbeFitVerticesBarrelPt10To20 * 
+    process.fit = cms.Path(process.TagProbeFitVerticesBarrelPt10To20 *
                            process.TagProbeFitVerticesEndcapPt10To20 *
                            process.TagProbeFitVerticesBarrelPt20To200 *
                            process.TagProbeFitVerticesEndcapPt20To200 )
