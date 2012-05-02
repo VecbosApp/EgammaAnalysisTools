@@ -16,6 +16,8 @@
 
 #include "include/HZZEleIDSelector.hh"
 #include "include/eIDCiChzzSelector.hh"
+#include "include/EGammaMvaEleEstimator.h"
+#include "include/ElectronEffectiveArea.h"
 
 using namespace std;
 
@@ -39,10 +41,10 @@ float Aeff_pho_dr04_2012[7] = { 0.144, 0.138, 0.084, 0.155, 0.201, 0.223, 0.265 
 float Aeff_ecal_dr03[2] = { 0.078, 0.046 };
 float Aeff_hcal_dr03[2] = { 0.026, 0.072 };
 
-bool cicid(int *cic, int level) { return (cic[level]>>0)%2; }
-bool ciciso(int *cic, int level) { return (cic[level]>>1)%2; }
-bool cicconv(int *cic, int level) { return (cic[level]>>2)%2; }
-bool cicip(int *cic, int level) { return (cic[level]>>3)%2; }
+bool cicidval(int *cic, int level) { return (cic[level]>>0)%2; }
+bool cicisoval(int *cic, int level) { return (cic[level]>>1)%2; }
+bool cicconvval(int *cic, int level) { return (cic[level]>>2)%2; }
+bool cicipval(int *cic, int level) { return (cic[level]>>3)%2; }
 
 bool passHWWID(Float_t eta, Float_t pt, Float_t bdthww, Float_t bdthzz, Float_t rho, Float_t combIso, Float_t combPFIsoHWW, idType type) {
   if(type == kIsoHWW2011) {
@@ -106,7 +108,19 @@ void makeFriendHZZIsolation(const char* file) {
   nF.ReplaceAll(".root","_hzzisoFriend.root");
   TFile *fF = TFile::Open(nF,"recreate");
 
-  Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8], rho, eta;
+  EGammaMvaEleEstimator *fElectronIsoMVA = new EGammaMvaEleEstimator();
+  vector<string> eleiso_weightfiles;
+  eleiso_weightfiles.push_back("elebdtweights/ElectronIso_BDTG_V0_BarrelPt5To10.weights.xml");
+  eleiso_weightfiles.push_back("elebdtweights/ElectronIso_BDTG_V0_EndcapPt5To10.weights.xml");
+  eleiso_weightfiles.push_back("elebdtweights/ElectronIso_BDTG_V0_BarrelPt10ToInf.weights.xml");
+  eleiso_weightfiles.push_back("elebdtweights/ElectronIso_BDTG_V0_EndcapPt10ToInf.weights.xml");
+
+  fElectronIsoMVA->initialize("EleIso_BDTG_IsoRings",
+			      EGammaMvaEleEstimator::kIsoRings,
+			      true,
+			      eleiso_weightfiles);
+
+  Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8], rho, eta, pt;
   Float_t trkIso,ecalIso,hcalIso;
   pT->SetBranchAddress("chaPFIso", chaPFIso);
   pT->SetBranchAddress("neuPFIso", neuPFIso);
@@ -116,14 +130,17 @@ void makeFriendHZZIsolation(const char* file) {
   pT->SetBranchAddress("hcalIso", &hcalIso);
   pT->SetBranchAddress("rho", &rho);
   pT->SetBranchAddress("eta", &eta);
+  pT->SetBranchAddress("pt", &pt);
 
   fF->mkdir("eleIDdir");
   TTree *fT = new TTree("T1","tree with hzz isolation");
   Float_t combDetIso, combIso, combIsoNoEA;
+  Float_t mvaPFIso;
   fT->Branch("combDetIsoHZZ",&combDetIso,"combDetIsoHZZ/F");
   fT->Branch("combPFIsoHZZ",&combIso,"combPFIsoHZZ/F");
   fT->Branch("combPFIsoHZZNoEA",&combIsoNoEA,"combPFIsoHZZNoEA/F");
-  
+  fT->Branch("mvaPFIso",&mvaPFIso,"mvaPFIso/F");
+
   for(int i=0; i<pT->GetEntries(); i++) {
     if (i%10000 == 0) std::cout << ">>> Analyzing event # " << i << " / " << pT->GetEntries() << " entries" << std::endl;
      pT->GetEntry(i);
@@ -141,6 +158,11 @@ void makeFriendHZZIsolation(const char* file) {
      int ieta = (fabs(eta)<1.479) ? 0 : 1;
      combDetIso = trkIso + ecalIso - rho * Aeff_ecal_dr03[ieta] + hcalIso - rho * Aeff_hcal_dr03[ieta];
 
+     mvaPFIso = fElectronIsoMVA->isoMvaValue(pt,eta,rho,ElectronEffectiveArea::kEleEAData2011,
+					     chaPFIso[0],chaPFIso[1]-chaPFIso[0],chaPFIso[2]-chaPFIso[1],chaPFIso[3]-chaPFIso[2],chaPFIso[4]-chaPFIso[3],
+					     phoPFIso[0],phoPFIso[1]-phoPFIso[0],phoPFIso[2]-phoPFIso[1],phoPFIso[3]-phoPFIso[2],phoPFIso[4]-phoPFIso[3],
+					     neuPFIso[0],neuPFIso[1]-neuPFIso[0],neuPFIso[2]-neuPFIso[1],neuPFIso[3]-neuPFIso[2],neuPFIso[4]-neuPFIso[3],
+					     true);
      fT->Fill();
   }
 
@@ -214,7 +236,7 @@ void makeFriendHZZIdBits(const char* file) {
   Int_t hwwWP, newhwwWP, newhzzWP;
   Int_t hwwWPisoonly, newhwwWPisoonly, newhzzWPisoonly;
   Int_t hwwWPidonly, newhwwWPidonly, newhzzWPidonly;
-  Int_t cicmedium, cicmediumid, cicmediumiso;
+  Int_t cicall[5], cicid[5], ciciso[5];
   // first 4 variables needed for TP
   fT->Branch("mass", &mass, "mass/F");
   fT->Branch("pt", &pt, "pt/F");
@@ -241,9 +263,9 @@ void makeFriendHZZIdBits(const char* file) {
   // same as HWW DenomFakeSmurf: change name for the friend tree
   fT->Branch("denom", &DenomFakeSmurf, "denom/I");
   // the cic used for HZZ
-  fT->Branch("cicmedium", &cicmedium, "cicmedium/I");
-  fT->Branch("cicmediumid", &cicmediumid, "cicmediumid/I");
-  fT->Branch("cicmediumiso", &cicmediumiso, "cicmediumiso/I");
+  fT->Branch("cicall", cicall, "cicall[5]/I");
+  fT->Branch("cicid", cicid, "cicid[5]/I");
+  fT->Branch("ciciso", ciciso, "ciciso[5]/I");
   fT->Branch("newhzzWP", &newhzzWP, "newhzzWP/I"); // 2012 WP?
   fT->Branch("newhzzWPisoonly", &newhzzWPisoonly, "newhzzWPisoonly/I"); // 2012 WP?
   fT->Branch("newhzzWPidonly", &newhzzWPidonly, "newhzzWPidonly/I"); // 2012 WP?
@@ -295,11 +317,11 @@ void makeFriendHZZIdBits(const char* file) {
 							   hcalIso - rho * Aeff_hcal_dr03[ieta],
 							   d0,misshits,deta,dphi,HoE,dcot,
 							   dist,!ecalseed,i,false);
-
-     cicmedium=cicmediumid=cicmediumiso=0;
-     if(cicid(cic,3) && ciciso(cic,3) && misshits<=1) cicmedium=1;
-     if(cicid(cic,3) && misshits<=1) cicmediumid=1;
-     if(ciciso(cic,3)) cicmediumiso=1;
+     for(int i=0; i<5; i++) {
+       cicall[i] = (cicidval(cic,i) && cicisoval(cic,i) && misshits<=1) ? 1 : 0;
+       cicid[i] = (cicidval(cic,i) && misshits<=1) ? 1 : 0;
+       ciciso[i] = (cicisoval(cic,i)) ? 1 : 0;
+     }
      // same fake rate in Z+1 fake as 2011 CIC WP
      newhzzWP=0;
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWPHZZ,HZZEleIDSelector::kMVAUnbiased)) newhzzWP=1;
@@ -320,7 +342,7 @@ void makeFriendHZZIdBits(const char* file) {
 
 int main(int argc, char* argv[]) {
 
-  int year = 2012;
+  int year = 2011;
   for(int i=0; i<7; i++) {
     if(year==2011) {
       Aeff_neu_dr04[i] = Aeff_neu_dr04_2011[i];
