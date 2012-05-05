@@ -41,13 +41,14 @@ bool HZZEleIDSelector::output(float pt, float eta, float bdt, float iso,
     return (bdt>bdtcut && iso/pt<isocut);
   }
 
-  // special WP that has the same eff as HWW 2011
-  if(WP==kWPHZZ && type==kMVAUnbiased) {
-    bdtcut=cutbdtfulliso_hzz[ptb][etab];
-    isocut=cutfulliso_hzz[ptb][etab];
+  // special WP that has the same fake rate as HZZ 2011
+  if((WP==kMVALoose || WP==kMVATight) && type==kMVAUnbiased) {
+    int wp = (WP==kMVALoose) ? 0 : 1;
+    bdtcut=cutbdtfulliso_hzz[ptb][etab][wp];
+    isocut=cutmvaiso_hzz[ptb][etab][wp];
     if(cuts==idonly) return (bdt>bdtcut);  
-    if(cuts==isoonly) return (iso/pt<isocut);
-    return (bdt>bdtcut && iso/pt<isocut);
+    if(cuts==isoonly) return (iso>isocut);  // attention: this is MVA output, not a relative iso!
+    return (bdt>bdtcut && iso>isocut);
   }
 
   // optimized working points

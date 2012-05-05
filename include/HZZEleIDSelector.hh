@@ -8,7 +8,8 @@ public:
   ~HZZEleIDSelector() {}
   enum wpfulliso {
     kWP95 = 0,
-    kWP90, kWP85, kWP80, kWP70, kWPHWW, kWPHZZ
+    kWP90, kWP85, kWP80, kWP70, kWPHWW, kWPHZZ,
+    kMVALoose, kMVATight
   };
 
   enum wpchiso {
