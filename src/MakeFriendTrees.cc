@@ -190,7 +190,7 @@ void makeFriendHZZIdBits(const char* file) {
   Float_t eta, abseta, pt, rho, vertices;
   Float_t bdthww[2], newbdthww[4], combPFIsoHWW;
   Float_t combPFIsoHZZ, bdthzz[4];
-  Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8];
+  Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8], mvaPFIso;
   Float_t mass; // not dummy only for TP trees
   Int_t DenomFakeSmurf, misshits, ecalseed;
   Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,trkIso,ecalIso,hcalIso;
@@ -222,6 +222,7 @@ void makeFriendHZZIdBits(const char* file) {
   pT->SetBranchAddress("trkIso", &trkIso);
   pT->SetBranchAddress("ecalIso", &ecalIso);
   pT->SetBranchAddress("hcalIso", &hcalIso);
+  pT->SetBranchAddress("mvaPFIso", &mvaPFIso);
   if(!TString(file).Contains("fake")) pT->SetBranchAddress("mass", &mass);
   else mass=-1.0;
 
@@ -237,6 +238,7 @@ void makeFriendHZZIdBits(const char* file) {
   Int_t hwwWPisoonly, newhwwWPisoonly, newhzzWPisoonly;
   Int_t hwwWPidonly, newhwwWPidonly, newhzzWPidonly;
   Int_t cicall[5], cicid[5], ciciso[5];
+  Int_t hzzMvaLoose, hzzMvaTight;
   // first 4 variables needed for TP
   fT->Branch("mass", &mass, "mass/F");
   fT->Branch("pt", &pt, "pt/F");
@@ -269,6 +271,9 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("newhzzWP", &newhzzWP, "newhzzWP/I"); // 2012 WP?
   fT->Branch("newhzzWPisoonly", &newhzzWPisoonly, "newhzzWPisoonly/I"); // 2012 WP?
   fT->Branch("newhzzWPidonly", &newhzzWPidonly, "newhzzWPidonly/I"); // 2012 WP?
+  // mva 2012 duncan's WP
+  fT->Branch("hzzMvaLoose", &hzzMvaLoose, "hzzMvaLoose/I");
+  fT->Branch("hzzMvaTight", &hzzMvaTight, "hzzMvaTight/I");
 
   HZZEleIDSelector aSel;
 
@@ -330,6 +335,11 @@ void makeFriendHZZIdBits(const char* file) {
      newhzzWPidonly=0;
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWPHZZ,HZZEleIDSelector::kMVAUnbiased,HZZEleIDSelector::idonly)) newhzzWPidonly=1;
      
+     // MVA iso rings and MVA ID
+     hzzMvaLoose=hzzMvaTight=0;
+     if(aSel.output(pt,eta,bdthzz[3],mvaPFIso,HZZEleIDSelector::kMVALoose,HZZEleIDSelector::kMVAUnbiased)) hzzMvaLoose=1;
+     if(aSel.output(pt,eta,bdthzz[3],mvaPFIso,HZZEleIDSelector::kMVATight,HZZEleIDSelector::kMVAUnbiased)) hzzMvaTight=1;
+
      fT->Fill();
   }
   fF->cd("eleIDdir");
