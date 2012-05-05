@@ -26,5 +26,9 @@ from ROOT import drawIdsBiased
 drawIdsBiased()
 from ROOT import drawIdsUnbiased
 drawIdsUnbiased()
+from ROOT import drawIdsUnbiasedNewWPs
+drawIdsUnbiasedNewWPs()
+from ROOT import drawIdsUnbiasedIsoBins
+drawIdsUnbiasedIsoBins()
 
 

@@ -44,6 +44,14 @@ public :
   enum wphzz {
     kHzzWP80,
     kHzzWP95,
+    kHzzCiCMedium,
+    kHzzCiCMediumIso1,
+    kHzzCiCMediumIso2,
+    knewWPHZZ,
+    knewWPHZZIso1,
+    knewWPHZZIso2,
+    khzzMvaLoose,
+    khzzMvaTight
   };
 
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
@@ -106,6 +114,7 @@ public :
    Int_t           charge;
    Int_t           DenomFake;
    Int_t           DenomFakeSmurf;
+   Int_t           cic[5];
    Float_t         trkIso;
    Float_t         ecalIso;
    Float_t         hcalIso;
@@ -183,6 +192,7 @@ public :
    TBranch        *b_charge;   //!
    TBranch        *b_DenomFake;   //!
    TBranch        *b_DenomFakeSmurf;   //!
+   TBranch        *b_cic;   //!
    TBranch        *b_trkIso;   //!
    TBranch        *b_ecalIso;   //!
    TBranch        *b_hcalIso;   //!
@@ -204,6 +214,7 @@ public :
    TBranch        *b_rho;   //!
 
    const char *_isofriend;
+   const char *_idbitsfriend;
 
    estimateFakeRate(TTree *tree=0);
    virtual ~estimateFakeRate();
@@ -216,6 +227,13 @@ public :
    virtual void     Show(Long64_t entry = -1);
    virtual Bool_t   passID(estimateFakeRate::idType type);
    virtual void     addIsoFriend(const char *filename) { _isofriend = filename;};
+   virtual void     addIdBitsFriend(const char *filename) { _idbitsfriend = filename;};
+
+   virtual bool cicid(int level) { return (cic[level]>>0)%2; }
+   virtual bool ciciso(int level) { return (cic[level]>>1)%2; }
+   virtual bool cicconv(int level) { return (cic[level]>>2)%2; }
+   virtual bool cicip(int level) { return (cic[level]>>3)%2; }
+
 };
 
 #endif
@@ -334,6 +352,7 @@ void estimateFakeRate::Init(TTree *tree)
    fChain->SetBranchAddress("charge", &charge, &b_charge);
    fChain->SetBranchAddress("DenomFake", &DenomFake, &b_DenomFake);
    fChain->SetBranchAddress("DenomFakeSmurf", &DenomFakeSmurf, &b_DenomFakeSmurf);
+   fChain->SetBranchAddress("cic", cic, &b_cic);
    fChain->SetBranchAddress("trkIso", &trkIso, &b_trkIso);
    fChain->SetBranchAddress("ecalIso", &ecalIso, &b_ecalIso);
    fChain->SetBranchAddress("hcalIso", &hcalIso, &b_hcalIso);

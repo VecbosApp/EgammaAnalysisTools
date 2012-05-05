@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
   TTree *tree = (TTree*)file->Get("eleIDdir/T1");
   estimateFakeRate analyzer(tree);
   analyzer.addIsoFriend("../results_data/fakes_hzzisoFriend.root");
+  analyzer.addIdBitsFriend("../results_data/fakes_hzzidbitsFriend.root");
   TString outfileBias(outname);
   outfileBias += TString("_trigger");
   analyzer.Loop(outfileBias);
@@ -33,6 +34,7 @@ int main(int argc, char* argv[]) {
   TTree *tree2 = (TTree*)file2->Get("eleIDdir/T1");
   estimateFakeRate analyzer2(tree2);
   analyzer2.addIsoFriend("../results_data/fakes-zeeOneFake_hzzisoFriend.root");
+  analyzer2.addIdBitsFriend("../results_data/fakes-zeeOneFake_hzzidbitsFriend.root");
   TString outfileUnbias(outname);
   outfileUnbias += TString("_zee1fake");
   analyzer2.Loop(outfileUnbias);
