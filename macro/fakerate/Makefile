@@ -39,9 +39,14 @@ fakerate: fakerate.cc estimateFakeRate.C \
 	$(OUTLIB)HZZEleIDSelector.o
 	$(CXX) $(CXXFLAGS) -o fakerate $(OUTLIB)/*.o $(GLIBS) $ $<
 
+fakeratehzz4l: fakerateHzz4l.cc estimateMuonFakeRateHzz4lTree.C \
+	$(OUTLIB)EfficiencyEvaluator.o 
+	$(CXX) $(CXXFLAGS) -o fakeratehzz4l $(OUTLIB)/*.o $(GLIBS) $ $<
+
 clean:
 	rm -f $(OUTLIB)*.o
 	rm -f fakerate
+	rm -f fakeratehzz4l
 
 all: fakerate
 
