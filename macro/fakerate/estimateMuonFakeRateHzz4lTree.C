@@ -14,7 +14,7 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
 
   std::vector<TString> NoTrgMuonID;
   NoTrgMuonID.push_back("hzzPfIso");  // reference pf iso
-  //  NoTrgEleID.push_back("hzzMvaPfIso");  // duncan's optimization for HZZ
+  NoTrgMuonID.push_back("hzzMvaPfIso");  // duncan's optimization for HZZ
 
   // -----------------------------------------------------------------------
   // study vs eta
@@ -127,7 +127,7 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
 
 
     // fill the numerator(s)
-    // === PF-muon ID, MVA for Iso ===
+    // === PF-muon ID, combined Iso ===
     if(passRefMuSel()) {
       if (highPt) NoTrgMuonEtaHighPt[khzzPfIso]->Fill(etaFake);
       if (lowPt)  NoTrgMuonEtaLowPt[khzzPfIso] ->Fill(etaFake);
@@ -138,6 +138,20 @@ void estimateMuonFakeRateHzz4lTree::Loop(const char *outname)
       if (isInEE) {
 	NoTrgMuonPtEndcap[khzzPfIso] ->Fill(etFake);
 	NoTrgMuonPUEndcap[khzzPfIso] ->Fill(vertices);
+      }
+    }
+
+    // === PF-muon ID, MVA Iso ===
+    if(passMvaMuSel(false)) {
+      if (highPt) NoTrgMuonEtaHighPt[khzzMvaPfIso]->Fill(etaFake);
+      if (lowPt)  NoTrgMuonEtaLowPt[khzzMvaPfIso] ->Fill(etaFake);
+      if (isInEB) { 
+	NoTrgMuonPtBarrel[khzzMvaPfIso] ->Fill(etFake);
+	NoTrgMuonPUBarrel[khzzMvaPfIso] ->Fill(vertices);
+      }
+      if (isInEE) {
+	NoTrgMuonPtEndcap[khzzMvaPfIso] ->Fill(etFake);
+	NoTrgMuonPUEndcap[khzzMvaPfIso] ->Fill(vertices);
       }
     }
 

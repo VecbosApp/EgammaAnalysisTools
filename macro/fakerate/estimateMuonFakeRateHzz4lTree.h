@@ -13,6 +13,8 @@
 #include <TFile.h>
 #include "../../../Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
 
+#include <iostream>
+
 // Header file for the classes stored in the TTree if any.
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
@@ -89,6 +91,7 @@ public :
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
    virtual Bool_t   passRefMuSel();
+   virtual Bool_t   passMvaMuSel(bool pfnopuiso);
 };
 
 #endif
@@ -219,4 +222,26 @@ Bool_t estimateMuonFakeRateHzz4lTree::passRefMuSel() {
 
   return (pfid && iso<0.4 && fabs(sip3d)<4.0);
 } 
+
+Bool_t estimateMuonFakeRateHzz4lTree::passMvaMuSel(bool pfnopuiso) {
+  
+  // id part
+  if (!pfid || fabs(sip3d)>=4.0) return false;
+
+  // iso part
+  float abseta=fabs(eta);
+  float bdtiso = (pfnopuiso) ? bdtIsoPnp : bdtIsoDz;
+  
+  if(globalmu && trackermu) {
+    if(pt<10 && abseta<1.5) return bdtiso>-0.593;
+    if(pt>=10 && abseta<1.5) return bdtiso>0.337;
+    if(pt<10 && abseta>=1.5) return bdtiso>-0.767;
+    if(pt>=10 && abseta>=1.5) return bdtiso>0.410;
+  }
+  if(!globalmu && trackermu) return bdtiso>-0.989;
+  if(globalmu && !trackermu) return bdtiso>-0.995;
+  std::cout << "This should never happen! passMvaMuSel() returning false." << std::endl;
+  return false;
+} 
+
 #endif // #ifdef estimateMuonFakeRateHzz4lTree_cxx
