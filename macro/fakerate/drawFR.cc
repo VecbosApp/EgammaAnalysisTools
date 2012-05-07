@@ -44,7 +44,7 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
   for(int i=0;i<(int)histos.size();++i) {
     
     histos[i]->SetMinimum(0);
-    histos[i]->SetMaximum(0.2);
+    histos[i]->SetMaximum(0.4);
     histos[i]->SetMarkerSize(2);
     histos[i]->SetMarkerStyle(20);
     histos[i]->SetMarkerColor(colors[i]);
@@ -415,5 +415,58 @@ void drawIdsUnbiasedIsoBins() {
   ptSet2.push_back(NoTrgElenewWPHZZIso2PtEndcap);
 
   drawOneToOne(ptSet1,ptSet2,"H#rightarrow ZZ CiC","H#rightarrow ZZ 2012","p_{T} [GeV]");
+
+}
+
+
+void drawMuonIdsUnbiased() {
+
+  TFile *file = TFile::Open("fakerates_zll1m.root");
+
+  // eta
+  TH1F *NoTrgMuonhzzPfIsoEtaHighPt = (TH1F*)file->Get("NoTrgMuonhzzPfIsoEtaHighPt_Eff");
+  TH1F *NoTrgMuonhzzPfIsoEtaLowPt = (TH1F*)file->Get("NoTrgMuonhzzPfIsoEtaLowPt_Eff");
+  // ---> HZZ id + EA corrected isolation
+  TH1F *NoTrgMuonhzzMvaPfIsoEtaHighPt = (TH1F*)file->Get("NoTrgMuonhzzMvaPfIsoEtaHighPt_Eff");
+  TH1F *NoTrgMuonhzzMvaPfIsoEtaLowPt = (TH1F*)file->Get("NoTrgMuonhzzMvaPfIsoEtaLowPt_Eff");
+
+  vector<TH1F*> etaSet1, etaSet2;
+  etaSet1.push_back(NoTrgMuonhzzPfIsoEtaHighPt);
+  etaSet1.push_back(NoTrgMuonhzzPfIsoEtaLowPt);
+  etaSet2.push_back(NoTrgMuonhzzMvaPfIsoEtaHighPt);
+  etaSet2.push_back(NoTrgMuonhzzMvaPfIsoEtaLowPt);
+  
+  drawOneToOne(etaSet1,etaSet2,"H#rightarrow ZZ PF iso","H#rightarrow ZZ MVA PF Iso","#eta");
+
+  // pt
+  TH1F *NoTrgMuonhzzPfIsoPtBarrel = (TH1F*)file->Get("NoTrgMuonhzzPfIsoPtBarrel_Eff");
+  TH1F *NoTrgMuonhzzPfIsoPtEndcap = (TH1F*)file->Get("NoTrgMuonhzzPfIsoPtEndcap_Eff");
+  // ---> HZZ id + EA corrected isolation
+  TH1F *NoTrgMuonhzzMvaPfIsoPtBarrel = (TH1F*)file->Get("NoTrgMuonhzzMvaPfIsoPtBarrel_Eff");
+  TH1F *NoTrgMuonhzzMvaPfIsoPtEndcap = (TH1F*)file->Get("NoTrgMuonhzzMvaPfIsoPtEndcap_Eff");
+
+  vector<TH1F*> ptSet1, ptSet2;
+  ptSet1.push_back(NoTrgMuonhzzPfIsoPtBarrel);
+  ptSet1.push_back(NoTrgMuonhzzPfIsoPtEndcap);
+  ptSet2.push_back(NoTrgMuonhzzMvaPfIsoPtBarrel);
+  ptSet2.push_back(NoTrgMuonhzzMvaPfIsoPtEndcap);
+
+  drawOneToOne(ptSet1,ptSet2,"H#rightarrow ZZ PF iso","H#rightarrow ZZ MVA PF iso","p_{T} [GeV]");
+
+  // PU
+  TH1F *NoTrgMuonhzzPfIsoPUBarrel = (TH1F*)file->Get("NoTrgMuonhzzPfIsoPUBarrel_Eff");
+  TH1F *NoTrgMuonhzzPfIsoPUEndcap = (TH1F*)file->Get("NoTrgMuonhzzPfIsoPUEndcap_Eff");
+  // ---> HZZ id + EA corrected isolation
+  TH1F *NoTrgMuonhzzMvaPfIsoPUBarrel = (TH1F*)file->Get("NoTrgMuonhzzMvaPfIsoPUBarrel_Eff");
+  TH1F *NoTrgMuonhzzMvaPfIsoPUEndcap = (TH1F*)file->Get("NoTrgMuonhzzMvaPfIsoPUEndcap_Eff");
+
+  vector<TH1F*> puSet1, puSet2;
+  puSet1.push_back(NoTrgMuonhzzPfIsoPUBarrel);
+  puSet1.push_back(NoTrgMuonhzzPfIsoPUEndcap);
+  puSet2.push_back(NoTrgMuonhzzMvaPfIsoPUBarrel);
+  puSet2.push_back(NoTrgMuonhzzMvaPfIsoPUEndcap);
+
+  drawOneToOne(puSet1,puSet2,"H#rightarrow ZZ PF iso","H#rightarrow ZZ MVA PF iso","# vertices");
+
 
 }

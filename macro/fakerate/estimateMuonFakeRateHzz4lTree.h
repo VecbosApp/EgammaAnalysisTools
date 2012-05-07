@@ -220,14 +220,13 @@ Bool_t estimateMuonFakeRateHzz4lTree::passRefMuSel() {
   float iso = pfIsoChHad04;
   iso += max<float>(0.,pfIsoNHad04_NoEA-eff_area_nh*rho + pfIsoPhoton04_NoEA-eff_area_ga*rho);
 
-  return (pfid && iso<0.4 && fabs(sip3d)<4.0);
+  return (pfid && iso/pt<0.25 && fabs(sip3d)<4.0);
 } 
 
 Bool_t estimateMuonFakeRateHzz4lTree::passMvaMuSel(bool pfnopuiso) {
   
   // id part
   if (!pfid || fabs(sip3d)>=4.0) return false;
-
   // iso part
   float abseta=fabs(eta);
   float bdtiso = (pfnopuiso) ? bdtIsoPnp : bdtIsoDz;

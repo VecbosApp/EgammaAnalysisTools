@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
   strcpy(outname,argv[1]);
 
   cout << "run the FR for non triggering muons..." << endl;
-  TFile *file = TFile::Open("hzzTree.root");
+  TFile *file = TFile::Open("../hzz4l_results_data/hzzTree.root");
   TTree *tree = (TTree*)file->Get("zllmtree/probe_tree");
   estimateMuonFakeRateHzz4lTree analyzer(tree);
   TString outfileUnbias(outname);
