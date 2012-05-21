@@ -221,6 +221,10 @@ void makeFriendHZZIsolation(const char* file) {
 
 void makeFriendHZZIdBits(const char* file) {
 
+  LumiReWeighting LumiWeights( "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/summer12.root",
+                               "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/run2012A.root",
+                               "pileup","pileup");
+
   TFile *pF = TFile::Open(file);
   TTree *pT = (TTree*)pF->Get("eleIDdir/T1");
 
@@ -232,9 +236,6 @@ void makeFriendHZZIdBits(const char* file) {
   nF.ReplaceAll(".root","_hzzidbitsFriend.root");
   TFile *fF = TFile::Open(nF,"recreate");
 
-  LumiReWeighting LumiWeights( "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/summer12.root",
-                               "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/run2012A.root",
-                               "pileup","pileup");
 
   Float_t eta, abseta, pt, rho, vertices;
   Float_t bdthww[2], newbdthww[4], combPFIsoHWW;
