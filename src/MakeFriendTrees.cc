@@ -18,8 +18,10 @@
 #include "include/eIDCiChzzSelector.hh"
 #include "include/EGammaMvaEleEstimator.h"
 #include "include/ElectronEffectiveArea.h"
+#include "../HiggsAnalysisTools/macro/LumiReweightingStandAlone.h"
 
 using namespace std;
+using namespace reweight;
 
 enum idType {
   kIsoHWW2011 = 0, // HWW cuts 2011
@@ -230,6 +232,10 @@ void makeFriendHZZIdBits(const char* file) {
   nF.ReplaceAll(".root","_hzzidbitsFriend.root");
   TFile *fF = TFile::Open(nF,"recreate");
 
+  LumiReWeighting LumiWeights( "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/summer12.root",
+                               "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/run2012A.root",
+                               "pileup","pileup");
+
   Float_t eta, abseta, pt, rho, vertices;
   Float_t bdthww[2], newbdthww[4], combPFIsoHWW;
   Float_t combPFIsoHZZ, bdthzz[4];
@@ -239,6 +245,7 @@ void makeFriendHZZIdBits(const char* file) {
   Int_t DenomFakeSmurf, misshits, ecalseed;
   Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,dz,trkIso,ecalIso,hcalIso;
   Int_t matchConv, missHits;
+  Float_t npu[3];
   pT->SetBranchAddress("bdthww", bdthww);
   pT->SetBranchAddress("newbdthww", newbdthww);
   pT->SetBranchAddress("bdthzz",bdthzz);
@@ -272,6 +279,7 @@ void makeFriendHZZIdBits(const char* file) {
   pT->SetBranchAddress("hcalIso", &hcalIso);
   pT->SetBranchAddress("mvaPFIso", &mvaPFIso);
   pT->SetBranchAddress("combIsoHww", &combIsoHww);
+  pT->SetBranchAddress("npu", npu);
   if(!TString(file).Contains("fake")) pT->SetBranchAddress("mass", &mass);
   else mass=-1.0;
 
@@ -288,6 +296,7 @@ void makeFriendHZZIdBits(const char* file) {
   Int_t hwwWPidonly, newhwwWPidonly, newhzzWPidonly;
   Int_t cicall[5], cicid[5], ciciso[5];
   Int_t hzzMvaLoose, hzzMvaTight;
+  Float_t puW;
   // first 4 variables needed for TP
   fT->Branch("mass", &mass, "mass/F");
   fT->Branch("pt", &pt, "pt/F");
@@ -323,6 +332,7 @@ void makeFriendHZZIdBits(const char* file) {
   // mva 2012 duncan's WP
   fT->Branch("hzzMvaLoose", &hzzMvaLoose, "hzzMvaLoose/I");
   fT->Branch("hzzMvaTight", &hzzMvaTight, "hzzMvaTight/I");
+  fT->Branch("puW", &puW, "puW/F");
 
   HZZEleIDSelector aSel;
 
@@ -389,6 +399,9 @@ void makeFriendHZZIdBits(const char* file) {
      hzzMvaLoose=hzzMvaTight=0;
      if(aSel.output(pt,eta,bdthzz[3],mvaPFIso,HZZEleIDSelector::kMVALoose,HZZEleIDSelector::kMVAUnbiased)) hzzMvaLoose=1;
      if(aSel.output(pt,eta,bdthzz[3],mvaPFIso,HZZEleIDSelector::kMVATight,HZZEleIDSelector::kMVAUnbiased)) hzzMvaTight=1;
+
+     // this is only needed in MC
+     puW = LumiWeights.weight(npu[1]);
 
      fT->Fill();
   }
