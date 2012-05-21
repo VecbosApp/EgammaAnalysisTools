@@ -21,25 +21,6 @@ FakeElectronSelectorWmunuPlusOneJet::FakeElectronSelectorWmunuPlusOneJet(TTree *
   
   _isData = true;       // chiara
   
-  // configuring electron likelihood
-  TFile *fileLH = TFile::Open("pdfs_MC.root");
-  TDirectory *EB0lt15dir = fileLH->GetDirectory("/");
-  TDirectory *EB1lt15dir = fileLH->GetDirectory("/");
-  TDirectory *EElt15dir = fileLH->GetDirectory("/");
-  TDirectory *EB0gt15dir = fileLH->GetDirectory("/");
-  TDirectory *EB1gt15dir = fileLH->GetDirectory("/");
-  TDirectory *EEgt15dir = fileLH->GetDirectory("/");
-  LikelihoodSwitches defaultSwitches;
-
-  defaultSwitches.m_useFBrem = true;
-  defaultSwitches.m_useEoverP = false;
-  defaultSwitches.m_useSigmaPhiPhi = true;
-  defaultSwitches.m_useHoverE = false;        
-  defaultSwitches.m_useOneOverEMinusOneOverP = true;
-
-  LH = new ElectronLikelihood(&(*EB0lt15dir), &(*EB1lt15dir), &(*EElt15dir), &(*EB0gt15dir), &(*EB1gt15dir), &(*EEgt15dir),
-                              defaultSwitches, std::string("class"),std::string("class"),true,true);
-
   // configuring the electron BDT
   fMVAHWW = new ElectronIDMVA();
   fMVAHWW->Initialize("BDTG method",
@@ -464,7 +445,7 @@ void FakeElectronSelectorWmunuPlusOneJet::Loop(const char *outname) {
     
     // some MVAs...
     float pfmva = pflowMVAEle[probe];
-    float lh=likelihoodRatio(probe,*LH);
+    float lh=eleIdLikelihoodEle[probe];
     float hwwbdts[2];
     hwwbdts[0] = eleBDT(fMVAHWW,probe);
     hwwbdts[1] = eleBDT(fMVAHWWWithIso,probe);
@@ -472,12 +453,14 @@ void FakeElectronSelectorWmunuPlusOneJet::Loop(const char *outname) {
     hzzbdts[0] = eleBDT(fMVAHZZDanV0,probe);
     hzzbdts[1] = eleBDT(fMVAHZZSiV0,probe);
     hzzbdts[2] = eleBDT(fMVAHZZSiV1,probe);
-    hzzbdts[3] = eleBDT(fMVAHZZSiDanV2,probe);
+    // hzzbdts[3] = eleBDT(fMVAHZZSiDanV2,probe);
+    hzzbdts[3] = mvaidnontrigEle[probe];
     float newhwwbdts[4];
     newhwwbdts[0] = eleBDT(fMVAHWWDanV0,probe);
     newhwwbdts[1] = eleBDT(fMVAHWWSiV0,probe);
     newhwwbdts[2] = eleBDT(fMVAHWWSiV1,probe);
-    newhwwbdts[3] = eleBDT(fMVAHWWSiDanV2,probe);
+    // newhwwbdts[3] = eleBDT(fMVAHWWSiDanV2,probe);
+    newhwwbdts[3] = mvaidtrigEle[probe];
 
     // isolations
     float chaPfIso[8], phoPfIso[8], neuPfIso[8];
