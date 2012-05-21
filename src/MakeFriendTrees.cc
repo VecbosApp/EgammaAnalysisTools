@@ -38,8 +38,8 @@ float Aeff_neu_dr04_2012[7] = { 0.041, 0.068, 0.075, 0.068, 0.071, 0.078, 0.140 
 float Aeff_pho_dr04_2012[7] = { 0.144, 0.138, 0.084, 0.155, 0.201, 0.223, 0.265 };
 
 // H->ZZ detector based effective areas
-float Aeff_ecal_dr03[2] = { 0.078, 0.046 };
-float Aeff_hcal_dr03[2] = { 0.026, 0.072 };
+float Aeff_ecal_dr03[2] = { 0.101, 0.046 };
+float Aeff_hcal_dr03[2] = { 0.021, 0.040 };
 
 bool cicidval(int *cic, int level) { return (cic[level]>>0)%2; }
 bool cicisoval(int *cic, int level) { return (cic[level]>>1)%2; }
@@ -99,6 +99,46 @@ bool passHWWID(Float_t eta, Float_t pt, Float_t bdthww, Float_t bdthzz, Float_t 
   return false;
 }
 
+float isoEAWW2012(float eta, float pfIsoChHad04, float pfIsoNHad04_NoEA, float pfIsoPhoton04_NoEA, float rho) {
+  float abseta=fabs(eta);
+
+  ElectronEffectiveArea::ElectronEffectiveAreaTarget effAreaTarget_ = ElectronEffectiveArea::kEleEAData2012;
+  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaGamma_   = ElectronEffectiveArea::kEleGammaIso04;
+  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaNeutralHad_ = ElectronEffectiveArea::kEleNeutralHadronIso04;
+  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaGammaAndNeutralHad_ =  ElectronEffectiveArea::kEleGammaAndNeutralHadronIso04;
+
+  float eff_area_ga  = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaGamma_, abseta, effAreaTarget_);
+  float eff_area_nh  = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaNeutralHad_, abseta, effAreaTarget_);
+  float eff_area_ganh = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaGammaAndNeutralHad_, abseta, effAreaTarget_);
+
+  float iso = pfIsoChHad04;
+  iso += max<float>(0.,pfIsoNHad04_NoEA+pfIsoPhoton04_NoEA - eff_area_ganh*rho);
+  return iso;
+}
+
+bool passHWWEleId2012(float pt, float eta, float bdt, float isoEA, bool matchConv, float misshits, float d0, float dz, int step) {
+  // steps: 0=id, 1=iso, 2=conv, 3=ip, 4=full
+  float abseta=fabs(eta);
+  bool ELE_ID_EGAMMA_2012 = (
+			     ( pt <= 20 && abseta >= 0.000 && abseta < 0.800 && bdt > 0.00 ) ||
+                             ( pt <= 20 && abseta >= 0.800 && abseta < 1.479 && bdt > 0.10 ) ||
+                             ( pt <= 20 && abseta >= 1.479 && abseta < 2.500 && bdt > 0.62 ) ||
+                             ( pt >  20 && abseta >= 0.000 && abseta < 0.800 && bdt > 0.94 ) ||
+                             ( pt >  20 && abseta >= 0.800 && abseta < 1.479 && bdt > 0.85 ) ||
+                             ( pt >  20 && abseta >= 1.479 && abseta < 2.500 && bdt > 0.92 )
+                             );
+  
+  bool ELE_ISO_EGAMMA_2012 = (isoEA/pt < 0.15);
+  bool ELE_CONV_2012 = (!matchConv && misshits==0);
+  bool ELE_IP_2012 = (fabs(d0)<0.02 && fabs(dz)<0.1);
+  
+  if(step==0) return ELE_ID_EGAMMA_2012;
+  if(step==1) return ELE_ISO_EGAMMA_2012;
+  if(step==2) return ELE_CONV_2012;
+  if(step==3) return ELE_IP_2012;
+  if(step==4) return (ELE_ID_EGAMMA_2012 && ELE_ISO_EGAMMA_2012 && ELE_CONV_2012 && ELE_IP_2012);
+}
+
 void makeFriendHZZIsolation(const char* file) {
 
   TFile *pF = TFile::Open(file);
@@ -135,11 +175,13 @@ void makeFriendHZZIsolation(const char* file) {
   fF->mkdir("eleIDdir");
   TTree *fT = new TTree("T1","tree with hzz isolation");
   Float_t combDetIso, combIso, combIsoNoEA;
+  Float_t combIsoHww;
   Float_t mvaPFIso;
   fT->Branch("combDetIsoHZZ",&combDetIso,"combDetIsoHZZ/F");
   fT->Branch("combPFIsoHZZ",&combIso,"combPFIsoHZZ/F");
   fT->Branch("combPFIsoHZZNoEA",&combIsoNoEA,"combPFIsoHZZNoEA/F");
   fT->Branch("mvaPFIso",&mvaPFIso,"mvaPFIso/F");
+  fT->Branch("combIsoHww",&combIsoHww,"combIsoHww/F");
 
   for(int i=0; i<pT->GetEntries(); i++) {
     if (i%10000 == 0) std::cout << ">>> Analyzing event # " << i << " / " << pT->GetEntries() << " entries" << std::endl;
@@ -163,6 +205,7 @@ void makeFriendHZZIsolation(const char* file) {
 					     phoPFIso[0],phoPFIso[1]-phoPFIso[0],phoPFIso[2]-phoPFIso[1],phoPFIso[3]-phoPFIso[2],phoPFIso[4]-phoPFIso[3],
 					     neuPFIso[0],neuPFIso[1]-neuPFIso[0],neuPFIso[2]-neuPFIso[1],neuPFIso[3]-neuPFIso[2],neuPFIso[4]-neuPFIso[3],
 					     true);
+     combIsoHww = isoEAWW2012(eta,chaPFIso[3],neuPFIso[3],phoPFIso[3],rho);
      fT->Fill();
   }
 
@@ -190,10 +233,12 @@ void makeFriendHZZIdBits(const char* file) {
   Float_t eta, abseta, pt, rho, vertices;
   Float_t bdthww[2], newbdthww[4], combPFIsoHWW;
   Float_t combPFIsoHZZ, bdthzz[4];
+  Float_t combIsoHww;
   Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8], mvaPFIso;
   Float_t mass; // not dummy only for TP trees
   Int_t DenomFakeSmurf, misshits, ecalseed;
-  Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,trkIso,ecalIso,hcalIso;
+  Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,dz,trkIso,ecalIso,hcalIso;
+  Int_t matchConv, missHits;
   pT->SetBranchAddress("bdthww", bdthww);
   pT->SetBranchAddress("newbdthww", newbdthww);
   pT->SetBranchAddress("bdthzz",bdthzz);
@@ -218,11 +263,15 @@ void makeFriendHZZIdBits(const char* file) {
   pT->SetBranchAddress("dist", &dist);
   pT->SetBranchAddress("dcot", &dcot);
   pT->SetBranchAddress("d0",&d0);
+  pT->SetBranchAddress("dz",&dz);
+  pT->SetBranchAddress("matchConv",&matchConv);
+  pT->SetBranchAddress("missHits",&missHits);
   pT->SetBranchAddress("ecaldriven", &ecalseed);
   pT->SetBranchAddress("trkIso", &trkIso);
   pT->SetBranchAddress("ecalIso", &ecalIso);
   pT->SetBranchAddress("hcalIso", &hcalIso);
   pT->SetBranchAddress("mvaPFIso", &mvaPFIso);
+  pT->SetBranchAddress("combIsoHww", &combIsoHww);
   if(!TString(file).Contains("fake")) pT->SetBranchAddress("mass", &mass);
   else mass=-1.0;
 
@@ -250,9 +299,9 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("wp85trg", &WP85trg, "wp85trg/I");
   fT->Branch("wp80trg", &WP80trg, "wp80trg/I");
   fT->Branch("wp70trg", &WP70trg, "wp70trg/I");
-  fT->Branch("newhwwWP", &newhwwWP, "newhwwWP/I"); // 2012 WP?
-  fT->Branch("newhwwWPisoonly", &newhwwWPisoonly, "newhwwWPisoonly/I"); // 2012 WP?
-  fT->Branch("newhwwWPidonly", &newhwwWPidonly, "newhwwWPidonly/I"); // 2012 WP?
+  fT->Branch("newhwwWP", &newhwwWP, "newhwwWP/I"); // 2012 WP
+  fT->Branch("newhwwWPisoonly", &newhwwWPisoonly, "newhwwWPisoonly/I"); // 2012 WP
+  fT->Branch("newhwwWPidonly", &newhwwWPidonly, "newhwwWPidonly/I"); // 2012 WP
   fT->Branch("hwwWP", &hwwWP, "hwwWP/I");  // 2011 WP
   fT->Branch("hwwWPisoonly", &hwwWPisoonly, "hwwWPisoonly/I");  // 2011 WP
   fT->Branch("hwwWPidonly", &hwwWPidonly, "hwwWPidonly/I");  // 2011 WP
@@ -297,13 +346,14 @@ void makeFriendHZZIdBits(const char* file) {
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP85,HZZEleIDSelector::kMVABiased)) WP85trg=1;
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP80,HZZEleIDSelector::kMVABiased)) WP80trg=1;
      if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWP70,HZZEleIDSelector::kMVABiased)) WP70trg=1;
-     // same efficiency as 2011 WP
+
+     // 2012 WP. Same FR as 2011
      newhwwWP=0;
-     if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWPHWW,HZZEleIDSelector::kMVABiased)) newhwwWP=1;
+     if(passHWWEleId2012(pt,eta,newbdthww[3],combIsoHww,matchConv,missHits,d0,dz,4)) newhwwWP=1;
      newhwwWPisoonly=0;
-     if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWPHWW,HZZEleIDSelector::kMVABiased,HZZEleIDSelector::isoonly)) newhwwWPisoonly=1;
+     if(passHWWEleId2012(pt,eta,newbdthww[3],combIsoHww,matchConv,missHits,d0,dz,1)) newhwwWPisoonly=1;
      newhwwWPidonly=0;
-     if(aSel.output(pt,eta,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWPHWW,HZZEleIDSelector::kMVABiased,HZZEleIDSelector::idonly)) newhwwWPidonly=1;
+     if(passHWWEleId2012(pt,eta,newbdthww[3],combIsoHww,matchConv,missHits,d0,dz,0)) newhwwWPidonly=1;
 
      WP95notrg=WP90notrg=WP85notrg=WP80notrg=WP70notrg=0;
      if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWP95,HZZEleIDSelector::kMVAUnbiased)) WP95notrg=1;
