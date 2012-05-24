@@ -19,6 +19,7 @@
 #include "include/EGammaMvaEleEstimator.h"
 #include "include/ElectronEffectiveArea.h"
 #include "../HiggsAnalysisTools/macro/LumiReweightingStandAlone.h"
+#include "../EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
 
 using namespace std;
 using namespace reweight;
@@ -141,7 +142,35 @@ bool passHWWEleId2012(float pt, float eta, float bdt, float isoEA, bool matchCon
   if(step==4) return (ELE_ID_EGAMMA_2012 && ELE_ISO_EGAMMA_2012 && ELE_CONV_2012 && ELE_IP_2012);
 }
 
+bool passHZZ4lEleId2012(float pt, float eta, float bdt, float isoEA, float misshits, float sip, int step) {
+  // steps: 0=id, 1=iso, 2=conv, 3=ip, 4=full
+  float abseta=fabs(eta);
+  bool ELE_ID_EGAMMA_2012 = (
+			     ( pt <= 10 && abseta >= 0.000 && abseta < 0.800 && bdt > 0.470 ) ||
+                             ( pt <= 10 && abseta >= 0.800 && abseta < 1.479 && bdt > 0.004 ) ||
+                             ( pt <= 10 && abseta >= 1.479 && abseta < 2.500 && bdt > 0.295 ) ||
+                             ( pt >  10 && abseta >= 0.000 && abseta < 0.800 && bdt > 0.500 ) ||
+                             ( pt >  10 && abseta >= 0.800 && abseta < 1.479 && bdt > 0.120 ) ||
+                             ( pt >  10 && abseta >= 1.479 && abseta < 2.500 && bdt > 0.600 )
+                             );
+  
+  bool ELE_ISO_EGAMMA_2012 = (isoEA/pt < 0.40);
+  bool ELE_CONV_2012 = (misshits<=1);
+  bool ELE_IP_2012 = (fabs(sip)<4);
+  
+  if(step==0) return ELE_ID_EGAMMA_2012;
+  if(step==1) return ELE_ISO_EGAMMA_2012;
+  if(step==2) return ELE_CONV_2012;
+  if(step==3) return ELE_IP_2012;
+  if(step==4) return (ELE_ID_EGAMMA_2012 && ELE_ISO_EGAMMA_2012 && ELE_CONV_2012 && ELE_IP_2012);
+}
+
 void makeFriendHZZIsolation(const char* file) {
+
+  ElectronEffectiveArea::ElectronEffectiveAreaTarget effAreaTarget_ = ElectronEffectiveArea::kEleEAData2011;
+  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaGamma_   = ElectronEffectiveArea::kEleGammaIso04;
+  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaNeutralHad_ = ElectronEffectiveArea::kEleNeutralHadronIso04;
+  ElectronEffectiveArea::ElectronEffectiveAreaType effAreaGammaAndNeutralHad_ =  ElectronEffectiveArea::kEleGammaAndNeutralHadronIso04;
 
   TFile *pF = TFile::Open(file);
   TTree *pT = (TTree*)pF->Get("eleIDdir/T1");
@@ -190,14 +219,14 @@ void makeFriendHZZIsolation(const char* file) {
      pT->GetEntry(i);
 
      combIsoNoEA = chaPFIso[3]+neuPFIso[3]+phoPFIso[3]; // [0] = cone 0.1, then steps of 0.1 up to 0.7 [7] is directional isolation with DR=0.4
-     combIso = 0.0;
-     if(fabs(eta) <  1.0) combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[0]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[0]*rho,Float_t(0.));
-     else if(fabs(eta) < 1.479) combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[1]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[1]*rho,Float_t(0.));
-     else if(fabs(eta) < 2.0) combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[2]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[2]*rho,Float_t(0.));
-     else if(fabs(eta) < 2.2) combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[3]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[3]*rho,Float_t(0.));
-     else if(fabs(eta) < 2.3) combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[4]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[4]*rho,Float_t(0.));
-     else if(fabs(eta) < 2.4) combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[5]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[5]*rho,Float_t(0.));
-     else combIso = chaPFIso[3] + TMath::Max(neuPFIso[3]-Aeff_neu_dr04[6]*rho,Float_t(0.)) + TMath::Max(phoPFIso[3]-Aeff_pho_dr04[6]*rho,Float_t(0.));
+
+     float abseta=fabs(eta);
+     float eff_area_ga  = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaGamma_, abseta, effAreaTarget_);
+     float eff_area_nh  = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaNeutralHad_, abseta, effAreaTarget_);
+     float eff_area_ganh = ElectronEffectiveArea::GetElectronEffectiveArea(effAreaGammaAndNeutralHad_, abseta, effAreaTarget_);
+     
+     combIso = chaPFIso[3];
+     combIso += max<float>(0.,neuPFIso[3]+phoPFIso[3] - eff_area_ganh*rho);
 
      int ieta = (fabs(eta)<1.479) ? 0 : 1;
      combDetIso = trkIso + ecalIso - rho * Aeff_ecal_dr03[ieta] + hcalIso - rho * Aeff_hcal_dr03[ieta];
@@ -221,8 +250,9 @@ void makeFriendHZZIsolation(const char* file) {
 
 void makeFriendHZZIdBits(const char* file) {
 
-  LumiReWeighting LumiWeights( "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/summer12.root",
-                               "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/run2012A.root",
+
+  LumiReWeighting LumiWeights( "/Users/emanuele/Work/electronid/hzzid/UserCode/emanuele/EgammaAnalysisTools/s6MCPileUp.root",
+                               "/Users/emanuele/Work/electronid/hzzid/UserCode/emanuele/EgammaAnalysisTools/pu2011AB.root",
                                "pileup","pileup");
 
   TFile *pF = TFile::Open(file);
@@ -236,7 +266,6 @@ void makeFriendHZZIdBits(const char* file) {
   nF.ReplaceAll(".root","_hzzidbitsFriend.root");
   TFile *fF = TFile::Open(nF,"recreate");
 
-
   Float_t eta, abseta, pt, rho, vertices;
   Float_t bdthww[2], newbdthww[4], combPFIsoHWW;
   Float_t combPFIsoHZZ, bdthzz[4];
@@ -244,7 +273,7 @@ void makeFriendHZZIdBits(const char* file) {
   Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8], mvaPFIso;
   Float_t mass; // not dummy only for TP trees
   Int_t DenomFakeSmurf, misshits, ecalseed;
-  Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,dz,trkIso,ecalIso,hcalIso;
+  Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,dz,sip,trkIso,ecalIso,hcalIso;
   Int_t matchConv, missHits;
   Float_t npu[3];
   pT->SetBranchAddress("bdthww", bdthww);
@@ -272,6 +301,7 @@ void makeFriendHZZIdBits(const char* file) {
   pT->SetBranchAddress("dcot", &dcot);
   pT->SetBranchAddress("d0",&d0);
   pT->SetBranchAddress("dz",&dz);
+  pT->SetBranchAddress("ip3ds",&sip);
   pT->SetBranchAddress("matchConv",&matchConv);
   pT->SetBranchAddress("missHits",&missHits);
   pT->SetBranchAddress("ecaldriven", &ecalseed);
@@ -294,6 +324,7 @@ void makeFriendHZZIdBits(const char* file) {
   // hzz WP is using the MVA for the unbiased electrons
   Int_t hwwWP, newhwwWP, newhzzWP;
   Int_t hwwWPisoonly, newhwwWPisoonly, newhzzWPisoonly;
+  Int_t newhzzWPconvonly;
   Int_t hwwWPidonly, newhwwWPidonly, newhzzWPidonly;
   Int_t cicall[5], cicid[5], ciciso[5];
   Int_t hzzMvaLoose, hzzMvaTight;
@@ -327,9 +358,10 @@ void makeFriendHZZIdBits(const char* file) {
   fT->Branch("cicall", cicall, "cicall[5]/I");
   fT->Branch("cicid", cicid, "cicid[5]/I");
   fT->Branch("ciciso", ciciso, "ciciso[5]/I");
-  fT->Branch("newhzzWP", &newhzzWP, "newhzzWP/I"); // 2012 WP?
-  fT->Branch("newhzzWPisoonly", &newhzzWPisoonly, "newhzzWPisoonly/I"); // 2012 WP?
-  fT->Branch("newhzzWPidonly", &newhzzWPidonly, "newhzzWPidonly/I"); // 2012 WP?
+  fT->Branch("newhzzWP", &newhzzWP, "newhzzWP/I"); // 2012 WP
+  fT->Branch("newhzzWPisoonly", &newhzzWPisoonly, "newhzzWPisoonly/I"); // 2012 WP
+  fT->Branch("newhzzWPidonly", &newhzzWPidonly, "newhzzWPidonly/I"); // 2012 WP
+  fT->Branch("newhzzWPconvonly", &newhzzWPconvonly, "newhzzWPconvonly/I"); // 2012 WP
   // mva 2012 duncan's WP
   fT->Branch("hzzMvaLoose", &hzzMvaLoose, "hzzMvaLoose/I");
   fT->Branch("hzzMvaTight", &hzzMvaTight, "hzzMvaTight/I");
@@ -388,13 +420,15 @@ void makeFriendHZZIdBits(const char* file) {
        cicid[i] = (cicidval(cic,i) && misshits<=1) ? 1 : 0;
        ciciso[i] = (cicisoval(cic,i)) ? 1 : 0;
      }
-     // same fake rate in Z+1 fake as 2011 CIC WP
+     // H->ZZ 2012 cut
      newhzzWP=0;
-     if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWPHZZ,HZZEleIDSelector::kMVAUnbiased)) newhzzWP=1;
+     if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,misshits,sip,4)) newhzzWP=1;
      newhzzWPisoonly=0;
-     if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWPHZZ,HZZEleIDSelector::kMVAUnbiased,HZZEleIDSelector::isoonly)) newhzzWPisoonly=1;
+     if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,misshits,sip,1)) newhzzWPisoonly=1;
      newhzzWPidonly=0;
-     if(aSel.output(pt,eta,bdthzz[3],combPFIsoHZZ,HZZEleIDSelector::kWPHZZ,HZZEleIDSelector::kMVAUnbiased,HZZEleIDSelector::idonly)) newhzzWPidonly=1;
+     if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,misshits,sip,0)) newhzzWPidonly=1;
+     newhzzWPconvonly=0;
+     if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,misshits,sip,2)) newhzzWPconvonly=1;
      
      // MVA iso rings and MVA ID
      hzzMvaLoose=hzzMvaTight=0;
@@ -402,6 +436,7 @@ void makeFriendHZZIdBits(const char* file) {
      if(aSel.output(pt,eta,bdthzz[3],mvaPFIso,HZZEleIDSelector::kMVATight,HZZEleIDSelector::kMVAUnbiased)) hzzMvaTight=1;
 
      // this is only needed in MC
+     cout << "npu[1] = " << npu[1] << endl;
      puW = LumiWeights.weight(npu[1]);
 
      fT->Fill();
