@@ -275,7 +275,7 @@ void makeFriendHZZIdBits(const char* file) {
   Int_t DenomFakeSmurf, misshits, ecalseed;
   Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,dz,sip,trkIso,ecalIso,hcalIso;
   Int_t matchConv, missHits;
-  Float_t npu[3];
+  Int_t npu[3];
   pT->SetBranchAddress("bdthww", bdthww);
   pT->SetBranchAddress("newbdthww", newbdthww);
   pT->SetBranchAddress("bdthzz",bdthzz);
