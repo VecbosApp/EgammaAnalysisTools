@@ -109,11 +109,11 @@ else:
     verticesbinslowpt = cms.vdouble(1,35)
 
 # pt<20 GeV
-process.TagProbeFitPt5To10 = process.TagProbeFitBase.clone()
-process.TagProbeFitPt5To10.Efficiencies.etapt.BinnedVariables.pt = (5,10)
-process.TagProbeFitPt5To10.Efficiencies.etapt.BinnedVariables.abseta = (0.,0.8,1.4442,1.566,2.0,2.5)
-process.TagProbeFitPt5To10.OutputFileName = WPTOTEST+"_"+PREFIX+"_Kine_Pt5To10.root"
-process.TagProbeFitPt5To10.PDFs.cruijffPlusExpo = cms.vstring("EXPR::signal('(@1<@0)*exp(-(@0-@1)*(@0-@1)/(@2*@2 + @3*(@0-@1)*(@0-@1))) + (@1>=@0)*exp(-(@0-@1)*(@0-@1)/(@4*@4 + @5*(@0-@1)*(@0-@1)))',mean[91.2, 80.0, 100.0],mass, sigmaL[2.3, 0.5, 10.0],alphaL[0.40],sigmaR[2.3, 0.5, 10.0],alphaR[0.2,0,3])",
+process.TagProbeFitPt7To10 = process.TagProbeFitBase.clone()
+process.TagProbeFitPt7To10.Efficiencies.etapt.BinnedVariables.pt = (7,10)
+process.TagProbeFitPt7To10.Efficiencies.etapt.BinnedVariables.abseta = (0.,0.8,1.4442,1.566,2.0,2.5)
+process.TagProbeFitPt7To10.OutputFileName = WPTOTEST+"_"+PREFIX+"_Kine_Pt7To10.root"
+process.TagProbeFitPt7To10.PDFs.cruijffPlusExpo = cms.vstring("EXPR::signal('(@1<@0)*exp(-(@0-@1)*(@0-@1)/(@2*@2 + @3*(@0-@1)*(@0-@1))) + (@1>=@0)*exp(-(@0-@1)*(@0-@1)/(@4*@4 + @5*(@0-@1)*(@0-@1)))',mean[91.2, 80.0, 100.0],mass, sigmaL[2.3, 0.5, 10.0],alphaL[0.40],sigmaR[2.3, 0.5, 10.0],alphaR[0.2,0,3])",
                                                                "RooExponential::backgroundPass(mass, cPass[0,-10,10])",
                                                                "RooExponential::backgroundFail(mass, cFail[0,-10,10])",
                                                                "efficiency[0.5,0,1]",
@@ -121,18 +121,18 @@ process.TagProbeFitPt5To10.PDFs.cruijffPlusExpo = cms.vstring("EXPR::signal('(@1
                                                                )
 
 # pt<20 GeV, barrel: as a function of vertices
-process.TagProbeFitVerticesBarrelPt5To10 = process.TagProbeFitPt5To10.clone()
-process.TagProbeFitVerticesBarrelPt5To10.Efficiencies.etapt.BinnedVariables.pt = (5,10)
-process.TagProbeFitVerticesBarrelPt5To10.Efficiencies.etapt.BinnedVariables.abseta = (0.,1.4442)
-process.TagProbeFitVerticesBarrelPt5To10.Efficiencies.etapt.BinnedVariables.vertices = verticesbinslowpt
-process.TagProbeFitVerticesBarrelPt5To10.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_barrel_Pt5To10.root"
+process.TagProbeFitVerticesBarrelPt7To10 = process.TagProbeFitPt7To10.clone()
+process.TagProbeFitVerticesBarrelPt7To10.Efficiencies.etapt.BinnedVariables.pt = (7,10)
+process.TagProbeFitVerticesBarrelPt7To10.Efficiencies.etapt.BinnedVariables.abseta = (0.,1.4442)
+process.TagProbeFitVerticesBarrelPt7To10.Efficiencies.etapt.BinnedVariables.vertices = verticesbinslowpt
+process.TagProbeFitVerticesBarrelPt7To10.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_barrel_Pt7To10.root"
 
 # pt<20 GeV, endcap: as a function of vertices
-process.TagProbeFitVerticesEndcapPt5To10 = process.TagProbeFitPt5To10.clone()
-process.TagProbeFitVerticesEndcapPt5To10.Efficiencies.etapt.BinnedVariables.pt = (5,10)
-process.TagProbeFitVerticesEndcapPt5To10.Efficiencies.etapt.BinnedVariables.abseta = (1.566,2.5)
-process.TagProbeFitVerticesEndcapPt5To10.Efficiencies.etapt.BinnedVariables.vertices = verticesbinslowpt
-process.TagProbeFitVerticesEndcapPt5To10.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_endcap_Pt5To10.root"
+process.TagProbeFitVerticesEndcapPt7To10 = process.TagProbeFitPt7To10.clone()
+process.TagProbeFitVerticesEndcapPt7To10.Efficiencies.etapt.BinnedVariables.pt = (7,10)
+process.TagProbeFitVerticesEndcapPt7To10.Efficiencies.etapt.BinnedVariables.abseta = (1.566,2.5)
+process.TagProbeFitVerticesEndcapPt7To10.Efficiencies.etapt.BinnedVariables.vertices = verticesbinslowpt
+process.TagProbeFitVerticesEndcapPt7To10.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_endcap_Pt7To10.root"
 
 
 # pt>20 GeV
@@ -162,10 +162,10 @@ process.TagProbeFitVerticesEndcapPt10To1000.Efficiencies.etapt.BinnedVariables.v
 process.TagProbeFitVerticesEndcapPt10To1000.OutputFileName = WPTOTEST+"_"+PREFIX+"_Vertices_endcap_Pt10To1000.root"
 
 if DOKINE:
-    process.fit = cms.Path(process.TagProbeFitPt5To10 *
+    process.fit = cms.Path(process.TagProbeFitPt7To10 *
                            process.TagProbeFitPt10To1000 )
 else:
-    process.fit = cms.Path(process.TagProbeFitVerticesBarrelPt5To10 *
-                           process.TagProbeFitVerticesEndcapPt5To10 *
+    process.fit = cms.Path(process.TagProbeFitVerticesBarrelPt7To10 *
+                           process.TagProbeFitVerticesEndcapPt7To10 *
                            process.TagProbeFitVerticesBarrelPt10To1000 *
                            process.TagProbeFitVerticesEndcapPt10To1000 )
