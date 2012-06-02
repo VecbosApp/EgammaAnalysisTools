@@ -4,13 +4,16 @@ import sys
 WPTOTEST = "newhzzWP"
 DOKINE = 1
 YEAR = 2011
+ISMC = 1
 
 if YEAR == 2011:
-    PREFIX = "eff_Data7TeV"
+    PREFIX = "eff_Data7TeV" if (ISMC==0) else "eff_MC7TeV"
 elif YEAR == 2012:
-    PREFIX = "eff_Data8TeV"
+    PREFIX = "eff_Data8TeV" if (ISMC==0) else "eff_MC8TeV"
 else:
     PREFIX = "eff_Data"
+IDTOTEST=WPTOTEST+"idonly"
+ISOTOTEST=WPTOTEST+"isoonly"
 
 process = cms.Process("TagProbe")
 process.source = cms.Source("EmptySource")
@@ -23,7 +26,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.TagProbeFitBase = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
                                          # IO parameters:
-                                         InputFileNames = cms.vstring("../results_data/electrons_hzzidbitsFriend.root"),
+                                         InputFileNames = cms.vstring("../results_data/electrons_hzzidbitsFriend.root") if (ISMC==0) else cms.vstring("../results_data/electrons_zeemc_hzzidbitsFriend.root"),
                                          InputDirectoryName = cms.string("eleIDdir"),
                                          InputTreeName = cms.string("T1"),
                                          OutputFileName = cms.string("effData.root"),
@@ -39,7 +42,8 @@ process.TagProbeFitBase = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
                                          Variables = cms.PSet( mass = cms.vstring("Tag-Probe Mass", "60.0", "120.0", "GeV/c^{2}"),
                                                                pt = cms.vstring("Probe p_{T}", "5", "1000", "GeV/c"),
                                                                abseta = cms.vstring("Probe #eta", "0.0", "2.5", ""),
-                                                               vertices = cms.vstring("vertices","1","35", "")
+                                                               vertices = cms.vstring("vertices","1","35", ""),
+                                                               puW = cms.vstring("puW","0","10","")
                                                                ),
                                          # defines all the discrete variables of the probes available in the input tree and intended for use in the efficiency calculations
                                          Categories = cms.PSet( denom = cms.vstring("denom", "dummy[pass=1,fail=0]"),
@@ -76,12 +80,14 @@ process.TagProbeFitBase = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
                                                           ),
                                          
                                          binnedFit = cms.bool(True),
-                                         binsForFit = cms.uint32(50),
+                                         binsForFit = cms.uint32(30),
+
+                                         WeightVariable = cms.string("puW"),
                                          
                                          # defines a set of efficiency calculations, what PDF to use for fitting and how to bin the data;
                                          # there will be a separate output directory for each calculation that includes a simultaneous fit, side band subtraction and counting. 
-                                         Efficiencies = cms.PSet(etapt = cms.PSet( EfficiencyCategoryAndState = cms.vstring(WPTOTEST,"pass"),
-                                                                                   UnbinnedVariables = cms.vstring("mass"),
+                                         Efficiencies = cms.PSet(etapt = cms.PSet( EfficiencyCategoryAndState = cms.vstring(WPTOTEST,"pass",IDTOTEST,"pass",ISOTOTEST,"pass"),
+                                                                                   UnbinnedVariables = cms.vstring("mass","puW"),
                                                                                    BinnedVariables = cms.PSet(abseta = cms.vdouble(0.,0.8,1.4442,1.566,2.0,2.5),
                                                                                                               pt = cms.vdouble(5,10,15,20,30,40,50,1000),
                                                                                                               vertices = cms.vdouble(1,35)
