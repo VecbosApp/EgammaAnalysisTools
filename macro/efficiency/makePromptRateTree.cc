@@ -11,6 +11,7 @@ using namespace std;
 void makeList(const char* cut) {
   TFile *f1 = new TFile("../results_data/electrons_zeemc_hzzidbitsFriend.root");
   TTree *ntuple = (TTree*) f1->Get("eleIDdir/T1");
+  ntuple->AddFriend("eleIDdir/T1 = eleIDdir/T1","../results_data/electrons_zeemc.root");
   ntuple->Draw(">>elist",cut);
   TEventList *elist = (TEventList*)gDirectory->Get("elist");
   TFile ef("elist.root","recreate");
