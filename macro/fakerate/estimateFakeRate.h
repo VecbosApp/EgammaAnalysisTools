@@ -134,6 +134,7 @@ public :
    Float_t         pfmva;
    Float_t         vertices;
    Float_t         rho;
+   Float_t         leadJetPt;
 
    // List of branches
    TBranch        *b_eleEoPout;   //!
@@ -212,6 +213,7 @@ public :
    TBranch        *b_pfmva;   //!
    TBranch        *b_vertices;   //!
    TBranch        *b_rho;   //!
+   TBranch        *b_leadJetPt;
 
    const char *_isofriend;
    const char *_idbitsfriend;
@@ -372,6 +374,7 @@ void estimateFakeRate::Init(TTree *tree)
    fChain->SetBranchAddress("pfmva", &pfmva, &b_pfmva);
    fChain->SetBranchAddress("vertices", &vertices, &b_vertices);
    fChain->SetBranchAddress("rho", &rho, &b_rho);
+   fChain->SetBranchAddress("leadJetPt", &leadJetPt, &b_leadJetPt);
    Notify();
 }
 

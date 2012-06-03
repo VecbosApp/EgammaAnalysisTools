@@ -45,9 +45,10 @@ void estimateFakeRate::Loop(const char *outname)
 
   // friend tree with id
   fChain->AddFriend( "eleIDdir/isoT1 = eleIDdir/T1", _idbitsfriend);
-  Int_t hzzMvaLoose, hzzMvaTight;
+  Int_t hzzMvaLoose, hzzMvaTight, newhwwWP;
   fChain->SetBranchAddress("hzzMvaLoose", &hzzMvaLoose);
   fChain->SetBranchAddress("hzzMvaTight", &hzzMvaTight);
+  fChain->SetBranchAddress("newhwwWP", &newhwwWP);
 
   std::vector<TString> EgammaTrgEleID, EgammaNoTrgEleID;
   // this is for triggering electrons
@@ -303,6 +304,8 @@ void estimateFakeRate::Loop(const char *outname)
 
     // NOT EWK CORRECTED: STOP AT 35 GEV!!!
     if(!TString(outname).Contains("zee1fake") && (pt>35 || !DenomFakeSmurf)) continue;
+    // JET PT threshold
+    if(leadJetPt<35) continue;
 
     // fill the denominator: take only the highest pT denominator candidate
     float etaFake = fabs(eta);
@@ -614,7 +617,7 @@ void estimateFakeRate::Loop(const char *outname)
     }
 
     // === HWW 2012 ~WP70x80 BDT ===
-    if(aSel.output(etFake,etaFake,newbdthww[3],combPFIsoHZZ,HZZEleIDSelector::kWPHWW,HZZEleIDSelector::kMVABiased)) {
+    if(newhwwWP) {
       TrgEleEta[knewWPHWW]->Fill(etaFake);
       TrgElePt[knewWPHWW] ->Fill(etFake);
       TrgElePU[knewWPHWW] ->Fill(vertices);
