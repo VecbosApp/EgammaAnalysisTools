@@ -19,7 +19,6 @@
 #include "include/EGammaMvaEleEstimator.h"
 #include "include/ElectronEffectiveArea.h"
 #include "../HiggsAnalysisTools/macro/LumiReweightingStandAlone.h"
-#include "../EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
 
 using namespace std;
 using namespace reweight;
@@ -165,7 +164,17 @@ bool passHZZ4lEleId2012(float pt, float eta, float bdt, float isoEA, float missh
   if(step==4) return (ELE_ID_EGAMMA_2012 && ELE_ISO_EGAMMA_2012 && ELE_CONV_2012 && ELE_IP_2012);
 }
 
-void makeFriendHZZIsolation(const char* file) {
+void makeFriendHZZIsolation(const char* file, int ismc) {
+
+  // 2012
+  LumiReWeighting LumiWeights( "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/s7pileup60.root",
+                               "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/puRun2012AB.root",
+                               "pileup","pileup");
+
+  // 2011
+  //   LumiReWeighting LumiWeights( "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/s6MCPileUp.root",
+  //                                "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/PUTarget.Full2011.160404-180252.root",
+  //                                "pileup","pileup");
 
   ElectronEffectiveArea::ElectronEffectiveAreaTarget effAreaTarget_ = ElectronEffectiveArea::kEleEAData2011;
   ElectronEffectiveArea::ElectronEffectiveAreaType effAreaGamma_   = ElectronEffectiveArea::kEleGammaIso04;
@@ -193,6 +202,7 @@ void makeFriendHZZIsolation(const char* file) {
 
   Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8], rho, eta, pt;
   Float_t trkIso,ecalIso,hcalIso;
+  Int_t npu[3];
   pT->SetBranchAddress("chaPFIso", chaPFIso);
   pT->SetBranchAddress("neuPFIso", neuPFIso);
   pT->SetBranchAddress("phoPFIso", phoPFIso);
@@ -202,17 +212,20 @@ void makeFriendHZZIsolation(const char* file) {
   pT->SetBranchAddress("rho", &rho);
   pT->SetBranchAddress("eta", &eta);
   pT->SetBranchAddress("pt", &pt);
+  pT->SetBranchAddress("npu", npu);
 
   fF->mkdir("eleIDdir");
   TTree *fT = new TTree("T1","tree with hzz isolation");
   Float_t combDetIso, combIso, combIsoNoEA;
   Float_t combIsoHww;
   Float_t mvaPFIso;
+  Float_t puW;
   fT->Branch("combDetIsoHZZ",&combDetIso,"combDetIsoHZZ/F");
   fT->Branch("combPFIsoHZZ",&combIso,"combPFIsoHZZ/F");
   fT->Branch("combPFIsoHZZNoEA",&combIsoNoEA,"combPFIsoHZZNoEA/F");
   fT->Branch("mvaPFIso",&mvaPFIso,"mvaPFIso/F");
   fT->Branch("combIsoHww",&combIsoHww,"combIsoHww/F");
+  fT->Branch("puW", &puW, "puW/F");
 
   for(int i=0; i<pT->GetEntries(); i++) {
     if (i%10000 == 0) std::cout << ">>> Analyzing event # " << i << " / " << pT->GetEntries() << " entries" << std::endl;
@@ -237,6 +250,11 @@ void makeFriendHZZIsolation(const char* file) {
 					     neuPFIso[0],neuPFIso[1]-neuPFIso[0],neuPFIso[2]-neuPFIso[1],neuPFIso[3]-neuPFIso[2],neuPFIso[4]-neuPFIso[3],
 					     true);
      combIsoHww = isoEAWW2012(eta,chaPFIso[3],neuPFIso[3],phoPFIso[3],rho);
+
+     // this is only needed in MC
+     if(ismc) puW = LumiWeights.weight(npu[1]);
+     else puW = 1.0;
+
      fT->Fill();
   }
 
@@ -248,12 +266,8 @@ void makeFriendHZZIsolation(const char* file) {
 
 }
 
-void makeFriendHZZIdBits(const char* file) {
+void makeFriendHZZIdBits(const char* file, int ismc) {
 
-
-  LumiReWeighting LumiWeights( "/Users/emanuele/Work/electronid/hzzid/UserCode/emanuele/EgammaAnalysisTools/s6MCPileUp.root",
-                               "/Users/emanuele/Work/electronid/hzzid/UserCode/emanuele/EgammaAnalysisTools/pu2011AB.root",
-                               "pileup","pileup");
 
   TFile *pF = TFile::Open(file);
   TTree *pT = (TTree*)pF->Get("eleIDdir/T1");
@@ -276,6 +290,8 @@ void makeFriendHZZIdBits(const char* file) {
   Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,dz,sip,trkIso,ecalIso,hcalIso;
   Int_t matchConv, missHits;
   Int_t npu[3];
+  Int_t mcmatch;
+  Float_t puW;
   pT->SetBranchAddress("bdthww", bdthww);
   pT->SetBranchAddress("newbdthww", newbdthww);
   pT->SetBranchAddress("bdthzz",bdthzz);
@@ -311,6 +327,8 @@ void makeFriendHZZIdBits(const char* file) {
   pT->SetBranchAddress("mvaPFIso", &mvaPFIso);
   pT->SetBranchAddress("combIsoHww", &combIsoHww);
   pT->SetBranchAddress("npu", npu);
+  pT->SetBranchAddress("mcmatch", &mcmatch);
+  pT->SetBranchAddress("puW", &puW);
   if(!TString(file).Contains("fake")) pT->SetBranchAddress("mass", &mass);
   else mass=-1.0;
 
@@ -328,12 +346,12 @@ void makeFriendHZZIdBits(const char* file) {
   Int_t hwwWPidonly, newhwwWPidonly, newhzzWPidonly;
   Int_t cicall[5], cicid[5], ciciso[5];
   Int_t hzzMvaLoose, hzzMvaTight;
-  Float_t puW;
   // first 4 variables needed for TP
   fT->Branch("mass", &mass, "mass/F");
   fT->Branch("pt", &pt, "pt/F");
   fT->Branch("abseta", &abseta, "abseta/F");
   fT->Branch("vertices", &vertices, "vertices/F");
+  fT->Branch("mcmatch", &mcmatch, "mcmatch/I");
   // for triggering eles
   fT->Branch("wp95trg", &WP95trg, "wp95trg/I");
   fT->Branch("wp90trg", &WP90trg, "wp90trg/I");
@@ -435,9 +453,7 @@ void makeFriendHZZIdBits(const char* file) {
      if(aSel.output(pt,eta,bdthzz[3],mvaPFIso,HZZEleIDSelector::kMVALoose,HZZEleIDSelector::kMVAUnbiased)) hzzMvaLoose=1;
      if(aSel.output(pt,eta,bdthzz[3],mvaPFIso,HZZEleIDSelector::kMVATight,HZZEleIDSelector::kMVAUnbiased)) hzzMvaTight=1;
 
-     // this is only needed in MC
-     cout << "npu[1] = " << npu[1] << endl;
-     puW = LumiWeights.weight(npu[1]);
+     if(ismc==0) mcmatch=1;
 
      fT->Fill();
   }
@@ -467,26 +483,26 @@ int main(int argc, char* argv[]) {
 
 
   char files1[500], files2[500], fileb1[500], fileb2[500], fileb3[500];
-  sprintf(files1,"macro/results_data/electrons.root");
-  sprintf(files2,"macro/results_data/electrons_zeemc.root");
-  sprintf(fileb1,"macro/results_data/fakes.root");
-  sprintf(fileb2,"macro/results_data/fakes-unbiased-wlnu.root");
-  sprintf(fileb3,"macro/results_data/fakes-zeeOneFake.root");
+  sprintf(files1,"macro/results_data_2012/electrons.root");
+  sprintf(files2,"macro/results_data_2012/electrons_zeemc.root");
+  sprintf(fileb1,"macro/results_data_2012/fakes.root");
+  sprintf(fileb2,"macro/results_data_2012/fakes-unbiased-wlnu.root");
+  sprintf(fileb3,"macro/results_data_2012/fakes-zeeOneFake.root");
 
   cout << "\t===> DOING ISOLATION FRIEND TREES <===" << endl;
   // isolation
-  makeFriendHZZIsolation(files1);
-  makeFriendHZZIsolation(files2);
-  makeFriendHZZIsolation(fileb1);
-  makeFriendHZZIsolation(fileb2);
-  makeFriendHZZIsolation(fileb3);
+  makeFriendHZZIsolation(files1,0);
+  makeFriendHZZIsolation(files2,1);
+//   makeFriendHZZIsolation(fileb1,0);
+//   makeFriendHZZIsolation(fileb2,0);
+//   makeFriendHZZIsolation(fileb3,0);
 
   cout << "\t===> DOING ID FRIEND TREES <===" << endl;
   // id bits
-  makeFriendHZZIdBits(files1);
-  makeFriendHZZIdBits(files2);
-  makeFriendHZZIdBits(fileb1);
-  makeFriendHZZIdBits(fileb2);
-  makeFriendHZZIdBits(fileb3);
+  makeFriendHZZIdBits(files1,0);
+  makeFriendHZZIdBits(files2,1);
+  //  makeFriendHZZIdBits(fileb1,0);
+  //   makeFriendHZZIdBits(fileb2,0);
+  //   makeFriendHZZIdBits(fileb3,0);
   
 }
