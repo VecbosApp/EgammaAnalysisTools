@@ -80,6 +80,21 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
 
 }
 
+void drawOne(vector<TH1F*> set1, const char* desc1, const char* xaxislabel) {
+  for(int i=0;i<(int)set1.size();++i) {
+    vector<TH1F*> histos;
+    vector<TString> desc;
+    histos.push_back(set1[i]);
+    desc.push_back(TString(desc1));
+    if(set1[i]==0) {
+      cout << "histogram not found!" << endl;
+      continue;
+    }
+    drawOneComparison(histos,desc,TString(xaxislabel),set1[i]->GetName());
+  }
+
+}
+
 void drawOneToOne(vector<TH1F*> set1, vector<TH1F*> set2, const char* desc1, const char* desc2, const char* xaxislabel) {
   if(set1.size()!=set2.size()) {
     cout << "first set and second set of histos have different sizes! ERROR! " << endl;
@@ -215,6 +230,26 @@ void drawIsolations() {
 
 }
 
+// draw just the reference one
+void drawIdsBiased() {
+
+  TFile *file = TFile::Open("fakerates_trigger.root");
+  // pt
+  TH1F *TrgElenewWPHWWPtBarrel1 = (TH1F*)file->Get("TrgElenewWPHWWPtBarrel1_Eff");
+  TH1F *TrgElenewWPHWWPtBarrel2 = (TH1F*)file->Get("TrgElenewWPHWWPtBarrel2_Eff");
+  TH1F *TrgElenewWPHWWPtEndcap1 = (TH1F*)file->Get("TrgElenewWPHWWPtEndcap1_Eff");
+  TH1F *TrgElenewWPHWWPtEndcap2 = (TH1F*)file->Get("TrgElenewWPHWWPtEndcap2_Eff");
+
+  vector<TH1F*> ptSet1;
+  ptSet1.push_back(TrgElenewWPHWWPtBarrel1);
+  ptSet1.push_back(TrgElenewWPHWWPtBarrel2);
+  ptSet1.push_back(TrgElenewWPHWWPtEndcap1);
+  ptSet1.push_back(TrgElenewWPHWWPtEndcap2);
+  drawOne(ptSet1,"Electrons","p_{T} [GeV]");
+}
+
+// compare two...
+/*
 void drawIdsBiased() {
 
   TFile *file = TFile::Open("fakerates_trigger.root");
@@ -232,7 +267,7 @@ void drawIdsBiased() {
   etaSet2.push_back(TrgElenewWPHWWEtaHighPt);
   etaSet2.push_back(TrgElenewWPHWWEtaLowPt);
   
-  drawOneToOne(etaSet1,etaSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-eff)","#eta");
+  drawOneToOne(etaSet1,etaSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-FR)","#eta");
 
   // pt
   TH1F *TrgEleWP80PtBarrel1 = (TH1F*)file->Get("TrgEleWP80PtBarrel1_Eff");
@@ -255,7 +290,7 @@ void drawIdsBiased() {
   ptSet2.push_back(TrgElenewWPHWWPtEndcap1);
   ptSet2.push_back(TrgElenewWPHWWPtEndcap2);
 
-  drawOneToOne(ptSet1,ptSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-eff)","p_{T} [GeV]");
+  drawOneToOne(ptSet1,ptSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-FR)","p_{T} [GeV]");
 
   // PU
   TH1F *TrgEleWP80PUBarrel1 = (TH1F*)file->Get("TrgEleWP80PUBarrel1_Eff");
@@ -278,11 +313,11 @@ void drawIdsBiased() {
   puSet2.push_back(TrgElenewWPHWWPUEndcap1);
   puSet2.push_back(TrgElenewWPHWWPUEndcap2);
 
-  drawOneToOne(puSet1,puSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-eff)","# vertices");
+  drawOneToOne(puSet1,puSet2,"H #rightarrow WW 2011","H #rightarrow WW 2012 (same-FR)","# vertices");
 
 
 }
-
+*/
 
 void drawIdsUnbiased() {
 
