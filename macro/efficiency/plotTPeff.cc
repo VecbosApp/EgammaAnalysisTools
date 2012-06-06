@@ -16,21 +16,22 @@
 #include <fstream>
 #include <math.h>
 
+#include "plotUtil.cxx"
+
 using namespace std;
 
 void plotTPeff() {
 
   vector<TString> filesData, filesMC;
-  filesData.push_back("results/hzzref/newhzzWP_eff_Data7TeV_Kine_Pt10To1000.root");
-  filesMC.push_back("results/hzzref/newhzzWP_eff_MC7TeV_Kine_Pt10To1000.root");
+  filesData.push_back("results/hzzref/2012/newhzzWP_eff_Data8TeV_Kine_Pt10To1000.root");
+  filesMC.push_back("results/hzzref/2012/newhzzWP_eff_MC8TeV_Kine_Pt10To1000.root");
 
   map<int,TString> etabins;
   etabins.insert(make_pair(0,"0<|#eta|<0.8"));
   etabins.insert(make_pair(1,"0.8<|#eta|<1.4442"));
   etabins.insert(make_pair(2,"1.4442<|#eta|<1.566"));
-  etabins.insert(make_pair(3,"1.566<|#eta|<1.8"));
-  etabins.insert(make_pair(4,"1.8<|#eta|<2.0"));
-  etabins.insert(make_pair(5,"2.0<|#eta|<2.5"));
+  etabins.insert(make_pair(3,"1.566<|#eta|<2.0"));
+  etabins.insert(make_pair(4,"2.0<|#eta|<2.5"));
 
 
   for(unsigned int e=0;e<etabins.size();e++) {
@@ -44,7 +45,7 @@ void plotTPeff() {
     TString dirdata = TString("eleIDdir/etapt/fit_eff_plots/");
     TString dirmc = TString("eleIDdir/etapt/cnt_eff_plots/");
     char plotname[100];
-    sprintf(plotname,"pt_PLOT_abseta_bin%d_&_vertices_bin0",e);
+    sprintf(plotname,"pt_PLOT_abseta_bin%d",e);
     TString plot(plotname);
     
     TCanvas c1("c1","c1",600,600);
@@ -57,52 +58,44 @@ void plotTPeff() {
     legend->SetTextFont  (  42);
     legend->SetTextSize  (0.05);
     
-    vector<RooHist*> plotdata, plotmc;
+    vector<TGraphAsymmErrors*> plotdata, plotmc;
     for(int i=0;i<(int)filesData.size();++i) {
       TFile *fileData = TFile::Open(filesData[i]);
       TFile *fileMC = TFile::Open(filesMC[i]);
 
       TCanvas *cdata = (TCanvas*)fileData->Get(dirdata+plot);
       TCanvas *cmc = (TCanvas*)fileMC->Get(dirmc+plot);
-
-      plotdata.push_back((RooHist*)cdata->GetPrimitive("hxy_fit_eff"));
-      plotmc.push_back((RooHist*)cmc->GetPrimitive("hxy_cnt_eff"));
+      plotdata.push_back((TGraphAsymmErrors*)cdata->FindObject("hxy_fit_eff"));
+      plotmc.push_back((TGraphAsymmErrors*)cmc->FindObject("hxy_cnt_eff"));
 
       c1.cd();
     
-      plotdata[i]->SetMinimum(0.4);
+      plotdata[i]->SetMinimum(0.0);
       plotdata[i]->SetMaximum(1.2);
       plotdata[i]->GetXaxis()->SetTitle("p_{T} [GeV]");
       plotdata[i]->GetYaxis()->SetTitle("efficiency");
       plotdata[i]->GetXaxis()->SetRangeUser(0,80);
 
       // cosmetics
-
-      // this is to cure the features of the error bars of the saved RooPlot
-      int np = plotdata[i]->GetN();
-      for(int p=0;p<np;p++) {
-	plotdata[i]->SetPointEXlow(p,0);
-	plotdata[i]->SetPointEXhigh(p,0);
-	plotmc[i]->SetPointEXlow(p,0);
-	plotmc[i]->SetPointEXhigh(p,0);
-	plotdata[i]->SetPointEYhigh(p,plotdata[i]->GetErrorYlow(p));
-	plotmc[i]->SetPointEYhigh(p,plotmc[i]->GetErrorYlow(p));
+      for(int b=0;b<plotdata[i]->GetN();b++) {
+	// minos give some large upper error when close to 1. Put the symmetric one from lower error
+	float yerrlo=plotdata[i]->GetErrorYlow(b);
+	plotdata[i]->SetPointEYhigh(b,yerrlo);
       }
-    
 
       plotdata[i]->SetMarkerSize(1.5);
       plotdata[i]->SetMarkerStyle(20);
       plotmc[i]->SetMarkerSize(1.5);
       plotmc[i]->SetMarkerStyle(20);
 
-      plotdata[i]->SetLineColor(kRed+1);
-      plotmc[i]->SetLineColor(kAzure-6);
+      plotdata[i]->SetLineColor(kAzure-6);
+      plotmc[i]->SetLineColor(kRed+1);
 
-      plotdata[i]->SetMarkerColor(kRed+1);
-      plotmc[i]->SetMarkerColor(kAzure-6);
+      plotdata[i]->SetMarkerColor(kAzure-6);
+      plotmc[i]->SetMarkerColor(kRed+1);
 
       if(i==0) {
-	legend->AddEntry(plotdata[i],"Data 2011","pl");
+	legend->AddEntry(plotdata[i],"Data 2012","pl");
 	legend->AddEntry(plotmc[i],"MC","pl");
       }
 
@@ -111,7 +104,7 @@ void plotTPeff() {
       legend->Draw();
 
       TPaveText* text  = new TPaveText(0.15, 0.9, 0.8, 0.7, "ndc");
-      text->AddText("#sqrt{s} = 7 TeV 2011, L = 4.9 fb^{-1}");
+      text->AddText("#sqrt{s} = 8 TeV 2012, L = 1.6 fb^{-1}");
       text->AddText(etabins[e]);
       text->SetBorderSize(0);
       text->SetFillStyle(0);
@@ -122,6 +115,9 @@ void plotTPeff() {
 
       c1.SaveAs(files[i]+TString(".pdf"));
       c1.SaveAs(files[i]+TString(".png"));
+
+      doRatio(plotdata[i],plotmc[i],files[i],"p_{T} [GeV]",text);
+
     }
   }
 
