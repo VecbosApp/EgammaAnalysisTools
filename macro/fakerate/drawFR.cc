@@ -89,7 +89,7 @@ void drawOne(vector<TH1F*> set1, vector<TString> bin, const char* desc1, const c
   for(int i=0;i<(int)set1.size();++i) {
 
     TPaveText* text  = new TPaveText(0.15, 0.9, 0.8, 0.7, "ndc");
-    text->AddText("#sqrt{s} = 8 TeV, L = 1.6 fb^{-1}");
+    text->AddText("#sqrt{s} = 8 TeV, L = 2.4 fb^{-1}");
     text->AddText(bin[i]);
     text->SetBorderSize(0);
     text->SetFillStyle(0);
