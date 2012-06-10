@@ -8,10 +8,11 @@
 #include <TStyle.h>
 #include <TString.h>
 #include <TLegend.h>
+#include <TPaveText.h>
 
 using namespace std;
 
-void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxislabel, const char *filename) {
+void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxislabel, const char *filename, TPaveText *t=0) {
 
   if(histos.size()>3) {
     cout << "more than 3 histos not implemented." << endl;
@@ -34,7 +35,7 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
   TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
   c1->SetGridx();
   c1->SetGridy();  
-  TLegend* legend = new TLegend(0.20, 0.70, 0.43, 0.86);
+  TLegend* legend = new TLegend(0.20, 0.50, 0.43, 0.66);
   legend->SetBorderSize(   0);
   legend->SetFillColor (   0);
   legend->SetTextAlign (  12);
@@ -51,11 +52,13 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
     histos[i]->SetLineColor(colors[i]);
     histos[i]->SetTitle("");
     if(TString(histos[i]->GetName()).Contains("PU")) {
-      histos[i]->Fit("pol1","","same",4,35);
+      histos[i]->SetMaximum(0.6);
+      histos[i]->Fit("pol1","","same",1,35);
       histos[i]->GetFunction("pol1")->SetLineColor(colors[i]);
     }
     histos[i]->GetXaxis()->SetTitle(xaxislabel);
-    histos[i]->GetYaxis()->SetTitle("efficiency");
+    histos[i]->GetYaxis()->SetTitle("Loose #rightarrow Tight efficiency");
+    histos[i]->GetYaxis()->SetTitleOffset(1.5);
 
     legend->AddEntry(histos[i],descr[i]);
 
@@ -72,6 +75,7 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
     else histos[i]->Draw("same pe1");
   }
   legend->Draw();
+  if(t) t->Draw();
 
   TString basename(filename);
   basename.ReplaceAll("Eff","FR");
@@ -80,8 +84,20 @@ void drawOneComparison(vector<TH1F*> histos, vector<TString> descr, TString xaxi
 
 }
 
-void drawOne(vector<TH1F*> set1, const char* desc1, const char* xaxislabel) {
+void drawOne(vector<TH1F*> set1, vector<TString> bin, const char* desc1, const char* xaxislabel) {
+
   for(int i=0;i<(int)set1.size();++i) {
+
+    TPaveText* text  = new TPaveText(0.15, 0.9, 0.8, 0.7, "ndc");
+    text->AddText("#sqrt{s} = 8 TeV, L = 1.6 fb^{-1}");
+    text->AddText(bin[i]);
+    text->SetBorderSize(0);
+    text->SetFillStyle(0);
+    text->SetTextAlign(12);
+    text->SetTextFont(32);
+    text->SetTextSize(0.05);
+    text->Draw();
+
     vector<TH1F*> histos;
     vector<TString> desc;
     histos.push_back(set1[i]);
@@ -90,7 +106,7 @@ void drawOne(vector<TH1F*> set1, const char* desc1, const char* xaxislabel) {
       cout << "histogram not found!" << endl;
       continue;
     }
-    drawOneComparison(histos,desc,TString(xaxislabel),set1[i]->GetName());
+    drawOneComparison(histos,desc,TString(xaxislabel),set1[i]->GetName(),text);
   }
 
 }
@@ -245,7 +261,30 @@ void drawIdsBiased() {
   ptSet1.push_back(TrgElenewWPHWWPtBarrel2);
   ptSet1.push_back(TrgElenewWPHWWPtEndcap1);
   ptSet1.push_back(TrgElenewWPHWWPtEndcap2);
-  drawOne(ptSet1,"Electrons","p_{T} [GeV]");
+
+  vector<TString> etabins;
+  etabins.push_back("0<|#eta|<1.0");
+  etabins.push_back("1.0<|#eta|<1.479");
+  etabins.push_back("1.479<|#eta|<2.0");
+  etabins.push_back("2.0<|#eta|<2.5");
+  
+  for(int i=0;i<4;i++) ptSet1[i]->GetXaxis()->SetRangeUser(10,35);
+  drawOne(ptSet1,etabins,"Electrons","p_{T} [GeV]");
+
+  // PU
+  TH1F *TrgElenewWPHWWPUBarrel1 = (TH1F*)file->Get("TrgElenewWPHWWPUBarrel1_Eff");
+  TH1F *TrgElenewWPHWWPUBarrel2 = (TH1F*)file->Get("TrgElenewWPHWWPUBarrel2_Eff");
+  TH1F *TrgElenewWPHWWPUEndcap1 = (TH1F*)file->Get("TrgElenewWPHWWPUEndcap1_Eff");
+  TH1F *TrgElenewWPHWWPUEndcap2 = (TH1F*)file->Get("TrgElenewWPHWWPUEndcap2_Eff");
+
+  vector<TH1F*> puSet1;
+  puSet1.push_back(TrgElenewWPHWWPUBarrel1);
+  puSet1.push_back(TrgElenewWPHWWPUBarrel2);
+  puSet1.push_back(TrgElenewWPHWWPUEndcap1);
+  puSet1.push_back(TrgElenewWPHWWPUEndcap2);
+
+  for(int i=0;i<4;i++) puSet1[i]->GetXaxis()->SetRangeUser(0,35);
+  drawOne(puSet1,etabins,"Electrons","# vertices");
 }
 
 // compare two...
