@@ -286,7 +286,7 @@ void makeFriendHZZIdBits(const char* file, int ismc) {
   Float_t combIsoHww;
   Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8], mvaPFIso;
   Float_t mass; // not dummy only for TP trees
-  Int_t DenomFakeSmurf, misshits, ecalseed;
+  Int_t DenomFakeSmurf, ecalseed;
   Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,dz,sip,trkIso,ecalIso,hcalIso;
   Int_t matchConv, missHits;
   Int_t npu[3];
@@ -312,7 +312,6 @@ void makeFriendHZZIdBits(const char* file, int ismc) {
   pT->SetBranchAddress("dphi", &dphi);
   pT->SetBranchAddress("see", &see);
   pT->SetBranchAddress("fbrem", &fbrem);
-  pT->SetBranchAddress("missHits", &misshits);
   pT->SetBranchAddress("dist", &dist);
   pT->SetBranchAddress("dcot", &dcot);
   pT->SetBranchAddress("d0",&d0);
@@ -431,23 +430,23 @@ void makeFriendHZZIdBits(const char* file, int ismc) {
 							   trkIso,
 							   ecalIso - rho * Aeff_ecal_dr03[ieta],
 							   hcalIso - rho * Aeff_hcal_dr03[ieta],
-							   d0,misshits,deta,dphi,HoE,dcot,
+							   d0,missHits,deta,dphi,HoE,dcot,
 							   dist,!ecalseed,i,false);
      for(int i=0; i<5; i++) {
-       cicall[i] = (cicidval(cic,i) && cicisoval(cic,i) && misshits<=1) ? 1 : 0;
-       cicid[i] = (cicidval(cic,i) && misshits<=1) ? 1 : 0;
+       cicall[i] = (cicidval(cic,i) && cicisoval(cic,i) && missHits<=1) ? 1 : 0;
+       cicid[i] = (cicidval(cic,i) && missHits<=1) ? 1 : 0;
        ciciso[i] = (cicisoval(cic,i)) ? 1 : 0;
      }
      // H->ZZ 2012 cut
      newhzzWP=0;
-     if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,misshits,sip,4)) newhzzWP=1;
+     if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,missHits,sip,4)) newhzzWP=1;
      newhzzWPisoonly=0;
-     if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,misshits,sip,1)) newhzzWPisoonly=1;
+     if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,missHits,sip,1)) newhzzWPisoonly=1;
      newhzzWPidonly=0;
-     if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,misshits,sip,0)) newhzzWPidonly=1;
+     if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,missHits,sip,0)) newhzzWPidonly=1;
      newhzzWPconvonly=0;
-     if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,misshits,sip,2)) newhzzWPconvonly=1;
-     
+     if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,missHits,sip,2)) newhzzWPconvonly=1;
+
      // MVA iso rings and MVA ID
      hzzMvaLoose=hzzMvaTight=0;
      if(aSel.output(pt,eta,bdthzz[3],mvaPFIso,HZZEleIDSelector::kMVALoose,HZZEleIDSelector::kMVAUnbiased)) hzzMvaLoose=1;
@@ -493,16 +492,16 @@ int main(int argc, char* argv[]) {
   // isolation
   makeFriendHZZIsolation(files1,0);
   makeFriendHZZIsolation(files2,1);
-//   makeFriendHZZIsolation(fileb1,0);
-//   makeFriendHZZIsolation(fileb2,0);
-//   makeFriendHZZIsolation(fileb3,0);
+  makeFriendHZZIsolation(fileb1,0);
+  makeFriendHZZIsolation(fileb2,0);
+  makeFriendHZZIsolation(fileb3,0);
 
   cout << "\t===> DOING ID FRIEND TREES <===" << endl;
   // id bits
   makeFriendHZZIdBits(files1,0);
   makeFriendHZZIdBits(files2,1);
-  //  makeFriendHZZIdBits(fileb1,0);
-  //   makeFriendHZZIdBits(fileb2,0);
-  //   makeFriendHZZIdBits(fileb3,0);
+  makeFriendHZZIdBits(fileb1,0);
+  makeFriendHZZIdBits(fileb2,0);
+  makeFriendHZZIdBits(fileb3,0);
   
 }
