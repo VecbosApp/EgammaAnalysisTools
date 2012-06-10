@@ -217,14 +217,27 @@ void estimateFakeRate::Loop(const char *outname)
   // -----------------------------------------------------------------------
   // study vs PU
   Float_t LowerPU[11];
+  // 2011 binning
+  // LowerPU[0] = 1;
+  // LowerPU[1] = 4;
+  // for(int i=2;i<6;++i) LowerPU[i]=i+3;
+  // LowerPU[6] = 10;
+  // LowerPU[7] = 15;
+  // LowerPU[8] = 25;
+  // LowerPU[9] = 30;
+  // LowerPU[10] = 35;
+
   LowerPU[0] = 1;
-  LowerPU[1] = 4;
-  for(int i=2;i<6;++i) LowerPU[i]=i+3;
-  LowerPU[6] = 10;
-  LowerPU[7] = 15;
-  LowerPU[8] = 25;
-  LowerPU[9] = 30;
-  LowerPU[10] = 35;
+  LowerPU[1] = 6;
+  LowerPU[2] = 10;
+  LowerPU[3] = 13;
+  LowerPU[4] = 15;
+  LowerPU[5] = 17;
+  LowerPU[6] = 19;
+  LowerPU[7] = 21;
+  LowerPU[8] = 26;
+  LowerPU[9] = 36;
+  LowerPU[10] = 50;
 
   TH1F *RecoPU         = new TH1F( "RecoPU",         "reconstructed nPU", 10, LowerPU );
   TH1F *RecoPUBarrel   = new TH1F( "RecoPUBarrel",   "reconstructed nPU", 10, LowerPU);    // this is done to subsplit 
