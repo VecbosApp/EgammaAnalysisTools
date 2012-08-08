@@ -167,9 +167,9 @@ bool passHZZ4lEleId2012(float pt, float eta, float bdt, float isoEA, float missh
 void makeFriendHZZIsolation(const char* file, int ismc) {
 
   // 2012
-  LumiReWeighting LumiWeights( "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/s7pileup60.root",
-                               "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/puRun2012AB.root",
-                               "pileup","pileup");
+  LumiReWeighting LumiWeights( "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/s7pileup200.root",
+                               "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/puRun2012_3500ipb.root",
+                               "hNPU","pileup");
 
   // 2011
   //   LumiReWeighting LumiWeights( "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/s6MCPileUp.root",
@@ -490,18 +490,18 @@ int main(int argc, char* argv[]) {
 
   cout << "\t===> DOING ISOLATION FRIEND TREES <===" << endl;
   // isolation
-  makeFriendHZZIsolation(files1,0);
-  makeFriendHZZIsolation(files2,1);
+  //   makeFriendHZZIsolation(files1,0);
+  //   makeFriendHZZIsolation(files2,1);
   makeFriendHZZIsolation(fileb1,0);
-  makeFriendHZZIsolation(fileb2,0);
-  makeFriendHZZIsolation(fileb3,0);
+//   makeFriendHZZIsolation(fileb2,0);
+//   makeFriendHZZIsolation(fileb3,0);
 
   cout << "\t===> DOING ID FRIEND TREES <===" << endl;
   // id bits
-  makeFriendHZZIdBits(files1,0);
-  makeFriendHZZIdBits(files2,1);
+//   makeFriendHZZIdBits(files1,0);
+//   makeFriendHZZIdBits(files2,1);
   makeFriendHZZIdBits(fileb1,0);
-  makeFriendHZZIdBits(fileb2,0);
-  makeFriendHZZIdBits(fileb3,0);
+//   makeFriendHZZIdBits(fileb2,0);
+//   makeFriendHZZIdBits(fileb3,0);
   
 }

@@ -342,6 +342,7 @@ void FakeElectronSelector::Loop(const char *outname) {
     // fill the denominator: take only the highest pT denominator candidate
     Utils anaUtils;
     float etaFake = fabs(tv3Denom1.Eta()); 
+    float phiFake  = tv3Denom1.Phi();
     float etFake  = tv3Denom1.Pt();
 
     // for the systematics of HWW - init
@@ -367,12 +368,13 @@ void FakeElectronSelector::Loop(const char *outname) {
     // does this denominator pass the IP cut as for H->WW ?  
 
     // some eleID variables
-    float HoE, s1s9, s9s25, phiwidth, etawidth, deta, dphi, fbrem, see, spp, eleopout, eopout, eop, eseedopin, nbrems, recoFlag, EleSCEta;
-    float oneoveremoneoverp, eledeta, d0, ip3d, ip3ds, kfhits, kfhitsall, kfchi2, e1x5e5x5, dcot, dist;
-    float detacalo, dphicalo, sep, dz, gsfchi2, emaxovere, etopovere, ebottomovere, eleftovere, erightovere,
-      e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
-      e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,
-      EleSCPhi, scenergy, scrawenergy, scesenergy;
+    float HoE, s1s9, s9s25, phiwidth, etawidth, deta, dphi, fbrem, see, spp, eleopout, eopout, eop, eseedopin, nbrems, recoFlag, EleSCEta, EleSCPhi;
+    float EleSCEt,EtaSeed,PhiSeed,ESeed,IEtaSeed,IPhiSeed,EtaCrySeed,PhiCrySeed,IEtaCrySeed,IPhiCrySeed;
+    float oneoveremoneoverp, eledeta, d0, ip3d, ip3ds, kfhits, kflayers, kfchi2, e1x5e5x5, dcot, dist;
+    float detacalo, dphicalo, sep, dz, gsfchi2, emax, etop, ebottom, eleft, eright,
+      e2nd, e2x5right, e2x5left, e2x5top, e2x5bottom, 
+      e2x5max, e1x5, e2x2, e3x3, e5x5, r9, nclu,
+      phi, scenergy, scrawenergy, scesenergy;
 
     int kfTrack = trackIndexEle[theDenom1];
 
@@ -386,15 +388,15 @@ void FakeElectronSelector::Loop(const char *outname) {
     float pmeankf=p3MeanKf.Mag();
 
     double gsfsign   = (-eleDxyPV(theDenom1,0) >=0 ) ? 1. : -1.;
-    int matchConv = (hasMatchedConversionEle[theDenom1]) ? 1 : 0;
+    bool matchConv = hasMatchedConversionEle[theDenom1];
 
     d0 = gsfsign * transvImpactParGsfTrack[gsfTrack];
     dz = eleDzPV(theDenom1,0);
     ip3d = gsfsign * impactPar3DGsfTrack[gsfTrack];
     ip3ds = ip3d/impactPar3DErrorGsfTrack[gsfTrack];
     kfchi2 = (kfTrack>-1) ? trackNormalizedChi2Track[kfTrack] : 0.0;
-    kfhits = (kfTrack>-1) ? trackerLayersWithMeasurementTrack[kfTrack] : -1.0;
-    kfhitsall = (kfTrack>-1) ? trackValidHitsTrack[kfTrack] : -1.0;
+    kflayers = (kfTrack>-1) ? trackerLayersWithMeasurementTrack[kfTrack] : -1.0;
+    kfhits = (kfTrack>-1) ? trackValidHitsTrack[kfTrack] : -1.0;
     gsfchi2 = trackNormalizedChi2GsfTrack[gsfTrack];
     int misshits = expInnerLayersGsfTrack[gsfTrack];
     dcot = convDistEle[theDenom1];
@@ -416,6 +418,7 @@ void FakeElectronSelector::Loop(const char *outname) {
       ecalseed = 1;
       int sc = superClusterIndexEle[theDenom1];
       float seedEnergy = seedClusterEnergySC[sc];
+      nclu = float(nBCSC[sc]);
       s1s9 = eMaxSC[sc]/eMaxSC[sc];
       s9s25 = e3x3SC[sc]/e5x5SC[sc];
       e1x5e5x5 = (e5x5SC[sc] - e1x5SC[sc])/e5x5SC[sc];
@@ -426,33 +429,45 @@ void FakeElectronSelector::Loop(const char *outname) {
       spp = sqrt(covIPhiIPhiSC[sc]);
       oneoveremoneoverp = 1./energySC[sc]  - 1./tv3Denom1.Mag();
       eseedopin = seedEnergy/p3ModeGsf.Mag();
-      emaxovere = eMaxSC[sc]/seedEnergy;
-      etopovere = eTopSC[sc]/seedEnergy;
-      ebottomovere = eBottomSC[sc]/seedEnergy;
-      eleftovere = eLeftSC[sc]/seedEnergy;
-      erightovere = eRightSC[sc]/seedEnergy;
-      e2ndovere = e2ndSC[sc]/seedEnergy;
-      e2x5rightovere = e2x5RightSC[sc]/seedEnergy;
-      e2x5leftovere = e2x5LeftSC[sc]/seedEnergy;
-      e2x5topovere = e2x5TopSC[sc]/seedEnergy;
-      e2x5bottomovere = e2x5BottomSC[sc]/seedEnergy;
-      e2x5maxovere = e2x5MaxSC[sc]/seedEnergy;
-      e1x5overe = e1x5SC[sc]/seedEnergy;
-      e2x2overe = e2x2SC[sc]/seedEnergy;
-      e3x3overe = e3x3SC[sc]/seedEnergy;
-      e5x5overe = e5x5SC[sc]/seedEnergy;
+      emax = eMaxSC[sc];
+      etop = eTopSC[sc];
+      ebottom = eBottomSC[sc];
+      eleft = eLeftSC[sc];
+      eright = eRightSC[sc];
+      e2nd = e2ndSC[sc];
+      e2x5right = e2x5RightSC[sc];
+      e2x5left = e2x5LeftSC[sc];
+      e2x5top = e2x5TopSC[sc];
+      e2x5bottom = e2x5BottomSC[sc];
+      e2x5max = e2x5MaxSC[sc];
+      e1x5 = e1x5SC[sc];
+      e2x2 = e2x2SC[sc];
+      e3x3 = e3x3SC[sc];
+      e5x5 = e5x5SC[sc];
       r9 = e3x3SC[sc]/rawEnergySC[sc];
       recoFlag = recoFlagSC[sc];
       EleSCEta = etaSC[sc];
       EleSCPhi = phiSC[sc];            
+      EleSCEt = energySC[sc]*fabs(sin(thetaSC[sc]));
       scenergy = energySC[sc];
       scrawenergy = rawEnergySC[sc];
       scesenergy = esEnergySC[sc];
+      int seedclu = indexSeedBC(sc,ecaldriven);
+      EtaSeed=etaBC[seedclu];
+      PhiSeed=phiBC[seedclu];
+      ESeed=energyBC[seedclu];
+      IEtaSeed=iEtaBC[seedclu];
+      IPhiSeed=iPhiBC[seedclu];
+      EtaCrySeed=etaCrystalBC[seedclu];
+      PhiCrySeed=phiCrystalBC[seedclu];
+      IEtaCrySeed=seedXSC[sc];
+      IPhiCrySeed=seedYSC[sc];
     } else {
       ecalseed = 0;
       int sc = PFsuperClusterIndexEle[theDenom1];
       if(sc>-1) {
 	float seedEnergy = seedEnergyPFSC[sc];
+        nclu = float(nBCPFSC[sc]);
         s9s25 = e3x3PFSC[sc]/e5x5PFSC[sc];
         s1s9 = eMaxPFSC[sc]/eMaxPFSC[sc];
         e1x5e5x5 = (e5x5PFSC[sc] - e1x5PFSC[sc])/e5x5PFSC[sc];
@@ -463,28 +478,39 @@ void FakeElectronSelector::Loop(const char *outname) {
         spp = sqrt(covIPhiIPhiPFSC[sc]);
         oneoveremoneoverp = 1./energyPFSC[sc]  - 1./tv3Denom1.Mag();
 	eseedopin = seedEnergy/p3ModeGsf.Mag();
-        emaxovere = eMaxPFSC[sc]/seedEnergy;
-        etopovere = eTopPFSC[sc]/seedEnergy;
-        ebottomovere = eBottomPFSC[sc]/seedEnergy;
-        eleftovere = eLeftPFSC[sc]/seedEnergy;
-        erightovere = eRightPFSC[sc]/seedEnergy;
-        e2ndovere = e2ndPFSC[sc]/seedEnergy;
-        e2x5rightovere = e2x5RightPFSC[sc]/seedEnergy;
-        e2x5leftovere = e2x5LeftPFSC[sc]/seedEnergy;
-        e2x5topovere = e2x5TopPFSC[sc]/seedEnergy;
-        e2x5bottomovere = e2x5BottomPFSC[sc]/seedEnergy;
-        e2x5maxovere = e2x5MaxPFSC[sc]/seedEnergy;
-        e1x5overe = e1x5PFSC[sc]/seedEnergy;
-        e2x2overe = e2x2PFSC[sc]/seedEnergy;
-        e3x3overe = e3x3PFSC[sc]/seedEnergy;
-        e5x5overe = e5x5PFSC[sc]/seedEnergy;
+        emax = eMaxPFSC[sc];
+        etop = eTopPFSC[sc];
+        ebottom = eBottomPFSC[sc];
+        eleft = eLeftPFSC[sc];
+        eright = eRightPFSC[sc];
+        e2nd = e2ndPFSC[sc];
+        e2x5right = e2x5RightPFSC[sc];
+        e2x5left = e2x5LeftPFSC[sc];
+        e2x5top = e2x5TopPFSC[sc];
+        e2x5bottom = e2x5BottomPFSC[sc];
+        e2x5max = e2x5MaxPFSC[sc];
+        e1x5 = e1x5PFSC[sc];
+        e2x2 = e2x2PFSC[sc];
+        e3x3 = e3x3PFSC[sc];
+        e5x5 = e5x5PFSC[sc];
         r9 = e3x3PFSC[sc]/rawEnergyPFSC[sc];
         recoFlag = recoFlagPFSC[sc];
         EleSCEta = etaPFSC[sc];
         EleSCPhi = phiPFSC[sc];     
+        EleSCEt = energyPFSC[sc]*fabs(sin(thetaPFSC[sc]));
         scenergy = energyPFSC[sc];
         scrawenergy = rawEnergyPFSC[sc];
         scesenergy = esEnergyPFSC[sc];
+        int seedclu = indexSeedBC(sc,ecaldriven);
+        EtaSeed=etaPFBC[seedclu];
+        PhiSeed=phiPFBC[seedclu];
+        ESeed=energyPFBC[seedclu];
+        IEtaSeed=iEtaPFBC[seedclu];
+        IPhiSeed=iPhiPFBC[seedclu];
+        EtaCrySeed=etaCrystalPFBC[seedclu];
+        PhiCrySeed=phiCrystalPFBC[seedclu];
+        IEtaCrySeed=seedXPFSC[sc];
+        IPhiCrySeed=seedYPFSC[sc];
       } else {
         s9s25 = 999.;
         see = 999.;
@@ -559,19 +585,30 @@ void FakeElectronSelector::Loop(const char *outname) {
     chaPfIso[7]=pfCandChargedDirIso04Ele[theDenom1];
     phoPfIso[7]=pfCandPhotonDirIso04Ele[theDenom1];
     neuPfIso[7]=pfCandNeutralDirIso04Ele[theDenom1];
+
+    float trkIso[2], ecalIso[2], hcalIso[2];
+    trkIso[0]=dr03TkSumPtEle[theDenom1];
+    trkIso[1]=dr04TkSumPtEle[theDenom1];
+    ecalIso[0]=dr03EcalRecHitSumEtEle[theDenom1];
+    ecalIso[1]=dr04EcalRecHitSumEtEle[theDenom1];
+    hcalIso[0]=dr03HcalTowerSumEtFullConeEle[theDenom1];
+    hcalIso[1]=dr04HcalTowerSumEtFullConeEle[theDenom1];
     
+    bool isEleEB= anaUtils.fiducialFlagECAL(fiducialFlagsEle[theDenom1], isEB);
+    bool isEleEE= anaUtils.fiducialFlagECAL(fiducialFlagsEle[theDenom1], isEE);
+
     // fill the reduced tree
     myOutIDTree->fillVariables(eleopout,eopout,eop,HoE,deta,dphi,s9s25,s1s9,see,spp,fbrem,
 			       nbrems,misshits,dcot,dist,pt,eta,charge,phiwidth,etawidth,
-			       oneoveremoneoverp,eledeta,d0,ip3d,ip3ds,kfhits,kfhitsall,kfchi2,e1x5e5x5,ecalseed,matchConv);
-    myOutIDTree->fillVariables2(detacalo, dphicalo, sep, dz, gsfchi2, emaxovere, etopovere, ebottomovere, eleftovere, erightovere,
-                                e2ndovere, e2x5rightovere, e2x5leftovere, e2x5topovere, e2x5bottomovere, 
-                                e2x5maxovere, e1x5overe, e2x2overe, e3x3overe, e5x5overe, r9,
-                                EleSCPhi, scenergy, scrawenergy, scesenergy,eseedopin);    
-    myOutIDTree->fillIsolations(dr03TkSumPtEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,
-                               dr03EcalRecHitSumEtEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,
-                               dr03HcalTowerSumEtFullConeEle[theDenom1] - rhoFastjet*TMath::Pi()*0.3*0.3,
-                               pfCombinedIsoEle[theDenom1],
+			       oneoveremoneoverp,eledeta,d0,ip3d,ip3ds,kfhits,kflayers,kfchi2,e1x5e5x5,ecalseed,matchConv,
+                               isEleEB,isEleEE);
+    myOutIDTree->fillVariables2(detacalo, dphicalo, sep, dz, gsfchi2, emax, etop, ebottom, eleft, eright,
+                                e2nd, e2x5right, e2x5left, e2x5top, e2x5bottom, 
+                                e2x5max, e1x5, e2x2, e3x3, e5x5, r9, nclu,
+                                phi, scenergy, scrawenergy, scesenergy,eseedopin);    
+    myOutIDTree->fillCluterInfos(EleSCEt,EleSCEta,EleSCPhi,EtaSeed,PhiSeed,ESeed,IEtaSeed,IPhiSeed,EtaCrySeed,PhiCrySeed,IEtaCrySeed,IPhiCrySeed);
+    myOutIDTree->fillIsolations(trkIso,ecalIso,hcalIso,
+                                pfCombinedIsoEle[theDenom1],
                                 chaPfIso, neuPfIso, phoPfIso);
     myOutIDTree->fillFakeRateDenomBits(ptLeadingJet,isDenomFake_HwwEgamma(theDenom1),isDenomFake_smurfs(theDenom1));
     myOutIDTree->fillMore(nPV,rhoFastjet,hwwbdts,newhwwbdts,hzzbdts,pfmva,lh);
@@ -610,7 +647,6 @@ int FakeElectronSelector::isDenomFake_HwwEgamma(int theEle) {
 
   // barrel or endcap
   bool isEleEB = anaUtils.fiducialFlagECAL(fiducialFlagsEle[theEle], isEB);    
-
   // taking shower shape                                                                                                             
   int sc;
   bool ecalDriven = anaUtils.electronRecoType(recoFlagsEle[theEle], bits::isEcalDriven);

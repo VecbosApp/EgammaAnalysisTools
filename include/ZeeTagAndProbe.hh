@@ -40,7 +40,10 @@ private:
 
   //! match the Z->ee MC truth: always match the probe, if tag==-1 then the tag is not matched
   bool mcMatches(int probe, int tag=-1);
-  
+
+  //! match the electron with the generator level one coming from the Z
+  float genEleEnergy(int ele, int status=-1, float deltar=0.3);
+
   //! for the prompt rate for fake rate
   int isDenomFake(int eleIndex);
   int isDenomFake_smurfs(int theEle);

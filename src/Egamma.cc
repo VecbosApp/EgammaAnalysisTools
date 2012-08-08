@@ -902,3 +902,37 @@ double Egamma::SiElectronEffectiveArea(ElectronEffectiveAreaType type, double Et
   }
   return EffectiveArea;  
 }
+
+int Egamma::indexSeedBC(int sc, int ecaldriven) {
+  std::vector<int> BCs;
+  if(ecaldriven) {
+    for(int ibc=0;ibc<nBC;++ibc) {
+      if(indexSCBC[ibc]==sc) BCs.push_back(ibc);
+    }
+    // find the seed BC
+    float maxE=-1.;
+    int seed=-1;
+    for(unsigned int ibc=0; ibc<BCs.size(); ++ibc) {
+      if(energyBC[BCs[ibc]]>maxE) {
+        maxE=energyBC[BCs[ibc]];
+        seed=BCs[ibc];
+      }
+    }
+    return seed;
+  } else {
+    for(int ibc=0;ibc<nPFBC;++ibc) {
+      if(indexSCPFBC[ibc]==sc) BCs.push_back(ibc);
+    }
+    // find the seed BC
+    // N.B. Since the PFBC collection was set to be the one made by PFphoton reco, then sometimes there could be not the seed of the electron PFSC. to be fixed
+    float maxE=-1.;
+    int seed=-1;
+    for(unsigned int ibc=0; ibc<BCs.size(); ++ibc) { 
+      if(energyPFBC[BCs[ibc]]>maxE) {
+        maxE=energyPFBC[BCs[ibc]];
+        seed=BCs[ibc];
+      }
+    }
+    return seed;
+  }
+}

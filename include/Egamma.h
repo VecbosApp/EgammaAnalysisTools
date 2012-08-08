@@ -85,6 +85,8 @@ public:
   bool passEleBDT(float pt, float eta, float bdtoutput);
   /// calculate EA corrected PF isolation
   float combPFIsoEACorr(int iele);
+  /// to get the BC seed of the SC (until the index is not stored)
+  int indexSeedBC(int sc, int ecaldriven);
   //! for the prompt rate for fake rate
   int isDenomFake_smurfs(int theEle);
   int isDenomFake_HwwEgamma(int theEle);

@@ -369,6 +369,74 @@ public :
    Float_t         esL2EnergyPhoPFSC[50];   //[nPhoPFSC]
    Int_t           esL1StripsPhoPFSC[50];   //[nPhoPFSC]
    Int_t           esL2StripsPhoPFSC[50];   //[nPhoPFSC]
+   Int_t           nBC;
+   Int_t           nCrystalsBC[1000];   //[nBC]
+   Float_t         energyBC[1000];   //[nBC]
+   Float_t         etaBC[1000];   //[nBC]
+   Float_t         thetaBC[1000];   //[nBC]
+   Float_t         phiBC[1000];   //[nBC]
+   Float_t         e3x3BC[1000];   //[nBC]
+   Float_t         e5x5BC[1000];   //[nBC]
+   Float_t         eMaxBC[1000];   //[nBC]
+   Float_t         e2x2BC[1000];   //[nBC]
+   Float_t         e2ndBC[1000];   //[nBC]
+   Float_t         eTopBC[1000];   //[nBC]
+   Float_t         eBottomBC[1000];   //[nBC]
+   Float_t         eLeftBC[1000];   //[nBC]
+   Float_t         eRightBC[1000];   //[nBC]
+   Float_t         e2x5MaxBC[1000];   //[nBC]
+   Float_t         e2x5TopBC[1000];   //[nBC]
+   Float_t         e2x5BottomBC[1000];   //[nBC]
+   Float_t         e2x5LeftBC[1000];   //[nBC]
+   Float_t         e2x5RightBC[1000];   //[nBC]
+   Float_t         etaCrystalBC[1000];   //[nBC]
+   Float_t         phiCrystalBC[1000];   //[nBC]
+   Int_t           iEtaBC[1000];   //[nBC]
+   Int_t           iPhiBC[1000];   //[nBC]
+   Float_t         thetaTiltBC[1000];   //[nBC]
+   Float_t         phiTiltBC[1000];   //[nBC]
+   Float_t         covIEtaIEtaBC[1000];   //[nBC]
+   Float_t         covIEtaIPhiBC[1000];   //[nBC]
+   Float_t         covIPhiIPhiBC[1000];   //[nBC]
+   Int_t           recoFlagBC[1000];   //[nBC]
+   Float_t         timeBC[1000];   //[nBC]
+   Float_t         chi2BC[1000];   //[nBC]
+   Float_t         seedEnergyBC[1000];   //[nBC]
+   Int_t           indexSCBC[1000];   //[nBC]
+   Int_t           nPFBC;
+   Int_t           nCrystalsPFBC[100];   //[nPFBC]
+   Float_t         energyPFBC[100];   //[nPFBC]
+   Float_t         etaPFBC[100];   //[nPFBC]
+   Float_t         thetaPFBC[100];   //[nPFBC]
+   Float_t         phiPFBC[100];   //[nPFBC]
+   Float_t         e3x3PFBC[100];   //[nPFBC]
+   Float_t         e5x5PFBC[100];   //[nPFBC]
+   Float_t         eMaxPFBC[100];   //[nPFBC]
+   Float_t         e2x2PFBC[100];   //[nPFBC]
+   Float_t         e2ndPFBC[100];   //[nPFBC]
+   Float_t         eTopPFBC[100];   //[nPFBC]
+   Float_t         eBottomPFBC[100];   //[nPFBC]
+   Float_t         eLeftPFBC[100];   //[nPFBC]
+   Float_t         eRightPFBC[100];   //[nPFBC]
+   Float_t         e2x5MaxPFBC[100];   //[nPFBC]
+   Float_t         e2x5TopPFBC[100];   //[nPFBC]
+   Float_t         e2x5BottomPFBC[100];   //[nPFBC]
+   Float_t         e2x5LeftPFBC[100];   //[nPFBC]
+   Float_t         e2x5RightPFBC[100];   //[nPFBC]
+   Float_t         etaCrystalPFBC[100];   //[nPFBC]
+   Float_t         phiCrystalPFBC[100];   //[nPFBC]
+   Int_t           iEtaPFBC[100];   //[nPFBC]
+   Int_t           iPhiPFBC[100];   //[nPFBC]
+   Float_t         thetaTiltPFBC[100];   //[nPFBC]
+   Float_t         phiTiltPFBC[100];   //[nPFBC]
+   Float_t         covIEtaIEtaPFBC[100];   //[nPFBC]
+   Float_t         covIEtaIPhiPFBC[100];   //[nPFBC]
+   Float_t         covIPhiIPhiPFBC[100];   //[nPFBC]
+   Int_t           recoFlagPFBC[100];   //[nPFBC]
+   Float_t         timePFBC[100];   //[nPFBC]
+   Float_t         chi2PFBC[100];   //[nPFBC]
+   Float_t         seedEnergyPFBC[100];   //[nPFBC]
+   Int_t           indexSCPFBC[100];   //[nPFBC]
    Int_t           nTrack;
    Float_t         pxTrack[5000];   //[nTrack]
    Float_t         pyTrack[5000];   //[nTrack]
@@ -1298,6 +1366,74 @@ public :
    TBranch        *b_esL2EnergyPhoPFSC;   //!
    TBranch        *b_esL1StripsPhoPFSC;   //!
    TBranch        *b_esL2StripsPhoPFSC;   //!
+   TBranch        *b_nBC;   //!
+   TBranch        *b_nCrystalsBC;   //!
+   TBranch        *b_energyBC;   //!
+   TBranch        *b_etaBC;   //!
+   TBranch        *b_thetaBC;   //!
+   TBranch        *b_phiBC;   //!
+   TBranch        *b_e3x3BC;   //!
+   TBranch        *b_e5x5BC;   //!
+   TBranch        *b_eMaxBC;   //!
+   TBranch        *b_e2x2BC;   //!
+   TBranch        *b_e2ndBC;   //!
+   TBranch        *b_eTopBC;   //!
+   TBranch        *b_eBottomBC;   //!
+   TBranch        *b_eLeftBC;   //!
+   TBranch        *b_eRightBC;   //!
+   TBranch        *b_e2x5MaxBC;   //!
+   TBranch        *b_e2x5TopBC;   //!
+   TBranch        *b_e2x5BottomBC;   //!
+   TBranch        *b_e2x5LeftBC;   //!
+   TBranch        *b_e2x5RightBC;   //!
+   TBranch        *b_etaCrystalBC;   //!
+   TBranch        *b_phiCrystalBC;   //!
+   TBranch        *b_iEtaBC;   //!
+   TBranch        *b_iPhiBC;   //!
+   TBranch        *b_thetaTiltBC;   //!
+   TBranch        *b_phiTiltBC;   //!
+   TBranch        *b_covIEtaIEtaBC;   //!
+   TBranch        *b_covIEtaIPhiBC;   //!
+   TBranch        *b_covIPhiIPhiBC;   //!
+   TBranch        *b_recoFlagBC;   //!
+   TBranch        *b_timeBC;   //!
+   TBranch        *b_chi2BC;   //!
+   TBranch        *b_seedEnergyBC;   //!
+   TBranch        *b_indexSCBC;   //!
+   TBranch        *b_nPFBC;   //!
+   TBranch        *b_nCrystalsPFBC;   //!
+   TBranch        *b_energyPFBC;   //!
+   TBranch        *b_etaPFBC;   //!
+   TBranch        *b_thetaPFBC;   //!
+   TBranch        *b_phiPFBC;   //!
+   TBranch        *b_e3x3PFBC;   //!
+   TBranch        *b_e5x5PFBC;   //!
+   TBranch        *b_eMaxPFBC;   //!
+   TBranch        *b_e2x2PFBC;   //!
+   TBranch        *b_e2ndPFBC;   //!
+   TBranch        *b_eTopPFBC;   //!
+   TBranch        *b_eBottomPFBC;   //!
+   TBranch        *b_eLeftPFBC;   //!
+   TBranch        *b_eRightPFBC;   //!
+   TBranch        *b_e2x5MaxPFBC;   //!
+   TBranch        *b_e2x5TopPFBC;   //!
+   TBranch        *b_e2x5BottomPFBC;   //!
+   TBranch        *b_e2x5LeftPFBC;   //!
+   TBranch        *b_e2x5RightPFBC;   //!
+   TBranch        *b_etaCrystalPFBC;   //!
+   TBranch        *b_phiCrystalPFBC;   //!
+   TBranch        *b_iEtaPFBC;   //!
+   TBranch        *b_iPhiPFBC;   //!
+   TBranch        *b_thetaTiltPFBC;   //!
+   TBranch        *b_phiTiltPFBC;   //!
+   TBranch        *b_covIEtaIEtaPFBC;   //!
+   TBranch        *b_covIEtaIPhiPFBC;   //!
+   TBranch        *b_covIPhiIPhiPFBC;   //!
+   TBranch        *b_recoFlagPFBC;   //!
+   TBranch        *b_timePFBC;   //!
+   TBranch        *b_chi2PFBC;   //!
+   TBranch        *b_seedEnergyPFBC;   //!
+   TBranch        *b_indexSCPFBC;   //!
    TBranch        *b_nTrack;   //!
    TBranch        *b_pxTrack;   //!
    TBranch        *b_pyTrack;   //!
@@ -2240,6 +2376,74 @@ void EgammaBase::Init(TTree *tree)
    fChain->SetBranchAddress("esL2EnergyPFSC", esL2EnergyPFSC, &b_esL2EnergyPFSC);
    fChain->SetBranchAddress("esL1StripsPFSC", esL1StripsPFSC, &b_esL1StripsPFSC);
    fChain->SetBranchAddress("esL2StripsPFSC", esL2StripsPFSC, &b_esL2StripsPFSC);
+   fChain->SetBranchAddress("nBC", &nBC, &b_nBC);
+   fChain->SetBranchAddress("nCrystalsBC", nCrystalsBC, &b_nCrystalsBC);
+   fChain->SetBranchAddress("energyBC", energyBC, &b_energyBC);
+   fChain->SetBranchAddress("etaBC", etaBC, &b_etaBC);
+   fChain->SetBranchAddress("thetaBC", thetaBC, &b_thetaBC);
+   fChain->SetBranchAddress("phiBC", phiBC, &b_phiBC);
+   fChain->SetBranchAddress("e3x3BC", e3x3BC, &b_e3x3BC);
+   fChain->SetBranchAddress("e5x5BC", e5x5BC, &b_e5x5BC);
+   fChain->SetBranchAddress("eMaxBC", eMaxBC, &b_eMaxBC);
+   fChain->SetBranchAddress("e2x2BC", e2x2BC, &b_e2x2BC);
+   fChain->SetBranchAddress("e2ndBC", e2ndBC, &b_e2ndBC);
+   fChain->SetBranchAddress("eTopBC", eTopBC, &b_eTopBC);
+   fChain->SetBranchAddress("eBottomBC", eBottomBC, &b_eBottomBC);
+   fChain->SetBranchAddress("eLeftBC", eLeftBC, &b_eLeftBC);
+   fChain->SetBranchAddress("eRightBC", eRightBC, &b_eRightBC);
+   fChain->SetBranchAddress("e2x5MaxBC", e2x5MaxBC, &b_e2x5MaxBC);
+   fChain->SetBranchAddress("e2x5TopBC", e2x5TopBC, &b_e2x5TopBC);
+   fChain->SetBranchAddress("e2x5BottomBC", e2x5BottomBC, &b_e2x5BottomBC);
+   fChain->SetBranchAddress("e2x5LeftBC", e2x5LeftBC, &b_e2x5LeftBC);
+   fChain->SetBranchAddress("e2x5RightBC", e2x5RightBC, &b_e2x5RightBC);
+   fChain->SetBranchAddress("etaCrystalBC", etaCrystalBC, &b_etaCrystalBC);
+   fChain->SetBranchAddress("phiCrystalBC", phiCrystalBC, &b_phiCrystalBC);
+   fChain->SetBranchAddress("iEtaBC", iEtaBC, &b_iEtaBC);
+   fChain->SetBranchAddress("iPhiBC", iPhiBC, &b_iPhiBC);
+   fChain->SetBranchAddress("thetaTiltBC", thetaTiltBC, &b_thetaTiltBC);
+   fChain->SetBranchAddress("phiTiltBC", phiTiltBC, &b_phiTiltBC);
+   fChain->SetBranchAddress("covIEtaIEtaBC", covIEtaIEtaBC, &b_covIEtaIEtaBC);
+   fChain->SetBranchAddress("covIEtaIPhiBC", covIEtaIPhiBC, &b_covIEtaIPhiBC);
+   fChain->SetBranchAddress("covIPhiIPhiBC", covIPhiIPhiBC, &b_covIPhiIPhiBC);
+   fChain->SetBranchAddress("recoFlagBC", recoFlagBC, &b_recoFlagBC);
+   fChain->SetBranchAddress("timeBC", timeBC, &b_timeBC);
+   fChain->SetBranchAddress("chi2BC", chi2BC, &b_chi2BC);
+   fChain->SetBranchAddress("seedEnergyBC", seedEnergyBC, &b_seedEnergyBC);
+   fChain->SetBranchAddress("indexSCBC", indexSCBC, &b_indexSCBC);
+   fChain->SetBranchAddress("nPFBC", &nPFBC, &b_nPFBC);
+   fChain->SetBranchAddress("nCrystalsPFBC", nCrystalsPFBC, &b_nCrystalsPFBC);
+   fChain->SetBranchAddress("energyPFBC", energyPFBC, &b_energyPFBC);
+   fChain->SetBranchAddress("etaPFBC", etaPFBC, &b_etaPFBC);
+   fChain->SetBranchAddress("thetaPFBC", thetaPFBC, &b_thetaPFBC);
+   fChain->SetBranchAddress("phiPFBC", phiPFBC, &b_phiPFBC);
+   fChain->SetBranchAddress("e3x3PFBC", e3x3PFBC, &b_e3x3PFBC);
+   fChain->SetBranchAddress("e5x5PFBC", e5x5PFBC, &b_e5x5PFBC);
+   fChain->SetBranchAddress("eMaxPFBC", eMaxPFBC, &b_eMaxPFBC);
+   fChain->SetBranchAddress("e2x2PFBC", e2x2PFBC, &b_e2x2PFBC);
+   fChain->SetBranchAddress("e2ndPFBC", e2ndPFBC, &b_e2ndPFBC);
+   fChain->SetBranchAddress("eTopPFBC", eTopPFBC, &b_eTopPFBC);
+   fChain->SetBranchAddress("eBottomPFBC", eBottomPFBC, &b_eBottomPFBC);
+   fChain->SetBranchAddress("eLeftPFBC", eLeftPFBC, &b_eLeftPFBC);
+   fChain->SetBranchAddress("eRightPFBC", eRightPFBC, &b_eRightPFBC);
+   fChain->SetBranchAddress("e2x5MaxPFBC", e2x5MaxPFBC, &b_e2x5MaxPFBC);
+   fChain->SetBranchAddress("e2x5TopPFBC", e2x5TopPFBC, &b_e2x5TopPFBC);
+   fChain->SetBranchAddress("e2x5BottomPFBC", e2x5BottomPFBC, &b_e2x5BottomPFBC);
+   fChain->SetBranchAddress("e2x5LeftPFBC", e2x5LeftPFBC, &b_e2x5LeftPFBC);
+   fChain->SetBranchAddress("e2x5RightPFBC", e2x5RightPFBC, &b_e2x5RightPFBC);
+   fChain->SetBranchAddress("etaCrystalPFBC", etaCrystalPFBC, &b_etaCrystalPFBC);
+   fChain->SetBranchAddress("phiCrystalPFBC", phiCrystalPFBC, &b_phiCrystalPFBC);
+   fChain->SetBranchAddress("iEtaPFBC", iEtaPFBC, &b_iEtaPFBC);
+   fChain->SetBranchAddress("iPhiPFBC", iPhiPFBC, &b_iPhiPFBC);
+   fChain->SetBranchAddress("thetaTiltPFBC", thetaTiltPFBC, &b_thetaTiltPFBC);
+   fChain->SetBranchAddress("phiTiltPFBC", phiTiltPFBC, &b_phiTiltPFBC);
+   fChain->SetBranchAddress("covIEtaIEtaPFBC", covIEtaIEtaPFBC, &b_covIEtaIEtaPFBC);
+   fChain->SetBranchAddress("covIEtaIPhiPFBC", covIEtaIPhiPFBC, &b_covIEtaIPhiPFBC);
+   fChain->SetBranchAddress("covIPhiIPhiPFBC", covIPhiIPhiPFBC, &b_covIPhiIPhiPFBC);
+   fChain->SetBranchAddress("recoFlagPFBC", recoFlagPFBC, &b_recoFlagPFBC);
+   fChain->SetBranchAddress("timePFBC", timePFBC, &b_timePFBC);
+   fChain->SetBranchAddress("chi2PFBC", chi2PFBC, &b_chi2PFBC);
+   fChain->SetBranchAddress("seedEnergyPFBC", seedEnergyPFBC, &b_seedEnergyPFBC);
+   fChain->SetBranchAddress("indexSCPFBC", indexSCPFBC, &b_indexSCPFBC);
    fChain->SetBranchAddress("nTrack", &nTrack, &b_nTrack);
    fChain->SetBranchAddress("pxTrack", pxTrack, &b_pxTrack);
    fChain->SetBranchAddress("pyTrack", pyTrack, &b_pyTrack);

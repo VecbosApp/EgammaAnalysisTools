@@ -30,15 +30,19 @@ public:
   //! needed for HZZ BDT
   void fillVariables(float eleEoPout, float EoPout, float EoP, float HoE, float Deta, float Dphi, float s9s25, float s1s9, float See, float Spp, float fbrem, 
                      int nbrems, int nHits, float dcot, float dist, float pt, float eta, int charge, float phiwidth, float etawidth,
-                     float IoEmIoP, float eledeta, float d0, float ip3d, float ip3ds, int kfhits, int kfhitsall, float kfchi2, float e1x5e5x5, int ecaldriven, int matchConv);
+                     float IoEmIoP, float eledeta, float d0, float ip3d, float ip3ds, int kfhits, int kflayers, float kfchi2, float e1x5e5x5, int ecaldriven, bool matchConv,
+                     bool iseb, bool isee);
   //! additional needed for HWW BDT
   void fillVariables2(float detacalo, float dphicalo, float sep, float dz, float gsfchi2, float emaxovere, float etopovere, float ebottomovere, float eleftovere, float erightovere,
                       float e2ndovere, float e2x5rightovere, float e2x5leftovere, float e2x5topevere, float e2x5bottomovere, 
-                      float e2x5maxovere, float e1x5overe, float e2x2overe, float e3x3overe, float e5x5overe, float r9,
+                      float e2x5maxovere, float e1x5overe, float e2x2overe, float e3x3overe, float e5x5overe, float r9, float nclu,
                       float phi, float scenergy, float scrawenergy, float scesenergy, float eseedopin);
 
+  //! fill ECAL cluster informations
+  void fillCluterInfos(float scEt, float scEta, float scPhi, float EtaSeed, float PhiSeed, float ESeed, float IEtaSeed, float IPhiSeed, float EtaCrySeed, float PhiCrySeed, float IEtaCrySeed, float IPhiCrySeed);
+
   //! fill the tree with isolation variables
-  void fillIsolations(float tkIso, float ecalIso, float hcalIso,
+  void fillIsolations(float tkIso[2], float ecalIso[2], float hcalIso[2],
                       float combPFiso,
                       float chaPFiso[8], float neuPFiso[8], float phoPFiso[8]);
 
@@ -47,12 +51,12 @@ public:
   void fillLHBasedIDBits(int LHBasedId[5], int LHBasedIdOnlyID[5], int LHBasedIdOnlyIso[5], int LHBasedIdOnlyConv[5]);
   void fillLHBasedPFIsoIDBits(int LHBasedPFIsoId[5], int LHBasedPFIsoIdOnlyID[5], int LHBasedPFIsoIdOnlyIso[5], int LHBasedPFIsoIdOnlyConv[5]);
   void fillCiCBasedIDBits(int cic[5]);
-  void fillFakeRateDenomBits(float leadJetPt, int isDenom, int isDenomSmurf);
+  void fillFakeRateDenomBits(float leadJetPt, bool isDenom, bool isDenomTrigger);
   void fillBDTBasedIDBits(int isBDTOnlyId);
 
   //! fill electron attributes + z mass for the tag and probe
   //! note: when both electrons from Z are probes, the same Z mass is repeated
-  void fillAttributesSignal(float zmass, int zeeDec);
+  void fillAttributesSignal(float zmass, int zeeDec, float genenergy, float genenergystatus1, float genenergystatus2);
   //! fill electron attributes + other quantities for background tag and probe
   void fillAttributesBackground(float dphi, float invmass, float met, float pth);
   //! fill the splitting categories of the PDFs
@@ -68,26 +72,30 @@ public:
 
 private:
 
-  float myEleEoPout, myEoPout, myEoP,myHoE,myDeta,myDphi,mys9s25,mys1s9,mySee,mySpp,myFbrem, myPhiWidth, myEtaWidth, myEseedoPin;
-  float myIoEoIoP, myEleDeta, myD0, myIP3d, myIP3dSig, myKFChi2, myE1x5E5x5;
-  int myNbrems, myKFHits, myKFHitsAll, myEcalDriven, myMissHits, myMatchConv;
+  float myEEleoPout, myEseedoPout, myEoP,myHoE,myDeta,myDphi,mys9s25,mys1s9,mySee,mySpp,myFbrem, myPhiWidth, myEtaWidth, myEseedoPin;
+  float myIoEoIoP, myEleDeta, myD0, myIP3d, myIP3dSig, myKFChi2, myE1x5E5x5, myPreShowerOverRaw;
+  int myNbrems, myKFHits, myKFLayers, myEcalDriven, myMissHits;
+  bool myMatchConv;
   float myDetaCalo, myDphiCalo, mySep, myDZ, myGSFChi2;
-  float mySeedEMaxOverE,mySeedETopOverE,mySeedEBottomOverE,mySeedELeftOverE,mySeedERightOverE,mySeedE2ndOverE,mySeedE2x5RightOverE,mySeedE2x5LeftOverE,mySeedE2x5TopOverE,mySeedE2x5BottomOverE;
-  float mySeedE2x5MaxOverE,mySeedE1x5OverE,mySeedE2x2OverE,mySeedE3x3OverE,mySeedE5x5OverE,myR9;
+  float mySeedEMax,mySeedETop,mySeedEBottom,mySeedELeft,mySeedERight,mySeedE2nd,mySeedE2x5Right,mySeedE2x5Left,mySeedE2x5Top,mySeedE2x5Bottom;
+  float mySeedE2x5Max,mySeedE1x5,mySeedE2x2,mySeedE3x3,mySeedE5x5,myR9,myNClusters,myOneMinusSeedE1x5OverE5x5;
   float myDist, myDcot;
   int myCharge;
-  float myEta, myPhi, myPt, mySCEnergy, mySCRawEnergy, mySCESEnergy;
+  float myEta, myPhi, myPt, mySCEnergy, mySCRawEnergy, myEsenergy;
   float myPComb, myPModeGsf, myPMeanGsf, myPKf;
   int myNpu[3];
   int myRun, myLS, myEvent, myMCMatch;
+  bool myIsEB, myIsEE;
+  float myScEt,myScEta,myScPhi,myEtaSeed,myPhiSeed,myESeed,myIEtaSeed,myIPhiSeed,myEtaCrySeed,myPhiCrySeed,myIEtaCrySeed,myIPhiCrySeed;
 
   float myZmass;
   int myZDec;
+  float myGeneratedEnergy,myGeneratedEnergyStatus1,myGeneratedEnergyStatus2;
 
   int myCutBasedId[6], myCutBasedIdOnlyID[6], myCutBasedIdOnlyIso[6], myCutBasedIdOnlyConv[6];
   int myLHBasedId[5], myLHBasedIdOnlyID[5], myLHBasedIdOnlyIso[5], myLHBasedIdOnlyConv[5];
   int myLHBasedPFIsoId[5], myLHBasedPFIsoIdOnlyID[5], myLHBasedPFIsoIdOnlyIso[5], myLHBasedPFIsoIdOnlyConv[5];
-  int myDenomFake, myDenomFakeSmurf;
+  int myDenomFake, myPassTriggerDenominator;
   float myLeadJetPt;
   int myCiC[5];
   int myBDTIdOnlyId;
@@ -102,11 +110,14 @@ private:
   int myiclass;
   int mynbrem;
 
-  float myTrkIso;
-  float myEcalIso;
-  float myHcalIso;
+  float myTrkIso03,myTrkIso04;
+  float myEcalIso03,myEcalIso04;
+  float myHcalIso03,myHcalIso04;
   float myPFCandCombinedIsoHWW;
   float myPFCandChargedIso[8], myPFCandNeutralIso[8], myPFCandPhotonIso[8];
+  float myChargedIso_DR0p0To0p1,myChargedIso_DR0p1To0p2,myChargedIso_DR0p2To0p3,myChargedIso_DR0p3To0p4,myChargedIso_DR0p4To0p5;
+  float myGammaIso_DR0p0To0p1,myGammaIso_DR0p1To0p2,myGammaIso_DR0p2To0p3,myGammaIso_DR0p3To0p4,myGammaIso_DR0p4To0p5;
+  float myNeutralHadronIso_DR0p0To0p1,myNeutralHadronIso_DR0p1To0p2,myNeutralHadronIso_DR0p2To0p3,myNeutralHadronIso_DR0p3To0p4,myNeutralHadronIso_DR0p4To0p5;
 
   float myNVtx;
   float myRho;
