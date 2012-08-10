@@ -56,7 +56,7 @@ public:
 
   //! fill electron attributes + z mass for the tag and probe
   //! note: when both electrons from Z are probes, the same Z mass is repeated
-  void fillAttributesSignal(float zmass, int zeeDec, float genenergy, float genenergystatus1, float genenergystatus2);
+  void fillAttributesSignal(float zmass, int zeeDec, float genenergy, float genenergystatus1, float genenergystatus3);
   //! fill electron attributes + other quantities for background tag and probe
   void fillAttributesBackground(float dphi, float invmass, float met, float pth);
   //! fill the splitting categories of the PDFs
@@ -74,28 +74,28 @@ private:
 
   float myEEleoPout, myEseedoPout, myEoP,myHoE,myDeta,myDphi,mys9s25,mys1s9,mySee,mySpp,myFbrem, myPhiWidth, myEtaWidth, myEseedoPin;
   float myIoEoIoP, myEleDeta, myD0, myIP3d, myIP3dSig, myKFChi2, myE1x5E5x5, myPreShowerOverRaw;
-  int myNbrems, myKFHits, myKFLayers, myEcalDriven, myMissHits;
-  bool myMatchConv;
+  float myNbrems, myKFHits, myKFLayers, myMissHits;
+  bool myMatchConv, myEcalDriven;
   float myDetaCalo, myDphiCalo, mySep, myDZ, myGSFChi2;
   float mySeedEMax,mySeedETop,mySeedEBottom,mySeedELeft,mySeedERight,mySeedE2nd,mySeedE2x5Right,mySeedE2x5Left,mySeedE2x5Top,mySeedE2x5Bottom;
   float mySeedE2x5Max,mySeedE1x5,mySeedE2x2,mySeedE3x3,mySeedE5x5,myR9,myNClusters,myOneMinusSeedE1x5OverE5x5;
-  float myDist, myDcot;
-  int myCharge;
-  float myEta, myPhi, myPt, mySCEnergy, mySCRawEnergy, myEsenergy;
+  float myDist, myDcot, myCharge;
+  float myEta, myPhi, myPt, mySCEnergy, mySCRawEnergy, myEsenergy, myEcalEnergy;
   float myPComb, myPModeGsf, myPMeanGsf, myPKf;
-  int myNpu[3];
-  int myRun, myLS, myEvent, myMCMatch;
+  float myNpu[3];
+  UInt_t myRun, myLS, myMCMatch;
+  ULong64_t myEvent;
   bool myIsEB, myIsEE;
   float myScEt,myScEta,myScPhi,myEtaSeed,myPhiSeed,myESeed,myIEtaSeed,myIPhiSeed,myEtaCrySeed,myPhiCrySeed,myIEtaCrySeed,myIPhiCrySeed;
-
-  float myZmass;
-  int myZDec;
-  float myGeneratedEnergy,myGeneratedEnergyStatus1,myGeneratedEnergyStatus2;
+  bool myEventNumberParity;
+  float myZmass, myZDec, myWeight;
+  float myGeneratedEnergy,myGeneratedEnergyStatus1,myGeneratedEnergyStatus3;
 
   int myCutBasedId[6], myCutBasedIdOnlyID[6], myCutBasedIdOnlyIso[6], myCutBasedIdOnlyConv[6];
   int myLHBasedId[5], myLHBasedIdOnlyID[5], myLHBasedIdOnlyIso[5], myLHBasedIdOnlyConv[5];
   int myLHBasedPFIsoId[5], myLHBasedPFIsoIdOnlyID[5], myLHBasedPFIsoIdOnlyIso[5], myLHBasedPFIsoIdOnlyConv[5];
-  int myDenomFake, myPassTriggerDenominator;
+  bool myDenomFake, myPassTriggerDenominator;
+  UInt_t myTriggerBit;
   float myLeadJetPt;
   int myCiC[5];
   int myBDTIdOnlyId;

@@ -10,13 +10,13 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myTree->Branch("pt",              &myPt,              "pt/F");
   myTree->Branch("eta",             &myEta,             "eta/F");
   myTree->Branch("phi",             &myPhi,             "phi/F");
-  myTree->Branch("Charge",          &myCharge,          "Charge/I");
+  myTree->Branch("Charge",          &myCharge,          "Charge/F");
   myTree->Branch("IsEB",            &myIsEB,            "IsEB/O");
   myTree->Branch("IsEE",            &myIsEE,            "IsEE/O");
 
   // ele ID vars
   myTree->Branch("EEleoPout",       &myEEleoPout,       "EEleoPout/F");
-  myTree->Branch("EseedoPout",      &myEseedoPout,      "EseedoPout/F");
+  myTree->Branch("ESeedoPout",      &myEseedoPout,      "ESeedoPout/F");
   myTree->Branch("EoP",             &myEoP,             "EoP/F");
   myTree->Branch("EoPin",           &myEseedoPin,       "EoPin/F");
   myTree->Branch("IoEmIoP",         &myIoEoIoP,         "IoEmIoP/F");
@@ -27,16 +27,16 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myTree->Branch("detacalo",        &myDetaCalo,        "detacalo/F");
   myTree->Branch("dphicalo",        &myDphiCalo,        "dphicalo/F");
   myTree->Branch("fbrem",           &myFbrem,           "fbrem/F");
-  myTree->Branch("nbrems",          &myNbrems,          "nbrems/I");
-  myTree->Branch("missHits",        &myMissHits,        "missHits/I");
+  myTree->Branch("nbrems",          &myNbrems,          "nbrems/F");
+  myTree->Branch("missHits",        &myMissHits,        "missHits/F");
   myTree->Branch("dist",            &myDist,            "dist/F");
   myTree->Branch("dcot",            &myDcot,            "dcot/F");
   myTree->Branch("d0",              &myD0,              "d0/F");
   myTree->Branch("dz",              &myDZ,              "dz/F");
   myTree->Branch("ip3d",            &myIP3d,            "ip3d/F");
   myTree->Branch("ip3ds",           &myIP3dSig,         "ip3ds/F");
-  myTree->Branch("kfhits",          &myKFHits,          "kfhits/I");
-  myTree->Branch("kflayers",        &myKFLayers,        "kflayers/I");
+  myTree->Branch("kfhits",          &myKFHits,          "kfhits/F");
+  myTree->Branch("kflayers",        &myKFLayers,        "kflayers/F");
   myTree->Branch("kfchi2",          &myKFChi2,          "kfchi2/F");
   myTree->Branch("gsfchi2",         &myGSFChi2,         "gsfchi2/F");
 
@@ -54,6 +54,7 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myTree->Branch("scEta",           &myScEta,           "scEta/F");
   myTree->Branch("scPhi",           &myScPhi,           "scPhi/F");
   myTree->Branch("SCRawEnergy",     &mySCRawEnergy,     "SCRawEnergy/F"); 
+  myTree->Branch("ecalenergy",      &myEcalEnergy,      "ecalenergy/F"); // this is dummy: not in vecbos
   myTree->Branch("esenergy",        &myEsenergy,        "esenergy/F");
   myTree->Branch("PreShowerOverRaw", &myPreShowerOverRaw, "PreShowerOverRaw/F");
   // seed basic cluster
@@ -87,7 +88,7 @@ RedEleIDTree::RedEleIDTree(const char *filename) {
   myTree->Branch("OneMinusSeedE1x5OverE5x5", &myOneMinusSeedE1x5OverE5x5, "OneMinusSeedE1x5OverE5x5/F");
   myTree->Branch("R9",              &myR9,              "R9/F");
   myTree->Branch("matchConv",       &myMatchConv,       "matchConv/O");
-  myTree->Branch("ecaldriven",      &myEcalDriven,      "ecaldriven/I");
+  myTree->Branch("ecaldriven",      &myEcalDriven,      "ecaldriven/O");
 }
 
 RedEleIDTree::~RedEleIDTree() {
@@ -96,10 +97,10 @@ RedEleIDTree::~RedEleIDTree() {
 
 void RedEleIDTree::addAttributesSignal() {
   myTree->Branch("mass",       &myZmass,       "mass/F");
-  myTree->Branch("zdec",       &myZDec,        "zdec/I");
+  myTree->Branch("zdec",       &myZDec,        "zdec/F");
   myTree->Branch("GeneratedEnergy",         &myGeneratedEnergy,         "GeneratedEnergy/F");
   myTree->Branch("GeneratedEnergyStatus1",  &myGeneratedEnergyStatus1,  "GeneratedEnergyStatus1/F");
-  myTree->Branch("GeneratedEnergyStatus2",  &myGeneratedEnergyStatus2,  "GeneratedEnergyStatus2/F");
+  myTree->Branch("GeneratedEnergyStatus3",  &myGeneratedEnergyStatus3,  "GeneratedEnergyStatus3/F");
 }
 
 void RedEleIDTree::addElectronIdBits() {
@@ -121,14 +122,17 @@ void RedEleIDTree::addDenominatorFakeBits() {
   myTree->Branch("DenomFake",          &myDenomFake,             "DenomFake/O");
   myTree->Branch("PassTriggerDenominator", &myPassTriggerDenominator, "PassTriggerDenominator/O");
   myTree->Branch("leadJetPt",          &myLeadJetPt,             "leadJetPt/F");
+  myTree->Branch("triggerBit",         &myTriggerBit,            "TriggerBit/i"); // dummy
 }
 
 void RedEleIDTree::addRunInfos() {
-  myTree->Branch("run",     &myRun,     "run/I");
-  myTree->Branch("lumi",    &myLS,      "lumi/I");
-  myTree->Branch("event",   &myEvent,   "event/I");
-  myTree->Branch("npu",      myNpu,     "npu[3]/I");
-  myTree->Branch("mcmatch", &myMCMatch, "mcmatch/I");
+  myTree->Branch("run",     &myRun,     "run/i");
+  myTree->Branch("lumi",    &myLS,      "lumi/i");
+  myTree->Branch("event",   &myEvent,   "event/l");
+  myTree->Branch("EventNumberParity",  &myEventNumberParity,  "EventNumberParity/O");
+  myTree->Branch("weight", &myWeight, "weight/F"); // dummy=1
+  myTree->Branch("npu",      myNpu,     "npu[3]/F");
+  myTree->Branch("mcmatch", &myMCMatch, "mcmatch/O");
 }
 
 void RedEleIDTree::addAttributesBackground() {
@@ -223,10 +227,10 @@ void RedEleIDTree::fillVariables(float EoPout, float EoP, float HoE, float DEta,
   mySee=See;
   mySpp=Spp;
   myFbrem=fbrem;
-  myNbrems=nbrems;
+  myNbrems=float(nbrems);
   myPt=pt;
   myEta=eta;
-  myCharge=charge;
+  myCharge=float(charge);
 }
 
 void RedEleIDTree::fillVariables(float eleEoPout, float EseedoPout, float EoP, float HoE, float Deta, float Dphi, float s9s25, float s1s9, float See, float Spp, float fbrem, 
@@ -244,8 +248,8 @@ void RedEleIDTree::fillVariables(float eleEoPout, float EseedoPout, float EoP, f
   mySee=See;
   mySpp=Spp;
   myFbrem=fbrem;
-  myNbrems=nbrems;
-  myMissHits=nHits;
+  myNbrems=float(nbrems);
+  myMissHits=float(nHits);
   myDist=dist;
   myDcot=dcot;
   myPt=pt;
@@ -258,11 +262,11 @@ void RedEleIDTree::fillVariables(float eleEoPout, float EseedoPout, float EoP, f
   myD0=d0;
   myIP3d=ip3d;
   myIP3dSig=ip3ds;
-  myKFHits=kfhits;
-  myKFLayers=kflayers;
+  myKFHits=float(kfhits);
+  myKFLayers=float(kflayers);
   myKFChi2=kfchi2;
   myE1x5E5x5=e1x5e5x5;
-  myEcalDriven=ecaldriven;
+  myEcalDriven=(ecaldriven==1) ? true : false;
   myMatchConv=matchConv;
   myIsEB=iseb;
   myIsEE=isee;
@@ -298,6 +302,7 @@ void RedEleIDTree::fillVariables2(float detacalo, float dphicalo, float sep, flo
   myPhi=phi;
   mySCEnergy=scenergy;
   mySCRawEnergy=scrawenergy;
+  myEcalEnergy=-999.;
   myEsenergy=scesenergy;
   myEseedoPin=eseedopin;
   myPreShowerOverRaw=scesenergy/scrawenergy;
@@ -355,12 +360,12 @@ void RedEleIDTree::fillIsolations(float trkIso[2], float ecalIso[2], float hcalI
 
 }
 
-void RedEleIDTree::fillAttributesSignal(float zmass, int zdec, float genenergy, float genenergystatus1, float genenergystatus2) {
+void RedEleIDTree::fillAttributesSignal(float zmass, int zdec, float genenergy, float genenergystatus1, float genenergystatus3) {
   myZmass=zmass;
-  myZDec=zdec;
+  myZDec=float(zdec);
   myGeneratedEnergy=genenergy;
   myGeneratedEnergyStatus1=genenergystatus1;
-  myGeneratedEnergyStatus2=genenergystatus2;
+  myGeneratedEnergyStatus3=genenergystatus3;
 }
 
 void RedEleIDTree::fillAttributesBackground(float deltaphi, float invmass, float met, float pth) {
@@ -439,6 +444,7 @@ void RedEleIDTree::fillFakeRateDenomBits(float leadJetPt, bool isDenom, bool pas
   myDenomFake = isDenom;
   myPassTriggerDenominator = passTriggerDenominator;
   myLeadJetPt = leadJetPt;
+  myTriggerBit=-1;
 }
 
 void RedEleIDTree::fillBDTBasedIDBits(int isBDTOnlyId) {
@@ -449,6 +455,8 @@ void RedEleIDTree::fillRunInfos(int run, int lumi, int event, int npu[3], int mc
   myRun = run;
   myLS = lumi;
   myEvent = event;
-  for(int i=0;i<3;i++) myNpu[i]=npu[i];
-  myMCMatch = mcmatch;
+  myEventNumberParity = (event%2==0) ? true : false;
+  myWeight=1.0;
+  for(int i=0;i<3;i++) myNpu[i]=float(npu[i]);
+  myMCMatch = (mcmatch==1) ? true : false;
 }
