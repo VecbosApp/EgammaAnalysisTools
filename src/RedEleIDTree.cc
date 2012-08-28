@@ -195,6 +195,8 @@ void RedEleIDTree::addTrackMomenta() {
   myTree->Branch("pmodegsf", &myPModeGsf, "pmodegsf/F");
   myTree->Branch("pmeangsf", &myPMeanGsf, "pmeangsf/F");
   myTree->Branch("pmeankf",  &myPKf,      "pmeankf/F");
+  myTree->Branch("pterrorgsf", &myPtErrorGsf, "pterrorgsf/F");
+  myTree->Branch("pterrorkf",  &myPtErrorKf,  "pterrorkf/F");
 }
 
 void RedEleIDTree::addGamma() {
@@ -394,11 +396,13 @@ void RedEleIDTree::fillMore(float nVtx, float rho, float bdthww[2], float newbdt
   myLike=like;
 }
 
-void RedEleIDTree::fillTrackMomenta(float pcomb, float pmodegsf, float pmeangsf, float pkf) {
+void RedEleIDTree::fillTrackMomenta(float pcomb, float pmodegsf, float pmeangsf, float pkf, float pterrorgsf, float pterrorkf) {
   myPComb=pcomb;
   myPModeGsf=pmodegsf;
   myPMeanGsf=pmeangsf;
   myPKf=pkf;
+  myPtErrorGsf=pterrorgsf;
+  myPtErrorKf=pterrorkf;
 }
 
 void RedEleIDTree::fillGamma(float atg, float aeg, float ahg, int ig) {

@@ -386,6 +386,8 @@ void FakeElectronSelector::Loop(const char *outname) {
     float pmeangsf=p3MeanGsf.Mag();
     TVector3 p3MeanKf(pxTrack[kfTrack],pyTrack[kfTrack],pzTrack[kfTrack]);
     float pmeankf=p3MeanKf.Mag();
+    float pterrorgsf = ptErrorGsfTrack[gsfTrack];
+    float pterrorkf = (kfTrack>-1) ? ptErrorTrack[kfTrack] : -1.0;
 
     double gsfsign   = (-eleDxyPV(theDenom1,0) >=0 ) ? 1. : -1.;
     bool matchConv = hasMatchedConversionEle[theDenom1];
@@ -612,7 +614,7 @@ void FakeElectronSelector::Loop(const char *outname) {
                                 chaPfIso, neuPfIso, phoPfIso);
     myOutIDTree->fillFakeRateDenomBits(ptLeadingJet,isDenomFake_HwwEgamma(theDenom1),isDenomFake_smurfs(theDenom1));
     myOutIDTree->fillMore(nPV,rhoFastjet,hwwbdts,newhwwbdts,hzzbdts,pfmva,lh);
-    myOutIDTree->fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
+    myOutIDTree->fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf,pterrorgsf,pterrorkf);
     myOutIDTree->fillCiCBasedIDBits(cic);
     myOutIDTree->fillRunInfos(runNumber, lumiBlock, eventNumber, nPU, -1);
     myOutIDTree->store();

@@ -476,6 +476,8 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
 	  float pmeangsf=p3MeanGsf.Mag();
 	  TVector3 p3MeanKf(pxTrack[kfTrack],pyTrack[kfTrack],pzTrack[kfTrack]);
 	  float pmeankf=p3MeanKf.Mag();
+          float pterrorgsf = ptErrorGsfTrack[gsfTrack];
+          float pterrorkf = (kfTrack>-1) ? ptErrorTrack[kfTrack] : -1.0;
 
           double gsfsign   = (-eleDxyPV(probe,0) >=0 ) ? 1. : -1.;
           bool matchConv = hasMatchedConversionEle[probe];
@@ -714,7 +716,7 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
                                      pfCombinedIsoEle[probe],
                                      chaPfIso, neuPfIso, phoPfIso);
           reducedTree.fillMore(nPV,rhoFastjet,hwwbdts,newhwwbdts,hzzbdts,pfmva,lh);
-	  reducedTree.fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf);
+	  reducedTree.fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf,pterrorgsf,pterrorkf);
           reducedTree.fillCutBasedIDBits(CutBasedId,CutBasedIdOnlyID,CutBasedIdOnlyIso,CutBasedIdOnlyConv);
           reducedTree.fillLHBasedIDBits(LHBasedId,LHBasedIdOnlyID,LHBasedIdOnlyIso,LHBasedIdOnlyConv);
           reducedTree.fillLHBasedPFIsoIDBits(LHBasedPFIsoId,LHBasedPFIsoIdOnlyID,LHBasedPFIsoIdOnlyIso,LHBasedPFIsoIdOnlyConv);
