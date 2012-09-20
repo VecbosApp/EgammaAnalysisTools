@@ -1,0 +1,411 @@
+#include <TTree.h>
+#include <TFile.h>
+#include <TH1F.h>
+#include <TF1.h>
+#include <TCanvas.h>
+#include <TMath.h>
+#include <TStyle.h>
+#include <TROOT.h>
+
+#include <sstream>
+#include <iostream>
+
+using namespace std;
+
+Double_t cryball( Double_t *x, Double_t * par) {
+
+  // par[0] = normalization
+  // par[1] = mean
+  // par[2] = sigma
+  // par[3] = alpha
+  // par[4] = n
+
+
+  double cryball;
+  double test = par[1] + par[2]*par[3];
+  double xp = (x[0] - par[1]) / par[2];
+  double A = TMath::Power((par[4]/par[3]),par[4]) * TMath::Exp(-0.5*par[3]*par[3]);
+  double  B = ( par[4]/par[3] ) - par[3];
+
+
+  if (x[0] < test)
+
+    {
+      cryball = par[0]*TMath::Exp(-0.5*xp*xp);
+
+    } else {
+
+      cryball =par[0]* A * TMath::Power(( B + xp ),-par[4]);
+
+   }
+  return cryball;
+}
+
+Double_t cruijff( Double_t *x, Double_t * par) {
+
+  // par[0] = normalization
+  // par[1] = mean
+  // par[2] = sigmaL
+  // par[3] = sigmaR
+  // par[4] = alphaL
+  // par[5] = alphaR
+
+  double dx = (x[0]-par[1]) ;
+  double sigma = dx<0 ? par[2]: par[3] ;
+  double alpha = dx<0 ? par[4]: par[5] ;
+  double f = 2*sigma*sigma + alpha*dx*dx ;
+  return par[0] * exp(-dx*dx/f) ;
+
+}
+
+void plotVtx() {
+
+ // ------ root settings ---------
+  gROOT->Reset();  
+  gROOT->SetStyle("Plain");
+  gStyle->SetPadGridX(kTRUE);
+  gStyle->SetPadGridY(kTRUE);
+  //gStyle->SetOptStat("kKsSiourRmMen");
+  gStyle->SetOptStat("iourme");
+  //gStyle->SetOptStat("rme");
+  //gStyle->SetOptStat("");
+  gStyle->SetOptFit(11);
+  gStyle->SetPadLeftMargin(0.14);
+  gStyle->SetPadRightMargin(0.06);
+  // ------------------------------ 
+
+  TFile *file = TFile::Open("/Users/emanuele/Work/data/hzz4l/electronreg/HZZ4L_53X_S1_V10_S2_V01/MC/EleRegr1/DYJetsMadgr.root");
+  TTree *tree = (TTree*)file->Get("electronTree/probe_tree");
+
+  TH1F *EoEt = new TH1F("EoEt","",100,-0.5,0.5);
+  EoEt->GetXaxis()->SetTitle("(p-p_{true})/p_{true}");
+  
+  float ptbins[12] = {7,10,15,20,25,30,35,40,45,50,70,100};
+  float etabins[7] = {0,0.5,0.8,1.2,1.479,2.0,2.5};
+  float vtxbins[11] = {0,5,10,15,17,19,21,23,25,30,50};
+  float classificationbins[5] = {0,1,2,3,4};
+  
+  // mean
+  TH1F *ptM = new TH1F("ptM","",11,ptbins);
+  TH1F *etaM = new TH1F("etaM","",6,etabins);
+  TH1F *vtxM = new TH1F("vtxM","",10,vtxbins);
+  TH1F *classM = new TH1F("classM","",4,classificationbins);
+ 
+  ptM->GetXaxis()->SetTitle("p_{T} [GeV]");
+  etaM->GetXaxis()->SetTitle("#eta");
+  vtxM->GetXaxis()->SetTitle("#rho");
+  classM->GetXaxis()->SetTitle("class");
+
+  ptM->GetYaxis()->SetTitle("(p-p_{true})/p_{true} mean");
+  etaM->GetYaxis()->SetTitle("(p-p_{true})/p_{true} mean");
+  vtxM->GetYaxis()->SetTitle("(p-p_{true})/p_{true} mean");
+  classM->GetYaxis()->SetTitle("(p-p_{true})/p_{true} mean");
+
+  ptM->GetYaxis()->SetTitleOffset(1.8);
+  etaM->GetYaxis()->SetTitleOffset(1.8);
+  vtxM->GetYaxis()->SetTitleOffset(1.8);
+  classM->GetYaxis()->SetTitleOffset(1.8);
+
+  ptM->SetMarkerStyle(8);
+  ptM->SetMarkerSize(1);
+  etaM->SetMarkerStyle(8);
+  etaM->SetMarkerSize(1);
+  vtxM->SetMarkerStyle(8);
+  vtxM->SetMarkerSize(1);
+  classM->SetMarkerStyle(8);
+  classM->SetMarkerSize(1);
+
+
+  ptM->SetMinimum(-0.05);
+  ptM->SetMaximum(0.05);
+
+
+  // peak
+  TH1F *ptP = (TH1F*)ptM->Clone("ptP");
+  TH1F *etaP = (TH1F*)etaM->Clone("etaP");
+  TH1F *vtxP = (TH1F*)vtxM->Clone("vtxP");
+  TH1F *classP = (TH1F*)classM->Clone("classP");
+  ptP->GetYaxis()->SetTitle("(p-p_{true})/p_{true} peak");
+  etaP->GetYaxis()->SetTitle("(p-p_{true})/p_{true} peak");
+  vtxP->GetYaxis()->SetTitle("(p-p_{true})/p_{true} peak");
+  classP->GetYaxis()->SetTitle("(p-p_{true})/p_{true} peak");
+
+  ptP->SetMinimum(-0.05);
+  ptP->SetMaximum(0.05);
+ 
+  // RMS
+  TH1F *ptRMS = (TH1F*)ptM->Clone("ptRMS");
+  TH1F *etaRMS = (TH1F*)etaM->Clone("etaRMS");
+  TH1F *vtxRMS = (TH1F*)vtxM->Clone("vtxRMS");
+  TH1F *classRMS = (TH1F*)classM->Clone("classRMS");
+  ptRMS->GetYaxis()->SetTitle("(p-p_{true})/p_{true} RMS");
+  etaRMS->GetYaxis()->SetTitle("(p-p_{true})/p_{true} RMS");
+  vtxRMS->GetYaxis()->SetTitle("(p-p_{true})/p_{true} RMS");
+  classRMS->GetYaxis()->SetTitle("(p-p_{true})/p_{true} RMS");
+  ptRMS->SetMinimum(0);
+  ptRMS->SetMaximum(0.2);
+
+
+  // Sigma
+  TH1F *ptSigma = (TH1F*)ptM->Clone("ptSigma");
+  TH1F *etaSigma = (TH1F*)etaM->Clone("etaSigma");
+  TH1F *vtxSigma = (TH1F*)vtxM->Clone("vtxSigma");
+  TH1F *classSigma = (TH1F*)classM->Clone("classSigma");
+  ptSigma->GetYaxis()->SetTitle("(p-p_{true})/p_{true} #sigma");
+  etaSigma->GetYaxis()->SetTitle("(p-p_{true})/p_{true} #sigma");
+  vtxSigma->GetYaxis()->SetTitle("(p-p_{true})/p_{true} #sigma");
+  classSigma->GetYaxis()->SetTitle("(p-p_{true})/p_{true} #sigma");
+  ptSigma->SetMinimum(0);
+  ptSigma->SetMaximum(0.2);
+
+  TF1 *func = new TF1("cruijff",cruijff,-1,1,6); 
+
+  TCanvas *c1 = new TCanvas("c1","c1",600,600);
+
+
+  
+  // ============ PT ==============
+  cout << "===> RUNNING VS PT " << endl;
+  for(int i=0;i<11;++i) {
+    stringstream cut;
+    cut << "pt>" << ptbins[i] << "&& pt<" << ptbins[i+1] << "&& abs(p-genp)/genp<0.5";
+
+    stringstream resfile;
+    resfile << "res_pt_" << ptbins[i] << "To" << ptbins[i+1] << ".png";
+
+    tree->Project("EoEt","(p-genp)/genp",cut.str().c_str());
+    EoEt->Draw();
+
+    float mean = EoEt->GetMean();
+    float meanerr = EoEt->GetMeanError();
+    float rms = EoEt->GetRMS();
+    float rmserr = EoEt->GetRMSError();
+    
+    // fit the Gaussian core
+    func->SetParameter(1,EoEt->GetMean());
+    func->SetParameter(2,EoEt->GetRMS());
+    func->SetParameter(3,EoEt->GetRMS());
+    func->SetParLimits(2,0.005,0.1);
+    func->SetParLimits(3,0.005,0.1);
+    func->SetParLimits(4,0,1);
+    func->SetParLimits(5,0,1);
+    func->SetParNames ("Constant","Mean","sigmaL","sigmaR","alphaL","alphaR"); 
+
+    EoEt->Fit("cruijff","","same",-0.2,0.2);
+
+    c1->SaveAs(resfile.str().c_str());
+
+    float peak = EoEt->GetFunction("cruijff")->GetParameter(1);
+    float peakerr = EoEt->GetFunction("cruijff")->GetParError(1);
+    float sigma = (EoEt->GetFunction("cruijff")->GetParameter(2) +  EoEt->GetFunction("cruijff")->GetParameter(3))/2.;
+    float sigmaerr = (EoEt->GetFunction("cruijff")->GetParError(2) + EoEt->GetFunction("cruijff")->GetParError(3))/2.;
+
+    ptM->SetBinContent(i+1,mean);    
+    ptM->SetBinError(i+1,meanerr);    
+    ptP->SetBinContent(i+1,peak);    
+    ptP->SetBinError(i+1,peakerr);    
+    ptRMS->SetBinContent(i+1,rms);    
+    ptRMS->SetBinError(i+1,rmserr);    
+    ptSigma->SetBinContent(i+1,sigma);    
+    ptSigma->SetBinError(i+1,sigmaerr);    
+
+  }
+  
+  ptM->Draw();  c1->SaveAs("ptM.png");
+  ptP->Draw();  c1->SaveAs("ptP.png");
+  ptRMS->Draw();  c1->SaveAs("ptRMS.png");
+  ptSigma->Draw();  c1->SaveAs("ptSigma.png");
+  
+
+
+
+
+  // ============ ETA ==============
+  cout << "===> RUNNING VS ETA " << endl;
+  etaM->SetMaximum(0.1);
+  etaP->SetMaximum(0.1);
+  etaRMS->SetMaximum(0.1);
+  etaSigma->SetMaximum(0.1);
+
+  for(int i=0;i<6;++i) {
+    stringstream cut;
+    cut << "abs(eta)>" << etabins[i] << "&& abs(eta)<" << etabins[i+1] << "&& abs(p-genp)/genp<0.5";
+
+    stringstream resfile;
+    resfile << "res_eta_" << etabins[i] << "To" << etabins[i+1] << ".png";
+
+    tree->Project("EoEt","(p-genp)/genp",cut.str().c_str());
+    EoEt->Draw();
+
+    float mean = EoEt->GetMean();
+    float meanerr = EoEt->GetMeanError();
+    float rms = EoEt->GetRMS();
+    float rmserr = EoEt->GetRMSError();
+    
+    // fit the Gaussian core
+    func->SetParameter(1,EoEt->GetMean());
+    func->SetParameter(2,EoEt->GetRMS());
+    func->SetParameter(3,EoEt->GetRMS());
+    func->SetParLimits(2,0.005,0.1);
+    func->SetParLimits(3,0.005,0.1);
+    func->SetParLimits(4,0,1);
+    func->SetParLimits(5,0,1);
+    func->SetParNames ("Constant","Mean","sigmaL","sigmaR","alphaL","alphaR"); 
+
+    EoEt->Fit("cruijff","","same",-0.5,0.5);
+
+    c1->SaveAs(resfile.str().c_str());
+
+    float peak = EoEt->GetFunction("cruijff")->GetParameter(1);
+    float peakerr = EoEt->GetFunction("cruijff")->GetParError(1);
+    float sigma = (EoEt->GetFunction("cruijff")->GetParameter(2) +  EoEt->GetFunction("cruijff")->GetParameter(3))/2.;
+    float sigmaerr = (EoEt->GetFunction("cruijff")->GetParError(2) + EoEt->GetFunction("cruijff")->GetParError(3))/2.;
+
+    etaM->SetBinContent(i+1,mean);    
+    etaM->SetBinError(i+1,meanerr);    
+    etaP->SetBinContent(i+1,peak);    
+    etaP->SetBinError(i+1,peakerr);    
+    etaRMS->SetBinContent(i+1,rms);    
+    etaRMS->SetBinError(i+1,rmserr);    
+    etaSigma->SetBinContent(i+1,sigma);    
+    etaSigma->SetBinError(i+1,sigmaerr);    
+
+  }
+  
+  etaM->Draw();  c1->SaveAs("etaM.png");
+  etaP->Draw();  c1->SaveAs("etaP.png");
+  etaRMS->Draw();  c1->SaveAs("etaRMS.png");
+  etaSigma->Draw();  c1->SaveAs("etaSigma.png");
+
+
+
+  // ============ VTX ==============
+  cout << "===> RUNNING VS NVTX " << endl;
+  vtxM->SetMaximum(0.05);
+  vtxP->SetMaximum(0.05);
+  vtxRMS->SetMaximum(0.1);
+  vtxSigma->SetMaximum(0.05);
+
+  for(int i=0;i<10;++i) {
+    stringstream cut;
+    cut << "rho>" << vtxbins[i] << "&& rho<" << vtxbins[i+1] << "&& abs(p-genp)/genp<0.5";
+
+    stringstream resfile;
+    resfile << "res_vtx_" << vtxbins[i] << "To" << vtxbins[i+1] << ".png";
+
+    tree->Project("EoEt","(p-genp)/genp",cut.str().c_str());
+    EoEt->Draw();
+
+    float mean = EoEt->GetMean();
+    float meanerr = EoEt->GetMeanError();
+    float rms = EoEt->GetRMS();
+    float rmserr = EoEt->GetRMSError();
+    
+    // fit the Gaussian core
+    func->SetParameter(1,EoEt->GetMean());
+    func->SetParameter(2,EoEt->GetRMS());
+    func->SetParameter(3,EoEt->GetRMS());
+    func->SetParLimits(2,0.005,0.1);
+    func->SetParLimits(3,0.005,0.1);
+    func->SetParLimits(4,0,1);
+    func->SetParLimits(5,0,1);
+    func->SetParNames ("Constant","Mean","sigmaL","sigmaR","alphaL","alphaR"); 
+
+    EoEt->Fit("cruijff","","same",-0.2,0.2);
+
+    c1->SaveAs(resfile.str().c_str());
+
+    float peak = EoEt->GetFunction("cruijff")->GetParameter(1);
+    float peakerr = EoEt->GetFunction("cruijff")->GetParError(1);
+    float sigma = (EoEt->GetFunction("cruijff")->GetParameter(2) +  EoEt->GetFunction("cruijff")->GetParameter(3))/2.;
+    float sigmaerr = (EoEt->GetFunction("cruijff")->GetParError(2) + EoEt->GetFunction("cruijff")->GetParError(3))/2.;
+
+    vtxM->SetBinContent(i+1,mean);    
+    vtxM->SetBinError(i+1,meanerr);    
+    vtxP->SetBinContent(i+1,peak);    
+    vtxP->SetBinError(i+1,peakerr);    
+    vtxRMS->SetBinContent(i+1,rms);    
+    vtxRMS->SetBinError(i+1,rmserr);    
+    vtxSigma->SetBinContent(i+1,sigma);    
+    vtxSigma->SetBinError(i+1,sigmaerr);    
+
+  }
+  
+  vtxM->Draw();  c1->SaveAs("vtxM.png");
+  vtxP->Draw();  c1->SaveAs("vtxP.png");
+  vtxRMS->Draw();  c1->SaveAs("vtxRMS.png");
+  vtxSigma->Draw();  c1->SaveAs("vtxSigma.png");
+
+
+
+
+
+  // ============ ELE CLASS ==============
+  cout << "===> RUNNING VS ELE CLASS " << endl;
+  classM->SetMaximum(0.5);
+  classP->SetMaximum(0.05);
+  classRMS->SetMaximum(0.2);
+  classSigma->SetMaximum(0.05);
+
+  for(int i=0;i<4;++i) {
+    stringstream cut;
+    cut << "classification==" << classificationbins[i] << "&& abs(p-genp)/genp<0.5";
+
+    stringstream resfile;
+    resfile << "res_class_" << classificationbins[i] << ".png";
+
+    tree->Project("EoEt","(p-genp)/genp",cut.str().c_str());
+    EoEt->Draw();
+
+    float mean = EoEt->GetMean();
+    float meanerr = EoEt->GetMeanError();
+    float rms = EoEt->GetRMS();
+    float rmserr = EoEt->GetRMSError();
+    
+    // fit the Gaussian core
+    func->SetParameter(1,EoEt->GetMean());
+    func->SetParameter(2,EoEt->GetRMS());
+    func->SetParameter(3,EoEt->GetRMS());
+    func->SetParLimits(2,0.005,0.1);
+    func->SetParLimits(3,0.005,0.1);
+    func->SetParLimits(4,0,1);
+    func->SetParLimits(5,0,1);
+    func->SetParNames ("Constant","Mean","sigmaL","sigmaR","alphaL","alphaR"); 
+
+    EoEt->Fit("cruijff","","same",-0.2,0.2);
+
+    c1->SaveAs(resfile.str().c_str());
+
+    float peak = EoEt->GetFunction("cruijff")->GetParameter(1);
+    float peakerr = EoEt->GetFunction("cruijff")->GetParError(1);
+    float sigma = (EoEt->GetFunction("cruijff")->GetParameter(2) +  EoEt->GetFunction("cruijff")->GetParameter(3))/2.;
+    float sigmaerr = (EoEt->GetFunction("cruijff")->GetParError(2) + EoEt->GetFunction("cruijff")->GetParError(3))/2.;
+
+    classM->SetBinContent(i+1,mean);    
+    classM->SetBinError(i+1,meanerr);    
+    classP->SetBinContent(i+1,peak);    
+    classP->SetBinError(i+1,peakerr);    
+    classRMS->SetBinContent(i+1,rms);    
+    classRMS->SetBinError(i+1,rmserr);    
+    classSigma->SetBinContent(i+1,sigma);    
+    classSigma->SetBinError(i+1,sigmaerr);    
+
+  }
+  
+  classM->Draw();  c1->SaveAs("classM.png");
+  classP->Draw();  c1->SaveAs("classP.png");
+  classRMS->Draw();  c1->SaveAs("classRMS.png");
+  classSigma->Draw();  c1->SaveAs("classSigma.png");
+
+
+
+  
+  TFile *resultfile = TFile::Open("results_elereg.root","recreate");
+  ptM->Write(); ptP->Write(); ptRMS->Write(); ptSigma->Write();
+  etaM->Write(); etaP->Write(); etaRMS->Write(); etaSigma->Write();
+  vtxM->Write(); vtxP->Write(); vtxRMS->Write(); vtxSigma->Write();
+  classM->Write(); classP->Write(); classRMS->Write(); classSigma->Write();
+  resultfile->Close();
+
+
+}
