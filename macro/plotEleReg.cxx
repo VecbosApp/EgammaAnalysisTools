@@ -6,6 +6,7 @@
 #include <TMath.h>
 #include <TStyle.h>
 #include <TROOT.h>
+#include <TLegend.h>
 
 #include <sstream>
 #include <iostream>
@@ -58,7 +59,7 @@ Double_t cruijff( Double_t *x, Double_t * par) {
 
 }
 
-void plotVtx() {
+void makeDependencyPlot() {
 
  // ------ root settings ---------
   gROOT->Reset();  
@@ -74,11 +75,11 @@ void plotVtx() {
   gStyle->SetPadRightMargin(0.06);
   // ------------------------------ 
 
-  TFile *file = TFile::Open("/Users/emanuele/Work/data/hzz4l/electronreg/HZZ4L_53X_S1_V10_S2_V01/MC/EleRegr1/DYJetsMadgr.root");
+  TFile *file = TFile::Open("/Users/emanuele/Work/data/hzz4l/electronreg/HZZ4L_53X_S1_V10_S2_V01/MC/NoRegr/DYJetsMadgr.root");
   TTree *tree = (TTree*)file->Get("electronTree/probe_tree");
 
   TH1F *EoEt = new TH1F("EoEt","",100,-0.5,0.5);
-  EoEt->GetXaxis()->SetTitle("(p-p_{true})/p_{true}");
+  EoEt->GetXaxis()->SetTitle("(E-p_{true})/p_{true}");
   
   float ptbins[12] = {7,10,15,20,25,30,35,40,45,50,70,100};
   float etabins[7] = {0,0.5,0.8,1.2,1.479,2.0,2.5};
@@ -96,10 +97,10 @@ void plotVtx() {
   vtxM->GetXaxis()->SetTitle("#rho");
   classM->GetXaxis()->SetTitle("class");
 
-  ptM->GetYaxis()->SetTitle("(p-p_{true})/p_{true} mean");
-  etaM->GetYaxis()->SetTitle("(p-p_{true})/p_{true} mean");
-  vtxM->GetYaxis()->SetTitle("(p-p_{true})/p_{true} mean");
-  classM->GetYaxis()->SetTitle("(p-p_{true})/p_{true} mean");
+  ptM->GetYaxis()->SetTitle("(E-p_{true})/p_{true} mean");
+  etaM->GetYaxis()->SetTitle("(E-p_{true})/p_{true} mean");
+  vtxM->GetYaxis()->SetTitle("(E-p_{true})/p_{true} mean");
+  classM->GetYaxis()->SetTitle("(E-p_{true})/p_{true} mean");
 
   ptM->GetYaxis()->SetTitleOffset(1.8);
   etaM->GetYaxis()->SetTitleOffset(1.8);
@@ -125,10 +126,10 @@ void plotVtx() {
   TH1F *etaP = (TH1F*)etaM->Clone("etaP");
   TH1F *vtxP = (TH1F*)vtxM->Clone("vtxP");
   TH1F *classP = (TH1F*)classM->Clone("classP");
-  ptP->GetYaxis()->SetTitle("(p-p_{true})/p_{true} peak");
-  etaP->GetYaxis()->SetTitle("(p-p_{true})/p_{true} peak");
-  vtxP->GetYaxis()->SetTitle("(p-p_{true})/p_{true} peak");
-  classP->GetYaxis()->SetTitle("(p-p_{true})/p_{true} peak");
+  ptP->GetYaxis()->SetTitle("(E-p_{true})/p_{true} peak");
+  etaP->GetYaxis()->SetTitle("(E-p_{true})/p_{true} peak");
+  vtxP->GetYaxis()->SetTitle("(E-p_{true})/p_{true} peak");
+  classP->GetYaxis()->SetTitle("(E-p_{true})/p_{true} peak");
 
   ptP->SetMinimum(-0.05);
   ptP->SetMaximum(0.05);
@@ -138,10 +139,10 @@ void plotVtx() {
   TH1F *etaRMS = (TH1F*)etaM->Clone("etaRMS");
   TH1F *vtxRMS = (TH1F*)vtxM->Clone("vtxRMS");
   TH1F *classRMS = (TH1F*)classM->Clone("classRMS");
-  ptRMS->GetYaxis()->SetTitle("(p-p_{true})/p_{true} RMS");
-  etaRMS->GetYaxis()->SetTitle("(p-p_{true})/p_{true} RMS");
-  vtxRMS->GetYaxis()->SetTitle("(p-p_{true})/p_{true} RMS");
-  classRMS->GetYaxis()->SetTitle("(p-p_{true})/p_{true} RMS");
+  ptRMS->GetYaxis()->SetTitle("(E-p_{true})/p_{true} RMS");
+  etaRMS->GetYaxis()->SetTitle("(E-p_{true})/p_{true} RMS");
+  vtxRMS->GetYaxis()->SetTitle("(E-p_{true})/p_{true} RMS");
+  classRMS->GetYaxis()->SetTitle("(E-p_{true})/p_{true} RMS");
   ptRMS->SetMinimum(0);
   ptRMS->SetMaximum(0.2);
 
@@ -151,10 +152,10 @@ void plotVtx() {
   TH1F *etaSigma = (TH1F*)etaM->Clone("etaSigma");
   TH1F *vtxSigma = (TH1F*)vtxM->Clone("vtxSigma");
   TH1F *classSigma = (TH1F*)classM->Clone("classSigma");
-  ptSigma->GetYaxis()->SetTitle("(p-p_{true})/p_{true} #sigma");
-  etaSigma->GetYaxis()->SetTitle("(p-p_{true})/p_{true} #sigma");
-  vtxSigma->GetYaxis()->SetTitle("(p-p_{true})/p_{true} #sigma");
-  classSigma->GetYaxis()->SetTitle("(p-p_{true})/p_{true} #sigma");
+  ptSigma->GetYaxis()->SetTitle("(E-p_{true})/p_{true} #sigma");
+  etaSigma->GetYaxis()->SetTitle("(E-p_{true})/p_{true} #sigma");
+  vtxSigma->GetYaxis()->SetTitle("(E-p_{true})/p_{true} #sigma");
+  classSigma->GetYaxis()->SetTitle("(E-p_{true})/p_{true} #sigma");
   ptSigma->SetMinimum(0);
   ptSigma->SetMaximum(0.2);
 
@@ -168,12 +169,12 @@ void plotVtx() {
   cout << "===> RUNNING VS PT " << endl;
   for(int i=0;i<11;++i) {
     stringstream cut;
-    cut << "pt>" << ptbins[i] << "&& pt<" << ptbins[i+1] << "&& abs(p-genp)/genp<0.5";
+    cut << "pt>" << ptbins[i] << "&& pt<" << ptbins[i+1] << "&& abs(scrawE-genp)/genp<0.5";
 
     stringstream resfile;
     resfile << "res_pt_" << ptbins[i] << "To" << ptbins[i+1] << ".png";
 
-    tree->Project("EoEt","(p-genp)/genp",cut.str().c_str());
+    tree->Project("EoEt","(scrawE-genp)/genp",cut.str().c_str());
     EoEt->Draw();
 
     float mean = EoEt->GetMean();
@@ -191,7 +192,7 @@ void plotVtx() {
     func->SetParLimits(5,0,1);
     func->SetParNames ("Constant","Mean","sigmaL","sigmaR","alphaL","alphaR"); 
 
-    EoEt->Fit("cruijff","","same",-0.2,0.2);
+    EoEt->Fit("cruijff","","same",-0.3,0.3);
 
     c1->SaveAs(resfile.str().c_str());
 
@@ -229,12 +230,12 @@ void plotVtx() {
 
   for(int i=0;i<6;++i) {
     stringstream cut;
-    cut << "abs(eta)>" << etabins[i] << "&& abs(eta)<" << etabins[i+1] << "&& abs(p-genp)/genp<0.5";
+    cut << "abs(eta)>" << etabins[i] << "&& abs(eta)<" << etabins[i+1] << "&& abs(scrawE-genp)/genp<0.5";
 
     stringstream resfile;
     resfile << "res_eta_" << etabins[i] << "To" << etabins[i+1] << ".png";
 
-    tree->Project("EoEt","(p-genp)/genp",cut.str().c_str());
+    tree->Project("EoEt","(scrawE-genp)/genp",cut.str().c_str());
     EoEt->Draw();
 
     float mean = EoEt->GetMean();
@@ -288,12 +289,12 @@ void plotVtx() {
 
   for(int i=0;i<10;++i) {
     stringstream cut;
-    cut << "rho>" << vtxbins[i] << "&& rho<" << vtxbins[i+1] << "&& abs(p-genp)/genp<0.5";
+    cut << "rho>" << vtxbins[i] << "&& rho<" << vtxbins[i+1] << "&& abs(scrawE-genp)/genp<0.5";
 
     stringstream resfile;
     resfile << "res_vtx_" << vtxbins[i] << "To" << vtxbins[i+1] << ".png";
 
-    tree->Project("EoEt","(p-genp)/genp",cut.str().c_str());
+    tree->Project("EoEt","(scrawE-genp)/genp",cut.str().c_str());
     EoEt->Draw();
 
     float mean = EoEt->GetMean();
@@ -349,12 +350,12 @@ void plotVtx() {
 
   for(int i=0;i<4;++i) {
     stringstream cut;
-    cut << "classification==" << classificationbins[i] << "&& abs(p-genp)/genp<0.5";
+    cut << "classification==" << classificationbins[i] << "&& abs(scrawE-genp)/genp<0.5";
 
     stringstream resfile;
     resfile << "res_class_" << classificationbins[i] << ".png";
 
-    tree->Project("EoEt","(p-genp)/genp",cut.str().c_str());
+    tree->Project("EoEt","(scrawE-genp)/genp",cut.str().c_str());
     EoEt->Draw();
 
     float mean = EoEt->GetMean();
@@ -407,5 +408,80 @@ void plotVtx() {
   classM->Write(); classP->Write(); classRMS->Write(); classSigma->Write();
   resultfile->Close();
 
+
+}
+
+
+
+void compareResults() {
+
+ // ------ root settings ---------
+  gROOT->Reset();  
+  gROOT->SetStyle("Plain");
+  gStyle->SetPadGridX(kTRUE);
+  gStyle->SetPadGridY(kTRUE);
+  gStyle->SetOptStat("");
+  gStyle->SetPadLeftMargin(0.14);
+  gStyle->SetPadRightMargin(0.06);
+  // ------------------------------ 
+
+  TFile *fileScRaw = TFile::Open("elereg/plots/NoRegr/ErawoGenP/results_elereg.root");
+  TFile *fileSc = TFile::Open("elereg/plots/NoRegr/EoGenP/results_elereg.root");
+  TFile *fileRegr = TFile::Open("elereg/plots/Regr1/EoGenP/results_elereg.root");
+
+  vector<string> histos;
+  histos.push_back("ptM");	
+  histos.push_back("ptP");	
+  histos.push_back("ptRMS");	
+  histos.push_back("ptSigma");	
+  histos.push_back("etaM");	
+  histos.push_back("etaP");	
+  histos.push_back("etaRMS");	
+  histos.push_back("etaSigma");	
+  histos.push_back("vtxM");	
+  histos.push_back("vtxP");	
+  histos.push_back("vtxRMS");	
+  histos.push_back("vtxSigma");	
+  histos.push_back("classM");	
+  histos.push_back("classP");	
+  histos.push_back("classRMS");	
+  histos.push_back("classSigma");	
+
+
+  vector<TFile*> files;
+  files.push_back(fileScRaw);
+  files.push_back(fileSc);
+  files.push_back(fileRegr);
+
+  TCanvas *c1 = new TCanvas("c1","c1",600,600);
+
+  for(int h=0;h<(int)histos.size();++h) {
+    cout << "Plotting now " << histos[h] << endl;
+    TLegend* legend = new TLegend(0.24, 0.70, 0.47, 0.85);
+    
+    legend->SetBorderSize(     0);
+    legend->SetFillColor (     0);
+    legend->SetTextAlign (    12);
+    legend->SetTextFont  (    42);
+    legend->SetTextSize  (0.05);
+
+    for(int i=0;i<3;++i) {
+
+      TH1F *histo = (TH1F*)files[i]->Get(histos[h].c_str());
+      histo->SetLineColor(i+1);
+      histo->SetMarkerColor(i+1);
+      if(histos[h].find("RMS")!=string::npos || histos[h].find("Sigma")!=string::npos) histo->SetMinimum(0); 
+      histo->Draw(i==0 ? "pe" : "samepe");
+
+      if(i==0) legend->AddEntry(histo,"raw SC");
+      if(i==1) legend->AddEntry(histo,"std SC");
+      if(i==2) legend->AddEntry(histo,"reg SC");
+      legend->Draw();
+
+      stringstream namefile;
+      namefile << histos[h] << "_comp.png";
+      c1->SaveAs(namefile.str().c_str());
+    }
+  }
 
 }
