@@ -75,7 +75,7 @@ void makeDependencyPlot() {
   gStyle->SetPadRightMargin(0.06);
   // ------------------------------ 
 
-  TFile *file = TFile::Open("/Users/emanuele/Work/data/hzz4l/electronreg/HZZ4L_53X_S1_V10_S2_V01/MC/NoRegr/DYJetsMadgr.root");
+  TFile *file = TFile::Open("/Users/emanuele/Work/data/hzz4l/electronreg/HZZ4L_53X_S1_V10_S2_V01/MC/EleRegr1/ggH125.root");
   TTree *tree = (TTree*)file->Get("electronTree/probe_tree");
 
   TH1F *EoEt = new TH1F("EoEt","",100,-0.5,0.5);
@@ -169,7 +169,7 @@ void makeDependencyPlot() {
   cout << "===> RUNNING VS PT " << endl;
   for(int i=0;i<11;++i) {
     stringstream cut;
-    cut << "pt>" << ptbins[i] << "&& pt<" << ptbins[i+1] << "&& abs(scrawE-genp)/genp<0.5";
+    cut << "pt>" << ptbins[i] << "&& pt<" << ptbins[i+1] << "&& abs(scrawE-genp)/genp<0.5 && genp>0";
 
     stringstream resfile;
     resfile << "res_pt_" << ptbins[i] << "To" << ptbins[i+1] << ".png";
@@ -230,7 +230,7 @@ void makeDependencyPlot() {
 
   for(int i=0;i<6;++i) {
     stringstream cut;
-    cut << "abs(eta)>" << etabins[i] << "&& abs(eta)<" << etabins[i+1] << "&& abs(scrawE-genp)/genp<0.5";
+    cut << "abs(eta)>" << etabins[i] << "&& abs(eta)<" << etabins[i+1] << "&& abs(scrawE-genp)/genp<0.5 && genp>0";
 
     stringstream resfile;
     resfile << "res_eta_" << etabins[i] << "To" << etabins[i+1] << ".png";
@@ -284,12 +284,14 @@ void makeDependencyPlot() {
   cout << "===> RUNNING VS NVTX " << endl;
   vtxM->SetMaximum(0.05);
   vtxP->SetMaximum(0.05);
+  vtxM->SetMinimum(-0.05);
+  vtxP->SetMinimum(-0.05);
   vtxRMS->SetMaximum(0.1);
   vtxSigma->SetMaximum(0.05);
 
   for(int i=0;i<10;++i) {
     stringstream cut;
-    cut << "rho>" << vtxbins[i] << "&& rho<" << vtxbins[i+1] << "&& abs(scrawE-genp)/genp<0.5";
+    cut << "rho>" << vtxbins[i] << "&& rho<" << vtxbins[i+1] << "&& abs(scrawE-genp)/genp<0.5 && genp>0";
 
     stringstream resfile;
     resfile << "res_vtx_" << vtxbins[i] << "To" << vtxbins[i+1] << ".png";
@@ -350,7 +352,7 @@ void makeDependencyPlot() {
 
   for(int i=0;i<4;++i) {
     stringstream cut;
-    cut << "classification==" << classificationbins[i] << "&& abs(scrawE-genp)/genp<0.5";
+    cut << "classification==" << classificationbins[i] << "&& abs(scrawE-genp)/genp<0.5 && genp>0";
 
     stringstream resfile;
     resfile << "res_class_" << classificationbins[i] << ".png";
@@ -401,7 +403,7 @@ void makeDependencyPlot() {
 
 
   
-  TFile *resultfile = TFile::Open("results_elereg.root","recreate");
+  TFile *resultfile = TFile::Open("results_elereg_ggH125.root","recreate");
   ptM->Write(); ptP->Write(); ptRMS->Write(); ptSigma->Write();
   etaM->Write(); etaP->Write(); etaRMS->Write(); etaSigma->Write();
   vtxM->Write(); vtxP->Write(); vtxRMS->Write(); vtxSigma->Write();
@@ -457,6 +459,7 @@ void compareResults() {
 
   for(int h=0;h<(int)histos.size();++h) {
     cout << "Plotting now " << histos[h] << endl;
+    c1->Clear();
     TLegend* legend = new TLegend(0.24, 0.70, 0.47, 0.85);
     
     legend->SetBorderSize(     0);
@@ -465,23 +468,60 @@ void compareResults() {
     legend->SetTextFont  (    42);
     legend->SetTextSize  (0.05);
 
+    Double_t min=100;
+    Double_t max=-100;
+    for(int i=0;i<3;++i) {
+      TH1F *histo = (TH1F*)files[i]->Get(histos[h].c_str());
+      min=TMath::Min(min,histo->GetMinimum());
+      max=TMath::Max(max,histo->GetMaximum());
+    }
+
+    bool reso=(histos[h].find("RMS")!=string::npos || histos[h].find("Sigma")!=string::npos);
+    if(reso) c1->Divide(1,2);
+
     for(int i=0;i<3;++i) {
 
       TH1F *histo = (TH1F*)files[i]->Get(histos[h].c_str());
       histo->SetLineColor(i+1);
       histo->SetMarkerColor(i+1);
-      if(histos[h].find("RMS")!=string::npos || histos[h].find("Sigma")!=string::npos) histo->SetMinimum(0); 
+      histo->SetMaximum(max);
+      histo->SetMinimum(min);
+      if(reso) { 
+	histo->SetMinimum(0); 
+	c1->cd(1);
+      }
       histo->Draw(i==0 ? "pe" : "samepe");
 
       if(i==0) legend->AddEntry(histo,"raw SC");
       if(i==1) legend->AddEntry(histo,"std SC");
       if(i==2) legend->AddEntry(histo,"reg SC");
       legend->Draw();
-
-      stringstream namefile;
-      namefile << histos[h] << "_comp.png";
-      c1->SaveAs(namefile.str().c_str());
     }
+
+    // in case of resolution, make ratio plot
+    if(reso) {
+      TH1F *histo1 = (TH1F*)files[1]->Get(histos[h].c_str());
+      TH1F *histo2 = (TH1F*)files[2]->Get(histos[h].c_str());
+      TH1F *histoD = (TH1F*)histo1->Clone();
+      histoD->Add(histo2,-1.);
+      histoD->SetMarkerStyle(24);
+      histoD->SetMarkerSize(2);
+      histoD->SetMarkerColor(kBlack);
+      histoD->SetLineColor(kBlack);
+
+      stringstream ytitle;
+      if(histos[h].find("RMS")!=string::npos) ytitle << "RMS(std SC)-RMS(reg SC)";
+      if(histos[h].find("Sigma")!=string::npos) ytitle << "#sigma(std SC)-#sigma(reg SC)";
+      histoD->GetYaxis()->SetTitle(ytitle.str().c_str());
+
+      c1->cd(2);
+      histoD->Draw();
+    }
+
+    stringstream namefile;
+    namefile << histos[h] << "_comp.png";
+    c1->SaveAs(namefile.str().c_str());
+
   }
 
 }
