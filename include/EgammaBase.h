@@ -79,6 +79,7 @@ public :
    Int_t           fiducialFlagsEle[100];   //[nEle]
    Int_t           recoFlagsEle[100];   //[nEle]
    Int_t           energyCorrectionsEle[100];   //[nEle]
+   Float_t         trackMomentumErrorEle[100];   //[nEle]
    Int_t           superClusterIndexEle[100];   //[nEle]
    Int_t           PFsuperClusterIndexEle[100];   //[nEle]
    Int_t           trackIndexEle[100];   //[nEle]
@@ -1078,6 +1079,7 @@ public :
    TBranch        *b_energyCorrectionsEle;   //!
    TBranch        *b_superClusterIndexEle;   //!
    TBranch        *b_PFsuperClusterIndexEle;   //!
+   TBranch        *b_trackMomentumErrorEle;   //!
    TBranch        *b_trackIndexEle;   //!
    TBranch        *b_gsfTrackIndexEle;   //!
    TBranch        *b_convDistEle;   //!
@@ -2141,6 +2143,7 @@ void EgammaBase::Init(TTree *tree)
    fChain->SetBranchAddress("energyCorrectionsEle", energyCorrectionsEle, &b_energyCorrectionsEle);
    fChain->SetBranchAddress("superClusterIndexEle", superClusterIndexEle, &b_superClusterIndexEle);
    fChain->SetBranchAddress("PFsuperClusterIndexEle", PFsuperClusterIndexEle, &b_PFsuperClusterIndexEle);
+   fChain->SetBranchAddress("trackMomentumErrorEle", trackMomentumErrorEle, &b_trackMomentumErrorEle);
    fChain->SetBranchAddress("trackIndexEle", trackIndexEle, &b_trackIndexEle);
    fChain->SetBranchAddress("gsfTrackIndexEle", gsfTrackIndexEle, &b_gsfTrackIndexEle);
    fChain->SetBranchAddress("convDistEle", convDistEle, &b_convDistEle);

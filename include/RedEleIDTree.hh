@@ -62,7 +62,7 @@ public:
   //! fill the splitting categories of the PDFs
   void fillCategories(int iecal, int iptbin, int iclass, int nbr);
   void fillMore(float nVtx, float rho, float bdthww[2], float newbdthww[4], float bdthzz[4], float pfmva, float like);
-  void fillTrackMomenta(float pcomb, float pmodegsf, float pmeangsf, float pkf, float pterrorgsf, float pterrorkf);
+  void fillTrackMomenta(float pcomb, float pmodegsf, float pmeangsf, float pkf, float pterrorgsf, float pterrorkf, float perror);
   void fillGamma(float atg, float aeg, float ahg, int ig);
   //! fill the run,lumi, event number, mc match
   void fillRunInfos(int run, int lumi, int event, int npu[3], int mcmatch);   
@@ -81,7 +81,7 @@ private:
   float mySeedE2x5Max,mySeedE1x5,mySeedE2x2,mySeedE3x3,mySeedE5x5,myR9,myNClusters,myOneMinusSeedE1x5OverE5x5;
   float myDist, myDcot, myCharge;
   float myEta, myPhi, myPt, mySCEnergy, mySCRawEnergy, myEsenergy, myEcalEnergy;
-  float myPComb, myPModeGsf, myPMeanGsf, myPKf, myPtErrorGsf, myPtErrorKf;
+  float myPComb, myPModeGsf, myPMeanGsf, myPKf, myPtErrorGsf, myPtErrorKf, myPError;
   float myNpu[3];
   UInt_t myRun, myLS, myMCMatch;
   ULong64_t myEvent;
