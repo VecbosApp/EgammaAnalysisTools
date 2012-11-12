@@ -192,6 +192,7 @@ void HZZ4LElectronSelector::Loop(const char *treefilesuffix) {
       float pmeankf=p3MeanKf.Mag();
       float pterrorgsf = ptErrorGsfTrack[gsfTrack];
       float pterrorkf = (kfTrack>-1) ? ptErrorTrack[kfTrack] : -1.0;
+      float perrorele = trackMomentumErrorEle[probe];
 
       double gsfsign   = (-eleDxyPV(probe,0) >=0 ) ? 1. : -1.;
       bool matchConv = hasMatchedConversionEle[probe];
@@ -413,7 +414,7 @@ void HZZ4LElectronSelector::Loop(const char *treefilesuffix) {
 				 chaPfIso, neuPfIso, phoPfIso);
       reducedTree.fillCluterInfos(EleSCEt,EleSCEta,EleSCPhi,EtaSeed,PhiSeed,ESeed,IEtaSeed,IPhiSeed,EtaCrySeed,PhiCrySeed,IEtaCrySeed,IPhiCrySeed);
       reducedTree.fillMore(nPV,rhoFastjet,hwwbdts,newhwwbdts,hzzbdts,pfmva,lh);
-      reducedTree.fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf,pterrorgsf,pterrorkf);
+      reducedTree.fillTrackMomenta(pcomb,pmodegsf,pmeangsf,pmeankf,pterrorgsf,pterrorkf,perrorele);
       reducedTree.fillFakeRateDenomBits(-1.,isDenomFake(probe),isDenomFake_smurfs(probe));
       reducedTree.fillBDTBasedIDBits(passEleBDT(pt,EleSCEta,hwwbdts[0]));
       reducedTree.fillCiCBasedIDBits(cic);
@@ -584,8 +585,8 @@ bool HZZ4LElectronSelector::mcMatches(int probe) {
   std::vector<int> ep,em;
   
   for(int imc=0; imc<20; ++imc) {
-    if(idMc[imc]==11 && abs(idMc[mothMc[imc]])==23 && abs(idMc[mothMc[mothMc[imc]]])==25 && em.size()<2) em.push_back(imc);
-    else if(idMc[imc]==-11 && abs(idMc[mothMc[imc]])==23 && abs(idMc[mothMc[mothMc[imc]]])==25 && ep.size()<2) ep.push_back(imc);
+    if(idMc[imc]==11 && abs(idMc[mothMc[imc]])>=23 && abs(idMc[mothMc[imc]])<=24 && abs(idMc[mothMc[mothMc[imc]]])==25 && em.size()<2) em.push_back(imc);
+    else if(idMc[imc]==-11 && abs(idMc[mothMc[imc]])>=23 && abs(idMc[mothMc[imc]])<=24 && abs(idMc[mothMc[mothMc[imc]]])==25 && ep.size()<2) ep.push_back(imc);
   }
   
   TVector3 probeP(pxEle[probe],pyEle[probe],pzEle[probe]);

@@ -484,7 +484,7 @@ int main(int argc, char* argv[]) {
   char files1[500], files2[500], fileb1[500], fileb2[500], fileb3[500];
   sprintf(files1,"macro/results_data_2012/electrons.root");
   sprintf(files2,"macro/results_data_2012/electrons_zeemc.root");
-  sprintf(fileb1,"macro/results_data_2012/fakes.root");
+  sprintf(fileb1,"/afs/cern.ch/user/e/emanuele/workspace/fakes.root");
   sprintf(fileb2,"macro/results_data_2012/fakes-unbiased-wlnu.root");
   sprintf(fileb3,"macro/results_data_2012/fakes-zeeOneFake.root");
 
