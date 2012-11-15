@@ -521,6 +521,9 @@ void FakeElectronSelector::Loop(const char *outname) {
       }
     }
 
+    // this only happens in 42X EE because of a bug in the EcalClusterTools
+    if(isnan(see) || isnan(spp) || isnan(sep)) continue;
+
     float pt = tlvDenom1.Pt();
     float eta = tlvDenom1.Eta();
     int charge = chargeEle[theDenom1];

@@ -625,6 +625,9 @@ void ZeeTagAndProbe::Loop(const char *treefilesuffix) {
             }
           }
 
+          // this only happens in 42X EE because of a bug in the EcalClusterTools
+          if(isnan(see) || isnan(spp) || isnan(sep)) continue;
+
 	  // CiC...
 	  eIDCiChzzSelector cicsel;
   	  int cic[5];

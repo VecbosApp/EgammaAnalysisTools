@@ -456,6 +456,9 @@ void FakeElectronSelectorWmunuPlusOneJet::Loop(const char *outname) {
       }
     }
 
+    // this only happens in 42X EE because of a bug in the EcalClusterTools
+    if(isnan(see) || isnan(spp) || isnan(sep)) continue;
+
     float pt = probeP4.Pt();
     float eta = probeP4.Eta();
     float phi = probeP4.Phi();
