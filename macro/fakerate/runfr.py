@@ -24,8 +24,12 @@ if(options.drawonly == False):
         print 'done complining.'
 
     if(options.electrons == True):
-        os.system('./fakerate fr')
+        os.system('./fakerate fakes  fr')
         os.system('hadd -f fakerates_trigger.root fr_trigger-EleMisid*')
+        os.system('./fakerate fakes-ewksub-wlnu ewkw')
+        os.system('hadd -f subewkw_trigger.root ewkw_trigger-EleMisid*')
+        os.system('./fakerate fakes-ewksub-zee ewkz')
+        os.system('hadd -f subewkz_trigger.root ewkz_trigger-EleMisid*')
 
 from ROOT import gROOT
 gROOT.LoadMacro('drawFR.cc+')
