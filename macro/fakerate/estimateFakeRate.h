@@ -12,6 +12,7 @@
 #include <TChain.h>
 #include <TFile.h>
 #include <iostream>
+#include <string>
 
 // Header file for the classes stored in the TTree if any.
 
@@ -113,7 +114,6 @@ public :
    Float_t         phi;
    Int_t           charge;
    Int_t           DenomFake;
-   Int_t           DenomFakeSmurf;
    Int_t           cic[5];
    Float_t         trkIso;
    Float_t         ecalIso;
@@ -192,7 +192,6 @@ public :
    TBranch        *b_phi;   //!
    TBranch        *b_charge;   //!
    TBranch        *b_DenomFake;   //!
-   TBranch        *b_DenomFakeSmurf;   //!
    TBranch        *b_cic;   //!
    TBranch        *b_trkIso;   //!
    TBranch        *b_ecalIso;   //!
@@ -215,8 +214,10 @@ public :
    TBranch        *b_rho;   //!
    TBranch        *b_leadJetPt;
 
-   const char *_isofriend;
-   const char *_idbitsfriend;
+   //   const char *_isofriend;
+   //   const char *_idbitsfriend;
+   std::string _isofriend;
+   std::string _idbitsfriend;
 
    estimateFakeRate(TTree *tree=0);
    virtual ~estimateFakeRate();
@@ -228,8 +229,8 @@ public :
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
    virtual Bool_t   passID(estimateFakeRate::idType type);
-   virtual void     addIsoFriend(const char *filename) { _isofriend = filename;};
-   virtual void     addIdBitsFriend(const char *filename) { _idbitsfriend = filename;};
+   virtual void     addIsoFriend(const char *filename) { _isofriend = std::string(filename);};
+   virtual void     addIdBitsFriend(const char *filename) { _idbitsfriend = std::string(filename);};
 
    virtual bool cicid(int level) { return (cic[level]>>0)%2; }
    virtual bool ciciso(int level) { return (cic[level]>>1)%2; }
@@ -353,7 +354,6 @@ void estimateFakeRate::Init(TTree *tree)
    fChain->SetBranchAddress("phi", &phi, &b_phi);
    fChain->SetBranchAddress("charge", &charge, &b_charge);
    fChain->SetBranchAddress("DenomFake", &DenomFake, &b_DenomFake);
-   fChain->SetBranchAddress("DenomFakeSmurf", &DenomFakeSmurf, &b_DenomFakeSmurf);
    fChain->SetBranchAddress("cic", cic, &b_cic);
    fChain->SetBranchAddress("trkIso", &trkIso, &b_trkIso);
    fChain->SetBranchAddress("ecalIso", &ecalIso, &b_ecalIso);

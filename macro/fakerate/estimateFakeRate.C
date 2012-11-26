@@ -38,13 +38,13 @@ void estimateFakeRate::Loop(const char *outname)
   if (fChain == 0) return;
 
   // friend tree with isolation
-  fChain->AddFriend( "eleIDdir/isoT1 = eleIDdir/T1", _isofriend);
+  fChain->AddFriend( "eleIDdir/isoT1 = eleIDdir/T1", _isofriend.c_str());
   Float_t combPFIsoHZZ, combDetIsoHZZ;
   fChain->SetBranchAddress("combPFIsoHZZ",&combPFIsoHZZ);
   fChain->SetBranchAddress("combDetIsoHZZ",&combDetIsoHZZ);
 
   // friend tree with id
-  fChain->AddFriend( "eleIDdir/isoT1 = eleIDdir/T1", _idbitsfriend);
+  fChain->AddFriend( "eleIDdir/isoT1 = eleIDdir/T1", _idbitsfriend.c_str());
   Int_t hzzMvaLoose, hzzMvaTight, newhwwWP;
   fChain->SetBranchAddress("hzzMvaLoose", &hzzMvaLoose);
   fChain->SetBranchAddress("hzzMvaTight", &hzzMvaTight);
@@ -316,7 +316,7 @@ void estimateFakeRate::Loop(const char *outname)
     if (jentry%100000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     // NOT EWK CORRECTED: STOP AT 35 GEV!!!
-    if(!TString(outname).Contains("zee1fake") && (pt>35 || !DenomFakeSmurf)) continue;
+    if(!TString(outname).Contains("zee1fake") && (pt>35 || !DenomFake)) continue;
     // JET PT threshold
     if(leadJetPt<35) continue;
 
