@@ -167,8 +167,8 @@ bool passHZZ4lEleId2012(float pt, float eta, float bdt, float isoEA, float missh
 void makeFriendHZZIsolation(const char* file, int ismc) {
 
   // 2012
-  LumiReWeighting LumiWeights( "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/s7pileup200.root",
-                               "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/puRun2012_3500ipb.root",
+  LumiReWeighting LumiWeights( "data/s7pileup200.root",
+                               "data/puRun2012_3500ipb.root",
                                "hNPU","pileup");
 
   // 2011
@@ -288,7 +288,8 @@ void makeFriendHZZIdBits(const char* file, int ismc) {
   Float_t mass; // not dummy only for TP trees
   Int_t DenomFakeSmurf, ecalseed;
   Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,dz,sip,trkIso,ecalIso,hcalIso;
-  Int_t matchConv, missHits;
+  Int_t missHits;
+  Bool_t matchConv;
   Int_t npu[3];
   Int_t mcmatch;
   Float_t puW;
@@ -484,24 +485,24 @@ int main(int argc, char* argv[]) {
   char files1[500], files2[500], fileb1[500], fileb2[500], fileb3[500];
   sprintf(files1,"macro/results_data_2012/electrons.root");
   sprintf(files2,"macro/results_data_2012/electrons_zeemc.root");
-  sprintf(fileb1,"/afs/cern.ch/user/e/emanuele/workspace/fakes.root");
-  sprintf(fileb2,"macro/results_data_2012/fakes-unbiased-wlnu.root");
-  sprintf(fileb3,"macro/results_data_2012/fakes-zeeOneFake.root");
+  sprintf(fileb1,"macro/results_data_2012/fakes.root");
+  sprintf(fileb2,"macro/results_data_2012/fakes-wlnu1e.root");
+  sprintf(fileb3,"macro/results_data_2012/fakes-zll1e.root");
 
   cout << "\t===> DOING ISOLATION FRIEND TREES <===" << endl;
   // isolation
-  //   makeFriendHZZIsolation(files1,0);
-  //   makeFriendHZZIsolation(files2,1);
+  makeFriendHZZIsolation(files1,0);
+  makeFriendHZZIsolation(files2,1);
   makeFriendHZZIsolation(fileb1,0);
-//   makeFriendHZZIsolation(fileb2,0);
-//   makeFriendHZZIsolation(fileb3,0);
+  makeFriendHZZIsolation(fileb2,0);
+  makeFriendHZZIsolation(fileb3,0);
 
   cout << "\t===> DOING ID FRIEND TREES <===" << endl;
   // id bits
-//   makeFriendHZZIdBits(files1,0);
-//   makeFriendHZZIdBits(files2,1);
+  makeFriendHZZIdBits(files1,0);
+  makeFriendHZZIdBits(files2,1);
   makeFriendHZZIdBits(fileb1,0);
-//   makeFriendHZZIdBits(fileb2,0);
-//   makeFriendHZZIdBits(fileb3,0);
+  makeFriendHZZIdBits(fileb2,0);
+  makeFriendHZZIdBits(fileb3,0);
   
 }
