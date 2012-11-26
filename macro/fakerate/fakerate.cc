@@ -1,6 +1,7 @@
 #include "estimateFakeRate.C"
 
 #include <iostream>
+#include <sstream>
 #include "TFile.h"
 #include "TTree.h"
 #include "TString.h"
@@ -9,20 +10,28 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 
-  char outname[300];
+  char inname[500], outname[500];
 
-  if( argc < 2) {
-    cout << "missing argument: fakerate <basename>" << endl;
+  if( argc < 3) {
+    cout << "missing argument: fakerate <inputfilebase> <basename>" << endl;
     return 1;
   }
-  strcpy(outname,argv[1]);
+  strcpy(inname,argv[1]);
+  strcpy(outname,argv[2]);
 
-  cout << "run the FR for triggering electrons..." << endl;
-  TFile *file = TFile::Open("../results_data/fakes.root");
+  stringstream infilename, isofriend, idfriend;
+  infilename << "../results_data/" << string(inname) << ".root";
+  isofriend << "../results_data/" << string(inname) << "_hzzisoFriend.root";
+  idfriend << "../results_data/" << string(inname) << "_hzzidbitsFriend.root";
+
+  cout << "run the FR for triggering electrons on " << infilename.str() << "..." << endl;
+  cout << "   iso friend file = " << isofriend.str() << "..." << endl;
+  cout << "   id friend file = " << idfriend.str() << "..." << endl;
+  TFile *file = TFile::Open(infilename.str().c_str());
   TTree *tree = (TTree*)file->Get("eleIDdir/T1");
   estimateFakeRate analyzer(tree);
-  analyzer.addIsoFriend("../results_data/fakes_hzzisoFriend.root");
-  analyzer.addIdBitsFriend("../results_data/fakes_hzzidbitsFriend.root");
+  analyzer.addIsoFriend(isofriend.str().c_str());
+  analyzer.addIdBitsFriend(idfriend.str().c_str());
   TString outfileBias(outname);
   outfileBias += TString("_trigger");
   analyzer.Loop(outfileBias);
