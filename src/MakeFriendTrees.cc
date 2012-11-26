@@ -482,12 +482,14 @@ int main(int argc, char* argv[]) {
   }
 
 
-  char files1[500], files2[500], fileb1[500], fileb2[500], fileb3[500];
+  char files1[500], files2[500], fileb1[500], fileb2[500], fileb3[500], fileb4[500], fileb5[500]; 
   sprintf(files1,"macro/results_data_2012/electrons.root");
   sprintf(files2,"macro/results_data_2012/electrons_zeemc.root");
   sprintf(fileb1,"macro/results_data_2012/fakes.root");
   sprintf(fileb2,"macro/results_data_2012/fakes-wlnu1e.root");
   sprintf(fileb3,"macro/results_data_2012/fakes-zll1e.root");
+  sprintf(fileb4,"macro/results_data_2012/fakes-ewksub-wlnu.root");
+  sprintf(fileb5,"macro/results_data_2012/fakes-ewksub-zee.root");
 
   cout << "\t===> DOING ISOLATION FRIEND TREES <===" << endl;
   // isolation
@@ -496,6 +498,8 @@ int main(int argc, char* argv[]) {
   makeFriendHZZIsolation(fileb1,0);
   makeFriendHZZIsolation(fileb2,0);
   makeFriendHZZIsolation(fileb3,0);
+  makeFriendHZZIsolation(fileb4,1);
+  makeFriendHZZIsolation(fileb5,1);
 
   cout << "\t===> DOING ID FRIEND TREES <===" << endl;
   // id bits
@@ -504,5 +508,7 @@ int main(int argc, char* argv[]) {
   makeFriendHZZIdBits(fileb1,0);
   makeFriendHZZIdBits(fileb2,0);
   makeFriendHZZIdBits(fileb3,0);
+  makeFriendHZZIdBits(fileb4,1);
+  makeFriendHZZIdBits(fileb5,1);
   
 }
