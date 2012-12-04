@@ -316,7 +316,7 @@ void estimateFakeRate::Loop(const char *outname)
     if (jentry%100000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     // NOT EWK CORRECTED: STOP AT 35 GEV!!!
-    if(!TString(outname).Contains("zee1fake") && (pt>35 || !DenomFake)) continue;
+    if(!TString(outname).Contains("zee1fake") && (pt>35 || !PassTriggerDenominator)) continue;
     // JET PT threshold
     if(leadJetPt<35) continue;
 

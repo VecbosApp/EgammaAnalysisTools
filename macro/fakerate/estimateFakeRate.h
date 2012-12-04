@@ -113,7 +113,8 @@ public :
    Float_t         eta;
    Float_t         phi;
    Int_t           charge;
-   Int_t           DenomFake;
+   Bool_t          DenomFake;
+   Bool_t          PassTriggerDenominator;
    Int_t           cic[5];
    Float_t         trkIso;
    Float_t         ecalIso;
@@ -192,6 +193,7 @@ public :
    TBranch        *b_phi;   //!
    TBranch        *b_charge;   //!
    TBranch        *b_DenomFake;   //!
+   TBranch        *b_PassTriggerDenominator; //!
    TBranch        *b_cic;   //!
    TBranch        *b_trkIso;   //!
    TBranch        *b_ecalIso;   //!
@@ -354,6 +356,7 @@ void estimateFakeRate::Init(TTree *tree)
    fChain->SetBranchAddress("phi", &phi, &b_phi);
    fChain->SetBranchAddress("charge", &charge, &b_charge);
    fChain->SetBranchAddress("DenomFake", &DenomFake, &b_DenomFake);
+   fChain->SetBranchAddress("PassTriggerDenominator", &PassTriggerDenominator, &b_PassTriggerDenominator);
    fChain->SetBranchAddress("cic", cic, &b_cic);
    fChain->SetBranchAddress("trkIso", &trkIso, &b_trkIso);
    fChain->SetBranchAddress("ecalIso", &ecalIso, &b_ecalIso);
