@@ -20,7 +20,7 @@ struct constants {
   Float_t xsecDYllMeas, xsecWlnuMeas;
 };
 
-void drawOne(TH1F* dataD, TH1F* dataN, TH1F* WD, TH1F* WN, TH1F* ZD, TH1F* ZN, const char *basename, const char* t) {
+TH1F* drawOne(TH1F* dataD, TH1F* dataN, TH1F* WD, TH1F* WN, TH1F* ZD, TH1F* ZN, const char *basename, const char* t) {
 
   constants c;
   c.lumiprescaled=12.9; // pb
@@ -120,7 +120,7 @@ void drawOne(TH1F* dataD, TH1F* dataN, TH1F* WD, TH1F* WN, TH1F* ZD, TH1F* ZN, c
   dataNSub->SetMarkerColor(kAzure);
   dataNSub->SetMarkerStyle(8);
   dataN->SetTitle("");
-  dataN->SetMaximum(0.04);
+  dataN->SetMaximum(0.4);
   dataN->GetYaxis()->SetTitle("fake rate");
 
   TLegend* legend2 = new TLegend(0.15, 0.60, 0.30, 0.70);
@@ -139,6 +139,8 @@ void drawOne(TH1F* dataD, TH1F* dataN, TH1F* WD, TH1F* WN, TH1F* ZD, TH1F* ZN, c
   stringstream fileCorr;
   fileCorr << basename << ".png";
   c2->SaveAs(fileCorr.str().c_str());
+
+  return dataNSub;
 
 }
 
@@ -187,9 +189,23 @@ void doEWKSub() {
   TH1F *ZTrgElenewWPHWWPtEndcap2 = (TH1F*)fileZ->Get("TrgElenewWPHWWPtEndcap2");
   // -----------------------------------
 
-  drawOne(RecoPtBarrel1,TrgElenewWPHWWPtBarrel1,WRecoPtBarrel1,WTrgElenewWPHWWPtBarrel1,ZRecoPtBarrel1,ZTrgElenewWPHWWPtBarrel1,"barrel1","|#eta|<1");
-  drawOne(RecoPtBarrel2,TrgElenewWPHWWPtBarrel2,WRecoPtBarrel2,WTrgElenewWPHWWPtBarrel2,ZRecoPtBarrel2,ZTrgElenewWPHWWPtBarrel2,"barrel2","1<|#eta|<1.48");
-  drawOne(RecoPtEndcap1,TrgElenewWPHWWPtEndcap1,WRecoPtEndcap1,WTrgElenewWPHWWPtEndcap1,ZRecoPtEndcap1,ZTrgElenewWPHWWPtEndcap1,"endcap1","1.48<|#eta|<2");
-  drawOne(RecoPtEndcap2,TrgElenewWPHWWPtEndcap2,WRecoPtEndcap2,WTrgElenewWPHWWPtEndcap2,ZRecoPtEndcap2,ZTrgElenewWPHWWPtEndcap2,"endcap2","|#eta|>2");
+  TFile *filecorr = TFile::Open("fakerates_trigger_ewksub_hcp.root","recreate");
+  TH1F *frBarrel1 = drawOne(RecoPtBarrel1,TrgElenewWPHWWPtBarrel1,WRecoPtBarrel1,WTrgElenewWPHWWPtBarrel1,ZRecoPtBarrel1,ZTrgElenewWPHWWPtBarrel1,"ewksub_barrel1","|#eta|<1");
+  TH1F *frBarrel2 = drawOne(RecoPtBarrel2,TrgElenewWPHWWPtBarrel2,WRecoPtBarrel2,WTrgElenewWPHWWPtBarrel2,ZRecoPtBarrel2,ZTrgElenewWPHWWPtBarrel2,"ewksub_barrel2","1<|#eta|<1.48");
+  TH1F *frEndcap1 = drawOne(RecoPtEndcap1,TrgElenewWPHWWPtEndcap1,WRecoPtEndcap1,WTrgElenewWPHWWPtEndcap1,ZRecoPtEndcap1,ZTrgElenewWPHWWPtEndcap1,"ewksub_endcap1","1.48<|#eta|<2");
+  TH1F *frEndcap2 = drawOne(RecoPtEndcap2,TrgElenewWPHWWPtEndcap2,WRecoPtEndcap2,WTrgElenewWPHWWPtEndcap2,ZRecoPtEndcap2,ZTrgElenewWPHWWPtEndcap2,"ewksub_endcap2","|#eta|>2");
+
+  // use same names as the originals to make application easier
+  frBarrel1->SetName("TrgElenewWPHWWPtBarrel1");
+  frBarrel2->SetName("TrgElenewWPHWWPtBarrel2");
+  frEndcap1->SetName("TrgElenewWPHWWPtEndcap1");
+  frEndcap2->SetName("TrgElenewWPHWWPtEndcap2");
+
+  filecorr->cd();
+  frBarrel1->Write();
+  frBarrel2->Write();
+  frEndcap1->Write();
+  frEndcap2->Write();
+  filecorr->Close();
 
 }
