@@ -23,7 +23,7 @@ struct constants {
 TH1F* drawOne(TH1F* dataD, TH1F* dataN, TH1F* WD, TH1F* WN, TH1F* ZD, TH1F* ZN, const char *basename, const char* t) {
 
   constants c;
-  c.lumiprescaled=12.9; // pb
+  c.lumiprescaled=16.5; // pb (lumi from golden JSON of HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*)
   c.nWlnuProc=45.161288e+6;
   c.nDYllProc=16.844034e+6;
   c.xsecWlnu=37509.0;
@@ -69,7 +69,7 @@ TH1F* drawOne(TH1F* dataD, TH1F* dataN, TH1F* WD, TH1F* WN, TH1F* ZD, TH1F* ZN, 
   dataN->SetMinimum(0.0);
 
   TPaveText* text  = new TPaveText(0.15, 0.9, 0.8, 0.7, "ndc");
-  text->AddText("#sqrt{s} = 8 TeV, L = 12.1 fb^{-1}");
+  text->AddText("#sqrt{s} = 8 TeV, L = 19.5 fb^{-1}");
   text->AddText(t);
   text->SetBorderSize(0);
   text->SetFillStyle(0);
@@ -189,7 +189,7 @@ void doEWKSub() {
   TH1F *ZTrgElenewWPHWWPtEndcap2 = (TH1F*)fileZ->Get("TrgElenewWPHWWPtEndcap2");
   // -----------------------------------
 
-  TFile *filecorr = TFile::Open("fakerates_trigger_ewksub_hcp.root","recreate");
+  TFile *filecorr = TFile::Open("fakerates_trigger_ewksub.root","recreate");
   TH1F *frBarrel1 = drawOne(RecoPtBarrel1,TrgElenewWPHWWPtBarrel1,WRecoPtBarrel1,WTrgElenewWPHWWPtBarrel1,ZRecoPtBarrel1,ZTrgElenewWPHWWPtBarrel1,"ewksub_barrel1","|#eta|<1");
   TH1F *frBarrel2 = drawOne(RecoPtBarrel2,TrgElenewWPHWWPtBarrel2,WRecoPtBarrel2,WTrgElenewWPHWWPtBarrel2,ZRecoPtBarrel2,ZTrgElenewWPHWWPtBarrel2,"ewksub_barrel2","1<|#eta|<1.48");
   TH1F *frEndcap1 = drawOne(RecoPtEndcap1,TrgElenewWPHWWPtEndcap1,WRecoPtEndcap1,WTrgElenewWPHWWPtEndcap1,ZRecoPtEndcap1,ZTrgElenewWPHWWPtEndcap1,"ewksub_endcap1","1.48<|#eta|<2");
