@@ -102,6 +102,8 @@ $(OUTLIB)ElectronIDMVAHZZ.o: $(INCLUDEDIR)/src/ElectronIDMVAHZZ.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ElectronIDMVAHZZ.o $<
 $(OUTLIB)HZZEleIDSelector.o: $(INCLUDEDIR)/src/HZZEleIDSelector.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)HZZEleIDSelector.o $<
+$(OUTLIB)eIDSimpleCutsSelector.o: $(INCLUDEDIR)/src/eIDSimpleCutsSelector.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)eIDSimpleCutsSelector.o $<
 $(OUTLIB)EGammaMvaEleEstimator.o: $(INCLUDEDIR)/src/EGammaMvaEleEstimator.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)EGammaMvaEleEstimator.o $<
 $(OUTLIB)SimpleCutsIDSelector.o: $(INCLUDEDIR)/src/SimpleCutsIDSelector.cc
@@ -169,6 +171,7 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)ElectronIDMVA.o \
 	$(OUTLIB)ElectronIDMVAHZZ.o \
 	$(OUTLIB)HZZEleIDSelector.o \
+	$(OUTLIB)eIDSimpleCutsSelector.o \
 	$(OUTLIB)EGammaMvaEleEstimator.o \
 	$(OUTLIB)SimpleCutsIDSelector.o \
 	$(OUTLIB)RedEleIDTree.o \
@@ -214,6 +217,7 @@ produceMCSubtractedFake: $(INCLUDEDIR)/src/produceMCSubtractedFake.cxx \
 makeFriendTrees: $(INCLUDEDIR)/src/MakeFriendTrees.cc \
 	$(OUTLIB)HZZEleIDSelector.o \
 	$(OUTLIB)SimpleCutsIDSelector.o \
+	$(OUTLIB)eIDSimpleCutsSelector.o \
 	$(OUTLIB)EGammaMvaEleEstimator.o \
 	$(OUTLIB)eIDCiChzzSelector.o
 	$(CXX) $(CXXFLAGS) -o makeFriendTrees $(OUTLIB)/*o $(GLIBS) $ $<
