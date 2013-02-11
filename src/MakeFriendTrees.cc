@@ -16,6 +16,7 @@
 
 #include "include/HZZEleIDSelector.hh"
 #include "include/eIDCiChzzSelector.hh"
+#include "include/eIDSimpleCutsSelector.hh"
 #include "include/EGammaMvaEleEstimator.h"
 #include "include/ElectronEffectiveArea.h"
 #include "../HiggsAnalysisTools/macro/LumiReweightingStandAlone.h"
@@ -30,6 +31,14 @@ enum idType {
   kIsoEACorr,
   kBDTHZZ_withIP
 };
+
+enum cutBasedIdType {
+  kVeto = 0,
+  kLoose,
+  kMedium,
+  kTight
+};
+  
 
 float Aeff_neu_dr04[7], Aeff_pho_dr04[7];
 
@@ -287,7 +296,7 @@ void makeFriendHZZIdBits(const char* file, int ismc) {
   Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8], mvaPFIso;
   Float_t mass; // not dummy only for TP trees
   Int_t DenomFakeSmurf, ecalseed;
-  Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,dz,sip,trkIso,ecalIso,hcalIso;
+  Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,dz,sip,trkIso,ecalIso,hcalIso,IoEmIoP;
   Int_t missHits;
   Bool_t matchConv;
   Int_t npu[3];
@@ -313,6 +322,7 @@ void makeFriendHZZIdBits(const char* file, int ismc) {
   pT->SetBranchAddress("dphi", &dphi);
   pT->SetBranchAddress("see", &see);
   pT->SetBranchAddress("fbrem", &fbrem);
+  pT->SetBranchAddress("IoEmIoP", &IoEmIoP);
   pT->SetBranchAddress("dist", &dist);
   pT->SetBranchAddress("dcot", &dcot);
   pT->SetBranchAddress("d0",&d0);
@@ -345,6 +355,7 @@ void makeFriendHZZIdBits(const char* file, int ismc) {
   Int_t newhzzWPconvonly;
   Int_t hwwWPidonly, newhwwWPidonly, newhzzWPidonly;
   Int_t cicall[5], cicid[5], ciciso[5];
+  Int_t spid[4];
   Int_t hzzMvaLoose, hzzMvaTight;
   // first 4 variables needed for TP
   fT->Branch("mass", &mass, "mass/F");
@@ -376,6 +387,7 @@ void makeFriendHZZIdBits(const char* file, int ismc) {
   fT->Branch("cicall", cicall, "cicall[5]/I");
   fT->Branch("cicid", cicid, "cicid[5]/I");
   fT->Branch("ciciso", ciciso, "ciciso[5]/I");
+  fT->Branch("spid", spid, "spid[4]/I");
   fT->Branch("newhzzWP", &newhzzWP, "newhzzWP/I"); // 2012 WP
   fT->Branch("newhzzWPisoonly", &newhzzWPisoonly, "newhzzWPisoonly/I"); // 2012 WP
   fT->Branch("newhzzWPidonly", &newhzzWPidonly, "newhzzWPidonly/I"); // 2012 WP
@@ -438,6 +450,13 @@ void makeFriendHZZIdBits(const char* file, int ismc) {
        cicid[i] = (cicidval(cic,i) && missHits<=1) ? 1 : 0;
        ciciso[i] = (cicisoval(cic,i)) ? 1 : 0;
      }
+     
+     // simple cuts 2012
+     eIDSimpleCutsSelector spsel(deta,dphi,see,HoE,d0,dz,IoEmIoP);
+     for(int i=0; i<4; i++) {
+       spid[i] = spsel.output(eta,i);
+     }
+
      // H->ZZ 2012 cut
      newhzzWP=0;
      if(passHZZ4lEleId2012(pt,eta,bdthzz[3],combPFIsoHZZ,missHits,sip,4)) newhzzWP=1;
@@ -510,5 +529,4 @@ int main(int argc, char* argv[]) {
   makeFriendHZZIdBits(fileb3,0);
   makeFriendHZZIdBits(fileb4,1);
   makeFriendHZZIdBits(fileb5,1);
-  
 }
