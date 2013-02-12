@@ -50,28 +50,28 @@ void makeIdCurveHWW(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutB
 
 void makeIdCurveHZZ(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile) {
 
-  TH1F *cichzz0_sig = new TH1F("cichzz0_sig","",100,-1.0,1.0);
-  TH1F *cichzz0_bkg = new TH1F("cichzz0_bkg","",100,-1.0,1.0);
-  TH1F *cichzz1_sig = new TH1F("cichzz1_sig","",100,-1.0,1.0);
-  TH1F *cichzz1_bkg = new TH1F("cichzz1_bkg","",100,-1.0,1.0);
-  TH1F *cichzz2_sig = new TH1F("cichzz2_sig","",100,-1.0,1.0);
-  TH1F *cichzz2_bkg = new TH1F("cichzz2_bkg","",100,-1.0,1.0);
-  TH1F *cichzz3_sig = new TH1F("cichzz3_sig","",100,-1.0,1.0);
-  TH1F *cichzz3_bkg = new TH1F("cichzz3_bkg","",100,-1.0,1.0);
-  TH1F *cichzz4_sig = new TH1F("cichzz4_sig","",100,-1.0,1.0);
-  TH1F *cichzz4_bkg = new TH1F("cichzz4_bkg","",100,-1.0,1.0);
+  TH1F *cichzz0_sig = new TH1F("cichzz0_sig","",10000,-1.0,1.0);
+  TH1F *cichzz0_bkg = new TH1F("cichzz0_bkg","",10000,-1.0,1.0);
+  TH1F *cichzz1_sig = new TH1F("cichzz1_sig","",10000,-1.0,1.0);
+  TH1F *cichzz1_bkg = new TH1F("cichzz1_bkg","",10000,-1.0,1.0);
+  TH1F *cichzz2_sig = new TH1F("cichzz2_sig","",10000,-1.0,1.0);
+  TH1F *cichzz2_bkg = new TH1F("cichzz2_bkg","",10000,-1.0,1.0);
+  TH1F *cichzz3_sig = new TH1F("cichzz3_sig","",10000,-1.0,1.0);
+  TH1F *cichzz3_bkg = new TH1F("cichzz3_bkg","",10000,-1.0,1.0);
+  TH1F *cichzz4_sig = new TH1F("cichzz4_sig","",10000,-1.0,1.0);
+  TH1F *cichzz4_bkg = new TH1F("cichzz4_bkg","",10000,-1.0,1.0);
 
-  TH1F *spid0_sig = new TH1F("spid0_sig","",100,-1.0,1.0);
-  TH1F *spid0_bkg = new TH1F("spid0_bkg","",100,-1.0,1.0);
-  TH1F *spid1_sig = new TH1F("spid1_sig","",100,-1.0,1.0);
-  TH1F *spid1_bkg = new TH1F("spid1_bkg","",100,-1.0,1.0);
-  TH1F *spid2_sig = new TH1F("spid2_sig","",100,-1.0,1.0);
-  TH1F *spid2_bkg = new TH1F("spid2_bkg","",100,-1.0,1.0);
-  TH1F *spid3_sig = new TH1F("spid3_sig","",100,-1.0,1.0);
-  TH1F *spid3_bkg = new TH1F("spid3_bkg","",100,-1.0,1.0);
+  TH1F *spid0_sig = new TH1F("spid0_sig","",10000,-1.0,1.0);
+  TH1F *spid0_bkg = new TH1F("spid0_bkg","",10000,-1.0,1.0);
+  TH1F *spid1_sig = new TH1F("spid1_sig","",10000,-1.0,1.0);
+  TH1F *spid1_bkg = new TH1F("spid1_bkg","",10000,-1.0,1.0);
+  TH1F *spid2_sig = new TH1F("spid2_sig","",10000,-1.0,1.0);
+  TH1F *spid2_bkg = new TH1F("spid2_bkg","",10000,-1.0,1.0);
+  TH1F *spid3_sig = new TH1F("spid3_sig","",10000,-1.0,1.0);
+  TH1F *spid3_bkg = new TH1F("spid3_bkg","",10000,-1.0,1.0);
 
-  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",100,-1.0,1.0);
-  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",100,-1.0,1.0);
+  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",10000,-1.0,1.0);
+  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",10000,-1.0,1.0);
 
   treeSig->Project("cichzz0_sig","cicid[0]",cutSig);
   treeBkg->Project("cichzz0_bkg","cicid[0]",cutBkg);
@@ -136,14 +136,14 @@ void makeIdCurveHZZ(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutB
 
 void make3IdCurves(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBkg, TString namefile) {
 
-  TH1F *bdthww_sig = new TH1F("bdthww_sig","",100,-1.0,1.0);
-  TH1F *bdthww_bkg = new TH1F("bdthww_bkg","",100,-1.0,1.0);
-  TH1F *bdthwwiso_sig = new TH1F("bdthwwiso_sig","",100,-1.0,1.0);
-  TH1F *bdthwwiso_bkg = new TH1F("bdthwwiso_bkg","",100,-1.0,1.0);
-  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",100,-1.0,1.0);
-  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",100,-1.0,1.0);
-  TH2F *bdthzziso_sig = new TH2F("bdthzziso_sig","",100,-1.0,1.0,100,0.0,5.0);
-  TH2F *bdthzziso_bkg = new TH2F("bdthzziso_bkg","",100,-1.0,1.0,100,0.0,5.0);
+  TH1F *bdthww_sig = new TH1F("bdthww_sig","",10000,-1.0,1.0);
+  TH1F *bdthww_bkg = new TH1F("bdthww_bkg","",10000,-1.0,1.0);
+  TH1F *bdthwwiso_sig = new TH1F("bdthwwiso_sig","",10000,-1.0,1.0);
+  TH1F *bdthwwiso_bkg = new TH1F("bdthwwiso_bkg","",10000,-1.0,1.0);
+  TH1F *bdthzz_sig = new TH1F("bdthzz_sig","",10000,-1.0,1.0);
+  TH1F *bdthzz_bkg = new TH1F("bdthzz_bkg","",10000,-1.0,1.0);
+  TH2F *bdthzziso_sig = new TH2F("bdthzziso_sig","",10000,-1.0,1.0,10000,0.0,5.0);
+  TH2F *bdthzziso_bkg = new TH2F("bdthzziso_bkg","",10000,-1.0,1.0,10000,0.0,5.0);
 
   cout << "cut sig = " << cutSig << " bkg = " << cutBkg << endl;
   
@@ -178,10 +178,10 @@ void make3IdCurves(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBk
 void makeIsolationCurve(TTree *treeSig, TTree* treeBkg, 
 			TString cutSig, TString cutBkg, TString namefile) {
 
-  TH1F *isohww_sig = new TH1F("isohww_sig","",100,0.0,2.0);
-  TH1F *isohww_bkg = new TH1F("isohww_bkg","",100,0.0,2.0);
-  TH1F *isohzz_sig = new TH1F("isohzz_sig","",100,-1.0,2.0);
-  TH1F *isohzz_bkg = new TH1F("isohzz_bkg","",100,-1.0,2.0);
+  TH1F *isohww_sig = new TH1F("isohww_sig","",10000,0.0,2.0);
+  TH1F *isohww_bkg = new TH1F("isohww_bkg","",10000,0.0,2.0);
+  TH1F *isohzz_sig = new TH1F("isohzz_sig","",10000,-1.0,2.0);
+  TH1F *isohzz_bkg = new TH1F("isohzz_bkg","",10000,-1.0,2.0);
   
   treeSig->Project("isohww_sig","chaPFIso[3]/pt",cutSig);
   treeBkg->Project("isohww_bkg","chaPFIso[3]/pt",cutBkg);
@@ -203,12 +203,12 @@ void makeIsolationCurve(TTree *treeSig, TTree* treeBkg,
 void make3IsolationCurvesHWW(TTree *treeSig, TTree* treeBkg, 
 			     TString cutSig, TString cutBkg, TString namefile) {
 
-  TH1F *isohww_sig = new TH1F("isohww_sig","",100,0.0,2.0);
-  TH1F *isohww_bkg = new TH1F("isohww_bkg","",100,0.0,2.0);
-  TH1F *isohzz_sig = new TH1F("isohzz_sig","",100,-1.0,2.0);
-  TH1F *isohzz_bkg = new TH1F("isohzz_bkg","",100,-1.0,2.0);
-  TH1F *isohzznoEA_sig = new TH1F("isohzznoEA_sig","",100,-1.0,2.0);
-  TH1F *isohzznoEA_bkg = new TH1F("isohzznoEA_bkg","",100,-1.0,2.0);
+  TH1F *isohww_sig = new TH1F("isohww_sig","",10000,0.0,2.0);
+  TH1F *isohww_bkg = new TH1F("isohww_bkg","",10000,0.0,2.0);
+  TH1F *isohzz_sig = new TH1F("isohzz_sig","",10000,-1.0,2.0);
+  TH1F *isohzz_bkg = new TH1F("isohzz_bkg","",10000,-1.0,2.0);
+  TH1F *isohzznoEA_sig = new TH1F("isohzznoEA_sig","",10000,-1.0,2.0);
+  TH1F *isohzznoEA_bkg = new TH1F("isohzznoEA_bkg","",10000,-1.0,2.0);
   
   treeSig->Project("isohww_sig","combPFIsoHWW/pt",cutSig);
   treeBkg->Project("isohww_bkg","combPFIsoHWW/pt",cutBkg);
@@ -234,12 +234,12 @@ void make3IsolationCurvesHWW(TTree *treeSig, TTree* treeBkg,
 void make3IsolationCurvesHZZ(TTree *treeSig, TTree* treeBkg, 
 			     TString cutSig, TString cutBkg, TString namefile) {
 
-  TH1F *detisohzz_sig = new TH1F("detisohzz_sig","",100,-1.0,2.0);
-  TH1F *detisohzz_bkg = new TH1F("detisohzz_bkg","",100,-1.0,2.0);
-  TH1F *isohzz_sig = new TH1F("isohzz_sig","",100,-1.0,2.0);
-  TH1F *isohzz_bkg = new TH1F("isohzz_bkg","",100,-1.0,2.0);
-  TH1F *isohzzMVA_sig = new TH1F("isohzzMVA_sig","",100,-1.0,1.0);
-  TH1F *isohzzMVA_bkg = new TH1F("isohzzMVA_bkg","",100,-1.0,1.0);
+  TH1F *detisohzz_sig = new TH1F("detisohzz_sig","",10000,-1.0,2.0);
+  TH1F *detisohzz_bkg = new TH1F("detisohzz_bkg","",10000,-1.0,2.0);
+  TH1F *isohzz_sig = new TH1F("isohzz_sig","",10000,-1.0,2.0);
+  TH1F *isohzz_bkg = new TH1F("isohzz_bkg","",10000,-1.0,2.0);
+  TH1F *isohzzMVA_sig = new TH1F("isohzzMVA_sig","",10000,-1.0,1.0);
+  TH1F *isohzzMVA_bkg = new TH1F("isohzzMVA_bkg","",10000,-1.0,1.0);
 
   treeSig->Project("detisohzz_sig","combDetIsoHZZ/pt",cutSig);
   treeBkg->Project("detisohzz_bkg","combDetIsoHZZ/pt",cutBkg);  
@@ -278,7 +278,7 @@ int main(int argc, char* argv[]) {
     fileBkg = TFile::Open("macro/results_data/fakes.root");
   } else {
     fileSig = TFile::Open("macro/results_data/electrons_zeemc.root");
-    fileBkg = TFile::Open("macro/results_data/fakes-wlnu1e.root");
+    fileBkg = TFile::Open("macro/results_data/fakes-zll1e.root");
   }
   if( fileSig && fileBkg) {
     fileSig->cd();
@@ -317,11 +317,13 @@ int main(int argc, char* argv[]) {
 
   vector<TString> cutSignal;
   for(int i=0;i<(int)cutBase.size();++i) 
-    cutSignal.push_back(cutBase[i]+TString("&& mcmatch && pt<35"));
+    //    cutSignal.push_back(cutBase[i]+TString("&& mcmatch && pt<35"));
+    cutSignal.push_back(cutBase[i]+TString("&& mcmatch"));
 
   vector<TString> cutBackground;
   for(int i=0;i<(int)cutBase.size();++i)
-    cutBackground.push_back(cutBase[i]+TString("&& pt<35 && !(run<=173692 && event%2==0)")); // HWW used the even events to train
+    //    cutBackground.push_back(cutBase[i]+TString("&& pt<35 && !(run<=173692 && event%2==0)")); // HWW used the even events to train
+    cutBackground.push_back(cutBase[i]);
 
   vector<TString> id;
   if(!trg) {
@@ -339,10 +341,10 @@ int main(int argc, char* argv[]) {
   // HZZ isolations and new id bits are in friend trees
   treeSig->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/electrons_zeemc_hzzisoFriend.root");
   if(trg) treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/fakes_hzzisoFriend.root");
-  else treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/fakes-wlnu1e_hzzisoFriend.root");
+  else treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/fakes-zll1e_hzzisoFriend.root");
   treeSig->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/electrons_zeemc_hzzidbitsFriend.root");
   if(trg) treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/fakes_hzzidbitsFriend.root");
-  else treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/fakes-wlnu1e_hzzidbitsFriend.root");
+  else treeBkg->AddFriend("eleIDdir/isoT1 = eleIDdir/T1","macro/results_data/fakes-zll1e_hzzidbitsFriend.root");
 
   for(int i=0;i<(int)cutBase.size();++i) {
     if(trg) makeIdCurveHWW(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
@@ -358,6 +360,7 @@ int main(int argc, char* argv[]) {
     else make3IsolationCurvesHZZ(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
   }
 
+  /*
   // and now in 2 big bins in nvtx
   vector<TString> cutSignalHiPU, cutSignalLoPU, cutBackgroundHiPU, cutBackgroundLoPU;
 
@@ -384,7 +387,7 @@ int main(int argc, char* argv[]) {
       make3IdCurves(treeSig,treeBkg,cutSignal[i],cutBackground[i],id[i]);
     else makeIdCurveHZZ(treeSig,treeBkg,cutSignalHiPU[i],cutBackgroundHiPU[i],id[i]);
   }
-
+  */
 
   return 0;
 }
