@@ -97,7 +97,7 @@ void makeIdCurveHZZ(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutB
   treeBkg->Project("bdthzz_bkg","newbdthww[3]",cutBkg);
 
   FiguresOfMeritEvaluator roc;
-  roc.setRange(0.5,1,0,0.4);
+  roc.setRange(0,0.4,0.5,1);
   roc.addSignal("Non-Triggering BDT", bdthzz_sig);
   roc.addBackgrounds(bdthzz_bkg);
   roc.setCutDirection(">");
@@ -157,7 +157,7 @@ void make3IdCurves(TTree *treeSig, TTree* treeBkg, TString cutSig, TString cutBk
   treeBkg->Project("bdthzziso_bkg","combPFIsoHZZ/pt:newbdthww[3]",cutBkg);
 
   FiguresOfMeritEvaluator roc;
-  roc.setRange(0.6,1,0,0.5);
+  roc.setRange(0,0.5,0.6,1);
   roc.addSignal("H #rightarrow WW BDT (2011)", bdthww_sig);
   roc.addBackgrounds(bdthww_bkg);
   roc.setCutDirection(">");
