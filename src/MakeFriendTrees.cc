@@ -176,9 +176,9 @@ bool passHZZ4lEleId2012(float pt, float eta, float bdt, float isoEA, float missh
 void makeFriendHZZIsolation(const char* file, int ismc) {
 
   // 2012
-  LumiReWeighting LumiWeights( "data/s7pileup200.root",
-                               "data/puRun2012_3500ipb.root",
-                               "hNPU","pileup");
+  LumiReWeighting LumiWeights( "data/s10MCPileUp.root",
+                               "data/PUdata2012Final.root",
+                               "pileup","pileup");
 
   // 2011
   //   LumiReWeighting LumiWeights( "/afs/cern.ch/user/e/emanuele/workspace/public/pileup/s6MCPileUp.root",
@@ -211,13 +211,13 @@ void makeFriendHZZIsolation(const char* file, int ismc) {
 
   Float_t chaPFIso[8], neuPFIso[8], phoPFIso[8], rho, eta, pt;
   Float_t trkIso,ecalIso,hcalIso;
-  Int_t npu[3];
+  Float_t npu[3];
   pT->SetBranchAddress("chaPFIso", chaPFIso);
   pT->SetBranchAddress("neuPFIso", neuPFIso);
   pT->SetBranchAddress("phoPFIso", phoPFIso);
-  pT->SetBranchAddress("trkIso", &trkIso);
-  pT->SetBranchAddress("ecalIso", &ecalIso);
-  pT->SetBranchAddress("hcalIso", &hcalIso);
+  pT->SetBranchAddress("trkIso04", &trkIso);
+  pT->SetBranchAddress("ecalIso04", &ecalIso);
+  pT->SetBranchAddress("hcalIso04", &hcalIso);
   pT->SetBranchAddress("rho", &rho);
   pT->SetBranchAddress("eta", &eta);
   pT->SetBranchAddress("pt", &pt);
@@ -253,11 +253,16 @@ void makeFriendHZZIsolation(const char* file, int ismc) {
      int ieta = (fabs(eta)<1.479) ? 0 : 1;
      combDetIso = trkIso + ecalIso - rho * Aeff_ecal_dr03[ieta] + hcalIso - rho * Aeff_hcal_dr03[ieta];
 
+     // slow and useless
+     /*
      mvaPFIso = fElectronIsoMVA->isoMvaValue(pt,eta,rho,ElectronEffectiveArea::kEleEAData2011,
 					     chaPFIso[0],chaPFIso[1]-chaPFIso[0],chaPFIso[2]-chaPFIso[1],chaPFIso[3]-chaPFIso[2],chaPFIso[4]-chaPFIso[3],
 					     phoPFIso[0],phoPFIso[1]-phoPFIso[0],phoPFIso[2]-phoPFIso[1],phoPFIso[3]-phoPFIso[2],phoPFIso[4]-phoPFIso[3],
 					     neuPFIso[0],neuPFIso[1]-neuPFIso[0],neuPFIso[2]-neuPFIso[1],neuPFIso[3]-neuPFIso[2],neuPFIso[4]-neuPFIso[3],
 					     true);
+     */
+     mvaPFIso = -1.;
+
      combIsoHww = isoEAWW2012(eta,chaPFIso[3],neuPFIso[3],phoPFIso[3],rho);
 
      // this is only needed in MC
@@ -299,7 +304,7 @@ void makeFriendHZZIdBits(const char* file, int ismc) {
   Float_t eop,eseedopin,HoE,deta,dphi,see,fbrem,dist,dcot,d0,dz,sip,trkIso,ecalIso,hcalIso,IoEmIoP;
   Int_t missHits;
   Bool_t matchConv;
-  Int_t npu[3];
+  Float_t npu[3];
   Int_t mcmatch;
   Float_t puW;
   pT->SetBranchAddress("bdthww", bdthww);
@@ -332,9 +337,9 @@ void makeFriendHZZIdBits(const char* file, int ismc) {
   pT->SetBranchAddress("missHits",&missHits);
   pT->SetBranchAddress("ecaldriven", &ecalseed);
   pT->SetBranchAddress("trkIso", &trkIso);
-  pT->SetBranchAddress("ecalIso", &ecalIso);
-  pT->SetBranchAddress("hcalIso", &hcalIso);
-  pT->SetBranchAddress("mvaPFIso", &mvaPFIso);
+  pT->SetBranchAddress("ecalIso04", &ecalIso);
+  pT->SetBranchAddress("hcalIso04", &hcalIso);
+  pT->SetBranchAddress("mvaPFIso04", &mvaPFIso);
   pT->SetBranchAddress("combIsoHww", &combIsoHww);
   pT->SetBranchAddress("npu", npu);
   pT->SetBranchAddress("mcmatch", &mcmatch);
