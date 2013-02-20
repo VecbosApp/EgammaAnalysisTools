@@ -5,6 +5,7 @@
 #include <TCanvas.h>
 #include <TF1.h>
 #include <TStyle.h>
+#include <TPaveText.h>
 #include <iostream>
 
 using namespace std;
@@ -53,18 +54,28 @@ void calibrateEA(const char* filename, const char* outfilename, const char *cut=
   fullCut += TString(cut);
   fullCut += TString(" && CutBasedIdOlyID[3] && abs(mass-91.1876)<7.5)"); // requiring WP80 ID only
 
+  cout << "Full cut  = " << fullCut.Data() << endl;
+
   tree->Project("rho_prof","rho:vertices",fullCut.Data());
   tree->Project("cha_prof","chaPFIso[3]:vertices",fullCut.Data());
   // this if you want separate NH/PHO
-  tree->Project("neu_prof","neuPFIso[3]:vertices",fullCut.Data());
-  tree->Project("pho_prof","phoPFIso[3]:vertices",fullCut.Data());
+  //  tree->Project("neu_prof","neuPFIso[3]:vertices",fullCut.Data());
+  //  tree->Project("pho_prof","phoPFIso[3]:vertices",fullCut.Data());
   // this is combined NH+PHO
-  // tree->Project("neu_prof","neuPFIso[3]+phoPFIso[3]:vertices",fullCut.Data());
+  tree->Project("neu_prof","neuPFIso[3]+phoPFIso[3]:vertices",fullCut.Data());
 
   rho_prof->Rebin(rebin);
   cha_prof->Rebin(rebin);
   neu_prof->Rebin(rebin);
   pho_prof->Rebin(rebin);
+
+  TPaveText *text = new TPaveText(0.15,0.90,0.77,0.98,"brNDC");
+  text->AddText("CMS Preliminary, #sqrt{s} = 8 TeV, #int L dt = 19.6 fb^{-1}");
+  text->SetBorderSize(0);
+  text->SetFillStyle(0);
+  text->SetTextAlign(12);
+  text->SetTextFont(132);
+  text->SetTextSize(0.04);
 
   TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
 
@@ -93,8 +104,9 @@ void calibrateEA(const char* filename, const char* outfilename, const char *cut=
     
   legend->AddEntry(rho_prof, "#rho");
   legend->AddEntry(cha_prof, "charged particles");
-  legend->AddEntry(neu_prof, "neutral hadrons");
-  legend->AddEntry(pho_prof, "photons");
+  //  legend->AddEntry(neu_prof, "neutral hadrons");
+  legend->AddEntry(neu_prof, "neutral particles");
+  //  legend->AddEntry(pho_prof, "photons");
 
   // =========================
   // And now apply the fit
@@ -137,15 +149,22 @@ void calibrateEA(const char* filename, const char* outfilename, const char *cut=
   neu_prof->Draw("same pe1");
   pho_prof->Draw("same pe1");
   legend->Draw();
+  text->Draw();
   c1->SaveAs(outfilename);
 
   TString png(outfilename);
   png.ReplaceAll("pdf","png");
   c1->SaveAs(png);
 
+  TString macro(outfilename);
+  macro.ReplaceAll("pdf","C");
+  c1->SaveAs(macro);
+
 }
 
 void calcAllAeff() {
+
+  cout << "NOW CALCULATING ALL THE EFFECTIVE AREAS" << endl;
 
   vector<TString> cut;
   cut.push_back(TString("abs(eta)<1.0"));                    // 0
@@ -180,6 +199,7 @@ void calcAllAeff() {
   Aeff_pho_err.reserve(id.size());
 
   for(int i=0; i<(int)cut.size(); ++i) {
+    cout << "\t---> calculating eff area for cut " << cut[i] << endl;
     calibrateEA("results_data/electrons.root",id[i].Data(),cut[i].Data(),max[i],rebin[i]);
     Aeff_neu[i] = neu[0]/rho[0];
     Aeff_neu_err[i] = Aeff_neu[i] * sqrt(pow(neu[1]/neu[0],2)+pow(rho[1]/rho[0],2));
@@ -230,12 +250,20 @@ void rhoEASubtracted(const char* filename, const char* outfilename, float aeffne
 
   // form the formula for the corrected isolation from calibrated EA
   char formula[1000];
-  sprintf(formula,"chaPFIso[3] + (neuPFIso[3] - %f * rho) + (phoPFIso[3] - %f * rho):vertices",aeffneu,aeffpho);
+  sprintf(formula,"chaPFIso[3] + max((neuPFIso[3] - %f * rho) + (phoPFIso[3] - %f * rho),0.0):vertices",aeffneu,aeffpho);
   tree->Project("isocorr_prof",formula,fullCut.Data());
 
   rho_prof->Rebin(rebin);
   iso_prof->Rebin(rebin);
   isocorr_prof->Rebin(rebin);
+
+  TPaveText *text = new TPaveText(0.15,0.90,0.77,0.98,"brNDC");
+  text->AddText("CMS Preliminary, #sqrt{s} = 8 TeV, #int L dt = 19.6 fb^{-1}");
+  text->SetBorderSize(0);
+  text->SetFillStyle(0);
+  text->SetTextAlign(12);
+  text->SetTextFont(132);
+  text->SetTextSize(0.04);
 
   TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
 
@@ -279,15 +307,22 @@ void rhoEASubtracted(const char* filename, const char* outfilename, float aeffne
   
   isocorr_prof->SetMaximum(20);
   isocorr_prof->SetMinimum(-1);
+  isocorr_prof->GetXaxis()->SetTitle("# vertices");
+  isocorr_prof->GetYaxis()->SetTitle("<E flow> [GeV]");
   rho_prof->Draw("same");
   iso_prof->Draw("same pe1");
   isocorr_prof->Draw("same pe1");
   legend->Draw();
+  text->Draw();
   c1->SaveAs(outfilename);
 
   TString png(outfilename);
   png.ReplaceAll("pdf","png");
   c1->SaveAs(png);
+
+  TString macro(outfilename);
+  macro.ReplaceAll("pdf","C");
+  c1->SaveAs(macro);
 
 }
 
