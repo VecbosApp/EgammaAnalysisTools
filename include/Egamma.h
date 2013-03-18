@@ -62,6 +62,8 @@ public:
   bool hasPassedHLT();
   //check for matching HLT object                          
   bool triggerMatch(float eta, float phi, float Dr);
+  // check for matching HLT object above threshold
+  bool triggerMatchThreshold(float pt);
   //get the value of the requested bits
   std::vector<int> getHLTOutput();
 

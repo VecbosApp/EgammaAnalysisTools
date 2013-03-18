@@ -282,6 +282,30 @@ bool Egamma::triggerMatch(float eta, float phi, float Dr){
   return match;
 }
 
+bool Egamma::triggerMatchThreshold(float pt){
+
+  bool match=false;
+
+  for( int i=0; i<m_requiredTriggers.size(); i++ ) {  // loop over require trigger paths
+    
+    int pathIndex=m_requiredTriggers[i];
+    if( sizePassing[pathIndex]>  0 ) {  //some object has passed the required trigger 
+      
+      for(int np = 0; np < sizePassing[pathIndex]; np++ ){
+        int iP = indexPassing[ indexPassingPerPath[pathIndex] +np];
+
+	if (triggerObsPt[iP]>pt) {
+          match=true;
+          break;
+        }
+      }
+    }
+    if(match)  //it's enough if one path matches	
+      break;
+  }
+  return match;
+}
+
 // two highest pT electrons 
 std::pair<int,int> Egamma::getBestGoodElePair(std::vector<int> goodElectrons) {
   

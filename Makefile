@@ -148,6 +148,10 @@ $(OUTLIB)LikelihoodPdfProduct.o: $(INCLUDEDIR)/src/LikelihoodPdfProduct.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LikelihoodPdfProduct.o $<
 $(OUTLIB)ElectronLikelihood.o: $(INCLUDEDIR)/src/ElectronLikelihood.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ElectronLikelihood.o $<
+$(OUTLIB)TestTurnOnCurveGamma.o: $(INCLUDEDIR)/src/TestTurnOnCurveGamma.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)TestTurnOnCurveGamma.o $<
+$(OUTLIB)TurnOnTreeGamma.o: $(INCLUDEDIR)/src/TurnOnTreeGamma.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)TurnOnTreeGamma.o $<
 
 #----------------------------------------------------#
 
@@ -189,6 +193,8 @@ EgammaAnalysis:  $(INCLUDEDIR)/src/EgammaAnalysis.C \
 	$(OUTLIB)FakeElectronSelectorWmunuPlusOneJet.o \
 	$(OUTLIB)FakeElectronSelectorZllPlusOneFake.o \
 	$(OUTLIB)ZeeTagAndProbe.o \
+	$(OUTLIB)TestTurnOnCurveGamma.o \
+	$(OUTLIB)TurnOnTreeGamma.o \
 	$(OUTLIB)HZZ4LElectronSelector.o
 	$(CXX) $(CXXFLAGS) -o EgammaAnalysis $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(GLIBS) $ $<
 

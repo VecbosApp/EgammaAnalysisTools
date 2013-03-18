@@ -63,6 +63,9 @@
 #if Application == 13
 #include "EgammaAnalysisTools/include/HZZ4LElectronSelector.hh"
 #endif
+#if Application == 14
+#include "EgammaAnalysisTools/include/TestTurnOnCurveGamma.hh"
+#endif
 
 int main(int argc, char* argv[]) {
 
@@ -288,6 +291,12 @@ int main(int argc, char* argv[]) {
 
 #endif
 
+#if Application == 14
+
+  TestTurnOnCurveGamma analysis(theChain);
+  analysis.measureTurnOnGamma(outputFileName);
+  
+#endif
 
   return 0;
 

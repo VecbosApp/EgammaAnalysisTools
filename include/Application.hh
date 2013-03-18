@@ -13,5 +13,6 @@
 //  11 = do the selection for the Wenu/Wmunu + Fake Electron
 //  12 = do the selection for the Zll + fake electron
 //  13 = MC only: take electrons from HZZ->4l
+//  14 = measure turn on curve for photons
 
-#define Application 13
+#define Application 14
